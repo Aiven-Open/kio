@@ -1,0 +1,10 @@
+exclude .editorconfig
+recursive-exclude .github *
+recursive-exclude tests *
+recursive-exclude codegen *
+recursive-include src py.typed
+recursive-include src *.py
+exclude *.yaml
+exclude *.yml
+include README.md
+include LICENSE

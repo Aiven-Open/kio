@@ -1,0 +1,26 @@
+"""
+Generated from DescribeConfigsRequest.json.
+"""
+from dataclasses import dataclass
+from dataclasses import field
+from typing import ClassVar
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class DescribeConfigsResource:
+    __flexible__: ClassVar[bool] = False
+    resource_type: int = field(metadata={"kafka_type": "int8"})
+    """The resource type."""
+    resource_name: str = field(metadata={"kafka_type": "string"})
+    """The resource name."""
+    configuration_keys: tuple[str, ...] = field(
+        metadata={"kafka_type": "string"}, default=()
+    )
+    """The configuration keys to list, or null to list all configuration keys."""
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class DescribeConfigsRequest:
+    __flexible__: ClassVar[bool] = False
+    resources: tuple[DescribeConfigsResource, ...]
+    """The resources whose configurations we want to describe."""

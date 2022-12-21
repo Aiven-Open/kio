@@ -1,0 +1,11 @@
+[build-system]
+requires = ["setuptools>=65.6.3", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.black]
+target-version = ["py311"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "src", "codegen"]
+addopts = "--doctest-modules"
+asyncio_mode = "auto"

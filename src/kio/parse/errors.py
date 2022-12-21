@@ -1,0 +1,6 @@
+class DecodeError(Exception):
+    ...
+
+
+class UnexpectedNull(DecodeError):
+    ...
