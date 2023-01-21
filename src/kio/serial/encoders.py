@@ -5,6 +5,7 @@ from typing import IO
 from typing import Final
 from typing import TypeAlias
 from typing import TypeVar
+from uuid import UUID
 
 Writable: TypeAlias = asyncio.StreamWriter | IO[bytes]
 T = TypeVar("T")
@@ -115,7 +116,7 @@ def write_legacy_string(buffer: Writable, value: str | bytes | None) -> None:
     """Write a non-nullable string with legacy int16 length encoding."""
     if value is None:
         raise TypeError("Unexpectedly received None value")
-    return write_nullable_legacy_string(buffer, value)
+    write_nullable_legacy_string(buffer, value)
 
 
 def write_empty_tagged_fields(buffer: Writable) -> None:
@@ -123,10 +124,14 @@ def write_empty_tagged_fields(buffer: Writable) -> None:
 
 
 def write_array_length(buffer: Writable, value: int) -> None:
-    return write_int32(buffer, value)
+    write_int32(buffer, value)
 
 
 def write_compact_array_length(buffer: Writable, value: int) -> None:
     # Kafka uses the array size plus 1 to ensure that `None` can be
     # distinguished from empty.
-    return write_unsigned_varint(buffer, value + 1)
+    write_unsigned_varint(buffer, value + 1)
+
+
+def write_uuid(buffer: Writable, value: UUID) -> None:
+    buffer.write(value.bytes)

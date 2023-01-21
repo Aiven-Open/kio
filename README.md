@@ -44,6 +44,8 @@ $ python -X dev -m pytest --cov
       fine as-is, but all numeric types need validation.
 - [ ] Test suite that tests sending and receiving a few messages to an actual Kafka
       instance, should be pretty trivial to setup with docker.
+- [ ] Use hypothesis to build entities and roundtrip-test all entities through a
+      encode-decode cycle.
 - [ ] Github CI.
   - Automate download of schema from Kafka repo.
   - Generate schema and check for changes.
