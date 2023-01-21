@@ -5,19 +5,19 @@ from contextlib import closing
 
 import pytest
 
-from kio.parse.encoders import Writable
-from kio.parse.encoders import write_compact_string
-from kio.parse.encoders import write_empty_tagged_fields
-from kio.parse.encoders import write_int8
-from kio.parse.encoders import write_int16
-from kio.parse.encoders import write_int32
-from kio.parse.encoders import write_int64
-from kio.parse.encoders import write_nullable_compact_string
-from kio.parse.encoders import write_uint8
-from kio.parse.encoders import write_uint16
-from kio.parse.encoders import write_uint32
-from kio.parse.encoders import write_uint64
-from kio.parse.encoders import write_unsigned_varint
+from kio.serial.encoders import Writable
+from kio.serial.encoders import write_compact_string
+from kio.serial.encoders import write_empty_tagged_fields
+from kio.serial.encoders import write_int8
+from kio.serial.encoders import write_int16
+from kio.serial.encoders import write_int32
+from kio.serial.encoders import write_int64
+from kio.serial.encoders import write_nullable_compact_string
+from kio.serial.encoders import write_uint8
+from kio.serial.encoders import write_uint16
+from kio.serial.encoders import write_uint32
+from kio.serial.encoders import write_uint64
+from kio.serial.encoders import write_unsigned_varint
 
 
 class IntWriterContract:

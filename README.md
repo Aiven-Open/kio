@@ -37,7 +37,6 @@ $ python -X dev -m pytest --cov
 
 - [ ] Encoding and decoding abilities, preferably without inheritance, maintaining fully
       declarative, but introspectable, definitions.
-- [ ] Respect "flexibility" when parsing entities.
 - [ ] Research `ignorable`, handled correct?
 - [ ] Use `extra=forbid` to make sure all details of schema handled.
 - [ ] Use `mapKey`?
@@ -53,6 +52,6 @@ $ python -X dev -m pytest --cov
 - [ ] Break out `Primitive` from `codegen` and define it in `kio`?? Should be useful for
       deserializing. Use it instead of strings inside Annotated, ie:
       `field(metadata={"kafka_type": Primitive.string})`.
-- [ ] Setup sphinx docs.
+- [ ] Setup sphinx docs with read-the-docs.
 
 [revert]: https://github.com/python/cpython/issues/82423

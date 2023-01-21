@@ -81,20 +81,41 @@ def write_unsigned_varint(buffer: Writable, value: int) -> None:
 
 
 def write_nullable_compact_string(buffer: Writable, value: str | bytes | None) -> None:
+    """Write a nullable string with compact length encoding."""
     if value is None:
         write_unsigned_varint(buffer, 0)
         return
     if isinstance(value, str):
         value = value.encode()
-    # Kafka uses the string length plus 1, so that null can be encoded as unsigned 0.
+    # The compact string format uses the string length plus 1, so that null can be
+    # encoded as an unsigned integer 0.
     write_unsigned_varint(buffer, len(value) + 1)
     buffer.write(value)
 
 
 def write_compact_string(buffer: Writable, value: str | bytes) -> None:
+    """Write a non-nullable string with compact length encoding."""
     if value is None:
         raise TypeError("Unexpectedly received None value")
     write_nullable_compact_string(buffer, value)
+
+
+def write_nullable_legacy_string(buffer: Writable, value: str | bytes | None) -> None:
+    """Write a nullable string with legacy int16 length encoding."""
+    if value is None:
+        write_int16(buffer, -1)
+        return
+    if isinstance(value, str):
+        value = value.encode()
+    write_int16(buffer, len(value))
+    buffer.write(value)
+
+
+def write_legacy_string(buffer: Writable, value: str | bytes | None) -> None:
+    """Write a non-nullable string with legacy int16 length encoding."""
+    if value is None:
+        raise TypeError("Unexpectedly received None value")
+    return write_nullable_legacy_string(buffer, value)
 
 
 def write_empty_tagged_fields(buffer: Writable) -> None:

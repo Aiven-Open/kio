@@ -11,7 +11,7 @@ from typing import TypeVar
 
 from typing_extensions import assert_never
 
-from kio.parse.errors import UnexpectedNull
+from kio.serial.errors import UnexpectedNull
 
 T = TypeVar("T")
 Cursor: TypeAlias = Generator["int | Decoder[object]", Any, T]

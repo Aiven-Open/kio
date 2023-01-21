@@ -5,26 +5,26 @@ from typing import IO
 
 import pytest
 
-from kio.parse.decoders import Decoder
-from kio.parse.decoders import decode_compact_string
-from kio.parse.decoders import decode_compact_string_as_bytes
-from kio.parse.decoders import decode_compact_string_as_bytes_nullable
-from kio.parse.decoders import decode_compact_string_nullable
-from kio.parse.decoders import decode_int8
-from kio.parse.decoders import decode_int16
-from kio.parse.decoders import decode_int32
-from kio.parse.decoders import decode_int64
-from kio.parse.decoders import decode_raw_bytes
-from kio.parse.decoders import decode_string
-from kio.parse.decoders import decode_string_nullable
-from kio.parse.decoders import decode_uint8
-from kio.parse.decoders import decode_uint16
-from kio.parse.decoders import decode_uint32
-from kio.parse.decoders import decode_uint64
-from kio.parse.decoders import decode_unsigned_varint
-from kio.parse.decoders import read_async
-from kio.parse.decoders import read_sync
-from kio.parse.errors import UnexpectedNull
+from kio.serial.decoders import Decoder
+from kio.serial.decoders import decode_compact_string
+from kio.serial.decoders import decode_compact_string_as_bytes
+from kio.serial.decoders import decode_compact_string_as_bytes_nullable
+from kio.serial.decoders import decode_compact_string_nullable
+from kio.serial.decoders import decode_int8
+from kio.serial.decoders import decode_int16
+from kio.serial.decoders import decode_int32
+from kio.serial.decoders import decode_int64
+from kio.serial.decoders import decode_raw_bytes
+from kio.serial.decoders import decode_string
+from kio.serial.decoders import decode_string_nullable
+from kio.serial.decoders import decode_uint8
+from kio.serial.decoders import decode_uint16
+from kio.serial.decoders import decode_uint32
+from kio.serial.decoders import decode_uint64
+from kio.serial.decoders import decode_unsigned_varint
+from kio.serial.decoders import read_async
+from kio.serial.decoders import read_sync
+from kio.serial.errors import UnexpectedNull
 
 
 class IntDecoderContract:
