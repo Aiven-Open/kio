@@ -1,10 +1,12 @@
 import io
+import uuid
 
 from hypothesis import given
 from hypothesis.strategies import binary
 from hypothesis.strategies import booleans
 from hypothesis.strategies import integers
 from hypothesis.strategies import text
+from hypothesis.strategies import uuids
 
 from kio.serial.decoders import Decoder
 from kio.serial.decoders import decode_array_length
@@ -23,6 +25,7 @@ from kio.serial.decoders import decode_uint16
 from kio.serial.decoders import decode_uint32
 from kio.serial.decoders import decode_uint64
 from kio.serial.decoders import decode_unsigned_varint
+from kio.serial.decoders import decode_uuid
 from kio.serial.decoders import read_async
 from kio.serial.decoders import read_sync
 from kio.serial.encoders import Writer
@@ -40,6 +43,7 @@ from kio.serial.encoders import write_uint16
 from kio.serial.encoders import write_uint32
 from kio.serial.encoders import write_uint64
 from kio.serial.encoders import write_unsigned_varint
+from kio.serial.encoders import write_uuid
 from tests.conftest import setup_async_buffers
 
 
@@ -201,3 +205,24 @@ def test_compact_string_roundtrip_none_sync() -> None:
     assert read_sync(buffer, decode_compact_string_nullable) is None
     # Make sure buffer is exhausted.
     assert buffer.read(1) == b""
+
+
+@given(uuids(), uuids())
+def test_uuid_roundtrip_sync(a: uuid.UUID, b: uuid.UUID) -> None:
+    buffer = io.BytesIO()
+    write_uuid(buffer, a)
+    write_uuid(buffer, b)
+    buffer.seek(0)
+    assert a == read_sync(buffer, decode_uuid)
+    assert b == read_sync(buffer, decode_uuid)
+    # Make sure buffer is exhausted.
+    assert buffer.read(1) == b""
+
+
+@given(uuids(), uuids())
+async def test_uuid_roundtrip_async(a: uuid.UUID, b: uuid.UUID) -> None:
+    async with setup_async_buffers() as (stream_reader, stream_writer):
+        write_uuid(stream_writer, a)
+        write_uuid(stream_writer, b)
+        assert a == await read_async(stream_reader, decode_uuid)
+        assert b == await read_async(stream_reader, decode_uuid)

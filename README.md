@@ -55,5 +55,6 @@ $ python -X dev -m pytest --cov
       deserializing. Use it instead of strings inside Annotated, ie:
       `field(metadata={"kafka_type": Primitive.string})`.
 - [ ] Setup sphinx docs with read-the-docs.
+- [ ] Implement tagged fields as a dict on all flexible entities.
 
 [revert]: https://github.com/python/cpython/issues/82423
