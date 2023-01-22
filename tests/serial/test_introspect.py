@@ -1,11 +1,15 @@
-from typing import Union
-from dataclasses import dataclass, field, fields, Field
+from dataclasses import Field
+from dataclasses import dataclass
+from dataclasses import field
+from dataclasses import fields
 
 import pytest
 
 from kio.serial.errors import SchemaError
-from kio.serial.introspect import get_schema_field_type, is_optional, classify_field, \
-    FieldKind
+from kio.serial.introspect import FieldKind
+from kio.serial.introspect import classify_field
+from kio.serial.introspect import get_schema_field_type
+from kio.serial.introspect import is_optional
 
 
 @dataclass
@@ -20,8 +24,8 @@ class A:
     valid_kafka_type: int = field(metadata={"kafka_type": "some_type"})
 
     none_union: int
-    verbose_union_with_none: Union[int, None]
-    verbose_union_without_none: Union[int, str]
+    verbose_union_with_none: int | None
+    verbose_union_without_none: int | str
     pep_604_union_with_none: int | None
     pep_604_union_without_none: int | str
 
@@ -82,10 +86,12 @@ class TestClassifyField:
 
     def test_can_classify_primitive_tuple_field(self) -> None:
         assert classify_field(model_fields["primitive_tuple"]) == (
-            FieldKind.primitive_tuple
-            , int
+            FieldKind.primitive_tuple,
+            int,
         )
 
     def test_can_classifY_entity_tuple_field(self) -> None:
         assert classify_field(model_fields["entity_tuple"]) == (
-            FieldKind.entity_tuple, Nested)
+            FieldKind.entity_tuple,
+            Nested,
+        )

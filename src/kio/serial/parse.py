@@ -1,10 +1,6 @@
 from dataclasses import Field
 from dataclasses import fields
-from dataclasses import is_dataclass
-from types import EllipsisType
 from typing import TypeVar
-from typing import get_args
-from typing import get_origin
 
 from typing_extensions import assert_never
 
@@ -14,8 +10,9 @@ from kio.serial.decoders import compact_array_decoder
 from kio.serial.decoders import skip_tagged_fields
 
 from . import decoders
-from .errors import SchemaError
-from .introspect import Entity, classify_field, FieldKind
+from .introspect import Entity
+from .introspect import FieldKind
+from .introspect import classify_field
 from .introspect import get_schema_field_type
 from .introspect import is_optional
 
@@ -83,7 +80,7 @@ def get_field_decoder(entity_type: type[Entity], field: Field[T]) -> Decoder[T]:
             )
         case FieldKind.entity_tuple:
             return compact_array_decoder(  # type: ignore[return-value]
-                entity_decoder(field_type)
+                entity_decoder(field_type)  # type: ignore[type-var]
             )
         case no_match:
             assert_never(no_match)

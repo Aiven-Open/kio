@@ -1,12 +1,15 @@
-from dataclasses import Field, is_dataclass
-from types import NoneType, EllipsisType
+import enum
+from dataclasses import Field
+from dataclasses import is_dataclass
+from types import EllipsisType
+from types import NoneType
 from types import UnionType
-from typing import ClassVar, TypeVar
+from typing import ClassVar
 from typing import Protocol
+from typing import TypeVar
 from typing import Union
 from typing import get_args
 from typing import get_origin
-import enum
 
 from .errors import SchemaError
 
@@ -42,7 +45,7 @@ class FieldKind(enum.Enum):
 T = TypeVar("T")
 
 
-def classify_field(field: Field[T]) -> tuple[FieldKind, T]:
+def classify_field(field: Field[T]) -> tuple[FieldKind, type[T]]:
     type_origin = get_origin(field.type)
 
     if type_origin is not tuple:

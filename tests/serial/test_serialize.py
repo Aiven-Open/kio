@@ -1,15 +1,22 @@
 import asyncio
+import uuid
 
 import pytest
 
 from kio.schema.entity import BrokerId
+from kio.schema.entity import TopicName
 from kio.schema.metadata.response.v12 import MetadataResponse
 from kio.schema.metadata.response.v12 import MetadataResponseBroker
+from kio.schema.metadata.response.v12 import MetadataResponsePartition
+from kio.schema.metadata.response.v12 import MetadataResponseTopic
 from kio.serial import encoders
+from kio.serial.decoders import decode_boolean
 from kio.serial.decoders import decode_compact_array_length
 from kio.serial.decoders import decode_compact_string
 from kio.serial.decoders import decode_compact_string_nullable
+from kio.serial.decoders import decode_int16
 from kio.serial.decoders import decode_int32
+from kio.serial.decoders import decode_uuid
 from kio.serial.decoders import read_async
 from kio.serial.decoders import skip_tagged_fields
 from kio.serial.serialize import entity_writer
@@ -96,6 +103,7 @@ async def test_serialize_complex_entity_async(
 ) -> None:
     write_metadata_response = entity_writer(MetadataResponse)
 
+    topic_id = uuid.uuid4()
     instance = MetadataResponse(
         throttle_time_ms=123,
         brokers=(
@@ -114,7 +122,26 @@ async def test_serialize_complex_entity_async(
         ),
         cluster_id="556",
         controller_id=BrokerId(3),
-        topics=(),
+        topics=(
+            MetadataResponseTopic(
+                error_code=123,
+                name=TopicName("topic 1"),
+                topic_id=topic_id,
+                is_internal=False,
+                partitions=(
+                    MetadataResponsePartition(
+                        error_code=8765,
+                        partition_index=5679,
+                        leader_id=BrokerId(2345),
+                        leader_epoch=6445678,
+                        replica_nodes=(BrokerId(12345), BrokerId(7651)),
+                        isr_nodes=(),
+                        offline_replicas=(),
+                    ),
+                ),
+                topic_authorized_operations=765443,
+            ),
+        ),
     )
     write_metadata_response(stream_writer, instance)
     await stream_writer.drain()
@@ -123,8 +150,7 @@ async def test_serialize_complex_entity_async(
     assert 123 == await read_async(stream_reader, decode_int32)
 
     # brokers
-    length = await read_async(stream_reader, decode_compact_array_length)
-    assert length == 2
+    assert 2 == await read_async(stream_reader, decode_compact_array_length)
     for i in range(1, 3):
         # node_id
         assert i == await read_async(stream_reader, decode_int32)
@@ -144,7 +170,43 @@ async def test_serialize_complex_entity_async(
     assert 3 == await read_async(stream_reader, decode_int32)
 
     # topics
-    assert 0 == await read_async(stream_reader, decode_compact_array_length)
+    assert 1 == await read_async(stream_reader, decode_compact_array_length)
+    for _ in range(1):
+        # error code
+        assert 123 == await read_async(stream_reader, decode_int16)
+        # name
+        assert "topic 1" == await read_async(
+            stream_reader, decode_compact_string_nullable
+        )
+        # topic id
+        assert topic_id == await read_async(stream_reader, decode_uuid)
+        # is internal
+        assert await read_async(stream_reader, decode_boolean) is False
+        # partitions
+        assert 1 == await read_async(stream_reader, decode_compact_array_length)
+        for __ in range(1):
+            # error code
+            assert 8765 == await read_async(stream_reader, decode_int16)
+            # partition index
+            assert 5679 == await read_async(stream_reader, decode_int32)
+            # leader id
+            assert 2345 == await read_async(stream_reader, decode_int32)
+            # leader epoch
+            assert 6445678 == await read_async(stream_reader, decode_int32)
+            # replica nodes
+            assert 2 == await read_async(stream_reader, decode_compact_array_length)
+            assert 12345 == await read_async(stream_reader, decode_int32)
+            assert 7651 == await read_async(stream_reader, decode_int32)
+            # isr nodes
+            assert 0 == await read_async(stream_reader, decode_compact_array_length)
+            # offline replicas
+            assert 0 == await read_async(stream_reader, decode_compact_array_length)
+            # partition tagged fields
+            await read_async(stream_reader, skip_tagged_fields)
+        # topic authorized operations
+        assert 765443 == await read_async(stream_reader, decode_int32)
+        # topic tagged fields
+        await read_async(stream_reader, skip_tagged_fields)
 
     # main entity tagged fields
     await read_async(stream_reader, skip_tagged_fields)

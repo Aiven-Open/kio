@@ -1,10 +1,6 @@
 from dataclasses import Field
 from dataclasses import fields
-from dataclasses import is_dataclass
-from types import EllipsisType
 from typing import TypeVar
-from typing import get_args
-from typing import get_origin
 
 from typing_extensions import assert_never
 
@@ -13,8 +9,9 @@ from kio.serial.encoders import Writable
 from kio.serial.encoders import Writer
 from kio.serial.encoders import compact_array_writer
 from kio.serial.encoders import write_empty_tagged_fields
-from kio.serial.errors import SchemaError
-from kio.serial.introspect import Entity, classify_field, FieldKind
+from kio.serial.introspect import Entity
+from kio.serial.introspect import FieldKind
+from kio.serial.introspect import classify_field
 from kio.serial.introspect import get_schema_field_type
 from kio.serial.introspect import is_optional
 
@@ -82,7 +79,8 @@ def get_field_writer(field: Field[T], flexible: bool) -> Writer[T]:
             )
         case FieldKind.entity_tuple:
             return compact_array_writer(  # type: ignore[return-value]
-                entity_writer(field_type))
+                entity_writer(field_type)  # type: ignore[type-var]
+            )
         case no_match:
             assert_never(no_match)
 
