@@ -6,13 +6,15 @@ from typing import TypeVar
 from typing import get_args
 from typing import get_origin
 
+from typing_extensions import assert_never
+
 from kio.serial import encoders
 from kio.serial.encoders import Writable
 from kio.serial.encoders import Writer
 from kio.serial.encoders import compact_array_writer
 from kio.serial.encoders import write_empty_tagged_fields
 from kio.serial.errors import SchemaError
-from kio.serial.introspect import Entity
+from kio.serial.introspect import Entity, classify_field, FieldKind
 from kio.serial.introspect import get_schema_field_type
 from kio.serial.introspect import is_optional
 
@@ -61,34 +63,28 @@ T = TypeVar("T")
 
 
 def get_field_writer(field: Field[T], flexible: bool) -> Writer[T]:
-    type_origin = get_origin(field.type)
-    optional = is_optional(field)
+    field_kind, field_type = classify_field(field)
 
-    if type_origin is not tuple:
-        # Field is a simple primitive field.
-        return get_writer(
-            kafka_type=get_schema_field_type(field),
-            flexible=flexible,
-            optional=optional,
-        )
-
-    type_args = get_args(field.type)
-
-    match type_args:
-        # Field is a homogenous tuple of a nested entity.
-        case (inner_type, EllipsisType()) if is_dataclass(inner_type):
-            return compact_array_writer(entity_writer(inner_type))  # type: ignore[return-value]
-        # Field is a homogenous tuple of primitives.
-        case (_, EllipsisType()):
+    match field_kind:
+        case FieldKind.primitive:
+            return get_writer(
+                kafka_type=get_schema_field_type(field),
+                flexible=flexible,
+                optional=is_optional(field),
+            )
+        case FieldKind.primitive_tuple:
             return compact_array_writer(  # type: ignore[return-value]
                 get_writer(
                     kafka_type=get_schema_field_type(field),
                     flexible=flexible,
-                    optional=optional,
+                    optional=is_optional(field),
                 )
             )
-
-    raise SchemaError(f"Field {field.name} has invalid tuple type args: {type_args}")
+        case FieldKind.entity_tuple:
+            return compact_array_writer(  # type: ignore[return-value]
+                entity_writer(field_type))
+        case no_match:
+            assert_never(no_match)
 
 
 E = TypeVar("E", bound=Entity)

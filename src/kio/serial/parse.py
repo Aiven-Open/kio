@@ -6,6 +6,8 @@ from typing import TypeVar
 from typing import get_args
 from typing import get_origin
 
+from typing_extensions import assert_never
+
 from kio.serial.decoders import Cursor
 from kio.serial.decoders import Decoder
 from kio.serial.decoders import compact_array_decoder
@@ -13,7 +15,7 @@ from kio.serial.decoders import skip_tagged_fields
 
 from . import decoders
 from .errors import SchemaError
-from .introspect import Entity
+from .introspect import Entity, classify_field, FieldKind
 from .introspect import get_schema_field_type
 from .introspect import is_optional
 
@@ -62,24 +64,16 @@ T = TypeVar("T")
 
 
 def get_field_decoder(entity_type: type[Entity], field: Field[T]) -> Decoder[T]:
-    type_origin = get_origin(field.type)
+    field_kind, field_type = classify_field(field)
 
-    if type_origin is not tuple:
-        # Field is a simple primitive field.
-        return get_decoder(
-            kafka_type=get_schema_field_type(field),
-            flexible=entity_type.__flexible__,
-            optional=is_optional(field),
-        )
-
-    type_args = get_args(field.type)
-
-    match type_args:
-        # Field is a homogenous tuple of a nested entity.
-        case (inner_type, EllipsisType()) if is_dataclass(inner_type):
-            return compact_array_decoder(entity_decoder(inner_type))  # type: ignore[return-value]
-        # Field is a homogenous tuple of primitives.
-        case (_, EllipsisType()):
+    match field_kind:
+        case FieldKind.primitive:
+            return get_decoder(
+                kafka_type=get_schema_field_type(field),
+                flexible=entity_type.__flexible__,
+                optional=is_optional(field),
+            )
+        case FieldKind.primitive_tuple:
             return compact_array_decoder(  # type: ignore[return-value]
                 get_decoder(
                     kafka_type=get_schema_field_type(field),
@@ -87,8 +81,12 @@ def get_field_decoder(entity_type: type[Entity], field: Field[T]) -> Decoder[T]:
                     optional=is_optional(field),
                 )
             )
-
-    raise SchemaError(f"Field {field.name} has invalid tuple type args: {type_args}")
+        case FieldKind.entity_tuple:
+            return compact_array_decoder(  # type: ignore[return-value]
+                entity_decoder(field_type)
+            )
+        case no_match:
+            assert_never(no_match)
 
 
 E = TypeVar("E", bound=Entity)
