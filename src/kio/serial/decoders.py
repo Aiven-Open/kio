@@ -6,12 +6,14 @@ from collections.abc import Callable
 from collections.abc import Generator
 from typing import IO
 from typing import Any
+from typing import Final
 from typing import TypeAlias
 from typing import TypeVar
+from uuid import UUID
 
 from typing_extensions import assert_never
 
-from kio.parse.errors import UnexpectedNull
+from kio.serial.errors import UnexpectedNull
 
 T = TypeVar("T")
 Cursor: TypeAlias = Generator["int | Decoder[object]", Any, T]
@@ -153,13 +155,42 @@ def decode_string_nullable() -> Cursor[str | None]:
     return bytes_value.decode()
 
 
-decode_array_length = decode_int32
+decode_array_length: Final = decode_int32
 
 
-def decode_compact_array_length() -> Generator[Decoder[int], int, int]:
+def decode_compact_array_length() -> Cursor[int]:
     decoded_value: int = yield decode_unsigned_varint
     # Kafka uses the array size plus 1.
     return decoded_value - 1
+
+
+# FIXME: Don't do this. We should capture this and expose it on entities.
+def skip_tagged_fields() -> Cursor[None]:
+    # The tagged field structure is described in
+    # https://cwiki.apache.org/confluence/display/KAFKA/KIP-482%3A+The+Kafka+Protocol+should+Support+Optional+Tagged+Fields
+    length: int = yield decode_unsigned_varint
+    for _ in range(length):
+        yield decode_unsigned_varint  # tag
+        value_len = yield decode_unsigned_varint
+        yield value_len
+    return None
+
+
+def decode_uuid() -> Cursor[UUID]:
+    byte_value: bytes = yield 16
+    return UUID(bytes=byte_value)
+
+
+def compact_array_decoder(item_decoder: Decoder[T]) -> Decoder[tuple[T, ...]]:
+    def decode_compact_array() -> Cursor[tuple[T, ...]]:
+        length: int = yield decode_compact_array_length
+        values = []
+        for _ in range(length):
+            item: T = yield item_decoder
+            values.append(item)
+        return tuple(values)
+
+    return decode_compact_array
 
 
 async def read_async(
