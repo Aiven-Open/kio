@@ -20,17 +20,37 @@ Kafka Protocol data types for Python.
 
 ## Development
 
-Generate and format schema.
+Install test dependencies.
 
 ```shell
-$ python -m codegen.generator
-$ pre-commit run --all-files
+$ pip install -e .[test]
 ```
 
 Run tests.
 
 ```shell
 $ python -X dev -m pytest --cov
+```
+
+Setup pre-commit hooks to run on push.
+
+```shell
+$ pre-commit install -t pre-push
+```
+
+#### Code generation
+
+Install dependencies.
+
+```shell
+$ pip install -e .[codegen]
+```
+
+Generate and format schema.
+
+```shell
+$ python -m codegen.generator
+$ pre-commit run --all-files
 ```
 
 ### Todo
