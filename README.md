@@ -35,8 +35,6 @@ $ python -X dev -m pytest --cov
 
 ### Todo
 
-- [x] Encoding and decoding abilities, preferably without inheritance, maintaining fully
-      declarative, but introspectable, definitions.
 - [ ] Research `ignorable`, handled correct?
 - [ ] Use `extra=forbid` to make sure all details of schema handled.
 - [ ] Use `mapKey`?
