@@ -86,6 +86,8 @@ def test_can_parse_entity(buffer: io.BytesIO) -> None:
     write_int32(buffer, 23_126)
     # rack
     write_compact_string(buffer, "da best")
+    # tagged fields
+    write_empty_tagged_fields(buffer)
 
     buffer.seek(0)
     instance = parse_entity(buffer, MetadataResponseBrokerV12)
@@ -107,6 +109,8 @@ def test_can_parse_legacy_entity(buffer: io.BytesIO) -> None:
     write_int32(buffer, 23_126)
     # rack
     write_legacy_string(buffer, "da best")
+    # tagged fields
+    write_empty_tagged_fields(buffer)
 
     buffer.seek(0)
     instance = parse_entity(buffer, MetadataResponseBrokerV5)

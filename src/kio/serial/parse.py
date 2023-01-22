@@ -9,6 +9,7 @@ from typing import get_args
 from typing import get_origin
 
 from kio.serial.decoders import Decoder
+from kio.serial.decoders import compact_array_decoder
 from kio.serial.decoders import decode_compact_array_length
 from kio.serial.decoders import decode_unsigned_varint
 from kio.serial.decoders import read_sync
@@ -100,12 +101,13 @@ def parse_entity(buffer: io.BytesIO, entity_type: type[E]) -> E:
                     kwargs[field.name] = read_compact_entity_array(buffer, inner_type)
                 case (_, EllipsisType()):
                     kafka_type = get_schema_field_type(field)
-                    decoder = get_decoder(
+                    item_decoder = get_decoder(
                         kafka_type=kafka_type,
                         flexible=entity_type.__flexible__,
                         optional=is_optional(field),
                     )
-                    kwargs[field.name] = read_compact_array(buffer, decoder)
+                    decoder = compact_array_decoder(item_decoder)
+                    kwargs[field.name] = read_sync(buffer, decoder)
                 case _:
                     raise NotImplementedError
         else:

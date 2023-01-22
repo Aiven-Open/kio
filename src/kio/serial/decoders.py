@@ -169,6 +169,18 @@ def decode_uuid() -> Cursor[UUID]:
     return UUID(bytes=byte_value)
 
 
+def compact_array_decoder(item_decoder: Decoder[T]) -> Decoder[tuple[T, ...]]:
+    def decode_compact_array() -> Cursor[tuple[T, ...]]:
+        length: int = yield decode_compact_array_length
+        values = []
+        for _ in range(length):
+            item: T = yield item_decoder
+            values.append(item)
+        return tuple(values)
+
+    return decode_compact_array
+
+
 async def read_async(
     reader: asyncio.StreamReader,
     decoder: Decoder[T],
