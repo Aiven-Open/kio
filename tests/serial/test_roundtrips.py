@@ -1,13 +1,17 @@
 import io
 import uuid
 
+import pytest
 from hypothesis import given
 from hypothesis.strategies import binary
 from hypothesis.strategies import booleans
+from hypothesis.strategies import from_type
 from hypothesis.strategies import integers
+from hypothesis.strategies import none
 from hypothesis.strategies import text
 from hypothesis.strategies import uuids
 
+from kio.schema.metadata.response.v12 import MetadataResponse
 from kio.serial.decoders import Decoder
 from kio.serial.decoders import decode_array_length
 from kio.serial.decoders import decode_boolean
@@ -20,6 +24,9 @@ from kio.serial.decoders import decode_int8
 from kio.serial.decoders import decode_int16
 from kio.serial.decoders import decode_int32
 from kio.serial.decoders import decode_int64
+from kio.serial.decoders import decode_legacy_bytes
+from kio.serial.decoders import decode_legacy_string
+from kio.serial.decoders import decode_nullable_legacy_string
 from kio.serial.decoders import decode_uint8
 from kio.serial.decoders import decode_uint16
 from kio.serial.decoders import decode_uint32
@@ -37,13 +44,17 @@ from kio.serial.encoders import write_int8
 from kio.serial.encoders import write_int16
 from kio.serial.encoders import write_int32
 from kio.serial.encoders import write_int64
+from kio.serial.encoders import write_legacy_string
 from kio.serial.encoders import write_nullable_compact_string
+from kio.serial.encoders import write_nullable_legacy_string
 from kio.serial.encoders import write_uint8
 from kio.serial.encoders import write_uint16
 from kio.serial.encoders import write_uint32
 from kio.serial.encoders import write_uint64
 from kio.serial.encoders import write_unsigned_varint
 from kio.serial.encoders import write_uuid
+from kio.serial.parse import entity_decoder
+from kio.serial.serialize import entity_writer
 from tests.conftest import setup_async_buffers
 
 
@@ -207,6 +218,75 @@ def test_compact_string_roundtrip_none_sync() -> None:
     assert buffer.read(1) == b""
 
 
+@given(text(), text())
+def test_legacy_string_roundtrip_sync(a: str, b: str) -> None:
+    buffer = io.BytesIO()
+    write_legacy_string(buffer, a)
+    write_legacy_string(buffer, b)
+    buffer.seek(0)
+    assert a == read_sync(buffer, decode_legacy_string)
+    assert b == read_sync(buffer, decode_legacy_string)
+    # Make sure buffer is exhausted.
+    assert buffer.read(1) == b""
+
+
+@given(text(), text())
+async def test_legacy_string_roundtrip_async(a: str, b: str) -> None:
+    async with setup_async_buffers() as (stream_reader, stream_writer):
+        write_legacy_string(stream_writer, a)
+        write_legacy_string(stream_writer, b)
+        await stream_writer.drain()
+        assert a == await read_async(stream_reader, decode_legacy_string)
+        assert b == await read_async(stream_reader, decode_legacy_string)
+
+
+@given(text() | none(), text() | none())
+def test_nullable_legacy_string_roundtrip_sync(a: str | None, b: str | None) -> None:
+    buffer = io.BytesIO()
+    write_nullable_legacy_string(buffer, a)
+    write_nullable_legacy_string(buffer, b)
+    buffer.seek(0)
+    assert a == read_sync(buffer, decode_nullable_legacy_string)
+    assert b == read_sync(buffer, decode_nullable_legacy_string)
+    # Make sure buffer is exhausted.
+    assert buffer.read(1) == b""
+
+
+@given(text() | none(), text() | none())
+async def test_nullable_legacy_string_roundtrip_async(
+    a: str | None,
+    b: str | None,
+) -> None:
+    async with setup_async_buffers() as (stream_reader, stream_writer):
+        write_nullable_legacy_string(stream_writer, a)
+        write_nullable_legacy_string(stream_writer, b)
+        await stream_writer.drain()
+        assert a == await read_async(stream_reader, decode_nullable_legacy_string)
+        assert b == await read_async(stream_reader, decode_nullable_legacy_string)
+
+
+@given(binary(), binary())
+def test_legacy_bytes_roundtrip_sync(a: bytes, b: bytes) -> None:
+    buffer = io.BytesIO()
+    write_legacy_string(buffer, a)
+    write_legacy_string(buffer, b)
+    buffer.seek(0)
+    assert a == read_sync(buffer, decode_legacy_bytes)
+    assert b == read_sync(buffer, decode_legacy_bytes)
+    # Make sure buffer is exhausted.
+    assert buffer.read(1) == b""
+
+
+@given(binary(), binary())
+async def test_legacy_bytes_roundtrip_async(a: bytes, b: bytes) -> None:
+    async with setup_async_buffers() as (stream_reader, stream_writer):
+        write_legacy_string(stream_writer, a)
+        write_legacy_string(stream_writer, b)
+        await stream_writer.drain()
+        assert a == await read_async(stream_reader, decode_legacy_bytes)
+        assert b == await read_async(stream_reader, decode_legacy_bytes)
+
+
 @given(uuids(), uuids())
 def test_uuid_roundtrip_sync(a: uuid.UUID, b: uuid.UUID) -> None:
     buffer = io.BytesIO()
@@ -226,3 +306,19 @@ async def test_uuid_roundtrip_async(a: uuid.UUID, b: uuid.UUID) -> None:
         write_uuid(stream_writer, b)
         assert a == await read_async(stream_reader, decode_uuid)
         assert b == await read_async(stream_reader, decode_uuid)
+
+
+# All field types need to use properly narrow types for this to work. There is
+# currently no way for Hypothesis to know that throttle_time_ms must be in the
+# range -2147483648 <= x <= 2147483647, and so it gives a falsifying example of
+# 2147483648.
+@pytest.mark.xfail
+@given(from_type(MetadataResponse))
+async def test_flexible_entity_roundtrip_async(instance: MetadataResponse) -> None:
+    write_metadata_response = entity_writer(MetadataResponse)
+    async with setup_async_buffers() as (stream_reader, stream_writer):
+        write_metadata_response(stream_writer, instance)
+        await stream_writer.drain()
+        result = await read_async(stream_reader, entity_decoder(MetadataResponse))
+
+    assert instance == result

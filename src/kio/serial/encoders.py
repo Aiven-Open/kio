@@ -1,6 +1,7 @@
 import asyncio
 import struct
 from collections.abc import Callable
+from collections.abc import Sequence
 from typing import IO
 from typing import Final
 from typing import TypeAlias
@@ -112,7 +113,7 @@ def write_nullable_legacy_string(buffer: Writable, value: str | bytes | None) ->
     buffer.write(value)
 
 
-def write_legacy_string(buffer: Writable, value: str | bytes | None) -> None:
+def write_legacy_string(buffer: Writable, value: str | bytes) -> None:
     """Write a non-nullable string with legacy int16 length encoding."""
     if value is None:
         raise TypeError("Unexpectedly received None value")
@@ -135,3 +136,12 @@ def write_compact_array_length(buffer: Writable, value: int) -> None:
 
 def write_uuid(buffer: Writable, value: UUID) -> None:
     buffer.write(value.bytes)
+
+
+def compact_array_writer(item_writer: Writer[T]) -> Writer[Sequence[T]]:
+    def write_compact_array(buffer: Writable, items: Sequence[T]) -> None:
+        write_compact_array_length(buffer, len(items))
+        for item in items:
+            item_writer(buffer, item)
+
+    return write_compact_array

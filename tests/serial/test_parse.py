@@ -12,6 +12,8 @@ from kio.schema.metadata.response.v12 import (
     MetadataResponseBroker as MetadataResponseBrokerV12,
 )
 from kio.serial import decoders
+from kio.serial.decoders import read_async
+from kio.serial.decoders import read_sync
 from kio.serial.encoders import write_boolean
 from kio.serial.encoders import write_compact_array_length
 from kio.serial.encoders import write_compact_string
@@ -21,9 +23,8 @@ from kio.serial.encoders import write_int32
 from kio.serial.encoders import write_legacy_string
 from kio.serial.encoders import write_nullable_compact_string
 from kio.serial.encoders import write_uuid
+from kio.serial.parse import entity_decoder
 from kio.serial.parse import get_decoder
-from kio.serial.parse import parse_entity_async
-from kio.serial.parse import parse_entity_sync
 
 
 class TestGetDecoder:
@@ -48,8 +49,12 @@ class TestGetDecoder:
             ("uint64", False, False, decoders.decode_uint64),
             ("string", True, False, decoders.decode_compact_string),
             ("string", True, True, decoders.decode_compact_string_nullable),
-            ("string", False, False, decoders.decode_string),
-            ("string", False, True, decoders.decode_string_nullable),
+            ("string", False, False, decoders.decode_legacy_string),
+            ("string", False, True, decoders.decode_nullable_legacy_string),
+            ("uuid", False, False, decoders.decode_uuid),
+            ("uuid", True, False, decoders.decode_uuid),
+            ("bool", False, False, decoders.decode_boolean),
+            ("bool", True, False, decoders.decode_boolean),
         ),
     )
     def test_can_match_kafka_type_with_decoder(
@@ -64,8 +69,26 @@ class TestGetDecoder:
     @pytest.mark.parametrize(
         "kafka_type, flexible, optional",
         (
+            ("int8", True, True),
+            ("int8", False, True),
+            ("int16", True, True),
+            ("int16", False, True),
             ("int32", True, True),
             ("int32", False, True),
+            ("int64", True, True),
+            ("int64", False, True),
+            ("uint8", True, True),
+            ("uint8", False, True),
+            ("uint16", True, True),
+            ("uint16", False, True),
+            ("uint32", True, True),
+            ("uint32", False, True),
+            ("uint64", True, True),
+            ("uint64", False, True),
+            ("uuid", False, True),
+            ("uuid", True, True),
+            ("bool", False, True),
+            ("bool", True, True),
         ),
     )
     def test_raises_not_implemented_error_for_invalid_combination(
@@ -92,7 +115,7 @@ def test_can_parse_entity(buffer: io.BytesIO) -> None:
     write_empty_tagged_fields(buffer)
 
     buffer.seek(0)
-    instance = parse_entity_sync(buffer, MetadataResponseBrokerV12)
+    instance = read_sync(buffer, entity_decoder(MetadataResponseBrokerV12))
     assert isinstance(instance, MetadataResponseBrokerV12)
 
     assert instance.node_id == 123
@@ -115,7 +138,7 @@ def test_can_parse_legacy_entity(buffer: io.BytesIO) -> None:
     write_empty_tagged_fields(buffer)
 
     buffer.seek(0)
-    instance = parse_entity_sync(buffer, MetadataResponseBrokerV5)
+    instance = read_sync(buffer, entity_decoder(MetadataResponseBrokerV5))
     assert isinstance(instance, MetadataResponseBrokerV5)
 
     assert instance.node_id == 123
@@ -196,7 +219,7 @@ def test_can_parse_complex_entity(buffer: io.BytesIO) -> None:
 
     buffer.seek(0)
 
-    instance = parse_entity_sync(buffer, MetadataResponse)
+    instance = read_sync(buffer, entity_decoder(MetadataResponse))
     assert isinstance(instance, MetadataResponse)
 
     assert instance.throttle_time_ms == 123
@@ -287,7 +310,7 @@ async def test_can_parse_complex_entity_async(
 
     await stream_writer.drain()
 
-    instance = await parse_entity_async(stream_reader, MetadataResponse)
+    instance = await read_async(stream_reader, entity_decoder(MetadataResponse))
     assert isinstance(instance, MetadataResponse)
 
     assert instance.throttle_time_ms == 123
