@@ -22,6 +22,7 @@ def write_int8(buffer: Writable, value: int) -> None:
 
 
 def write_int16(buffer: Writable, value: int) -> None:
+    bytes_value = struct.pack(">h", value)
     buffer.write(struct.pack(">h", value))
 
 

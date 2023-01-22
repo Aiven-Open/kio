@@ -139,7 +139,15 @@ def decode_raw_bytes() -> Cursor[bytes | None]:
     return byte_value
 
 
-def decode_string() -> Cursor[str]:
+def decode_legacy_bytes() -> Cursor[str]:
+    length: int = yield decode_int16
+    if length == -1:
+        raise UnexpectedNull("Unexpectedly read null where bytes was expected")
+    bytes_value: bytes = yield length
+    return bytes_value
+
+
+def decode_legacy_string() -> Cursor[str]:
     length: int = yield decode_int16
     if length == -1:
         raise UnexpectedNull("Unexpectedly read null where string/bytes was expected")
@@ -147,7 +155,7 @@ def decode_string() -> Cursor[str]:
     return bytes_value.decode()
 
 
-def decode_string_nullable() -> Cursor[str | None]:
+def decode_nullable_legacy_string() -> Cursor[str | None]:
     length: int = yield decode_int16
     if length == -1:
         return None
@@ -169,7 +177,8 @@ def skip_tagged_fields() -> Cursor[None]:
     # The tagged field structure is described in
     # https://cwiki.apache.org/confluence/display/KAFKA/KIP-482%3A+The+Kafka+Protocol+should+Support+Optional+Tagged+Fields
     length: int = yield decode_unsigned_varint
-    for _ in range(length):
+    # TODO: Remove pragma when implementing real tagged fields.
+    for _ in range(length):  # pragma: no cover
         yield decode_unsigned_varint  # tag
         value_len = yield decode_unsigned_varint
         yield value_len

@@ -3,7 +3,7 @@ import uuid
 
 import pytest
 from hypothesis import given
-from hypothesis.strategies import binary
+from hypothesis.strategies import binary, none
 from hypothesis.strategies import booleans
 from hypothesis.strategies import from_type
 from hypothesis.strategies import integers
@@ -11,7 +11,8 @@ from hypothesis.strategies import text
 from hypothesis.strategies import uuids
 
 from kio.schema.metadata.response.v12 import MetadataResponse
-from kio.serial.decoders import Decoder
+from kio.serial.decoders import Decoder, decode_legacy_string, \
+    decode_nullable_legacy_string, decode_legacy_bytes
 from kio.serial.decoders import decode_array_length
 from kio.serial.decoders import decode_boolean
 from kio.serial.decoders import decode_compact_array_length
@@ -31,7 +32,8 @@ from kio.serial.decoders import decode_unsigned_varint
 from kio.serial.decoders import decode_uuid
 from kio.serial.decoders import read_async
 from kio.serial.decoders import read_sync
-from kio.serial.encoders import Writer
+from kio.serial.encoders import Writer, write_legacy_string, \
+    write_nullable_legacy_string
 from kio.serial.encoders import write_array_length
 from kio.serial.encoders import write_boolean
 from kio.serial.encoders import write_compact_array_length
@@ -210,6 +212,80 @@ def test_compact_string_roundtrip_none_sync() -> None:
     assert read_sync(buffer, decode_compact_string_nullable) is None
     # Make sure buffer is exhausted.
     assert buffer.read(1) == b""
+
+
+@given(text(), text())
+def test_legacy_string_roundtrip_sync(
+    a: str,
+    b: str
+) -> None:
+    buffer = io.BytesIO()
+    write_legacy_string(buffer, a)
+    write_legacy_string(buffer, b)
+    buffer.seek(0)
+    assert a == read_sync(buffer, decode_legacy_string)
+    assert b == read_sync(buffer, decode_legacy_string)
+    # Make sure buffer is exhausted.
+    assert buffer.read(1) == b""
+
+
+@given(text(), text())
+async def test_legacy_string_roundtrip_async(a: str, b: str) -> None:
+    async with setup_async_buffers() as (stream_reader, stream_writer):
+        write_legacy_string(stream_writer, a)
+        write_legacy_string(stream_writer, b)
+        await stream_writer.drain()
+        assert a == await read_async(stream_reader, decode_legacy_string)
+        assert b == await read_async(stream_reader, decode_legacy_string)
+
+
+@given(text() | none(), text() | none())
+def test_nullable_legacy_string_roundtrip_sync(a: str | None, b: str | None) -> None:
+    buffer = io.BytesIO()
+    write_nullable_legacy_string(buffer, a)
+    write_nullable_legacy_string(buffer, b)
+    buffer.seek(0)
+    assert a == read_sync(buffer, decode_nullable_legacy_string)
+    assert b == read_sync(buffer, decode_nullable_legacy_string)
+    # Make sure buffer is exhausted.
+    assert buffer.read(1) == b""
+
+
+@given(text() | none(), text() | none())
+async def test_nullable_legacy_string_roundtrip_async(
+    a: str | None,
+    b: str | None,) -> None:
+    async with setup_async_buffers() as (stream_reader, stream_writer):
+        write_nullable_legacy_string(stream_writer, a)
+        write_nullable_legacy_string(stream_writer, b)
+        await stream_writer.drain()
+        assert a == await read_async(stream_reader, decode_nullable_legacy_string)
+        assert b == await read_async(stream_reader, decode_nullable_legacy_string)
+
+
+@given(binary(), binary())
+def test_legacy_bytes_roundtrip_sync(
+    a: bytes,
+    b: bytes
+) -> None:
+    buffer = io.BytesIO()
+    write_legacy_string(buffer, a)
+    write_legacy_string(buffer, b)
+    buffer.seek(0)
+    assert a == read_sync(buffer, decode_legacy_bytes)
+    assert b == read_sync(buffer, decode_legacy_bytes)
+    # Make sure buffer is exhausted.
+    assert buffer.read(1) == b""
+
+
+@given(binary(), binary())
+async def test_legacy_bytes_roundtrip_async(a: bytes, b: bytes) -> None:
+    async with setup_async_buffers() as (stream_reader, stream_writer):
+        write_legacy_string(stream_writer, a)
+        write_legacy_string(stream_writer, b)
+        await stream_writer.drain()
+        assert a == await read_async(stream_reader, decode_legacy_bytes)
+        assert b == await read_async(stream_reader, decode_legacy_bytes)
 
 
 @given(uuids(), uuids())

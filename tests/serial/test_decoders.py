@@ -15,8 +15,8 @@ from kio.serial.decoders import decode_int16
 from kio.serial.decoders import decode_int32
 from kio.serial.decoders import decode_int64
 from kio.serial.decoders import decode_raw_bytes
-from kio.serial.decoders import decode_string
-from kio.serial.decoders import decode_string_nullable
+from kio.serial.decoders import decode_legacy_string
+from kio.serial.decoders import decode_nullable_legacy_string
 from kio.serial.decoders import decode_uint8
 from kio.serial.decoders import decode_uint16
 from kio.serial.decoders import decode_uint32
@@ -418,7 +418,7 @@ class TestDecodeString:
         buffer.write(struct.pack(">h", -1))
         buffer.seek(0)
         with pytest.raises(UnexpectedNull):
-            read_sync(buffer, decode_string)
+            read_sync(buffer, decode_legacy_string)
 
     async def test_raises_unexpected_null_for_negative_length_async(
         self,
@@ -428,7 +428,7 @@ class TestDecodeString:
         stream_writer.write(struct.pack(">h", -1))
         await stream_writer.drain()
         with pytest.raises(UnexpectedNull):
-            await read_async(stream_reader, decode_string)
+            await read_async(stream_reader, decode_legacy_string)
 
     def test_can_decode_string_sync(
         self,
@@ -440,7 +440,7 @@ class TestDecodeString:
         buffer.write(struct.pack(">h", byte_length))
         buffer.write(byte_value)
         buffer.seek(0)
-        assert value == read_sync(buffer, decode_string)
+        assert value == read_sync(buffer, decode_legacy_string)
 
     async def test_can_decode_string_async(
         self,
@@ -453,7 +453,7 @@ class TestDecodeString:
         stream_writer.write(struct.pack(">h", byte_length))
         stream_writer.write(byte_value)
         await stream_writer.drain()
-        assert value == await read_async(stream_reader, decode_string)
+        assert value == await read_async(stream_reader, decode_legacy_string)
 
 
 class TestDecodeStringNullable:
@@ -463,7 +463,7 @@ class TestDecodeStringNullable:
     ) -> None:
         buffer.write(struct.pack(">h", -1))
         buffer.seek(0)
-        assert read_sync(buffer, decode_string_nullable) is None
+        assert read_sync(buffer, decode_nullable_legacy_string) is None
 
     async def test_returns_null_for_negative_length_async(
         self,
@@ -472,7 +472,7 @@ class TestDecodeStringNullable:
     ) -> None:
         stream_writer.write(struct.pack(">h", -1))
         await stream_writer.drain()
-        assert await read_async(stream_reader, decode_string_nullable) is None
+        assert await read_async(stream_reader, decode_nullable_legacy_string) is None
 
     def test_can_decode_string_sync(
         self,
@@ -484,7 +484,7 @@ class TestDecodeStringNullable:
         buffer.write(struct.pack(">h", byte_length))
         buffer.write(byte_value)
         buffer.seek(0)
-        assert value == read_sync(buffer, decode_string_nullable)
+        assert value == read_sync(buffer, decode_nullable_legacy_string)
 
     async def test_can_decode_string_async(
         self,
@@ -497,4 +497,4 @@ class TestDecodeStringNullable:
         stream_writer.write(struct.pack(">h", byte_length))
         stream_writer.write(byte_value)
         await stream_writer.drain()
-        assert value == await read_async(stream_reader, decode_string_nullable)
+        assert value == await read_async(stream_reader, decode_nullable_legacy_string)
