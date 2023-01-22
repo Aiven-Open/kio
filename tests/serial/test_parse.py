@@ -50,6 +50,10 @@ class TestGetDecoder:
             ("string", True, True, decoders.decode_compact_string_nullable),
             ("string", False, False, decoders.decode_string),
             ("string", False, True, decoders.decode_string_nullable),
+            ("uuid", False, False, decoders.decode_uuid),
+            ("uuid", True, False, decoders.decode_uuid),
+            ("bool", False, False, decoders.decode_boolean),
+            ("bool", True, False, decoders.decode_boolean),
         ),
     )
     def test_can_match_kafka_type_with_decoder(
@@ -64,8 +68,26 @@ class TestGetDecoder:
     @pytest.mark.parametrize(
         "kafka_type, flexible, optional",
         (
+            ("int8", True, True),
+            ("int8", False, True),
+            ("int16", True, True),
+            ("int16", False, True),
             ("int32", True, True),
             ("int32", False, True),
+            ("int64", True, True),
+            ("int64", False, True),
+            ("uint8", True, True),
+            ("uint8", False, True),
+            ("uint16", True, True),
+            ("uint16", False, True),
+            ("uint32", True, True),
+            ("uint32", False, True),
+            ("uint64", True, True),
+            ("uint64", False, True),
+            ("uuid", False, True),
+            ("uuid", True, True),
+            ("bool", False, True),
+            ("bool", True, True),
         ),
     )
     def test_raises_not_implemented_error_for_invalid_combination(

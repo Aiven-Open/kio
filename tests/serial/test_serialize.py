@@ -1,15 +1,92 @@
 import asyncio
 
+import pytest
+
 from kio.schema.entity import BrokerId
 from kio.schema.metadata.response.v12 import MetadataResponse
 from kio.schema.metadata.response.v12 import MetadataResponseBroker
+from kio.serial import encoders
 from kio.serial.decoders import decode_compact_array_length
 from kio.serial.decoders import decode_compact_string
 from kio.serial.decoders import decode_compact_string_nullable
 from kio.serial.decoders import decode_int32
 from kio.serial.decoders import read_async
 from kio.serial.decoders import skip_tagged_fields
-from kio.serial.serialize import entity_writer
+from kio.serial.serialize import entity_writer, get_writer
+
+
+class TestGetWriter:
+    @pytest.mark.parametrize(
+        "kafka_type, flexible, optional, expected",
+        (
+            ("int8", True, False, encoders.write_int8),
+            ("int8", False, False, encoders.write_int8),
+            ("int16", True, False, encoders.write_int16),
+            ("int16", False, False, encoders.write_int16),
+            ("int32", True, False, encoders.write_int32),
+            ("int32", False, False, encoders.write_int32),
+            ("int64", True, False, encoders.write_int64),
+            ("int64", False, False, encoders.write_int64),
+            ("uint8", True, False, encoders.write_uint8),
+            ("uint8", False, False, encoders.write_uint8),
+            ("uint16", True, False, encoders.write_uint16),
+            ("uint16", False, False, encoders.write_uint16),
+            ("uint32", True, False, encoders.write_uint32),
+            ("uint32", False, False, encoders.write_uint32),
+            ("uint64", True, False, encoders.write_uint64),
+            ("uint64", False, False, encoders.write_uint64),
+            ("string", True, False, encoders.write_compact_string),
+            ("string", True, True, encoders.write_nullable_compact_string),
+            ("string", False, False, encoders.write_legacy_string),
+            ("string", False, True, encoders.write_nullable_legacy_string),
+            ("uuid", False, False, encoders.write_uuid),
+            ("uuid", True, False, encoders.write_uuid),
+            ("bool", False, False, encoders.write_boolean),
+            ("bool", True, False, encoders.write_boolean),
+        ),
+    )
+    def test_can_match_kafka_type_with_writer(
+        self,
+        kafka_type: str,
+        flexible: bool,
+        optional: bool,
+        expected: encoders.Writer,
+    ) -> None:
+        assert get_writer(kafka_type, flexible, optional) == expected
+
+    @pytest.mark.parametrize(
+        "kafka_type, flexible, optional",
+        (
+            ("int8", True, True),
+            ("int8", False, True),
+            ("int16", True, True),
+            ("int16", False, True),
+            ("int32", True, True),
+            ("int32", False, True),
+            ("int64", True, True),
+            ("int64", False, True),
+            ("uint8", True, True),
+            ("uint8", False, True),
+            ("uint16", True, True),
+            ("uint16", False, True),
+            ("uint32", True, True),
+            ("uint32", False, True),
+            ("uint64", True, True),
+            ("uint64", False, True),
+            ("uuid", False, True),
+            ("uuid", True, True),
+            ("bool", False, True),
+            ("bool", True, True),
+        ),
+    )
+    def test_raises_not_implemented_error_for_invalid_combination(
+        self,
+        kafka_type: str,
+        flexible: bool,
+        optional: bool,
+    ) -> None:
+        with pytest.raises(NotImplementedError):
+            get_writer(kafka_type, flexible, optional)
 
 
 async def test_serialize_complex_entity_async(

@@ -17,7 +17,6 @@ from kio.serial.introspect import get_schema_field_type
 from kio.serial.introspect import is_optional
 
 
-# FIXME: unit-test this function.
 def get_writer(
     kafka_type: str,
     flexible: bool,
