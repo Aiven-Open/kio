@@ -1,6 +1,7 @@
 import asyncio
 import struct
 from collections.abc import Callable
+from collections.abc import Sequence
 from typing import IO
 from typing import Final
 from typing import TypeAlias
@@ -135,3 +136,12 @@ def write_compact_array_length(buffer: Writable, value: int) -> None:
 
 def write_uuid(buffer: Writable, value: UUID) -> None:
     buffer.write(value.bytes)
+
+
+def compact_array_writer(item_writer: Writer[T]) -> Writer[Sequence[T]]:
+    def write_compact_array(buffer: Writable, items: Sequence[T]) -> None:
+        write_compact_array_length(buffer, len(items))
+        for item in items:
+            item_writer(buffer, item)
+
+    return write_compact_array

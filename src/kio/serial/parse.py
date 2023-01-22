@@ -4,8 +4,6 @@ from dataclasses import Field
 from dataclasses import fields
 from dataclasses import is_dataclass
 from types import EllipsisType
-from typing import ClassVar
-from typing import Protocol
 from typing import TypeVar
 from typing import get_args
 from typing import get_origin
@@ -19,6 +17,7 @@ from kio.serial.decoders import skip_tagged_fields
 
 from . import decoders
 from .errors import SchemaError
+from .introspect import Entity
 from .introspect import get_schema_field_type
 from .introspect import is_optional
 
@@ -61,10 +60,6 @@ def get_decoder(
     raise NotImplementedError(
         f"Failed identifying decoder for {kafka_type!r} field {flexible=} {optional=}"
     )
-
-
-class Entity(Protocol):
-    __flexible__: ClassVar[bool]
 
 
 T = TypeVar("T")

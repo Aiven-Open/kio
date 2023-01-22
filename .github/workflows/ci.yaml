@@ -39,7 +39,7 @@ jobs:
       - name: Install requirements
         run: pip install --upgrade -e '.[test]'
       - name: Run test suite
-        run: coverage run -m pytest
+        run: python -X dev -m coverage run -m pytest
       # TODO: Enable coverage reporting.
       # - name: Collect coverage
       #   run: |

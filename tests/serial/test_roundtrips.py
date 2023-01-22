@@ -1,13 +1,16 @@
 import io
 import uuid
 
+import pytest
 from hypothesis import given
 from hypothesis.strategies import binary
 from hypothesis.strategies import booleans
+from hypothesis.strategies import from_type
 from hypothesis.strategies import integers
 from hypothesis.strategies import text
 from hypothesis.strategies import uuids
 
+from kio.schema.metadata.response.v12 import MetadataResponse
 from kio.serial.decoders import Decoder
 from kio.serial.decoders import decode_array_length
 from kio.serial.decoders import decode_boolean
@@ -44,6 +47,8 @@ from kio.serial.encoders import write_uint32
 from kio.serial.encoders import write_uint64
 from kio.serial.encoders import write_unsigned_varint
 from kio.serial.encoders import write_uuid
+from kio.serial.parse import parse_entity_async
+from kio.serial.serialize import entity_writer
 from tests.conftest import setup_async_buffers
 
 
@@ -226,3 +231,19 @@ async def test_uuid_roundtrip_async(a: uuid.UUID, b: uuid.UUID) -> None:
         write_uuid(stream_writer, b)
         assert a == await read_async(stream_reader, decode_uuid)
         assert b == await read_async(stream_reader, decode_uuid)
+
+
+# All field types need to use properly narrow types for this to work. There is
+# currently no way for Hypothesis to know that throttle_time_ms must be in the
+# range -2147483648 <= x <= 2147483647, and so it gives a falsifying example of
+# 2147483648.
+@pytest.mark.xfail
+@given(from_type(MetadataResponse))
+async def test_flexible_entity_roundtrip_async(instance: MetadataResponse) -> None:
+    write_metadata_response = entity_writer(MetadataResponse)
+    async with setup_async_buffers() as (stream_reader, stream_writer):
+        write_metadata_response(stream_writer, instance)
+        await stream_writer.drain()
+        result = await parse_entity_async(stream_reader, MetadataResponse)
+
+    assert instance == result

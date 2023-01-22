@@ -35,17 +35,19 @@ $ python -X dev -m pytest --cov
 
 ### Todo
 
-- [ ] Encoding and decoding abilities, preferably without inheritance, maintaining fully
+- [x] Encoding and decoding abilities, preferably without inheritance, maintaining fully
       declarative, but introspectable, definitions.
 - [ ] Research `ignorable`, handled correct?
 - [ ] Use `extra=forbid` to make sure all details of schema handled.
 - [ ] Use `mapKey`?
-- [ ] Introduce specialized types for primitives with limits (bytes and str) probably
-      fine as-is, but all numeric types need validation.
 - [ ] Test suite that tests sending and receiving a few messages to an actual Kafka
       instance, should be pretty trivial to setup with docker.
-- [ ] Use hypothesis to build entities and roundtrip-test all entities through a
-      encode-decode cycle.
+- [ ] Introduce specialized types for primitives with limits (bytes and str) probably
+      fine as-is, but all numeric types need validation.
+- [ ] Use hypothesis to build entities and roundtrip-test all entities through an
+      encode-decode cycle. The above point is required for this to work, ie all fields
+      must use types that Hypothesis can introspect and yield valid values for. There is
+      a test checked-in that uses this strategy, currently disabled with xfail.
 - [ ] Github CI.
   - Automate download of schema from Kafka repo.
   - Generate schema and check for changes.
