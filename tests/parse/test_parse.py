@@ -1,3 +1,4 @@
+import asyncio
 import io
 import uuid
 
@@ -21,7 +22,8 @@ from kio.serial.encoders import write_legacy_string
 from kio.serial.encoders import write_nullable_compact_string
 from kio.serial.encoders import write_uuid
 from kio.serial.parse import get_decoder
-from kio.serial.parse import parse_entity
+from kio.serial.parse import parse_entity_async
+from kio.serial.parse import parse_entity_sync
 
 
 class TestGetDecoder:
@@ -90,7 +92,7 @@ def test_can_parse_entity(buffer: io.BytesIO) -> None:
     write_empty_tagged_fields(buffer)
 
     buffer.seek(0)
-    instance = parse_entity(buffer, MetadataResponseBrokerV12)
+    instance = parse_entity_sync(buffer, MetadataResponseBrokerV12)
     assert isinstance(instance, MetadataResponseBrokerV12)
 
     assert instance.node_id == 123
@@ -113,7 +115,7 @@ def test_can_parse_legacy_entity(buffer: io.BytesIO) -> None:
     write_empty_tagged_fields(buffer)
 
     buffer.seek(0)
-    instance = parse_entity(buffer, MetadataResponseBrokerV5)
+    instance = parse_entity_sync(buffer, MetadataResponseBrokerV5)
     assert isinstance(instance, MetadataResponseBrokerV5)
 
     assert instance.node_id == 123
@@ -122,7 +124,6 @@ def test_can_parse_legacy_entity(buffer: io.BytesIO) -> None:
     assert instance.rack == "da best"
 
 
-# TODO: Still not recognizing tagged fields ...
 def test_can_parse_complex_entity(buffer: io.BytesIO) -> None:
     assert MetadataResponse.__flexible__
 
@@ -195,7 +196,7 @@ def test_can_parse_complex_entity(buffer: io.BytesIO) -> None:
 
     buffer.seek(0)
 
-    instance = parse_entity(buffer, MetadataResponse)
+    instance = parse_entity_sync(buffer, MetadataResponse)
     assert isinstance(instance, MetadataResponse)
 
     assert instance.throttle_time_ms == 123
@@ -210,4 +211,93 @@ def test_can_parse_complex_entity(buffer: io.BytesIO) -> None:
     assert len(instance.topics[0].partitions) == 1
     assert instance.topics[0].topic_authorized_operations == 0
 
-    print(instance)
+
+async def test_can_parse_complex_entity_async(
+    stream_writer: asyncio.StreamWriter,
+    stream_reader: asyncio.StreamReader,
+) -> None:
+    assert MetadataResponse.__flexible__
+
+    # throttle time
+    write_int32(stream_writer, 123)
+
+    # brokers
+    write_compact_array_length(stream_writer, 2)
+    for i in range(1, 3):
+        # node_id
+        write_int32(stream_writer, i)
+        # host
+        write_compact_string(stream_writer, "kafka.aiven.test")
+        # port
+        write_int32(stream_writer, i**i)
+        # rack
+        write_compact_string(stream_writer, "da best")
+
+        write_empty_tagged_fields(stream_writer)
+
+    # cluster_id
+    write_nullable_compact_string(stream_writer, None)
+
+    # controller id
+    write_int32(stream_writer, 321)
+
+    # topics
+    write_compact_array_length(stream_writer, 1)
+    topic_id = uuid.uuid4()
+    for i in range(1):
+        # error code
+        write_int16(stream_writer, 0)
+        # name
+        write_compact_string(stream_writer, f"great topic {i}")
+        # topic_id
+        write_uuid(stream_writer, topic_id)
+        # is_internal
+        write_boolean(stream_writer, False)
+
+        # partitions
+        write_compact_array_length(stream_writer, 1)
+        for ii in range(1):
+            # error_code
+            write_int16(stream_writer, 0)
+            # partition_index
+            write_int32(stream_writer, ii)
+            # leader_id
+            write_int32(stream_writer, 321)
+            # leader_epoch
+            write_int32(stream_writer, 13)
+            # replica_nodes
+            write_compact_array_length(stream_writer, 0)
+            # isr_nodes
+            write_compact_array_length(stream_writer, 0)
+            # offline_replicas
+            write_compact_array_length(stream_writer, 3)
+            write_int32(stream_writer, 123)
+            write_int32(stream_writer, 1090)
+            write_int32(stream_writer, 3321)
+            # tagged fields
+            write_empty_tagged_fields(stream_writer)
+
+        # topic_authorized_operations
+        write_int32(stream_writer, 0)
+        # tagged fields
+        write_empty_tagged_fields(stream_writer)
+
+    # main entity tagged fields
+    write_empty_tagged_fields(stream_writer)
+
+    await stream_writer.drain()
+
+    instance = await parse_entity_async(stream_reader, MetadataResponse)
+    assert isinstance(instance, MetadataResponse)
+
+    assert instance.throttle_time_ms == 123
+    assert len(instance.brokers) == 2
+    assert instance.cluster_id is None
+    assert instance.controller_id == 321
+    assert len(instance.topics) == 1
+    assert instance.topics[0].error_code == 0
+    assert instance.topics[0].name == "great topic 0"
+    assert instance.topics[0].topic_id == topic_id
+    assert instance.topics[0].is_internal is False
+    assert len(instance.topics[0].partitions) == 1
+    assert instance.topics[0].topic_authorized_operations == 0

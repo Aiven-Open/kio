@@ -164,6 +164,18 @@ def decode_compact_array_length() -> Cursor[int]:
     return decoded_value - 1
 
 
+# FIXME: Don't do this. We should capture this and expose it on entities.
+def skip_tagged_fields() -> Cursor[None]:
+    # The tagged field structure is described in
+    # https://cwiki.apache.org/confluence/display/KAFKA/KIP-482%3A+The+Kafka+Protocol+should+Support+Optional+Tagged+Fields
+    length: int = yield decode_unsigned_varint
+    for _ in range(length):
+        yield decode_unsigned_varint  # tag
+        value_len = yield decode_unsigned_varint
+        yield value_len
+    return None
+
+
 def decode_uuid() -> Cursor[UUID]:
     byte_value: bytes = yield 16
     return UUID(bytes=byte_value)

@@ -56,5 +56,8 @@ $ python -X dev -m pytest --cov
       `field(metadata={"kafka_type": Primitive.string})`.
 - [ ] Setup sphinx docs with read-the-docs.
 - [ ] Implement tagged fields as a dict on all flexible entities.
+- [ ] NewType-types are named "entity", this should be renamed to something else. Entity
+      is not wrong, but isn't very specific, and is too easy to mix up with schema model
+      classes.
 
 [revert]: https://github.com/python/cpython/issues/82423

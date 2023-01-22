@@ -1,4 +1,6 @@
+import asyncio
 import io
+from dataclasses import Field
 from dataclasses import fields
 from dataclasses import is_dataclass
 from types import EllipsisType
@@ -8,13 +10,15 @@ from typing import TypeVar
 from typing import get_args
 from typing import get_origin
 
+from kio.serial.decoders import Cursor
 from kio.serial.decoders import Decoder
 from kio.serial.decoders import compact_array_decoder
-from kio.serial.decoders import decode_compact_array_length
-from kio.serial.decoders import decode_unsigned_varint
+from kio.serial.decoders import read_async
 from kio.serial.decoders import read_sync
+from kio.serial.decoders import skip_tagged_fields
 
 from . import decoders
+from .errors import SchemaError
 from .introspect import get_schema_field_type
 from .introspect import is_optional
 
@@ -63,64 +67,59 @@ class Entity(Protocol):
     __flexible__: ClassVar[bool]
 
 
-# FIXME: Don't do this.
-def skip_tagged_fields(buffer: io.BytesIO) -> None:
-    # The tagged field structure is described in
-    # https://cwiki.apache.org/confluence/display/KAFKA/KIP-482%3A+The+Kafka+Protocol+should+Support+Optional+Tagged+Fields
-    for _ in range(read_sync(buffer, decode_unsigned_varint)):
-        read_sync(buffer, decode_unsigned_varint)  # tag
-        value_len = read_sync(buffer, decode_unsigned_varint)
-        buffer.seek(buffer.tell() + value_len)
+T = TypeVar("T")
+
+
+def get_field_decoder(entity_type: type[Entity], field: Field[T]) -> Decoder[T]:
+    type_origin = get_origin(field.type)
+
+    if type_origin is not tuple:
+        # Field is a simple primitive field.
+        return get_decoder(
+            kafka_type=get_schema_field_type(field),
+            flexible=entity_type.__flexible__,
+            optional=is_optional(field),
+        )
+
+    type_args = get_args(field.type)
+
+    match type_args:
+        # Field is a homogenous tuple of a nested entity.
+        case (inner_type, EllipsisType()) if is_dataclass(inner_type):
+            return compact_array_decoder(entity_decoder(inner_type))  # type: ignore[return-value]
+        # Field is a homogenous tuple of primitives.
+        case (_, EllipsisType()):
+            return compact_array_decoder(  # type: ignore[return-value]
+                get_decoder(
+                    kafka_type=get_schema_field_type(field),
+                    flexible=entity_type.__flexible__,
+                    optional=is_optional(field),
+                )
+            )
+
+    raise SchemaError(f"Field {field.name} has invalid tuple type args: {type_args}")
 
 
 E = TypeVar("E", bound=Entity)
 
 
-def read_compact_entity_array(
-    buffer: io.BytesIO,
+def entity_decoder(entity_type: type[E]) -> Decoder[E]:
+    def decode_entity() -> Cursor[E]:
+        kwargs = {}
+        for field in fields(entity_type):
+            kwargs[field.name] = yield get_field_decoder(entity_type, field)
+        yield skip_tagged_fields
+        return entity_type(**kwargs)
+
+    return decode_entity
+
+
+def parse_entity_sync(buffer: io.BytesIO, entity_type: type[E]) -> E:
+    return read_sync(buffer, entity_decoder(entity_type))
+
+
+async def parse_entity_async(
+    stream_reader: asyncio.StreamReader,
     entity_type: type[E],
-) -> tuple[E, ...]:
-    length = read_sync(buffer, decode_compact_array_length)
-    return tuple(parse_entity(buffer, entity_type) for _ in range(length))
-
-
-T = TypeVar("T")
-
-
-def read_compact_array(buffer: io.BytesIO, decoder: Decoder[T]) -> tuple[T, ...]:
-    length = read_sync(buffer, decode_compact_array_length)
-    return tuple(read_sync(buffer, decoder) for _ in range(length))
-
-
-def parse_entity(buffer: io.BytesIO, entity_type: type[E]) -> E:
-    kwargs = {}
-    for field in fields(entity_type):
-        if get_origin(field.type) is tuple:
-            match get_args(field.type):
-                case (inner_type, EllipsisType()) if is_dataclass(inner_type):
-                    kwargs[field.name] = read_compact_entity_array(buffer, inner_type)
-                case (_, EllipsisType()):
-                    kafka_type = get_schema_field_type(field)
-                    item_decoder = get_decoder(
-                        kafka_type=kafka_type,
-                        flexible=entity_type.__flexible__,
-                        optional=is_optional(field),
-                    )
-                    decoder = compact_array_decoder(item_decoder)
-                    kwargs[field.name] = read_sync(buffer, decoder)
-                case _:
-                    raise NotImplementedError
-        else:
-            kafka_type = get_schema_field_type(field)
-            decoder = get_decoder(
-                kafka_type=kafka_type,
-                flexible=entity_type.__flexible__,
-                optional=is_optional(field),
-            )
-            print(f"reading {field.name} of {entity_type.__qualname__}")
-            kwargs[field.name] = read_sync(buffer, decoder)
-            print(f" -> value={kwargs[field.name]}")
-
-    skip_tagged_fields(buffer)
-
-    return entity_type(**kwargs)
+) -> E:
+    return await read_async(stream_reader, entity_decoder(entity_type))
