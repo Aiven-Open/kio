@@ -12,6 +12,8 @@ from kio.schema.metadata.response.v12 import (
     MetadataResponseBroker as MetadataResponseBrokerV12,
 )
 from kio.serial import decoders
+from kio.serial.decoders import read_async
+from kio.serial.decoders import read_sync
 from kio.serial.encoders import write_boolean
 from kio.serial.encoders import write_compact_array_length
 from kio.serial.encoders import write_compact_string
@@ -21,9 +23,8 @@ from kio.serial.encoders import write_int32
 from kio.serial.encoders import write_legacy_string
 from kio.serial.encoders import write_nullable_compact_string
 from kio.serial.encoders import write_uuid
+from kio.serial.parse import entity_decoder
 from kio.serial.parse import get_decoder
-from kio.serial.parse import parse_entity_async
-from kio.serial.parse import parse_entity_sync
 
 
 class TestGetDecoder:
@@ -114,7 +115,7 @@ def test_can_parse_entity(buffer: io.BytesIO) -> None:
     write_empty_tagged_fields(buffer)
 
     buffer.seek(0)
-    instance = parse_entity_sync(buffer, MetadataResponseBrokerV12)
+    instance = read_sync(buffer, entity_decoder(MetadataResponseBrokerV12))
     assert isinstance(instance, MetadataResponseBrokerV12)
 
     assert instance.node_id == 123
@@ -137,7 +138,7 @@ def test_can_parse_legacy_entity(buffer: io.BytesIO) -> None:
     write_empty_tagged_fields(buffer)
 
     buffer.seek(0)
-    instance = parse_entity_sync(buffer, MetadataResponseBrokerV5)
+    instance = read_sync(buffer, entity_decoder(MetadataResponseBrokerV5))
     assert isinstance(instance, MetadataResponseBrokerV5)
 
     assert instance.node_id == 123
@@ -218,7 +219,7 @@ def test_can_parse_complex_entity(buffer: io.BytesIO) -> None:
 
     buffer.seek(0)
 
-    instance = parse_entity_sync(buffer, MetadataResponse)
+    instance = read_sync(buffer, entity_decoder(MetadataResponse))
     assert isinstance(instance, MetadataResponse)
 
     assert instance.throttle_time_ms == 123
@@ -309,7 +310,7 @@ async def test_can_parse_complex_entity_async(
 
     await stream_writer.drain()
 
-    instance = await parse_entity_async(stream_reader, MetadataResponse)
+    instance = await read_async(stream_reader, entity_decoder(MetadataResponse))
     assert isinstance(instance, MetadataResponse)
 
     assert instance.throttle_time_ms == 123

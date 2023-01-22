@@ -12,7 +12,8 @@ from kio.serial.decoders import decode_compact_string_nullable
 from kio.serial.decoders import decode_int32
 from kio.serial.decoders import read_async
 from kio.serial.decoders import skip_tagged_fields
-from kio.serial.serialize import entity_writer, get_writer
+from kio.serial.serialize import entity_writer
+from kio.serial.serialize import get_writer
 
 
 class TestGetWriter:

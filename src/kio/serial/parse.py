@@ -1,5 +1,3 @@
-import asyncio
-import io
 from dataclasses import Field
 from dataclasses import fields
 from dataclasses import is_dataclass
@@ -11,8 +9,6 @@ from typing import get_origin
 from kio.serial.decoders import Cursor
 from kio.serial.decoders import Decoder
 from kio.serial.decoders import compact_array_decoder
-from kio.serial.decoders import read_async
-from kio.serial.decoders import read_sync
 from kio.serial.decoders import skip_tagged_fields
 
 from . import decoders
@@ -107,14 +103,3 @@ def entity_decoder(entity_type: type[E]) -> Decoder[E]:
         return entity_type(**kwargs)
 
     return decode_entity
-
-
-def parse_entity_sync(buffer: io.BytesIO, entity_type: type[E]) -> E:
-    return read_sync(buffer, entity_decoder(entity_type))
-
-
-async def parse_entity_async(
-    stream_reader: asyncio.StreamReader,
-    entity_type: type[E],
-) -> E:
-    return await read_async(stream_reader, entity_decoder(entity_type))

@@ -47,7 +47,7 @@ from kio.serial.encoders import write_uint32
 from kio.serial.encoders import write_uint64
 from kio.serial.encoders import write_unsigned_varint
 from kio.serial.encoders import write_uuid
-from kio.serial.parse import parse_entity_async
+from kio.serial.parse import entity_decoder
 from kio.serial.serialize import entity_writer
 from tests.conftest import setup_async_buffers
 
@@ -244,6 +244,6 @@ async def test_flexible_entity_roundtrip_async(instance: MetadataResponse) -> No
     async with setup_async_buffers() as (stream_reader, stream_writer):
         write_metadata_response(stream_writer, instance)
         await stream_writer.drain()
-        result = await parse_entity_async(stream_reader, MetadataResponse)
+        result = await read_async(stream_reader, entity_decoder(MetadataResponse))
 
     assert instance == result
