@@ -3,16 +3,16 @@ import uuid
 
 import pytest
 from hypothesis import given
-from hypothesis.strategies import binary, none
+from hypothesis.strategies import binary
 from hypothesis.strategies import booleans
 from hypothesis.strategies import from_type
 from hypothesis.strategies import integers
+from hypothesis.strategies import none
 from hypothesis.strategies import text
 from hypothesis.strategies import uuids
 
 from kio.schema.metadata.response.v12 import MetadataResponse
-from kio.serial.decoders import Decoder, decode_legacy_string, \
-    decode_nullable_legacy_string, decode_legacy_bytes
+from kio.serial.decoders import Decoder
 from kio.serial.decoders import decode_array_length
 from kio.serial.decoders import decode_boolean
 from kio.serial.decoders import decode_compact_array_length
@@ -24,6 +24,9 @@ from kio.serial.decoders import decode_int8
 from kio.serial.decoders import decode_int16
 from kio.serial.decoders import decode_int32
 from kio.serial.decoders import decode_int64
+from kio.serial.decoders import decode_legacy_bytes
+from kio.serial.decoders import decode_legacy_string
+from kio.serial.decoders import decode_nullable_legacy_string
 from kio.serial.decoders import decode_uint8
 from kio.serial.decoders import decode_uint16
 from kio.serial.decoders import decode_uint32
@@ -32,8 +35,7 @@ from kio.serial.decoders import decode_unsigned_varint
 from kio.serial.decoders import decode_uuid
 from kio.serial.decoders import read_async
 from kio.serial.decoders import read_sync
-from kio.serial.encoders import Writer, write_legacy_string, \
-    write_nullable_legacy_string
+from kio.serial.encoders import Writer
 from kio.serial.encoders import write_array_length
 from kio.serial.encoders import write_boolean
 from kio.serial.encoders import write_compact_array_length
@@ -42,7 +44,9 @@ from kio.serial.encoders import write_int8
 from kio.serial.encoders import write_int16
 from kio.serial.encoders import write_int32
 from kio.serial.encoders import write_int64
+from kio.serial.encoders import write_legacy_string
 from kio.serial.encoders import write_nullable_compact_string
+from kio.serial.encoders import write_nullable_legacy_string
 from kio.serial.encoders import write_uint8
 from kio.serial.encoders import write_uint16
 from kio.serial.encoders import write_uint32
@@ -215,10 +219,7 @@ def test_compact_string_roundtrip_none_sync() -> None:
 
 
 @given(text(), text())
-def test_legacy_string_roundtrip_sync(
-    a: str,
-    b: str
-) -> None:
+def test_legacy_string_roundtrip_sync(a: str, b: str) -> None:
     buffer = io.BytesIO()
     write_legacy_string(buffer, a)
     write_legacy_string(buffer, b)
@@ -254,7 +255,8 @@ def test_nullable_legacy_string_roundtrip_sync(a: str | None, b: str | None) -> 
 @given(text() | none(), text() | none())
 async def test_nullable_legacy_string_roundtrip_async(
     a: str | None,
-    b: str | None,) -> None:
+    b: str | None,
+) -> None:
     async with setup_async_buffers() as (stream_reader, stream_writer):
         write_nullable_legacy_string(stream_writer, a)
         write_nullable_legacy_string(stream_writer, b)
@@ -264,10 +266,7 @@ async def test_nullable_legacy_string_roundtrip_async(
 
 
 @given(binary(), binary())
-def test_legacy_bytes_roundtrip_sync(
-    a: bytes,
-    b: bytes
-) -> None:
+def test_legacy_bytes_roundtrip_sync(a: bytes, b: bytes) -> None:
     buffer = io.BytesIO()
     write_legacy_string(buffer, a)
     write_legacy_string(buffer, b)

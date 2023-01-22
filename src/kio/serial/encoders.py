@@ -22,7 +22,6 @@ def write_int8(buffer: Writable, value: int) -> None:
 
 
 def write_int16(buffer: Writable, value: int) -> None:
-    bytes_value = struct.pack(">h", value)
     buffer.write(struct.pack(">h", value))
 
 
@@ -114,7 +113,7 @@ def write_nullable_legacy_string(buffer: Writable, value: str | bytes | None) ->
     buffer.write(value)
 
 
-def write_legacy_string(buffer: Writable, value: str | bytes | None) -> None:
+def write_legacy_string(buffer: Writable, value: str | bytes) -> None:
     """Write a non-nullable string with legacy int16 length encoding."""
     if value is None:
         raise TypeError("Unexpectedly received None value")

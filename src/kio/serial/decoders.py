@@ -139,7 +139,7 @@ def decode_raw_bytes() -> Cursor[bytes | None]:
     return byte_value
 
 
-def decode_legacy_bytes() -> Cursor[str]:
+def decode_legacy_bytes() -> Cursor[bytes]:
     length: int = yield decode_int16
     if length == -1:
         raise UnexpectedNull("Unexpectedly read null where bytes was expected")
