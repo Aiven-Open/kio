@@ -388,7 +388,3 @@ def main() -> None:
                     )
                 case no_match:
                     assert_never(no_match)  # type: ignore[arg-type]
-
-
-if __name__ == "__main__":
-    main()
