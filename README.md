@@ -49,7 +49,7 @@ $ pip install -e .[codegen]
 Generate and format schema.
 
 ```shell
-$ python -m codegen.generator
+$ python -m codegen
 $ pre-commit run --all-files
 ```
 
