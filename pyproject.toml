@@ -6,6 +6,6 @@ build-backend = "setuptools.build_meta"
 target-version = ["py311"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests", "src", "codegen"]
+testpaths = ["tests", "src"]
 addopts = "--doctest-modules"
 asyncio_mode = "auto"
