@@ -25,8 +25,8 @@ request to Kafka, and receive and parse the response into a full entity.
 
 ```python
 import asyncio
-from kio.schema.metadata.request.v12 import MetadataRequest
-from kio.schema.metadata.response.v12 import MetadataResponse
+from kio.schema.metadata.v12.request import MetadataRequest
+from kio.schema.metadata.v12.response import MetadataResponse
 from kio.serial import entity_writer
 from kio.serial import entity_decoder
 from kio.serial import read_async
