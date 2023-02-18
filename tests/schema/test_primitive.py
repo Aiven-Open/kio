@@ -1,6 +1,5 @@
 from typing import cast
 
-from hypothesis import example
 from hypothesis import given
 from hypothesis.strategies import from_type
 from hypothesis.strategies import integers
