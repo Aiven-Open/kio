@@ -11,7 +11,7 @@ from hypothesis.strategies import none
 from hypothesis.strategies import text
 from hypothesis.strategies import uuids
 
-from kio.schema.metadata.response.v12 import MetadataResponse
+from kio.schema.metadata.v12.response import MetadataResponse
 from kio.serial.decoders import Decoder
 from kio.serial.decoders import decode_array_length
 from kio.serial.decoders import decode_boolean
