@@ -8,6 +8,16 @@ from typing import TypeAlias
 from typing import TypeVar
 from uuid import UUID
 
+from kio.schema.primitive import i8
+from kio.schema.primitive import i16
+from kio.schema.primitive import i32
+from kio.schema.primitive import i64
+from kio.schema.primitive import u8
+from kio.schema.primitive import u16
+from kio.schema.primitive import u32
+from kio.schema.primitive import u64
+from kio.serial.errors import OutOfBoundValue
+
 Writable: TypeAlias = asyncio.StreamWriter | IO[bytes]
 T = TypeVar("T")
 Writer: TypeAlias = Callable[[Writable, T], None]
@@ -17,35 +27,35 @@ def write_boolean(buffer: Writable, value: bool) -> None:
     buffer.write(struct.pack(">?", value))
 
 
-def write_int8(buffer: Writable, value: int) -> None:
+def write_int8(buffer: Writable, value: i8) -> None:
     buffer.write(struct.pack(">b", value))
 
 
-def write_int16(buffer: Writable, value: int) -> None:
+def write_int16(buffer: Writable, value: i16) -> None:
     buffer.write(struct.pack(">h", value))
 
 
-def write_int32(buffer: Writable, value: int) -> None:
+def write_int32(buffer: Writable, value: i32) -> None:
     buffer.write(struct.pack(">i", value))
 
 
-def write_int64(buffer: Writable, value: int) -> None:
+def write_int64(buffer: Writable, value: i64) -> None:
     buffer.write(struct.pack(">q", value))
 
 
-def write_uint8(buffer: Writable, value: int) -> None:
+def write_uint8(buffer: Writable, value: u8) -> None:
     buffer.write(struct.pack(">B", value))
 
 
-def write_uint16(buffer: Writable, value: int) -> None:
+def write_uint16(buffer: Writable, value: u16) -> None:
     buffer.write(struct.pack(">H", value))
 
 
-def write_uint32(buffer: Writable, value: int) -> None:
+def write_uint32(buffer: Writable, value: u32) -> None:
     buffer.write(struct.pack(">I", value))
 
 
-def write_uint64(buffer: Writable, value: int) -> None:
+def write_uint64(buffer: Writable, value: u64) -> None:
     buffer.write(struct.pack(">Q", value))
 
 
@@ -105,11 +115,20 @@ def write_compact_string(buffer: Writable, value: str | bytes) -> None:
 def write_nullable_legacy_string(buffer: Writable, value: str | bytes | None) -> None:
     """Write a nullable string with legacy int16 length encoding."""
     if value is None:
-        write_int16(buffer, -1)
+        write_int16(buffer, i16(-1))
         return
     if isinstance(value, str):
         value = value.encode()
-    write_int16(buffer, len(value))
+
+    try:
+        length = i16(len(value))
+    except TypeError as exception:
+        raise OutOfBoundValue(
+            f"String is too long for legacy string format ({len(value)} > "
+            f"{i16.__high__})"
+        ) from exception
+
+    write_int16(buffer, length)
     buffer.write(value)
 
 
@@ -124,7 +143,7 @@ def write_empty_tagged_fields(buffer: Writable) -> None:
     write_unsigned_varint(buffer, 0)
 
 
-def write_array_length(buffer: Writable, value: int) -> None:
+def write_array_length(buffer: Writable, value: i32) -> None:
     write_int32(buffer, value)
 
 

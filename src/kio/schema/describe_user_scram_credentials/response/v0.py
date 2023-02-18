@@ -5,13 +5,17 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
 
+from kio.schema.primitive import i8
+from kio.schema.primitive import i16
+from kio.schema.primitive import i32
+
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class CredentialInfo:
     __flexible__: ClassVar[bool] = True
-    mechanism: int = field(metadata={"kafka_type": "int8"})
+    mechanism: i8 = field(metadata={"kafka_type": "int8"})
     """The SCRAM mechanism."""
-    iterations: int = field(metadata={"kafka_type": "int32"})
+    iterations: i32 = field(metadata={"kafka_type": "int32"})
     """The number of iterations used in the SCRAM credential."""
 
 
@@ -20,7 +24,7 @@ class DescribeUserScramCredentialsResult:
     __flexible__: ClassVar[bool] = True
     user: str = field(metadata={"kafka_type": "string"})
     """The user name."""
-    error_code: int = field(metadata={"kafka_type": "int16"})
+    error_code: i16 = field(metadata={"kafka_type": "int16"})
     """The user-level error code."""
     error_message: str | None = field(metadata={"kafka_type": "string"})
     """The user-level error message, if any."""
@@ -31,9 +35,9 @@ class DescribeUserScramCredentialsResult:
 @dataclass(frozen=True, slots=True, kw_only=True)
 class DescribeUserScramCredentialsResponse:
     __flexible__: ClassVar[bool] = True
-    throttle_time_ms: int = field(metadata={"kafka_type": "int32"})
+    throttle_time_ms: i32 = field(metadata={"kafka_type": "int32"})
     """The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota."""
-    error_code: int = field(metadata={"kafka_type": "int16"})
+    error_code: i16 = field(metadata={"kafka_type": "int16"})
     """The message-level error code, 0 except for user authorization or infrastructure issues."""
     error_message: str | None = field(metadata={"kafka_type": "string"})
     """The message-level error message, if any."""

@@ -8,6 +8,7 @@ from typing import ClassVar
 from kio.schema.entity import GroupId
 from kio.schema.entity import ProducerId
 from kio.schema.entity import TransactionalId
+from kio.schema.primitive import i16
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -17,7 +18,7 @@ class AddOffsetsToTxnRequest:
     """The transactional id corresponding to the transaction."""
     producer_id: ProducerId = field(metadata={"kafka_type": "int64"})
     """Current producer id in use by the transactional id."""
-    producer_epoch: int = field(metadata={"kafka_type": "int16"})
+    producer_epoch: i16 = field(metadata={"kafka_type": "int16"})
     """Current epoch associated with the producer id."""
     group_id: GroupId = field(metadata={"kafka_type": "string"})
     """The unique group identifier."""

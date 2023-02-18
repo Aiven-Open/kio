@@ -7,14 +7,16 @@ from typing import ClassVar
 
 from kio.schema.entity import BrokerId
 from kio.schema.entity import TopicName
+from kio.schema.primitive import i32
+from kio.schema.primitive import i64
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class ListOffsetsPartition:
     __flexible__: ClassVar[bool] = False
-    partition_index: int = field(metadata={"kafka_type": "int32"})
+    partition_index: i32 = field(metadata={"kafka_type": "int32"})
     """The partition index."""
-    timestamp: int = field(metadata={"kafka_type": "int64"})
+    timestamp: i64 = field(metadata={"kafka_type": "int64"})
     """The current timestamp."""
 
 

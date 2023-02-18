@@ -9,16 +9,21 @@ from kio.schema.entity import GroupId
 from kio.schema.entity import ProducerId
 from kio.schema.entity import TopicName
 from kio.schema.entity import TransactionalId
+from kio.schema.primitive import i16
+from kio.schema.primitive import i32
+from kio.schema.primitive import i64
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class TxnOffsetCommitRequestPartition:
     __flexible__: ClassVar[bool] = True
-    partition_index: int = field(metadata={"kafka_type": "int32"})
+    partition_index: i32 = field(metadata={"kafka_type": "int32"})
     """The index of the partition within the topic."""
-    committed_offset: int = field(metadata={"kafka_type": "int64"})
+    committed_offset: i64 = field(metadata={"kafka_type": "int64"})
     """The message offset to be committed."""
-    committed_leader_epoch: int = field(metadata={"kafka_type": "int32"}, default=-1)
+    committed_leader_epoch: i32 = field(
+        metadata={"kafka_type": "int32"}, default=i32(-1)
+    )
     """The leader epoch of the last consumed record."""
     committed_metadata: str | None = field(metadata={"kafka_type": "string"})
     """Any associated metadata the client wants to keep."""
@@ -42,9 +47,9 @@ class TxnOffsetCommitRequest:
     """The ID of the group."""
     producer_id: ProducerId = field(metadata={"kafka_type": "int64"})
     """The current producer ID in use by the transactional ID."""
-    producer_epoch: int = field(metadata={"kafka_type": "int16"})
+    producer_epoch: i16 = field(metadata={"kafka_type": "int16"})
     """The current epoch associated with the producer ID."""
-    generation_id: int = field(metadata={"kafka_type": "int32"}, default=-1)
+    generation_id: i32 = field(metadata={"kafka_type": "int32"}, default=i32(-1))
     """The generation of the consumer."""
     member_id: str = field(metadata={"kafka_type": "string"}, default="")
     """The member ID assigned by the group coordinator."""

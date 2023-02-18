@@ -7,6 +7,8 @@ from dataclasses import field
 from typing import ClassVar
 
 from kio.schema.entity import BrokerId
+from kio.schema.primitive import i16
+from kio.schema.primitive import u16
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -16,9 +18,9 @@ class Listener:
     """The name of the endpoint."""
     host: str = field(metadata={"kafka_type": "string"})
     """The hostname."""
-    port: int = field(metadata={"kafka_type": "uint16"})
+    port: u16 = field(metadata={"kafka_type": "uint16"})
     """The port."""
-    security_protocol: int = field(metadata={"kafka_type": "int16"})
+    security_protocol: i16 = field(metadata={"kafka_type": "int16"})
     """The security protocol."""
 
 
@@ -27,9 +29,9 @@ class Feature:
     __flexible__: ClassVar[bool] = True
     name: str = field(metadata={"kafka_type": "string"})
     """The feature name."""
-    min_supported_version: int = field(metadata={"kafka_type": "int16"})
+    min_supported_version: i16 = field(metadata={"kafka_type": "int16"})
     """The minimum supported feature level."""
-    max_supported_version: int = field(metadata={"kafka_type": "int16"})
+    max_supported_version: i16 = field(metadata={"kafka_type": "int16"})
     """The maximum supported feature level."""
 
 

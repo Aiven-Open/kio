@@ -5,6 +5,9 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
 
+from kio.schema.primitive import i16
+from kio.schema.primitive import i32
+
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class EntityData:
@@ -18,7 +21,7 @@ class EntityData:
 @dataclass(frozen=True, slots=True, kw_only=True)
 class EntryData:
     __flexible__: ClassVar[bool] = True
-    error_code: int = field(metadata={"kafka_type": "int16"})
+    error_code: i16 = field(metadata={"kafka_type": "int16"})
     """The error code, or `0` if the quota alteration succeeded."""
     error_message: str | None = field(metadata={"kafka_type": "string"})
     """The error message, or `null` if the quota alteration succeeded."""
@@ -29,7 +32,7 @@ class EntryData:
 @dataclass(frozen=True, slots=True, kw_only=True)
 class AlterClientQuotasResponse:
     __flexible__: ClassVar[bool] = True
-    throttle_time_ms: int = field(metadata={"kafka_type": "int32"})
+    throttle_time_ms: i32 = field(metadata={"kafka_type": "int32"})
     """The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota."""
     entries: tuple[EntryData, ...]
     """The quota configuration entries to alter."""

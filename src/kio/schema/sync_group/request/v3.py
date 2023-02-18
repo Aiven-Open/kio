@@ -6,6 +6,7 @@ from dataclasses import field
 from typing import ClassVar
 
 from kio.schema.entity import GroupId
+from kio.schema.primitive import i32
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -22,7 +23,7 @@ class SyncGroupRequest:
     __flexible__: ClassVar[bool] = False
     group_id: GroupId = field(metadata={"kafka_type": "string"})
     """The unique group identifier."""
-    generation_id: int = field(metadata={"kafka_type": "int32"})
+    generation_id: i32 = field(metadata={"kafka_type": "int32"})
     """The generation of the group."""
     member_id: str = field(metadata={"kafka_type": "string"})
     """The member ID assigned by the group."""

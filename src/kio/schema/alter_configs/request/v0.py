@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
 
+from kio.schema.primitive import i8
+
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class AlterableConfig:
@@ -18,7 +20,7 @@ class AlterableConfig:
 @dataclass(frozen=True, slots=True, kw_only=True)
 class AlterConfigsResource:
     __flexible__: ClassVar[bool] = False
-    resource_type: int = field(metadata={"kafka_type": "int8"})
+    resource_type: i8 = field(metadata={"kafka_type": "int8"})
     """The resource type."""
     resource_name: str = field(metadata={"kafka_type": "string"})
     """The resource name."""

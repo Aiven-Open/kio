@@ -7,14 +7,16 @@ from typing import ClassVar
 
 from kio.schema.entity import BrokerId
 from kio.schema.entity import TopicName
+from kio.schema.primitive import i32
+from kio.schema.primitive import i64
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class StopReplicaPartitionState:
     __flexible__: ClassVar[bool] = True
-    partition_index: int = field(metadata={"kafka_type": "int32"})
+    partition_index: i32 = field(metadata={"kafka_type": "int32"})
     """The partition index."""
-    leader_epoch: int = field(metadata={"kafka_type": "int32"}, default=-1)
+    leader_epoch: i32 = field(metadata={"kafka_type": "int32"}, default=i32(-1))
     """The leader epoch."""
     delete_partition: bool = field(metadata={"kafka_type": "bool"})
     """Whether this partition should be deleted."""
@@ -34,9 +36,9 @@ class StopReplicaRequest:
     __flexible__: ClassVar[bool] = True
     controller_id: BrokerId = field(metadata={"kafka_type": "int32"})
     """The controller id."""
-    controller_epoch: int = field(metadata={"kafka_type": "int32"})
+    controller_epoch: i32 = field(metadata={"kafka_type": "int32"})
     """The controller epoch."""
-    broker_epoch: int = field(metadata={"kafka_type": "int64"}, default=-1)
+    broker_epoch: i64 = field(metadata={"kafka_type": "int64"}, default=i64(-1))
     """The broker epoch."""
     topic_states: tuple[StopReplicaTopicState, ...]
     """Each topic."""

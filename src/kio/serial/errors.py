@@ -1,4 +1,8 @@
-class DecodeError(Exception):
+class SerialError(Exception):
+    ...
+
+
+class DecodeError(SerialError):
     ...
 
 
@@ -6,5 +10,9 @@ class UnexpectedNull(DecodeError):
     ...
 
 
-class SchemaError(Exception):
+class SchemaError(SerialError):
+    ...
+
+
+class OutOfBoundValue(SerialError):
     ...

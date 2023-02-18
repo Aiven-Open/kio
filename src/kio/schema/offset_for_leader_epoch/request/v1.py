@@ -6,14 +6,15 @@ from dataclasses import field
 from typing import ClassVar
 
 from kio.schema.entity import TopicName
+from kio.schema.primitive import i32
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class OffsetForLeaderPartition:
     __flexible__: ClassVar[bool] = False
-    partition: int = field(metadata={"kafka_type": "int32"})
+    partition: i32 = field(metadata={"kafka_type": "int32"})
     """The partition index."""
-    leader_epoch: int = field(metadata={"kafka_type": "int32"})
+    leader_epoch: i32 = field(metadata={"kafka_type": "int32"})
     """The epoch to look up an offset for."""
 
 

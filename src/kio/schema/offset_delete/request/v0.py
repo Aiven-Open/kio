@@ -7,12 +7,13 @@ from typing import ClassVar
 
 from kio.schema.entity import GroupId
 from kio.schema.entity import TopicName
+from kio.schema.primitive import i32
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class OffsetDeleteRequestPartition:
     __flexible__: ClassVar[bool] = False
-    partition_index: int = field(metadata={"kafka_type": "int32"})
+    partition_index: i32 = field(metadata={"kafka_type": "int32"})
     """The partition index."""
 
 

@@ -6,18 +6,21 @@ from dataclasses import field
 from typing import ClassVar
 
 from kio.schema.entity import TopicName
+from kio.schema.primitive import i16
+from kio.schema.primitive import i32
+from kio.schema.primitive import i64
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class EpochEndOffset:
     __flexible__: ClassVar[bool] = False
-    error_code: int = field(metadata={"kafka_type": "int16"})
+    error_code: i16 = field(metadata={"kafka_type": "int16"})
     """The error code 0, or if there was no error."""
-    partition: int = field(metadata={"kafka_type": "int32"})
+    partition: i32 = field(metadata={"kafka_type": "int32"})
     """The partition index."""
-    leader_epoch: int = field(metadata={"kafka_type": "int32"}, default=-1)
+    leader_epoch: i32 = field(metadata={"kafka_type": "int32"}, default=i32(-1))
     """The leader epoch of the partition."""
-    end_offset: int = field(metadata={"kafka_type": "int64"}, default=-1)
+    end_offset: i64 = field(metadata={"kafka_type": "int64"}, default=i64(-1))
     """The end offset of the epoch."""
 
 

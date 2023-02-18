@@ -8,6 +8,8 @@ from typing import ClassVar
 
 from kio.schema.entity import BrokerId
 from kio.schema.entity import TopicName
+from kio.schema.primitive import i16
+from kio.schema.primitive import i32
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -17,7 +19,7 @@ class MetadataResponseBroker:
     """The broker ID."""
     host: str = field(metadata={"kafka_type": "string"})
     """The broker hostname."""
-    port: int = field(metadata={"kafka_type": "int32"})
+    port: i32 = field(metadata={"kafka_type": "int32"})
     """The broker port."""
     rack: str | None = field(metadata={"kafka_type": "string"}, default=None)
     """The rack of the broker, or null if it has not been assigned to a rack."""
@@ -26,13 +28,13 @@ class MetadataResponseBroker:
 @dataclass(frozen=True, slots=True, kw_only=True)
 class MetadataResponsePartition:
     __flexible__: ClassVar[bool] = True
-    error_code: int = field(metadata={"kafka_type": "int16"})
+    error_code: i16 = field(metadata={"kafka_type": "int16"})
     """The partition error, or 0 if there was no error."""
-    partition_index: int = field(metadata={"kafka_type": "int32"})
+    partition_index: i32 = field(metadata={"kafka_type": "int32"})
     """The partition index."""
     leader_id: BrokerId = field(metadata={"kafka_type": "int32"})
     """The ID of the leader broker."""
-    leader_epoch: int = field(metadata={"kafka_type": "int32"}, default=-1)
+    leader_epoch: i32 = field(metadata={"kafka_type": "int32"}, default=i32(-1))
     """The leader epoch of this partition."""
     replica_nodes: tuple[BrokerId, ...] = field(
         metadata={"kafka_type": "int32"}, default=()
@@ -51,7 +53,7 @@ class MetadataResponsePartition:
 @dataclass(frozen=True, slots=True, kw_only=True)
 class MetadataResponseTopic:
     __flexible__: ClassVar[bool] = True
-    error_code: int = field(metadata={"kafka_type": "int16"})
+    error_code: i16 = field(metadata={"kafka_type": "int16"})
     """The topic error, or 0 if there was no error."""
     name: TopicName = field(metadata={"kafka_type": "string"})
     """The topic name."""
@@ -61,8 +63,8 @@ class MetadataResponseTopic:
     """True if the topic is internal."""
     partitions: tuple[MetadataResponsePartition, ...]
     """Each partition in the topic."""
-    topic_authorized_operations: int = field(
-        metadata={"kafka_type": "int32"}, default=-2147483648
+    topic_authorized_operations: i32 = field(
+        metadata={"kafka_type": "int32"}, default=i32(-2147483648)
     )
     """32-bit bitfield to represent authorized operations for this topic."""
 
@@ -70,19 +72,19 @@ class MetadataResponseTopic:
 @dataclass(frozen=True, slots=True, kw_only=True)
 class MetadataResponse:
     __flexible__: ClassVar[bool] = True
-    throttle_time_ms: int = field(metadata={"kafka_type": "int32"})
+    throttle_time_ms: i32 = field(metadata={"kafka_type": "int32"})
     """The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota."""
     brokers: tuple[MetadataResponseBroker, ...]
     """Each broker in the response."""
     cluster_id: str | None = field(metadata={"kafka_type": "string"}, default=None)
     """The cluster ID that responding broker belongs to."""
     controller_id: BrokerId = field(
-        metadata={"kafka_type": "int32"}, default=BrokerId(-1)
+        metadata={"kafka_type": "int32"}, default=BrokerId(i32(-1))
     )
     """The ID of the controller broker."""
     topics: tuple[MetadataResponseTopic, ...]
     """Each topic in the response."""
-    cluster_authorized_operations: int = field(
-        metadata={"kafka_type": "int32"}, default=-2147483648
+    cluster_authorized_operations: i32 = field(
+        metadata={"kafka_type": "int32"}, default=i32(-2147483648)
     )
     """32-bit bitfield to represent authorized operations for this cluster."""

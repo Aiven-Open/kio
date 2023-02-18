@@ -9,6 +9,8 @@ from kio.schema.metadata.response.v12 import MetadataResponse
 from kio.schema.metadata.response.v12 import MetadataResponseBroker
 from kio.schema.metadata.response.v12 import MetadataResponsePartition
 from kio.schema.metadata.response.v12 import MetadataResponseTopic
+from kio.schema.primitive import i16
+from kio.schema.primitive import i32
 from kio.serial import encoders
 from kio.serial.decoders import decode_boolean
 from kio.serial.decoders import decode_compact_array_length
@@ -105,41 +107,41 @@ async def test_serialize_complex_entity_async(
 
     topic_id = uuid.uuid4()
     instance = MetadataResponse(
-        throttle_time_ms=123,
+        throttle_time_ms=i32(123),
         brokers=(
             MetadataResponseBroker(
-                node_id=BrokerId(1),
+                node_id=BrokerId(i32(1)),
                 host="foo.bar",
-                port=1234,
+                port=i32(1234),
                 rack=None,
             ),
             MetadataResponseBroker(
-                node_id=BrokerId(2),
+                node_id=BrokerId(i32(2)),
                 host="foo.bar",
-                port=1234,
+                port=i32(1234),
                 rack=None,
             ),
         ),
         cluster_id="556",
-        controller_id=BrokerId(3),
+        controller_id=BrokerId(i32(3)),
         topics=(
             MetadataResponseTopic(
-                error_code=123,
+                error_code=i16(123),
                 name=TopicName("topic 1"),
                 topic_id=topic_id,
                 is_internal=False,
                 partitions=(
                     MetadataResponsePartition(
-                        error_code=8765,
-                        partition_index=5679,
-                        leader_id=BrokerId(2345),
-                        leader_epoch=6445678,
-                        replica_nodes=(BrokerId(12345), BrokerId(7651)),
+                        error_code=i16(8765),
+                        partition_index=i32(5679),
+                        leader_id=BrokerId(i32(2345)),
+                        leader_epoch=i32(6445678),
+                        replica_nodes=(BrokerId(i32(12345)), BrokerId(i32(7651))),
                         isr_nodes=(),
                         offline_replicas=(),
                     ),
                 ),
-                topic_authorized_operations=765443,
+                topic_authorized_operations=i32(765443),
             ),
         ),
     )

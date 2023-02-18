@@ -7,14 +7,16 @@ from typing import ClassVar
 
 from kio.schema.entity import GroupId
 from kio.schema.entity import TopicName
+from kio.schema.primitive import i32
+from kio.schema.primitive import i64
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class OffsetCommitRequestPartition:
     __flexible__: ClassVar[bool] = False
-    partition_index: int = field(metadata={"kafka_type": "int32"})
+    partition_index: i32 = field(metadata={"kafka_type": "int32"})
     """The partition index."""
-    committed_offset: int = field(metadata={"kafka_type": "int64"})
+    committed_offset: i64 = field(metadata={"kafka_type": "int64"})
     """The message offset to be committed."""
     committed_metadata: str | None = field(metadata={"kafka_type": "string"})
     """Any associated metadata the client wants to keep."""

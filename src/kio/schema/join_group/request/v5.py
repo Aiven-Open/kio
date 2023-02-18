@@ -6,6 +6,7 @@ from dataclasses import field
 from typing import ClassVar
 
 from kio.schema.entity import GroupId
+from kio.schema.primitive import i32
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -22,9 +23,9 @@ class JoinGroupRequest:
     __flexible__: ClassVar[bool] = False
     group_id: GroupId = field(metadata={"kafka_type": "string"})
     """The group identifier."""
-    session_timeout_ms: int = field(metadata={"kafka_type": "int32"})
+    session_timeout_ms: i32 = field(metadata={"kafka_type": "int32"})
     """The coordinator considers the consumer dead if it receives no heartbeat after this timeout in milliseconds."""
-    rebalance_timeout_ms: int = field(metadata={"kafka_type": "int32"}, default=-1)
+    rebalance_timeout_ms: i32 = field(metadata={"kafka_type": "int32"}, default=i32(-1))
     """The maximum time in milliseconds that the coordinator will wait for each member to rejoin when rebalancing the group."""
     member_id: str = field(metadata={"kafka_type": "string"})
     """The member id assigned by the group coordinator."""

@@ -5,13 +5,15 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
 
+from kio.schema.primitive import i8
+
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class AlterableConfig:
     __flexible__: ClassVar[bool] = True
     name: str = field(metadata={"kafka_type": "string"})
     """The configuration key name."""
-    config_operation: int = field(metadata={"kafka_type": "int8"})
+    config_operation: i8 = field(metadata={"kafka_type": "int8"})
     """The type (Set, Delete, Append, Subtract) of operation."""
     value: str | None = field(metadata={"kafka_type": "string"})
     """The value to set for the configuration key."""
@@ -20,7 +22,7 @@ class AlterableConfig:
 @dataclass(frozen=True, slots=True, kw_only=True)
 class AlterConfigsResource:
     __flexible__: ClassVar[bool] = True
-    resource_type: int = field(metadata={"kafka_type": "int8"})
+    resource_type: i8 = field(metadata={"kafka_type": "int8"})
     """The resource type."""
     resource_name: str = field(metadata={"kafka_type": "string"})
     """The resource name."""

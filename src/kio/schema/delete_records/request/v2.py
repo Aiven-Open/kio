@@ -6,14 +6,16 @@ from dataclasses import field
 from typing import ClassVar
 
 from kio.schema.entity import TopicName
+from kio.schema.primitive import i32
+from kio.schema.primitive import i64
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class DeleteRecordsPartition:
     __flexible__: ClassVar[bool] = True
-    partition_index: int = field(metadata={"kafka_type": "int32"})
+    partition_index: i32 = field(metadata={"kafka_type": "int32"})
     """The partition index."""
-    offset: int = field(metadata={"kafka_type": "int64"})
+    offset: i64 = field(metadata={"kafka_type": "int64"})
     """The deletion offset."""
 
 
@@ -31,5 +33,5 @@ class DeleteRecordsRequest:
     __flexible__: ClassVar[bool] = True
     topics: tuple[DeleteRecordsTopic, ...]
     """Each topic that we want to delete records from."""
-    timeout_ms: int = field(metadata={"kafka_type": "int32"})
+    timeout_ms: i32 = field(metadata={"kafka_type": "int32"})
     """How long to wait for the deletion to complete, in milliseconds."""

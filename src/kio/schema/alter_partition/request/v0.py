@@ -7,18 +7,20 @@ from typing import ClassVar
 
 from kio.schema.entity import BrokerId
 from kio.schema.entity import TopicName
+from kio.schema.primitive import i32
+from kio.schema.primitive import i64
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class PartitionData:
     __flexible__: ClassVar[bool] = True
-    partition_index: int = field(metadata={"kafka_type": "int32"})
+    partition_index: i32 = field(metadata={"kafka_type": "int32"})
     """The partition index"""
-    leader_epoch: int = field(metadata={"kafka_type": "int32"})
+    leader_epoch: i32 = field(metadata={"kafka_type": "int32"})
     """The leader epoch of this partition"""
     new_isr: tuple[BrokerId, ...] = field(metadata={"kafka_type": "int32"}, default=())
     """The ISR for this partition"""
-    partition_epoch: int = field(metadata={"kafka_type": "int32"})
+    partition_epoch: i32 = field(metadata={"kafka_type": "int32"})
     """The expected epoch of the partition which is being updated. For legacy cluster this is the ZkVersion in the LeaderAndIsr request."""
 
 
@@ -35,6 +37,6 @@ class AlterPartitionRequest:
     __flexible__: ClassVar[bool] = True
     broker_id: BrokerId = field(metadata={"kafka_type": "int32"})
     """The ID of the requesting broker"""
-    broker_epoch: int = field(metadata={"kafka_type": "int64"}, default=-1)
+    broker_epoch: i64 = field(metadata={"kafka_type": "int64"}, default=i64(-1))
     """The epoch of the requesting broker"""
     topics: tuple[TopicData, ...]

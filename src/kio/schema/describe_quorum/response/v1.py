@@ -7,31 +7,36 @@ from typing import ClassVar
 
 from kio.schema.entity import BrokerId
 from kio.schema.entity import TopicName
+from kio.schema.primitive import i16
+from kio.schema.primitive import i32
+from kio.schema.primitive import i64
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class ReplicaState:
     __flexible__: ClassVar[bool] = True
     replica_id: BrokerId = field(metadata={"kafka_type": "int32"})
-    log_end_offset: int = field(metadata={"kafka_type": "int64"})
+    log_end_offset: i64 = field(metadata={"kafka_type": "int64"})
     """The last known log end offset of the follower or -1 if it is unknown"""
-    last_fetch_timestamp: int = field(metadata={"kafka_type": "int64"}, default=-1)
+    last_fetch_timestamp: i64 = field(metadata={"kafka_type": "int64"}, default=i64(-1))
     """The last known leader wall clock time time when a follower fetched from the leader. This is reported as -1 both for the current leader or if it is unknown for a voter"""
-    last_caught_up_timestamp: int = field(metadata={"kafka_type": "int64"}, default=-1)
+    last_caught_up_timestamp: i64 = field(
+        metadata={"kafka_type": "int64"}, default=i64(-1)
+    )
     """The leader wall clock append time of the offset for which the follower made the most recent fetch request. This is reported as the current time for the leader and -1 if unknown for a voter"""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class PartitionData:
     __flexible__: ClassVar[bool] = True
-    partition_index: int = field(metadata={"kafka_type": "int32"})
+    partition_index: i32 = field(metadata={"kafka_type": "int32"})
     """The partition index."""
-    error_code: int = field(metadata={"kafka_type": "int16"})
+    error_code: i16 = field(metadata={"kafka_type": "int16"})
     leader_id: BrokerId = field(metadata={"kafka_type": "int32"})
     """The ID of the current leader or -1 if the leader is unknown."""
-    leader_epoch: int = field(metadata={"kafka_type": "int32"})
+    leader_epoch: i32 = field(metadata={"kafka_type": "int32"})
     """The latest known leader epoch"""
-    high_watermark: int = field(metadata={"kafka_type": "int64"})
+    high_watermark: i64 = field(metadata={"kafka_type": "int64"})
     current_voters: tuple[ReplicaState, ...]
     observers: tuple[ReplicaState, ...]
 
@@ -47,6 +52,6 @@ class TopicData:
 @dataclass(frozen=True, slots=True, kw_only=True)
 class DescribeQuorumResponse:
     __flexible__: ClassVar[bool] = True
-    error_code: int = field(metadata={"kafka_type": "int16"})
+    error_code: i16 = field(metadata={"kafka_type": "int16"})
     """The top level error code."""
     topics: tuple[TopicData, ...]

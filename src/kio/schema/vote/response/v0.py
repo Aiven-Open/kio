@@ -7,17 +7,19 @@ from typing import ClassVar
 
 from kio.schema.entity import BrokerId
 from kio.schema.entity import TopicName
+from kio.schema.primitive import i16
+from kio.schema.primitive import i32
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class PartitionData:
     __flexible__: ClassVar[bool] = True
-    partition_index: int = field(metadata={"kafka_type": "int32"})
+    partition_index: i32 = field(metadata={"kafka_type": "int32"})
     """The partition index."""
-    error_code: int = field(metadata={"kafka_type": "int16"})
+    error_code: i16 = field(metadata={"kafka_type": "int16"})
     leader_id: BrokerId = field(metadata={"kafka_type": "int32"})
     """The ID of the current leader or -1 if the leader is unknown."""
-    leader_epoch: int = field(metadata={"kafka_type": "int32"})
+    leader_epoch: i32 = field(metadata={"kafka_type": "int32"})
     """The latest known leader epoch"""
     vote_granted: bool = field(metadata={"kafka_type": "bool"})
     """True if the vote was granted and false otherwise"""
@@ -34,6 +36,6 @@ class TopicData:
 @dataclass(frozen=True, slots=True, kw_only=True)
 class VoteResponse:
     __flexible__: ClassVar[bool] = True
-    error_code: int = field(metadata={"kafka_type": "int16"})
+    error_code: i16 = field(metadata={"kafka_type": "int16"})
     """The top level error code."""
     topics: tuple[TopicData, ...]
