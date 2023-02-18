@@ -5,9 +5,9 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
 
-from kio.schema.entity import TopicName
 from kio.schema.primitive import i8
 from kio.schema.primitive import i32
+from kio.schema.types import TopicName
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

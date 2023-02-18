@@ -118,7 +118,7 @@ class EntityTypeDef:
         return f'{self.name} = NewType("{self.name}", {self.type_hint})'
 
     def get_import(self) -> str:
-        return f"from kio.schema.entity import {self.name}"
+        return f"from kio.schema.types import {self.name}"
 
     def get_type_hint(self, optional: bool = False) -> str:
         return f"{self.name} | None" if optional else self.name
@@ -358,7 +358,7 @@ def create_module_primitive(destination: pathlib.Path) -> None:
 
 def main() -> None:
     schema_output_path = pathlib.Path("src/kio/schema/")
-    entity_module_path = schema_output_path / "entity.py"
+    types_module_path = schema_output_path / "types.py"
     shutil.rmtree(schema_output_path)
     create_package(schema_output_path)
     schemas = pathlib.Path("schema/").glob("*.json")
@@ -384,7 +384,7 @@ def main() -> None:
                     module_entity_dependencies[(version, api_type_package)].append(
                         entity_type
                     )
-                    write_entity_type(entity_module_path, entity_type)
+                    write_entity_type(types_module_path, entity_type)
                 case (version, code):
                     write_to_version_module(  # type: ignore[unreachable]
                         schema=schema,

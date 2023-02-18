@@ -5,10 +5,10 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
 
-from kio.schema.entity import GroupId
-from kio.schema.entity import ProducerId
-from kio.schema.entity import TransactionalId
 from kio.schema.primitive import i16
+from kio.schema.types import GroupId
+from kio.schema.types import ProducerId
+from kio.schema.types import TransactionalId
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
