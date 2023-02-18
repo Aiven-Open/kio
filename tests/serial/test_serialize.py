@@ -3,14 +3,14 @@ import uuid
 
 import pytest
 
-from kio.schema.entity import BrokerId
-from kio.schema.entity import TopicName
 from kio.schema.metadata.response.v12 import MetadataResponse
 from kio.schema.metadata.response.v12 import MetadataResponseBroker
 from kio.schema.metadata.response.v12 import MetadataResponsePartition
 from kio.schema.metadata.response.v12 import MetadataResponseTopic
 from kio.schema.primitive import i16
 from kio.schema.primitive import i32
+from kio.schema.types import BrokerId
+from kio.schema.types import TopicName
 from kio.serial import encoders
 from kio.serial.decoders import decode_boolean
 from kio.serial.decoders import decode_compact_array_length
