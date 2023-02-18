@@ -59,8 +59,6 @@ class Primitive(enum.Enum):
     uint16 = "uint16"
     uint32 = "uint32"
     uint64 = "uint64"
-    float16 = "float16"
-    float32 = "float32"
     float64 = "float64"
     string = "string"
     bytes_ = "bytes"
@@ -83,8 +81,8 @@ class Primitive(enum.Enum):
                 hint = "u32"
             case Primitive.uint64:
                 hint = "u64"
-            case (Primitive.float16 | Primitive.float32 | Primitive.float64):
-                hint = "float"
+            case Primitive.float64:
+                hint = "f64"
             case Primitive.string:
                 hint = "str"
             case Primitive.bytes_:

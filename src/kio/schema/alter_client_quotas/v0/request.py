@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
 
+from kio.schema.primitive import f64
+
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class EntityData:
@@ -20,7 +22,7 @@ class OpData:
     __flexible__: ClassVar[bool] = False
     key: str = field(metadata={"kafka_type": "string"})
     """The quota configuration key."""
-    value: float = field(metadata={"kafka_type": "float64"})
+    value: f64 = field(metadata={"kafka_type": "float64"})
     """The value to set, otherwise ignored if the value is to be removed."""
     remove: bool = field(metadata={"kafka_type": "bool"})
     """Whether the quota configuration value should be removed, otherwise set."""

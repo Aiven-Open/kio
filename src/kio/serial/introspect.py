@@ -31,9 +31,21 @@ def get_schema_field_type(field: Field) -> str:
 
 
 def is_optional(field: Field) -> bool:
-    if get_origin(field.type) not in [UnionType, Union]:
+    if get_origin(field.type) is tuple:
+        type_args = get_args(field.type)
+        match type_args:
+            case (inner_type, EllipsisType()):
+                inner_type = inner_type
+            case _:
+                raise SchemaError(
+                    f"Field {field.name} has invalid tuple type args: {type_args}"
+                )
+    else:
+        inner_type = field.type
+
+    if get_origin(inner_type) not in [UnionType, Union]:
         return False
-    return NoneType in get_args(field.type)
+    return NoneType in get_args(inner_type)
 
 
 class FieldKind(enum.Enum):

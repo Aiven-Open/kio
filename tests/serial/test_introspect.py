@@ -32,6 +32,7 @@ class A:
     simple_primitive: int
     complex_primitive: int | str
     primitive_tuple: tuple[int, ...]
+    primitive_tuple_optional: tuple[int | None, ...]
     entity: Nested
     entity_tuple: tuple[Nested, ...]
     unsupported_tuple: tuple[int, str]
@@ -62,6 +63,9 @@ class TestIsOptional:
 
     def test_returns_true_for_pep_604_union_with_none(self) -> None:
         assert is_optional(model_fields["pep_604_union_with_none"]) is True
+
+    def test_returns_true_for_inner_optional(self) -> None:
+        assert is_optional(model_fields["primitive_tuple_optional"]) is True
 
     def test_returns_false_for_verbose_union_without_none(self) -> None:
         assert is_optional(model_fields["verbose_union_without_none"]) is False

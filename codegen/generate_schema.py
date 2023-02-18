@@ -37,8 +37,7 @@ Generated from {schema_source}.
 from dataclasses import dataclass, field
 from typing import Annotated, ClassVar
 import uuid
-from kio.schema.primitive import i8, i16, i32, i64
-from kio.schema.primitive import u8, u16, u32, u64
+from kio.schema.primitive import i8, i16, i32, i64, u8, u16, u32, u64, f64
 '''
 
 
@@ -85,7 +84,7 @@ def format_default(
             value = default.capitalize()
             assert value in ("True", "False"), f"invalid default for bool: {default}"
             return f"{entity_type_open}{value}{entity_type_close}"
-        case Primitive.float16 | Primitive.float32 | Primitive.float64, default:
+        case Primitive.float64, default:
             return f"{entity_type_open}{default}{entity_type_close}"
 
     raise NotImplementedError(
@@ -306,7 +305,7 @@ def create_package(path: pathlib.Path) -> None:
 seen_entitites = set[str]()
 entity_imports = """\
 from typing import NewType
-from kio.schema.primitive import i8, i16, i32, i64, u8, u16, u32, u64
+from kio.schema.primitive import i8, i16, i32, i64, u8, u16, u32, u64, f64
 """
 
 
