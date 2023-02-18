@@ -268,11 +268,7 @@ def generate_dataclass(  # noqa: C901
         if schema.flexibleVersions.matches(version)
         else "    __flexible__: ClassVar[bool] = False\n"
     )
-
-    if class_fields:
-        yield from class_fields
-    else:
-        yield "    ...\n"
+    yield from class_fields
 
 
 def generate_models(
