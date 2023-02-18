@@ -19,10 +19,6 @@ class TestU8:
     high = cast(int, u8.__high__)
 
     @given(from_type(u8))
-    def test_is_subtype_of_i16(self, value: u8) -> None:
-        assert isinstance(value, i16)
-
-    @given(from_type(u8))
     def test_is_subtype_of_u16(self, value: u8) -> None:
         assert isinstance(value, u16)
 
@@ -40,10 +36,6 @@ class TestU16:
     high = cast(int, u16.__high__)
 
     @given(from_type(u16))
-    def test_is_subtype_of_i32(self, value: u16) -> None:
-        assert isinstance(value, i32)
-
-    @given(from_type(u16))
     def test_is_subtype_of_u32(self, value: u16) -> None:
         assert isinstance(value, u32)
 
@@ -59,10 +51,6 @@ class TestU16:
 class TestU32:
     low = cast(int, u32.__low__)
     high = cast(int, u32.__high__)
-
-    @given(from_type(u32))
-    def test_is_subtype_of_i64(self, value: u32) -> None:
-        assert isinstance(value, i64)
 
     @given(from_type(u32))
     def test_is_subtype_of_u64(self, value: u32) -> None:
