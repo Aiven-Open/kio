@@ -9,6 +9,8 @@ from collections.abc import Iterator
 from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Final
+from typing import Literal
+from typing import TypeAlias
 
 from pydantic import ValidationError
 from typing_extensions import assert_never
@@ -319,7 +321,8 @@ def write_entity_type(path: pathlib.Path, entity_type: EntityTypeDef) -> None:
         print(entity_type.get_definition(), file=fd)
 
 
-module_entity_dependencies = defaultdict[tuple[int, pathlib.Path], list[EntityTypeDef]](
+SchemaType: TypeAlias = Literal["request", "response", "header", "data"]
+module_entity_dependencies = defaultdict[tuple[int, SchemaType], list[EntityTypeDef]](
     list
 )
 
@@ -328,13 +331,14 @@ def write_to_version_module(
     schema: MessageSchema | HeaderSchema | DataSchema,
     schema_path: pathlib.Path,
     api_name: str,
-    api_type_package_path: pathlib.Path,
+    api_package_path: pathlib.Path,
     version: int,
     code: str,
 ) -> None:
     global seen
     seen = set()
-    module_path = api_type_package_path / f"v{version}.py"
+    module_path = api_package_path / f"v{version}" / f"{schema.type}.py"
+    create_package(module_path.resolve().parent)
     write_imports = not module_path.exists()
     print(f"-> [{schema.type}] {api_name} v{version} ...", end="")
 
@@ -344,7 +348,7 @@ def write_to_version_module(
                 imports_and_docstring.format(schema_source=schema_path.name),
                 file=fd,
             )
-            entities = module_entity_dependencies[(version, api_type_package_path)]
+            entities = module_entity_dependencies[(version, schema.type)]
             for entity in entities:
                 print(entity.get_import(), file=fd)
         print(code, file=fd)
@@ -375,13 +379,11 @@ def main() -> None:
 
         api_package = schema_output_path / api_name
         create_package(api_package)
-        api_type_package = api_package / schema.type
-        create_package(api_type_package)
 
         for chunk in generate_models(schema):
             match chunk:
                 case (version, EntityTypeDef() as entity_type):
-                    module_entity_dependencies[(version, api_type_package)].append(
+                    module_entity_dependencies[(version, schema.type)].append(
                         entity_type
                     )
                     write_entity_type(types_module_path, entity_type)
@@ -389,7 +391,7 @@ def main() -> None:
                     write_to_version_module(  # type: ignore[unreachable]
                         schema=schema,
                         api_name=api_name,
-                        api_type_package_path=api_type_package,
+                        api_package_path=api_package,
                         schema_path=path,
                         version=version,
                         code=code,

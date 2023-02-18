@@ -4,11 +4,11 @@ import uuid
 
 import pytest
 
-from kio.schema.metadata.response.v5 import (
+from kio.schema.metadata.v5.response import (
     MetadataResponseBroker as MetadataResponseBrokerV5,
 )
-from kio.schema.metadata.response.v12 import MetadataResponse
-from kio.schema.metadata.response.v12 import (
+from kio.schema.metadata.v12.response import MetadataResponse
+from kio.schema.metadata.v12.response import (
     MetadataResponseBroker as MetadataResponseBrokerV12,
 )
 from kio.schema.primitive import i16

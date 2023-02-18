@@ -17,17 +17,17 @@ class i8(i16, Inclusive, low=-128, high=127):
     ...
 
 
-class u64(i64, Inclusive, low=0, high=2**64 - 1):
+class u64(int, Inclusive, low=0, high=2**64 - 1):
     ...
 
 
-class u32(i32, u64, Inclusive, low=0, high=2**32 - 1):
+class u32(u64, Inclusive, low=0, high=2**32 - 1):
     ...
 
 
-class u16(i16, u32, Inclusive, low=0, high=2**16 - 1):
+class u16(u32, Inclusive, low=0, high=2**16 - 1):
     ...
 
 
-class u8(i8, u16, Inclusive, low=0, high=2**8 - 1):
+class u8(u16, Inclusive, low=0, high=2**8 - 1):
     ...

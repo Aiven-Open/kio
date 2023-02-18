@@ -3,10 +3,10 @@ import uuid
 
 import pytest
 
-from kio.schema.metadata.response.v12 import MetadataResponse
-from kio.schema.metadata.response.v12 import MetadataResponseBroker
-from kio.schema.metadata.response.v12 import MetadataResponsePartition
-from kio.schema.metadata.response.v12 import MetadataResponseTopic
+from kio.schema.metadata.v12.response import MetadataResponse
+from kio.schema.metadata.v12.response import MetadataResponseBroker
+from kio.schema.metadata.v12.response import MetadataResponsePartition
+from kio.schema.metadata.v12.response import MetadataResponseTopic
 from kio.schema.primitive import i16
 from kio.schema.primitive import i32
 from kio.schema.types import BrokerId
