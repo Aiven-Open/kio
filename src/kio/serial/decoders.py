@@ -13,6 +13,14 @@ from uuid import UUID
 
 from typing_extensions import assert_never
 
+from kio.schema.primitive import i8
+from kio.schema.primitive import i16
+from kio.schema.primitive import i32
+from kio.schema.primitive import i64
+from kio.schema.primitive import u8
+from kio.schema.primitive import u16
+from kio.schema.primitive import u32
+from kio.schema.primitive import u64
 from kio.serial.errors import UnexpectedNull
 
 T = TypeVar("T")
@@ -26,49 +34,49 @@ def decode_boolean() -> Cursor[bool]:
     return value  # type: ignore[no-any-return]
 
 
-def decode_int8() -> Cursor[int]:
+def decode_int8() -> Cursor[i8]:
     byte_value: bytes = yield 1
     (value,) = struct.unpack(">b", byte_value)
     return value  # type: ignore[no-any-return]
 
 
-def decode_int16() -> Cursor[int]:
+def decode_int16() -> Cursor[i16]:
     byte_value: bytes = yield 2
     (value,) = struct.unpack(">h", byte_value)
     return value  # type: ignore[no-any-return]
 
 
-def decode_int32() -> Cursor[int]:
+def decode_int32() -> Cursor[i32]:
     byte_value: bytes = yield 4
     (value,) = struct.unpack(">i", byte_value)
     return value  # type: ignore[no-any-return]
 
 
-def decode_int64() -> Cursor[int]:
+def decode_int64() -> Cursor[i64]:
     byte_value: bytes = yield 8
     (value,) = struct.unpack(">q", byte_value)
     return value  # type: ignore[no-any-return]
 
 
-def decode_uint8() -> Cursor[int]:
+def decode_uint8() -> Cursor[u8]:
     byte_value: bytes = yield 1
     (value,) = struct.unpack(">B", byte_value)
     return value  # type: ignore[no-any-return]
 
 
-def decode_uint16() -> Cursor[int]:
+def decode_uint16() -> Cursor[u16]:
     byte_value: bytes = yield 2
     (value,) = struct.unpack(">H", byte_value)
     return value  # type: ignore[no-any-return]
 
 
-def decode_uint32() -> Cursor[int]:
+def decode_uint32() -> Cursor[u32]:
     byte_value: bytes = yield 4
     (value,) = struct.unpack(">I", byte_value)
     return value  # type: ignore[no-any-return]
 
 
-def decode_uint64() -> Cursor[int]:
+def decode_uint64() -> Cursor[u64]:
     byte_value: bytes = yield 8
     (value,) = struct.unpack(">Q", byte_value)
     return value  # type: ignore[no-any-return]

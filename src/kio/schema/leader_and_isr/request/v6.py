@@ -8,22 +8,25 @@ from typing import ClassVar
 
 from kio.schema.entity import BrokerId
 from kio.schema.entity import TopicName
+from kio.schema.primitive import i8
+from kio.schema.primitive import i32
+from kio.schema.primitive import i64
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class LeaderAndIsrPartitionState:
     __flexible__: ClassVar[bool] = True
-    partition_index: int = field(metadata={"kafka_type": "int32"})
+    partition_index: i32 = field(metadata={"kafka_type": "int32"})
     """The partition index."""
-    controller_epoch: int = field(metadata={"kafka_type": "int32"})
+    controller_epoch: i32 = field(metadata={"kafka_type": "int32"})
     """The controller epoch."""
     leader: BrokerId = field(metadata={"kafka_type": "int32"})
     """The broker ID of the leader."""
-    leader_epoch: int = field(metadata={"kafka_type": "int32"})
+    leader_epoch: i32 = field(metadata={"kafka_type": "int32"})
     """The leader epoch."""
     isr: tuple[BrokerId, ...] = field(metadata={"kafka_type": "int32"}, default=())
     """The in-sync replica IDs."""
-    partition_epoch: int = field(metadata={"kafka_type": "int32"})
+    partition_epoch: i32 = field(metadata={"kafka_type": "int32"})
     """The current epoch for the partition. The epoch is a monotonically increasing value which is incremented after every partition change. (Since the LeaderAndIsr request is only used by the legacy controller, this corresponds to the zkVersion)"""
     replicas: tuple[BrokerId, ...] = field(metadata={"kafka_type": "int32"}, default=())
     """The replica IDs."""
@@ -37,7 +40,7 @@ class LeaderAndIsrPartitionState:
     """The replica IDs that we are removing this partition from, or null if no replicas are being removed."""
     is_new: bool = field(metadata={"kafka_type": "bool"}, default=False)
     """Whether the replica should have existed on the broker or not."""
-    leader_recovery_state: int = field(metadata={"kafka_type": "int8"}, default=0)
+    leader_recovery_state: i8 = field(metadata={"kafka_type": "int8"}, default=i8(0))
     """1 if the partition is recovering from an unclean leader election; 0 otherwise."""
 
 
@@ -59,7 +62,7 @@ class LeaderAndIsrLiveLeader:
     """The leader's broker ID."""
     host_name: str = field(metadata={"kafka_type": "string"})
     """The leader's hostname."""
-    port: int = field(metadata={"kafka_type": "int32"})
+    port: i32 = field(metadata={"kafka_type": "int32"})
     """The leader's port."""
 
 
@@ -68,11 +71,11 @@ class LeaderAndIsrRequest:
     __flexible__: ClassVar[bool] = True
     controller_id: BrokerId = field(metadata={"kafka_type": "int32"})
     """The current controller ID."""
-    controller_epoch: int = field(metadata={"kafka_type": "int32"})
+    controller_epoch: i32 = field(metadata={"kafka_type": "int32"})
     """The current controller epoch."""
-    broker_epoch: int = field(metadata={"kafka_type": "int64"}, default=-1)
+    broker_epoch: i64 = field(metadata={"kafka_type": "int64"}, default=i64(-1))
     """The current broker epoch."""
-    type: int = field(metadata={"kafka_type": "int8"})
+    type: i8 = field(metadata={"kafka_type": "int8"})
     """The type that indicates whether all topics are included in the request"""
     topic_states: tuple[LeaderAndIsrTopicState, ...]
     """Each topic."""

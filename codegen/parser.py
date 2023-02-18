@@ -69,16 +69,20 @@ class Primitive(enum.Enum):
 
     def get_type_hint(self, optional: bool = False) -> str:
         match self:
-            case (
-                Primitive.int8
-                | Primitive.int16
-                | Primitive.int32
-                | Primitive.int64
-                | Primitive.uint16
-                | Primitive.uint32
-                | Primitive.uint64
-            ):
-                hint = "int"
+            case Primitive.int8:
+                hint = "i8"
+            case Primitive.int16:
+                hint = "i16"
+            case Primitive.int32:
+                hint = "i32"
+            case Primitive.int64:
+                hint = "i64"
+            case Primitive.uint16:
+                hint = "u16"
+            case Primitive.uint32:
+                hint = "u32"
+            case Primitive.uint64:
+                hint = "u64"
             case (Primitive.float16 | Primitive.float32 | Primitive.float64):
                 hint = "float"
             case Primitive.string:

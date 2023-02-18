@@ -6,6 +6,8 @@ from dataclasses import field
 from typing import ClassVar
 
 from kio.schema.entity import GroupId
+from kio.schema.primitive import i16
+from kio.schema.primitive import i32
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -30,7 +32,7 @@ class DescribedGroupMember:
 @dataclass(frozen=True, slots=True, kw_only=True)
 class DescribedGroup:
     __flexible__: ClassVar[bool] = True
-    error_code: int = field(metadata={"kafka_type": "int16"})
+    error_code: i16 = field(metadata={"kafka_type": "int16"})
     """The describe error, or 0 if there was no error."""
     group_id: GroupId = field(metadata={"kafka_type": "string"})
     """The group ID string."""
@@ -42,8 +44,8 @@ class DescribedGroup:
     """The group protocol data, or the empty string."""
     members: tuple[DescribedGroupMember, ...]
     """The group members."""
-    authorized_operations: int = field(
-        metadata={"kafka_type": "int32"}, default=-2147483648
+    authorized_operations: i32 = field(
+        metadata={"kafka_type": "int32"}, default=i32(-2147483648)
     )
     """32-bit bitfield to represent authorized operations for this group."""
 
@@ -51,7 +53,7 @@ class DescribedGroup:
 @dataclass(frozen=True, slots=True, kw_only=True)
 class DescribeGroupsResponse:
     __flexible__: ClassVar[bool] = True
-    throttle_time_ms: int = field(metadata={"kafka_type": "int32"})
+    throttle_time_ms: i32 = field(metadata={"kafka_type": "int32"})
     """The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota."""
     groups: tuple[DescribedGroup, ...]
     """Each described group."""

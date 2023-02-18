@@ -7,20 +7,22 @@ from typing import ClassVar
 
 from kio.schema.entity import BrokerId
 from kio.schema.entity import TopicName
+from kio.schema.primitive import i32
+from kio.schema.primitive import i64
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class PartitionData:
     __flexible__: ClassVar[bool] = True
-    partition_index: int = field(metadata={"kafka_type": "int32"})
+    partition_index: i32 = field(metadata={"kafka_type": "int32"})
     """The partition index."""
-    candidate_epoch: int = field(metadata={"kafka_type": "int32"})
+    candidate_epoch: i32 = field(metadata={"kafka_type": "int32"})
     """The bumped epoch of the candidate sending the request"""
     candidate_id: BrokerId = field(metadata={"kafka_type": "int32"})
     """The ID of the voter sending the request"""
-    last_offset_epoch: int = field(metadata={"kafka_type": "int32"})
+    last_offset_epoch: i32 = field(metadata={"kafka_type": "int32"})
     """The epoch of the last record written to the metadata log"""
-    last_offset: int = field(metadata={"kafka_type": "int64"})
+    last_offset: i64 = field(metadata={"kafka_type": "int64"})
     """The offset of the last record written to the metadata log"""
 
 

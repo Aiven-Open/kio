@@ -7,18 +7,19 @@ from typing import ClassVar
 
 from kio.schema.entity import BrokerId
 from kio.schema.entity import TopicName
+from kio.schema.primitive import i32
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class PartitionData:
     __flexible__: ClassVar[bool] = False
-    partition_index: int = field(metadata={"kafka_type": "int32"})
+    partition_index: i32 = field(metadata={"kafka_type": "int32"})
     """The partition index."""
     leader_id: BrokerId = field(metadata={"kafka_type": "int32"})
     """The current leader ID that is resigning"""
-    leader_epoch: int = field(metadata={"kafka_type": "int32"})
+    leader_epoch: i32 = field(metadata={"kafka_type": "int32"})
     """The current epoch"""
-    preferred_successors: tuple[int, ...] = field(
+    preferred_successors: tuple[i32, ...] = field(
         metadata={"kafka_type": "int32"}, default=()
     )
     """A sorted list of preferred successors to start the election"""

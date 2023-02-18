@@ -7,16 +7,20 @@ from typing import ClassVar
 
 from kio.schema.entity import GroupId
 from kio.schema.entity import TopicName
+from kio.schema.primitive import i32
+from kio.schema.primitive import i64
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class OffsetCommitRequestPartition:
     __flexible__: ClassVar[bool] = True
-    partition_index: int = field(metadata={"kafka_type": "int32"})
+    partition_index: i32 = field(metadata={"kafka_type": "int32"})
     """The partition index."""
-    committed_offset: int = field(metadata={"kafka_type": "int64"})
+    committed_offset: i64 = field(metadata={"kafka_type": "int64"})
     """The message offset to be committed."""
-    committed_leader_epoch: int = field(metadata={"kafka_type": "int32"}, default=-1)
+    committed_leader_epoch: i32 = field(
+        metadata={"kafka_type": "int32"}, default=i32(-1)
+    )
     """The leader epoch of this partition."""
     committed_metadata: str | None = field(metadata={"kafka_type": "string"})
     """Any associated metadata the client wants to keep."""
@@ -36,7 +40,7 @@ class OffsetCommitRequest:
     __flexible__: ClassVar[bool] = True
     group_id: GroupId = field(metadata={"kafka_type": "string"})
     """The unique group identifier."""
-    generation_id: int = field(metadata={"kafka_type": "int32"}, default=-1)
+    generation_id: i32 = field(metadata={"kafka_type": "int32"}, default=i32(-1))
     """The generation of the group."""
     member_id: str = field(metadata={"kafka_type": "string"})
     """The member ID assigned by the group coordinator."""

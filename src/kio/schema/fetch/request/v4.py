@@ -7,16 +7,19 @@ from typing import ClassVar
 
 from kio.schema.entity import BrokerId
 from kio.schema.entity import TopicName
+from kio.schema.primitive import i8
+from kio.schema.primitive import i32
+from kio.schema.primitive import i64
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class FetchPartition:
     __flexible__: ClassVar[bool] = False
-    partition: int = field(metadata={"kafka_type": "int32"})
+    partition: i32 = field(metadata={"kafka_type": "int32"})
     """The partition index."""
-    fetch_offset: int = field(metadata={"kafka_type": "int64"})
+    fetch_offset: i64 = field(metadata={"kafka_type": "int64"})
     """The message offset."""
-    partition_max_bytes: int = field(metadata={"kafka_type": "int32"})
+    partition_max_bytes: i32 = field(metadata={"kafka_type": "int32"})
     """The maximum bytes to fetch from this partition.  See KIP-74 for cases where this limit may not be honored."""
 
 
@@ -34,13 +37,13 @@ class FetchRequest:
     __flexible__: ClassVar[bool] = False
     replica_id: BrokerId = field(metadata={"kafka_type": "int32"})
     """The broker ID of the follower, of -1 if this request is from a consumer."""
-    max_wait_ms: int = field(metadata={"kafka_type": "int32"})
+    max_wait_ms: i32 = field(metadata={"kafka_type": "int32"})
     """The maximum time in milliseconds to wait for the response."""
-    min_bytes: int = field(metadata={"kafka_type": "int32"})
+    min_bytes: i32 = field(metadata={"kafka_type": "int32"})
     """The minimum bytes to accumulate in the response."""
-    max_bytes: int = field(metadata={"kafka_type": "int32"}, default=2147483647)
+    max_bytes: i32 = field(metadata={"kafka_type": "int32"}, default=i32(2147483647))
     """The maximum bytes to fetch.  See KIP-74 for cases where this limit may not be honored."""
-    isolation_level: int = field(metadata={"kafka_type": "int8"}, default=0)
+    isolation_level: i8 = field(metadata={"kafka_type": "int8"}, default=i8(0))
     """This setting controls the visibility of transactional records. Using READ_UNCOMMITTED (isolation_level = 0) makes all records visible. With READ_COMMITTED (isolation_level = 1), non-transactional and COMMITTED transactional records are visible. To be more concrete, READ_COMMITTED returns all data from offsets smaller than the current LSO (last stable offset), and enables the inclusion of the list of aborted transactions in the result, which allows consumers to discard ABORTED transactional records"""
     topics: tuple[FetchTopic, ...]
     """The topics to fetch."""

@@ -11,6 +11,8 @@ from kio.schema.metadata.response.v12 import MetadataResponse
 from kio.schema.metadata.response.v12 import (
     MetadataResponseBroker as MetadataResponseBrokerV12,
 )
+from kio.schema.primitive import i16
+from kio.schema.primitive import i32
 from kio.serial import decoders
 from kio.serial.decoders import read_async
 from kio.serial.decoders import read_sync
@@ -104,11 +106,11 @@ class TestGetDecoder:
 def test_can_parse_entity(buffer: io.BytesIO) -> None:
     assert MetadataResponseBrokerV12.__flexible__
     # node_id
-    write_int32(buffer, 123)
+    write_int32(buffer, i32(123))
     # host
     write_compact_string(buffer, "kafka.aiven.test")
     # port
-    write_int32(buffer, 23_126)
+    write_int32(buffer, i32(23_126))
     # rack
     write_compact_string(buffer, "da best")
     # tagged fields
@@ -127,11 +129,11 @@ def test_can_parse_entity(buffer: io.BytesIO) -> None:
 def test_can_parse_legacy_entity(buffer: io.BytesIO) -> None:
     assert not MetadataResponseBrokerV5.__flexible__
     # node_id
-    write_int32(buffer, 123)
+    write_int32(buffer, i32(123))
     # host
     write_legacy_string(buffer, "kafka.aiven.test")
     # port
-    write_int32(buffer, 23_126)
+    write_int32(buffer, i32(23_126))
     # rack
     write_legacy_string(buffer, "da best")
     # tagged fields
@@ -151,13 +153,13 @@ def test_can_parse_complex_entity(buffer: io.BytesIO) -> None:
     assert MetadataResponse.__flexible__
 
     # throttle time
-    write_int32(buffer, 123)
+    write_int32(buffer, i32(123))
 
     # brokers
     write_compact_array_length(buffer, 2)
     for i in range(1, 3):
         # node_id
-        write_int32(buffer, i)
+        write_int32(buffer, i32(i))
         # host
         write_compact_string(buffer, "kafka.aiven.test")
         # port
@@ -171,14 +173,14 @@ def test_can_parse_complex_entity(buffer: io.BytesIO) -> None:
     write_nullable_compact_string(buffer, None)
 
     # controller id
-    write_int32(buffer, 321)
+    write_int32(buffer, i32(321))
 
     # topics
     write_compact_array_length(buffer, 1)
     topic_id = uuid.uuid4()
     for i in range(1):
         # error code
-        write_int16(buffer, 0)
+        write_int16(buffer, i16(0))
         # name
         write_compact_string(buffer, f"great topic {i}")
         # topic_id
@@ -190,27 +192,27 @@ def test_can_parse_complex_entity(buffer: io.BytesIO) -> None:
         write_compact_array_length(buffer, 1)
         for ii in range(1):
             # error_code
-            write_int16(buffer, 0)
+            write_int16(buffer, i16(0))
             # partition_index
-            write_int32(buffer, ii)
+            write_int32(buffer, i32(ii))
             # leader_id
-            write_int32(buffer, 321)
+            write_int32(buffer, i32(321))
             # leader_epoch
-            write_int32(buffer, 13)
+            write_int32(buffer, i32(13))
             # replica_nodes
             write_compact_array_length(buffer, 0)
             # isr_nodes
             write_compact_array_length(buffer, 0)
             # offline_replicas
             write_compact_array_length(buffer, 3)
-            write_int32(buffer, 123)
-            write_int32(buffer, 1090)
-            write_int32(buffer, 3321)
+            write_int32(buffer, i32(123))
+            write_int32(buffer, i32(1090))
+            write_int32(buffer, i32(3321))
             # tagged fields
             write_empty_tagged_fields(buffer)
 
         # topic_authorized_operations
-        write_int32(buffer, 0)
+        write_int32(buffer, i32(0))
         # tagged fields
         write_empty_tagged_fields(buffer)
 
@@ -242,13 +244,13 @@ async def test_can_parse_complex_entity_async(
     assert MetadataResponse.__flexible__
 
     # throttle time
-    write_int32(stream_writer, 123)
+    write_int32(stream_writer, i32(123))
 
     # brokers
     write_compact_array_length(stream_writer, 2)
     for i in range(1, 3):
         # node_id
-        write_int32(stream_writer, i)
+        write_int32(stream_writer, i32(i))
         # host
         write_compact_string(stream_writer, "kafka.aiven.test")
         # port
@@ -262,14 +264,14 @@ async def test_can_parse_complex_entity_async(
     write_nullable_compact_string(stream_writer, None)
 
     # controller id
-    write_int32(stream_writer, 321)
+    write_int32(stream_writer, i32(321))
 
     # topics
     write_compact_array_length(stream_writer, 1)
     topic_id = uuid.uuid4()
     for i in range(1):
         # error code
-        write_int16(stream_writer, 0)
+        write_int16(stream_writer, i16(0))
         # name
         write_compact_string(stream_writer, f"great topic {i}")
         # topic_id
@@ -281,27 +283,27 @@ async def test_can_parse_complex_entity_async(
         write_compact_array_length(stream_writer, 1)
         for ii in range(1):
             # error_code
-            write_int16(stream_writer, 0)
+            write_int16(stream_writer, i16(0))
             # partition_index
-            write_int32(stream_writer, ii)
+            write_int32(stream_writer, i32(ii))
             # leader_id
-            write_int32(stream_writer, 321)
+            write_int32(stream_writer, i32(321))
             # leader_epoch
-            write_int32(stream_writer, 13)
+            write_int32(stream_writer, i32(13))
             # replica_nodes
             write_compact_array_length(stream_writer, 0)
             # isr_nodes
             write_compact_array_length(stream_writer, 0)
             # offline_replicas
             write_compact_array_length(stream_writer, 3)
-            write_int32(stream_writer, 123)
-            write_int32(stream_writer, 1090)
-            write_int32(stream_writer, 3321)
+            write_int32(stream_writer, i32(123))
+            write_int32(stream_writer, i32(1090))
+            write_int32(stream_writer, i32(3321))
             # tagged fields
             write_empty_tagged_fields(stream_writer)
 
         # topic_authorized_operations
-        write_int32(stream_writer, 0)
+        write_int32(stream_writer, i32(0))
         # tagged fields
         write_empty_tagged_fields(stream_writer)
 

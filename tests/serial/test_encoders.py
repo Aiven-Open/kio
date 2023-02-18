@@ -1,11 +1,12 @@
 import io
 import struct
-from collections.abc import Callable
 from contextlib import closing
+from typing import Generic
+from typing import TypeVar
 
 import pytest
 
-from kio.serial.encoders import Writable
+from kio.serial.encoders import Writer
 from kio.serial.encoders import write_compact_string
 from kio.serial.encoders import write_empty_tagged_fields
 from kio.serial.encoders import write_int8
@@ -20,9 +21,11 @@ from kio.serial.encoders import write_uint32
 from kio.serial.encoders import write_uint64
 from kio.serial.encoders import write_unsigned_varint
 
+_I = TypeVar("_I", bound=int, contravariant=True)
 
-class IntWriterContract:
-    write_function: Callable[[Writable, int], None]
+
+class IntWriterContract(Generic[_I]):
+    write_function: Writer[_I]
     lower_limit: int
     lower_limit_as_bytes: bytes
     upper_limit: int

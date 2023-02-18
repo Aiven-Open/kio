@@ -6,18 +6,20 @@ from dataclasses import field
 from typing import ClassVar
 
 from kio.schema.entity import BrokerId
+from kio.schema.primitive import i16
+from kio.schema.primitive import i32
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class Voter:
     __flexible__: ClassVar[bool] = True
-    voter_id: int = field(metadata={"kafka_type": "int32"})
+    voter_id: i32 = field(metadata={"kafka_type": "int32"})
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class LeaderChangeMessage:
     __flexible__: ClassVar[bool] = True
-    version: int = field(metadata={"kafka_type": "int16"})
+    version: i16 = field(metadata={"kafka_type": "int16"})
     """The version of the leader change message"""
     leader_id: BrokerId = field(metadata={"kafka_type": "int32"})
     """The ID of the newly elected leader"""

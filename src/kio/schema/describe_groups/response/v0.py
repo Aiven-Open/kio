@@ -6,6 +6,7 @@ from dataclasses import field
 from typing import ClassVar
 
 from kio.schema.entity import GroupId
+from kio.schema.primitive import i16
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -26,7 +27,7 @@ class DescribedGroupMember:
 @dataclass(frozen=True, slots=True, kw_only=True)
 class DescribedGroup:
     __flexible__: ClassVar[bool] = False
-    error_code: int = field(metadata={"kafka_type": "int16"})
+    error_code: i16 = field(metadata={"kafka_type": "int16"})
     """The describe error, or 0 if there was no error."""
     group_id: GroupId = field(metadata={"kafka_type": "string"})
     """The group ID string."""

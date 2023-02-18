@@ -35,6 +35,8 @@ Generated from {schema_source}.
 from dataclasses import dataclass, field
 from typing import Annotated, ClassVar
 import uuid
+from kio.schema.primitive import i8, i16, i32, i64
+from kio.schema.primitive import u8, u16, u32, u64
 '''
 
 
@@ -65,18 +67,18 @@ def format_default(
             | Primitive.uint16
             | Primitive.uint32
             | Primitive.uint64
-        ), int(default):
-            return f"{entity_type_open}{default}{entity_type_close}"
-        case (
-            Primitive.int8
-            | Primitive.int16
-            | Primitive.int32
-            | Primitive.int64
-            | Primitive.uint16
-            | Primitive.uint32
-            | Primitive.uint64
         ), str(default):
-            return f"{entity_type_open}{int(default, 0)}{entity_type_close}"
+            type_open = f"{type_.get_type_hint()}("
+            type_close = ")"
+            return "".join(
+                (
+                    entity_type_open,
+                    type_open,
+                    str(int(default, 0)),
+                    type_close,
+                    entity_type_close,
+                )
+            )
         case Primitive.bool_, str(default):
             value = default.capitalize()
             assert value in ("True", "False"), f"invalid default for bool: {default}"
@@ -304,6 +306,10 @@ def create_package(path: pathlib.Path) -> None:
 
 
 seen_entitites = set[str]()
+entity_imports = """\
+from typing import NewType
+from kio.schema.primitive import i8, i16, i32, i64, u8, u16, u32, u64
+"""
 
 
 def write_entity_type(path: pathlib.Path, entity_type: EntityTypeDef) -> None:
@@ -313,7 +319,7 @@ def write_entity_type(path: pathlib.Path, entity_type: EntityTypeDef) -> None:
     seen_entitites.add(entity_type.name)
     with path.open("a") as fd:
         if write_imports:
-            print("from typing import NewType", file=fd)
+            print(entity_imports, file=fd)
         print(entity_type.get_definition(), file=fd)
 
 
@@ -349,12 +355,18 @@ def write_to_version_module(
     print(" done.")
 
 
+def create_module_primitive(destination: pathlib.Path) -> None:
+    source = pathlib.Path(__file__).parent.resolve() / "template/primitive.py"
+    shutil.copy(source, destination)
+
+
 def main() -> None:
     schema_output_path = pathlib.Path("src/kio/schema/")
     entity_module_path = schema_output_path / "entity.py"
     shutil.rmtree(schema_output_path)
     create_package(schema_output_path)
     schemas = pathlib.Path("schema/").glob("*.json")
+    create_module_primitive(schema_output_path / "primitive.py")
 
     for path in schemas:
         try:

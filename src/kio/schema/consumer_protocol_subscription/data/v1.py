@@ -6,13 +6,14 @@ from dataclasses import field
 from typing import ClassVar
 
 from kio.schema.entity import TopicName
+from kio.schema.primitive import i32
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class TopicPartition:
     __flexible__: ClassVar[bool] = False
     topic: TopicName = field(metadata={"kafka_type": "string"})
-    partitions: tuple[int, ...] = field(metadata={"kafka_type": "int32"}, default=())
+    partitions: tuple[i32, ...] = field(metadata={"kafka_type": "int32"}, default=())
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

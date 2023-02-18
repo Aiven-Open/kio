@@ -1,7 +1,7 @@
 import io
 import uuid
+from typing import TypeVar
 
-import pytest
 from hypothesis import given
 from hypothesis.strategies import binary
 from hypothesis.strategies import booleans
@@ -70,8 +70,11 @@ def test_booleans_roundtrip_sync(a: bool, b: bool) -> None:
     assert buffer.read(1) == b""
 
 
+_I = TypeVar("_I", bound=int, contravariant=True)
+
+
 def create_integer_roundtrip_test(
-    int_writer: Writer[int],
+    int_writer: Writer[_I],
     int_decoder: Decoder[int],
     min_value: int,
     max_value: int,
@@ -83,7 +86,7 @@ def create_integer_roundtrip_test(
 
     class Test:
         @parameterize
-        def test_roundtrip_sync(self, a: bool, b: bool) -> None:
+        def test_roundtrip_sync(self, a: _I, b: _I) -> None:
             buffer = io.BytesIO()
             int_writer(buffer, a)
             int_writer(buffer, b)
@@ -94,7 +97,7 @@ def create_integer_roundtrip_test(
             assert buffer.read(1) == b"", "buffer not exhausted"
 
         @parameterize
-        async def test_roundtrip_async(self, a: bool, b: bool) -> None:
+        async def test_roundtrip_async(self, a: _I, b: _I) -> None:
             async with setup_async_buffers() as (stream_reader, stream_writer):
                 int_writer(stream_writer, a)
                 int_writer(stream_writer, b)
@@ -308,11 +311,6 @@ async def test_uuid_roundtrip_async(a: uuid.UUID, b: uuid.UUID) -> None:
         assert b == await read_async(stream_reader, decode_uuid)
 
 
-# All field types need to use properly narrow types for this to work. There is
-# currently no way for Hypothesis to know that throttle_time_ms must be in the
-# range -2147483648 <= x <= 2147483647, and so it gives a falsifying example of
-# 2147483648.
-@pytest.mark.xfail
 @given(from_type(MetadataResponse))
 async def test_flexible_entity_roundtrip_async(instance: MetadataResponse) -> None:
     write_metadata_response = entity_writer(MetadataResponse)
