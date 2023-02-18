@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
 
-from kio.schema.entity import BrokerId
+from kio.schema.types import BrokerId
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
