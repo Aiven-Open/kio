@@ -55,6 +55,8 @@ class TestGetWriter:
             ("bytes", False, True, encoders.write_nullable_legacy_string),
             ("bytes", True, False, encoders.write_compact_string),
             ("bytes", False, False, encoders.write_legacy_string),
+            ("records", True, True, encoders.write_nullable_legacy_string),
+            ("records", False, True, encoders.write_nullable_legacy_string),
             ("uuid", False, False, encoders.write_uuid),
             ("uuid", True, False, encoders.write_uuid),
             ("bool", False, False, encoders.write_boolean),
@@ -95,6 +97,8 @@ class TestGetWriter:
             ("uuid", True, True),
             ("bool", False, True),
             ("bool", True, True),
+            ("records", True, False),
+            ("records", False, False),
         ),
     )
     def test_raises_not_implemented_error_for_invalid_combination(

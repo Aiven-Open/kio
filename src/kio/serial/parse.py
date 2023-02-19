@@ -57,6 +57,8 @@ def get_decoder(
             return decoders.decode_legacy_bytes
         case ("bytes", False, True):
             return decoders.decode_nullable_legacy_bytes
+        case ("records", _, True):
+            return decoders.decode_nullable_legacy_bytes
         case ("uuid", _, False):
             return decoders.decode_uuid
         case ("bool", _, False):
