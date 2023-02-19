@@ -32,6 +32,7 @@ class A:
     simple_primitive: int
     complex_primitive: int | str
     primitive_tuple: tuple[int, ...]
+    entity: Nested
     entity_tuple: tuple[Nested, ...]
     unsupported_tuple: tuple[int, str]
 
@@ -90,8 +91,11 @@ class TestClassifyField:
             int,
         )
 
-    def test_can_classifY_entity_tuple_field(self) -> None:
+    def test_can_classify_entity_tuple_field(self) -> None:
         assert classify_field(model_fields["entity_tuple"]) == (
             FieldKind.entity_tuple,
             Nested,
         )
+
+    def test_can_classify_simple_nested_entity(self) -> None:
+        assert classify_field(model_fields["entity"]) == (FieldKind.entity, Nested)

@@ -77,6 +77,8 @@ def get_field_writer(field: Field[T], flexible: bool) -> Writer[T]:
                     optional=is_optional(field),
                 )
             )
+        case FieldKind.entity:
+            return entity_writer(field_type)  # type: ignore[type-var]
         case FieldKind.entity_tuple:
             return compact_array_writer(  # type: ignore[return-value]
                 entity_writer(field_type)  # type: ignore[type-var]
