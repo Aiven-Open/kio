@@ -47,6 +47,14 @@ def get_decoder(
             return decoders.decode_legacy_string
         case ("string", False, True):
             return decoders.decode_nullable_legacy_string
+        case ("bytes", True, False):
+            return decoders.decode_compact_string_as_bytes
+        case ("bytes", True, True):
+            return decoders.decode_compact_string_as_bytes_nullable
+        case ("bytes", False, False):
+            return decoders.decode_legacy_bytes
+        case ("bytes", False, True):
+            return decoders.decode_nullable_legacy_bytes
         case ("uuid", _, False):
             return decoders.decode_uuid
         case ("bool", _, False):

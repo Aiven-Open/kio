@@ -46,13 +46,21 @@ def get_writer(
             return encoders.write_legacy_string
         case ("string", False, True):
             return encoders.write_nullable_legacy_string
+        case ("bytes", True, False):
+            return encoders.write_compact_string
+        case ("bytes", True, True):
+            return encoders.write_nullable_compact_string
+        case ("bytes", False, False):
+            return encoders.write_legacy_string
+        case ("bytes", False, True):
+            return encoders.write_nullable_legacy_string
         case ("uuid", _, False):
             return encoders.write_uuid
         case ("bool", _, False):
             return encoders.write_boolean
 
     raise NotImplementedError(
-        f"Failed identifying decoder for {kafka_type!r} field {flexible=} {optional=}"
+        f"Failed identifying encoder for {kafka_type!r} field {flexible=} {optional=}"
     )
 
 
