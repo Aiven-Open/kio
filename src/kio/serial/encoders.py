@@ -92,6 +92,10 @@ def write_unsigned_varint(buffer: Writable, value: int) -> None:
     buffer.write(seven_bit_chunk.to_bytes(1, "little"))
 
 
+def write_float64(buffer: Writable, value: float) -> None:
+    buffer.write(struct.pack(">d", value))
+
+
 def write_nullable_compact_string(buffer: Writable, value: str | bytes | None) -> None:
     """Write a nullable string with compact length encoding."""
     if value is None:

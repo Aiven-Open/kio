@@ -1,6 +1,7 @@
 import asyncio
 import io
 import struct
+import sys
 from typing import IO
 
 import pytest
@@ -10,6 +11,7 @@ from kio.serial.decoders import decode_compact_string
 from kio.serial.decoders import decode_compact_string_as_bytes
 from kio.serial.decoders import decode_compact_string_as_bytes_nullable
 from kio.serial.decoders import decode_compact_string_nullable
+from kio.serial.decoders import decode_float64
 from kio.serial.decoders import decode_int8
 from kio.serial.decoders import decode_int16
 from kio.serial.decoders import decode_int32
@@ -186,6 +188,26 @@ class TestDecodeUnsignedVarint(IntDecoderContract):
         buffer.seek(0)
         with pytest.raises(ValueError, match=r"^Varint is too long"):
             self.read_sync(buffer)
+
+
+class TestDecodeFloat64:
+    @pytest.mark.parametrize(
+        "value",
+        (
+            0,
+            0.0,
+            1,
+            1.0001,
+            -2345678.234567,
+            sys.float_info.min,
+            sys.float_info.max,
+        ),
+    )
+    def test_can_decode_value(self, buffer: io.BytesIO, value: float) -> None:
+        buffer.write(struct.pack(">d", value))
+        buffer.seek(0)
+        decoded = read_sync(buffer, decode_float64)
+        assert decoded == value
 
 
 class TestDecodeCompactStringAsBytes:

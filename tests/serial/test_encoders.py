@@ -1,5 +1,6 @@
 import io
 import struct
+import sys
 from contextlib import closing
 from typing import Generic
 from typing import TypeVar
@@ -9,6 +10,7 @@ import pytest
 from kio.serial.encoders import Writer
 from kio.serial.encoders import write_compact_string
 from kio.serial.encoders import write_empty_tagged_fields
+from kio.serial.encoders import write_float64
 from kio.serial.encoders import write_int8
 from kio.serial.encoders import write_int16
 from kio.serial.encoders import write_int32
@@ -181,6 +183,26 @@ class TestWriteUnsignedVarint:
         write_unsigned_varint(buffer, value)
         buffer.seek(0)
         assert buffer.read(1000) == expected
+
+
+class TestWriteFloat64:
+    @pytest.mark.parametrize(
+        "value",
+        (
+            0,
+            0.0,
+            1,
+            1.0001,
+            -2345678.234567,
+            sys.float_info.min,
+            sys.float_info.max,
+        ),
+    )
+    def test_can_decode_value(self, buffer: io.BytesIO, value: float) -> None:
+        write_float64(buffer, value)
+        buffer.seek(0)
+        (unpacked,) = struct.unpack(">d", buffer.read(8))
+        assert unpacked == value
 
 
 class TestWriteEmptyTaggedFields:

@@ -39,6 +39,8 @@ def get_decoder(
             return decoders.decode_uint32
         case ("uint64", _, False):
             return decoders.decode_uint64
+        case ("float64", _, False):
+            return decoders.decode_float64
         case ("string", True, False):
             return decoders.decode_compact_string
         case ("string", True, True):
