@@ -39,6 +39,7 @@ def is_optional(field: Field) -> bool:
 class FieldKind(enum.Enum):
     primitive = enum.auto()
     primitive_tuple = enum.auto()
+    entity = enum.auto()
     entity_tuple = enum.auto()
 
 
@@ -49,8 +50,10 @@ def classify_field(field: Field[T]) -> tuple[FieldKind, type[T]]:
     type_origin = get_origin(field.type)
 
     if type_origin is not tuple:
-        # Fixme: Should support non-tuple nested entities!!
-        return FieldKind.primitive, field.type
+        if is_dataclass(field.type):
+            return FieldKind.entity, field.type
+        else:
+            return FieldKind.primitive, field.type
 
     type_args = get_args(field.type)
 

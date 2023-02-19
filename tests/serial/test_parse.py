@@ -1,6 +1,9 @@
 import asyncio
 import io
 import uuid
+from dataclasses import dataclass
+from dataclasses import field
+from typing import ClassVar
 
 import pytest
 
@@ -326,3 +329,59 @@ async def test_can_parse_complex_entity_async(
     assert instance.topics[0].is_internal is False
     assert len(instance.topics[0].partitions) == 1
     assert instance.topics[0].topic_authorized_operations == 0
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class Child:
+    __flexible__: ClassVar[bool] = True
+    name: str = field(metadata={"kafka_type": "string"})
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class UniParent:
+    __flexible__: ClassVar[bool] = True
+    name: str = field(metadata={"kafka_type": "string"})
+    child: Child
+
+
+def test_can_parse_nested_non_array_entity(buffer: io.BytesIO) -> None:
+    write_compact_string(buffer, "parent name")
+    write_compact_string(buffer, "child name")
+    write_empty_tagged_fields(buffer)  # child fields
+    write_empty_tagged_fields(buffer)  # parent fields
+    buffer.seek(0)
+
+    instance = read_sync(buffer, entity_decoder(UniParent))
+
+    assert instance == UniParent(
+        name="parent name",
+        child=Child(name="child name"),
+    )
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class MultiParent:
+    __flexible__: ClassVar[bool] = True
+    name: str = field(metadata={"kafka_type": "string"})
+    children: tuple[Child, ...]
+
+
+def test_can_parse_nested_entity_array(buffer: io.BytesIO) -> None:
+    write_compact_string(buffer, "parent name")
+    write_compact_array_length(buffer, 2)
+    write_compact_string(buffer, "first child")
+    write_empty_tagged_fields(buffer)  # first child fields
+    write_compact_string(buffer, "second child")
+    write_empty_tagged_fields(buffer)  # second child fields
+    write_empty_tagged_fields(buffer)  # parent fields
+    buffer.seek(0)
+
+    instance = read_sync(buffer, entity_decoder(MultiParent))
+
+    assert instance == MultiParent(
+        name="parent name",
+        children=(
+            Child(name="first child"),
+            Child(name="second child"),
+        ),
+    )

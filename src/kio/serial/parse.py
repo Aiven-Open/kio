@@ -78,6 +78,8 @@ def get_field_decoder(entity_type: type[Entity], field: Field[T]) -> Decoder[T]:
                     optional=is_optional(field),
                 )
             )
+        case FieldKind.entity:
+            return entity_decoder(field_type)  # type: ignore[type-var]
         case FieldKind.entity_tuple:
             return compact_array_decoder(  # type: ignore[return-value]
                 entity_decoder(field_type)  # type: ignore[type-var]
