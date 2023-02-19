@@ -16,6 +16,7 @@ from kio.serial.decoders import decode_int32
 from kio.serial.decoders import decode_int64
 from kio.serial.decoders import decode_legacy_bytes
 from kio.serial.decoders import decode_legacy_string
+from kio.serial.decoders import decode_nullable_legacy_bytes
 from kio.serial.decoders import decode_nullable_legacy_string
 from kio.serial.decoders import decode_raw_bytes
 from kio.serial.decoders import decode_uint8
@@ -409,6 +410,48 @@ class TestDecodeRawBytes:
         stream_writer.write(value)
         await stream_writer.drain()
         assert value == await read_async(stream_reader, decode_raw_bytes)
+
+
+class TestDecodeNullableLegacyBytes:
+    def test_returns_none_for_negative_length_sync(
+        self,
+        buffer: io.BytesIO,
+    ) -> None:
+        buffer.write(struct.pack(">h", -1))
+        buffer.seek(0)
+        assert read_sync(buffer, decode_nullable_legacy_bytes) is None
+
+    async def test_returns_none_for_negative_length_async(
+        self,
+        stream_reader: asyncio.StreamReader,
+        stream_writer: asyncio.StreamWriter,
+    ) -> None:
+        stream_writer.write(struct.pack(">h", -1))
+        await stream_writer.drain()
+        assert await read_async(stream_reader, decode_nullable_legacy_bytes) is None
+
+    def test_can_decode_bytes_sync(
+        self,
+        buffer: io.BytesIO,
+    ) -> None:
+        value = b"k\x9bC\x94\xbe\x1fV\xd6"
+        byte_length = len(value)
+        buffer.write(struct.pack(">h", byte_length))
+        buffer.write(value)
+        buffer.seek(0)
+        assert value == read_sync(buffer, decode_nullable_legacy_bytes)
+
+    async def test_can_decode_bytes_async(
+        self,
+        stream_reader: asyncio.StreamReader,
+        stream_writer: asyncio.StreamWriter,
+    ) -> None:
+        value = b"k\x9bC\x94\xbe\x1fV\xd6"
+        byte_length = len(value)
+        stream_writer.write(struct.pack(">h", byte_length))
+        stream_writer.write(value)
+        await stream_writer.drain()
+        assert value == await read_async(stream_reader, decode_nullable_legacy_bytes)
 
 
 class TestDecodeLegacyString:

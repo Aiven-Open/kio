@@ -155,6 +155,14 @@ def decode_legacy_bytes() -> Cursor[bytes]:
     return bytes_value
 
 
+def decode_nullable_legacy_bytes() -> Cursor[bytes | None]:
+    length: int = yield decode_int16
+    if length == -1:
+        return None
+    bytes_value: bytes = yield length
+    return bytes_value
+
+
 def decode_legacy_string() -> Cursor[str]:
     length: int = yield decode_int16
     if length == -1:
