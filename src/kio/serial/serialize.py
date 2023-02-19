@@ -38,6 +38,8 @@ def get_writer(
             return encoders.write_uint32
         case ("uint64", _, False):
             return encoders.write_uint64
+        case ("float64", _, False):
+            return encoders.write_float64
         case ("string", True, False):
             return encoders.write_compact_string
         case ("string", True, True):

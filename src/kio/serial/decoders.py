@@ -105,6 +105,12 @@ def decode_unsigned_varint() -> Cursor[int]:
     )
 
 
+def decode_float64() -> Cursor[float]:
+    byte_value: bytes = yield 8
+    (value,) = struct.unpack(">d", byte_value)
+    return value  # type: ignore[no-any-return]
+
+
 def decode_compact_string_as_bytes() -> Cursor[bytes]:
     raw_length: int = yield decode_unsigned_varint
     # Kafka uses the string length plus 1.
