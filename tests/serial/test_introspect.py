@@ -73,6 +73,10 @@ class TestIsOptional:
     def test_returns_false_for_pep_604_union_without_none(self) -> None:
         assert is_optional(model_fields["pep_604_union_without_none"]) is False
 
+    def test_raises_schema_error_for_invalid_tuple_type(self) -> None:
+        with pytest.raises(SchemaError, match=r"has invalid tuple type"):
+            is_optional(model_fields["unsupported_tuple"])
+
 
 class TestClassifyField:
     def test_raises_schema_error_for_invalid_tuple_type(self) -> None:

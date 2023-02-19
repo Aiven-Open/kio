@@ -17,11 +17,13 @@ from kio.serial.encoders import write_int32
 from kio.serial.encoders import write_int64
 from kio.serial.encoders import write_legacy_string
 from kio.serial.encoders import write_nullable_compact_string
+from kio.serial.encoders import write_nullable_legacy_string
 from kio.serial.encoders import write_uint8
 from kio.serial.encoders import write_uint16
 from kio.serial.encoders import write_uint32
 from kio.serial.encoders import write_uint64
 from kio.serial.encoders import write_unsigned_varint
+from kio.serial.errors import OutOfBoundValue
 
 _I = TypeVar("_I", bound=int, contravariant=True)
 
@@ -267,3 +269,28 @@ class TestWriteLegacyString:
     def test_raises_type_error_for_none(self, buffer: io.BytesIO) -> None:
         with pytest.raises(TypeError, match=r"^Unexpectedly received None value"):
             write_legacy_string(buffer, None)  # type: ignore[arg-type]
+
+
+class TestWriteNullableLegacyString:
+    def test_can_write_valid_value(self, buffer: io.BytesIO) -> None:
+        value = "The quick brown 🦊 jumps over the lazy dog 🧖"
+        byte_value = value.encode()
+        byte_length = len(byte_value)
+        write_nullable_legacy_string(buffer, value)
+        buffer.seek(0)
+        (read_length,) = struct.unpack(">h", buffer.read(2))
+        assert read_length == byte_length
+        assert buffer.read(1000) == byte_value
+
+    def test_can_write_none(self, buffer: io.BytesIO) -> None:
+        write_nullable_legacy_string(buffer, None)
+        buffer.seek(0)
+        (read_length,) = struct.unpack(">h", buffer.read(2))
+        assert read_length == -1
+
+    def test_raises_out_of_bound_value_for_too_large_string(
+        self,
+        buffer: io.BytesIO,
+    ) -> None:
+        with pytest.raises(OutOfBoundValue):
+            write_nullable_legacy_string(buffer, 2**15 * "a")

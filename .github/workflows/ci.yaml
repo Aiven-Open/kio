@@ -11,6 +11,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
+env:
+  COLUMNS: "120"
+
 jobs:
   lint:
     name: Static analysis
