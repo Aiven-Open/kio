@@ -7,5 +7,5 @@ target-version = ["py311"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "src"]
-addopts = "--doctest-modules"
+addopts = "--doctest-modules --color=yes"
 asyncio_mode = "auto"

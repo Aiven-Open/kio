@@ -10,12 +10,18 @@ import pytest
 import pytest_asyncio
 
 
-@pytest.fixture(scope="function")
 def buffer() -> Iterator[io.BytesIO]:
     with closing(io.BytesIO()) as buffer:
         yield buffer
         # Make sure buffer is exhausted.
         assert buffer.read(1) == b"", "buffer not exhausted"
+
+
+buffer_fixture = pytest.fixture(
+    scope="function",
+    name="buffer",
+)(buffer)
+setup_buffer = contextlib.contextmanager(buffer)
 
 
 async def async_buffers() -> AsyncIterator[

@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
 
+from kio.schema.primitive import f64
 from kio.schema.primitive import i16
 from kio.schema.primitive import i32
 
@@ -23,7 +24,7 @@ class ValueData:
     __flexible__: ClassVar[bool] = False
     key: str = field(metadata={"kafka_type": "string"})
     """The quota configuration key."""
-    value: float = field(metadata={"kafka_type": "float64"})
+    value: f64 = field(metadata={"kafka_type": "float64"})
     """The quota configuration value."""
 
 
