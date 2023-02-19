@@ -56,6 +56,8 @@ def get_writer(
             return encoders.write_legacy_string
         case ("bytes", False, True):
             return encoders.write_nullable_legacy_string
+        case ("records", _, True):
+            return encoders.write_nullable_legacy_string
         case ("uuid", _, False):
             return encoders.write_uuid
         case ("bool", _, False):

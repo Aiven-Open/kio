@@ -62,6 +62,8 @@ class TestGetDecoder:
             ("bytes", True, True, decoders.decode_compact_string_as_bytes_nullable),
             ("bytes", False, False, decoders.decode_legacy_bytes),
             ("bytes", False, True, decoders.decode_nullable_legacy_bytes),
+            ("records", True, True, decoders.decode_nullable_legacy_bytes),
+            ("records", False, True, decoders.decode_nullable_legacy_bytes),
             ("uuid", False, False, decoders.decode_uuid),
             ("uuid", True, False, decoders.decode_uuid),
             ("bool", False, False, decoders.decode_boolean),
@@ -102,6 +104,8 @@ class TestGetDecoder:
             ("uuid", True, True),
             ("bool", False, True),
             ("bool", True, True),
+            ("records", True, False),
+            ("records", False, False),
         ),
     )
     def test_raises_not_implemented_error_for_invalid_combination(
