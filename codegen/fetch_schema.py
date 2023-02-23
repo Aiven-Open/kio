@@ -1,4 +1,5 @@
 import shutil
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Final
 
@@ -23,6 +24,17 @@ class ContentsResponse(BaseModel, allow_mutation=False):
     __root__: tuple[ContentFile, ...]
 
 
+def fetch_file(content_file: ContentFile) -> None:
+    file_path = schema_dir / content_file.name
+    with (
+        file_path.open("wb") as fd,
+        requests.get(content_file.download_url, stream=True) as stream_response,
+    ):
+        stream_response.raise_for_status()
+        for chunk in stream_response.iter_content(chunk_size=131_072):
+            fd.write(chunk)
+
+
 def main() -> None:
     # Remove existing schema directory.
     if schema_dir.exists():
@@ -34,16 +46,10 @@ def main() -> None:
     response.raise_for_status()
     parsed_response = ContentsResponse.parse_raw(response.content)
 
-    # Fetch and store
-    for content_file in parsed_response.__root__:
-        file_path = schema_dir / content_file.name
-        with (
-            file_path.open("wb") as fd,
-            requests.get(content_file.download_url, stream=True) as stream_response,
-        ):
-            stream_response.raise_for_status()
-            for chunk in stream_response.iter_content(chunk_size=131_072):
-                fd.write(chunk)
+    # Fetch and store each file, using threading.
+    with ThreadPoolExecutor() as pool:
+        for content_file in parsed_response.__root__:
+            pool.submit(fetch_file, content_file)
 
 
 if __name__ == "__main__":

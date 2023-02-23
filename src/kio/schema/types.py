@@ -2,11 +2,11 @@ from kio.schema.primitive import i32
 from kio.schema.primitive import i64
 
 
-class TopicName(str):
+class BrokerId(i32):
     ...
 
 
-class BrokerId(i32):
+class GroupId(str):
     ...
 
 
@@ -14,9 +14,9 @@ class ProducerId(i64):
     ...
 
 
-class TransactionalId(str):
+class TopicName(str):
     ...
 
 
-class GroupId(str):
+class TransactionalId(str):
     ...

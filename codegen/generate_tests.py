@@ -8,6 +8,8 @@ from types import ModuleType
 
 from codegen.case import to_snake_case
 
+import kio.schema
+
 
 def generate_modules(parent: ModuleType) -> Iterator[ModuleType]:
     for package in walk_packages(parent.__path__):
@@ -64,7 +66,7 @@ def test_{entity_snake_case}_roundtrip(instance: {entity_type}) -> None:
 
 base_dir = Path(__file__).parent.parent.resolve()
 generated_tests_module = base_dir / "tests" / "generated"
-schema_src_dir = base_dir / "src" / "kio" / "schema"
+schema_src_dir = Path(kio.schema.__file__).parent.resolve()
 
 
 def build_filename(source_path: str) -> str:

@@ -114,7 +114,7 @@ def format_dataclass_field(
     return f" = field({formatted_kwargs})"
 
 
-@dataclass(frozen=True, slots=True, kw_only=True)
+@dataclass(frozen=True, slots=True, kw_only=True, order=True)
 class EntityTypeDef:
     name: str
     type_: Primitive
@@ -392,6 +392,7 @@ def main() -> None:
     create_package(schema_output_path)
     schemas = pathlib.Path("schema/").glob("*.json")
     create_module_primitive(schema_output_path / "primitive.py")
+    entity_types = set[EntityTypeDef]()
 
     for path in schemas:
         try:
@@ -408,10 +409,9 @@ def main() -> None:
         for chunk in generate_models(schema):
             match chunk:
                 case (version, EntityTypeDef() as entity_type):
-                    module_entity_dependencies[(version, schema.type)].append(
-                        entity_type
-                    )
-                    write_entity_type(types_module_path, entity_type)
+                    key = (version, schema.type)
+                    module_entity_dependencies[key].append(entity_type)
+                    entity_types.add(entity_type)
                 case (version, code):
                     write_to_version_module(  # type: ignore[unreachable]
                         schema=schema,
@@ -423,3 +423,9 @@ def main() -> None:
                     )
                 case no_match:
                     assert_never(no_match)  # type: ignore[arg-type]
+
+    # We accumulate entity types and process them separately here, so that they can
+    # be sorted before written, otherwise they become a source of in-determinism.
+    for entity_type in sorted(entity_types):
+        print(f"-> [entity type] {entity_type.name}")
+        write_entity_type(types_module_path, entity_type)
