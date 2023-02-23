@@ -35,7 +35,7 @@ class DescribeClusterResponse:
     cluster_id: str = field(metadata={"kafka_type": "string"})
     """The cluster ID that responding broker belongs to."""
     controller_id: BrokerId = field(
-        metadata={"kafka_type": "int32"}, default=BrokerId(i32(-1))
+        metadata={"kafka_type": "int32"}, default=BrokerId(-1)
     )
     """The ID of the controller broker."""
     brokers: tuple[DescribeClusterBroker, ...]

@@ -45,9 +45,7 @@ class FetchSnapshotRequest:
     __flexible__: ClassVar[bool] = True
     cluster_id: str | None = field(metadata={"kafka_type": "string"}, default=None)
     """The clusterId if known, this is used to validate metadata fetches prior to broker registration"""
-    replica_id: BrokerId = field(
-        metadata={"kafka_type": "int32"}, default=BrokerId(i32(-1))
-    )
+    replica_id: BrokerId = field(metadata={"kafka_type": "int32"}, default=BrokerId(-1))
     """The broker ID of the follower"""
     max_bytes: i32 = field(metadata={"kafka_type": "int32"}, default=i32(2147483647))
     """The maximum bytes to fetch from all of the snapshots"""

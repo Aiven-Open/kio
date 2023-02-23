@@ -69,15 +69,19 @@ def format_default(
             | Primitive.uint32
             | Primitive.uint64
         ), str(default):
-            type_open = f"{type_.get_type_hint()}("
-            type_close = ")"
+            if entity_type_open:
+                return "".join(
+                    (
+                        entity_type_open,
+                        str(int(default, 0)),
+                        entity_type_close,
+                    )
+                )
             return "".join(
                 (
-                    entity_type_open,
-                    type_open,
+                    f"{type_.get_type_hint()}(",
                     str(int(default, 0)),
-                    type_close,
-                    entity_type_close,
+                    ")",
                 )
             )
         case Primitive.bool_, str(default):
@@ -113,10 +117,34 @@ def format_dataclass_field(
 @dataclass(frozen=True, slots=True, kw_only=True)
 class EntityTypeDef:
     name: str
-    type_hint: str
+    type_: Primitive
 
     def get_definition(self) -> str:
-        return f'{self.name} = NewType("{self.name}", {self.type_hint})'
+        type_hint = self.type_.get_type_hint()
+        if self.type_ is Primitive.string:
+            return textwrap.dedent(
+                f"""\
+                class {self.name}({type_hint}):
+                    ...
+                """
+            )
+        elif self.type_ in (
+            Primitive.int8,
+            Primitive.int16,
+            Primitive.int32,
+            Primitive.int64,
+            Primitive.uint16,
+            Primitive.uint32,
+            Primitive.uint64,
+            Primitive.float64,
+        ):
+            return textwrap.dedent(
+                f"""\
+                class {self.name}({type_hint}):
+                    ...
+                """
+            )
+        return f'{self.name} = NewType("{self.name}", {type_hint})'
 
     def get_import(self) -> str:
         return f"from kio.schema.types import {self.name}"
@@ -135,10 +163,7 @@ def generate_entity_type(
     name = capitalize_first(raw_name)
     if (entity_type := entities.get(name)) is not None:
         return entity_type
-    entity_type = EntityTypeDef(
-        name=name,
-        type_hint=type_.get_type_hint(),
-    )
+    entity_type = EntityTypeDef(name=name, type_=type_)
     entities[name] = entity_type
     return entity_type
 
@@ -306,6 +331,7 @@ seen_entitites = set[str]()
 entity_imports = """\
 from typing import NewType
 from kio.schema.primitive import i8, i16, i32, i64, u8, u16, u32, u64, f64
+from phantom import Phantom
 """
 
 

@@ -33,9 +33,7 @@ class OffsetForLeaderTopic:
 @dataclass(frozen=True, slots=True, kw_only=True)
 class OffsetForLeaderEpochRequest:
     __flexible__: ClassVar[bool] = False
-    replica_id: BrokerId = field(
-        metadata={"kafka_type": "int32"}, default=BrokerId(i32(-2))
-    )
+    replica_id: BrokerId = field(metadata={"kafka_type": "int32"}, default=BrokerId(-2))
     """The broker ID of the follower, of -1 if this request is from a consumer."""
     topics: tuple[OffsetForLeaderTopic, ...]
     """Each topic to get offsets for."""

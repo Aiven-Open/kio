@@ -38,7 +38,7 @@ class PartitionData:
     aborted_transactions: tuple[AbortedTransaction, ...]
     """The aborted transactions."""
     preferred_read_replica: BrokerId = field(
-        metadata={"kafka_type": "int32"}, default=BrokerId(i32(-1))
+        metadata={"kafka_type": "int32"}, default=BrokerId(-1)
     )
     """The preferred read replica for the consumer to use on its next fetch request"""
     records: tuple[bytes | None, ...] | None = field(metadata={"kafka_type": "records"})
