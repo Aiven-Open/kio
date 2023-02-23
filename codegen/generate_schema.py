@@ -114,7 +114,7 @@ def format_dataclass_field(
     return f" = field({formatted_kwargs})"
 
 
-@dataclass(frozen=True, slots=True, kw_only=True)
+@dataclass(frozen=True, slots=True, kw_only=True, order=True)
 class EntityTypeDef:
     name: str
     type_: Primitive
@@ -404,6 +404,9 @@ def main() -> None:
 
         api_package = schema_output_path / api_name
         create_package(api_package)
+        # Accumulate entity types so that they can be sorted before written, otherwise
+        # they become a source of in-determinism.
+        entity_types = []
 
         for chunk in generate_models(schema):
             match chunk:
@@ -411,7 +414,7 @@ def main() -> None:
                     module_entity_dependencies[(version, schema.type)].append(
                         entity_type
                     )
-                    write_entity_type(types_module_path, entity_type)
+                    entity_types.append(entity_type)
                 case (version, code):
                     write_to_version_module(  # type: ignore[unreachable]
                         schema=schema,
@@ -423,3 +426,6 @@ def main() -> None:
                     )
                 case no_match:
                     assert_never(no_match)  # type: ignore[arg-type]
+
+        for entity_type in sorted(entity_types):
+            write_entity_type(types_module_path, entity_type)
