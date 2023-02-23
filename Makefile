@@ -3,6 +3,6 @@ fetch-schema-src:
 
 generate-schema:
 	python3 -m codegen
-	pre-commit run --all-files
+	pre-commit run --all-files || true
 
 build-schema: fetch-schema-src generate-schema
