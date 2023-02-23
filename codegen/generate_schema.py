@@ -336,7 +336,6 @@ entity_imports = """\
 from typing import NewType
 from kio.schema.primitive import i8, i16, i32, i64, u8, u16, u32, u64, f64
 from phantom import Phantom
-from phantom.predicates.boolean import true
 """
 
 
