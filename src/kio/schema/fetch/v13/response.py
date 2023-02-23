@@ -23,9 +23,7 @@ class EpochEndOffset:
 @dataclass(frozen=True, slots=True, kw_only=True)
 class LeaderIdAndEpoch:
     __flexible__: ClassVar[bool] = True
-    leader_id: BrokerId = field(
-        metadata={"kafka_type": "int32"}, default=BrokerId(i32(-1))
-    )
+    leader_id: BrokerId = field(metadata={"kafka_type": "int32"}, default=BrokerId(-1))
     """The ID of the current leader or -1 if the leader is unknown."""
     leader_epoch: i32 = field(metadata={"kafka_type": "int32"}, default=i32(-1))
     """The latest known leader epoch"""
@@ -68,7 +66,7 @@ class PartitionData:
     aborted_transactions: tuple[AbortedTransaction, ...]
     """The aborted transactions."""
     preferred_read_replica: BrokerId = field(
-        metadata={"kafka_type": "int32"}, default=BrokerId(i32(-1))
+        metadata={"kafka_type": "int32"}, default=BrokerId(-1)
     )
     """The preferred read replica for the consumer to use on its next fetch request"""
     records: tuple[bytes | None, ...] | None = field(metadata={"kafka_type": "records"})

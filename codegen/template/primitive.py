@@ -49,4 +49,4 @@ class f64(float, Phantom, predicate=math.isfinite):
     def __register_strategy__(cls) -> SearchStrategy:
         from hypothesis.strategies import floats
 
-        return floats(allow_nan=False)
+        return floats(allow_nan=False, allow_infinity=False)

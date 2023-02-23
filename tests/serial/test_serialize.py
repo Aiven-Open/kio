@@ -122,20 +122,20 @@ async def test_serialize_complex_entity_async(
         throttle_time_ms=i32(123),
         brokers=(
             MetadataResponseBroker(
-                node_id=BrokerId(i32(1)),
+                node_id=BrokerId(1),
                 host="foo.bar",
                 port=i32(1234),
                 rack=None,
             ),
             MetadataResponseBroker(
-                node_id=BrokerId(i32(2)),
+                node_id=BrokerId(2),
                 host="foo.bar",
                 port=i32(1234),
                 rack=None,
             ),
         ),
         cluster_id="556",
-        controller_id=BrokerId(i32(3)),
+        controller_id=BrokerId(3),
         topics=(
             MetadataResponseTopic(
                 error_code=i16(123),
@@ -146,9 +146,9 @@ async def test_serialize_complex_entity_async(
                     MetadataResponsePartition(
                         error_code=i16(8765),
                         partition_index=i32(5679),
-                        leader_id=BrokerId(i32(2345)),
+                        leader_id=BrokerId(2345),
                         leader_epoch=i32(6445678),
-                        replica_nodes=(BrokerId(i32(12345)), BrokerId(i32(7651))),
+                        replica_nodes=(BrokerId(12345), BrokerId(7651)),
                         isr_nodes=(),
                         offline_replicas=(),
                     ),

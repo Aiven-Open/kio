@@ -62,7 +62,7 @@ class MetadataResponse:
     brokers: tuple[MetadataResponseBroker, ...]
     """Each broker in the response."""
     controller_id: BrokerId = field(
-        metadata={"kafka_type": "int32"}, default=BrokerId(i32(-1))
+        metadata={"kafka_type": "int32"}, default=BrokerId(-1)
     )
     """The ID of the controller broker."""
     topics: tuple[MetadataResponseTopic, ...]

@@ -69,15 +69,19 @@ def format_default(
             | Primitive.uint32
             | Primitive.uint64
         ), str(default):
-            type_open = f"{type_.get_type_hint()}("
-            type_close = ")"
+            if entity_type_open:
+                return "".join(
+                    (
+                        entity_type_open,
+                        str(int(default, 0)),
+                        entity_type_close,
+                    )
+                )
             return "".join(
                 (
-                    entity_type_open,
-                    type_open,
+                    f"{type_.get_type_hint()}(",
                     str(int(default, 0)),
-                    type_close,
-                    entity_type_close,
+                    ")",
                 )
             )
         case Primitive.bool_, str(default):
@@ -116,6 +120,31 @@ class EntityTypeDef:
     type_hint: str
 
     def get_definition(self) -> str:
+        # FIXME: Let type_hint be enum, refrain from string comparison here.
+        if self.type_hint == "str":
+            return textwrap.dedent(
+                f"""\
+                class {self.name}({self.type_hint}):
+                    ...
+                """
+            )
+        elif self.type_hint in (
+            "i8",
+            "i16",
+            "i32",
+            "i64",
+            "u8",
+            "u16",
+            "u32",
+            "u64",
+            "f64",
+        ):
+            return textwrap.dedent(
+                f"""\
+                class {self.name}({self.type_hint}):
+                    ...
+                """
+            )
         return f'{self.name} = NewType("{self.name}", {self.type_hint})'
 
     def get_import(self) -> str:
@@ -306,6 +335,8 @@ seen_entitites = set[str]()
 entity_imports = """\
 from typing import NewType
 from kio.schema.primitive import i8, i16, i32, i64, u8, u16, u32, u64, f64
+from phantom import Phantom
+from phantom.predicates.boolean import true
 """
 
 

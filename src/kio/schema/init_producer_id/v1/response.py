@@ -7,7 +7,6 @@ from typing import ClassVar
 
 from kio.schema.primitive import i16
 from kio.schema.primitive import i32
-from kio.schema.primitive import i64
 from kio.schema.types import ProducerId
 
 
@@ -19,7 +18,7 @@ class InitProducerIdResponse:
     error_code: i16 = field(metadata={"kafka_type": "int16"})
     """The error code, or 0 if there was no error."""
     producer_id: ProducerId = field(
-        metadata={"kafka_type": "int64"}, default=ProducerId(i64(-1))
+        metadata={"kafka_type": "int64"}, default=ProducerId(-1)
     )
     """The current producer id."""
     producer_epoch: i16 = field(metadata={"kafka_type": "int16"})
