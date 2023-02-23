@@ -49,11 +49,10 @@ async def get_metadata(request: MetadataRequest) -> MetadataResponse:
 
 ## Development
 
-Generate and format schema.
+Fetch, generate, and format schema.
 
 ```shell
-$ python -m codegen
-$ pre-commit run --all-files
+$ make build-schema
 ```
 
 Run tests.
