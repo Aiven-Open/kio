@@ -60,3 +60,5 @@ class ApiVersionsResponse:
     """The monotonically increasing epoch for the finalized features information. Valid values are >= 0. A value of -1 is special and represents unknown epoch."""
     finalized_features: tuple[FinalizedFeatureKey, ...]
     """List of cluster-wide finalized features. The information is valid only if FinalizedFeaturesEpoch >= 0."""
+    zk_migration_ready: bool = field(metadata={"kafka_type": "bool"}, default=False)
+    """Set by a KRaft controller if the required configurations for ZK migration are present"""
