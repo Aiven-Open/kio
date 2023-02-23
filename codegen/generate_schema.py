@@ -427,4 +427,5 @@ def main() -> None:
         # We accumulate entity types and process them separately here, so that they can
         # be sorted before written, otherwise they become a source of in-determinism.
         for entity_type in sorted(entity_types):
+            print(f"-> [entity type] {entity_type}")
             write_entity_type(types_module_path, entity_type)
