@@ -404,16 +404,13 @@ def main() -> None:
 
         api_package = schema_output_path / api_name
         create_package(api_package)
-        # Accumulate entity types so that they can be sorted before written, otherwise
-        # they become a source of in-determinism.
         entity_types = []
 
         for chunk in generate_models(schema):
             match chunk:
                 case (version, EntityTypeDef() as entity_type):
-                    module_entity_dependencies[(version, schema.type)].append(
-                        entity_type
-                    )
+                    key = (version, schema.type)
+                    module_entity_dependencies[key].append(entity_type)
                     entity_types.append(entity_type)
                 case (version, code):
                     write_to_version_module(  # type: ignore[unreachable]
@@ -427,5 +424,7 @@ def main() -> None:
                 case no_match:
                     assert_never(no_match)  # type: ignore[arg-type]
 
+        # We accumulate entity types and process them separately here, so that they can
+        # be sorted before written, otherwise they become a source of in-determinism.
         for entity_type in sorted(entity_types):
             write_entity_type(types_module_path, entity_type)
