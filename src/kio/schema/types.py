@@ -6,7 +6,7 @@ class BrokerId(i32):
     ...
 
 
-class TopicName(str):
+class GroupId(str):
     ...
 
 
@@ -14,9 +14,9 @@ class ProducerId(i64):
     ...
 
 
-class TransactionalId(str):
+class TopicName(str):
     ...
 
 
-class GroupId(str):
+class TransactionalId(str):
     ...
