@@ -1,3 +1,5 @@
+SHELL:=/bin/bash
+
 fetch-schema-src:
 	python3 -m codegen.fetch_schema
 
