@@ -4,7 +4,9 @@
     <a href=https://github.com/aiven/python-kafka-protocol/actions?query=workflow%3ACI+branch%3Amain><img src=https://github.com/aiven/python-kafka-protocol/workflows/CI/badge.svg alt="CI Build Status"></a>
 </p>
 
-Kafka Protocol data types for Python.
+<p align=center>
+    Kafka Protocol data types for Python.
+</p>
 
 ## Features
 
