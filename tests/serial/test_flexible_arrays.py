@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
 
+from kio.schema.primitive import i16
 from kio.schema.primitive import u8
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
@@ -19,12 +20,14 @@ from kio.serial.encoders import write_uint8
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class Child:
+    __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     name: str = field(metadata={"kafka_type": "string"})
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class Parent:
+    __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     name: str = field(metadata={"kafka_type": "string"})
     children: tuple[Child, ...]
@@ -78,6 +81,7 @@ def test_can_serialize_flexible_entity_array(buffer: io.BytesIO) -> None:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class Flat:
+    __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     values: tuple[u8, ...] = field(metadata={"kafka_type": "uint8"})
 

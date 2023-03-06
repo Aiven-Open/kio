@@ -8,12 +8,16 @@ from typing import ClassVar
 
 from kio.schema.primitive import i16
 from kio.schema.primitive import i32
+from kio.schema.response_header.v1.header import ResponseHeader
 from kio.schema.types import TopicName
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class DeletableTopicResult:
+    __version__: ClassVar[i16] = i16(6)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(20)
+    __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     name: TopicName | None = field(metadata={"kafka_type": "string"})
     """The topic name"""
     topic_id: uuid.UUID = field(metadata={"kafka_type": "uuid"})
@@ -26,7 +30,10 @@ class DeletableTopicResult:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class DeleteTopicsResponse:
+    __version__: ClassVar[i16] = i16(6)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(20)
+    __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     throttle_time_ms: i32 = field(metadata={"kafka_type": "int32"})
     """The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota."""
     responses: tuple[DeletableTopicResult, ...]

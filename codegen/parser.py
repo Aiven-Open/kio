@@ -298,7 +298,7 @@ def parse_file(path: pathlib.Path) -> MessageSchema | HeaderSchema | DataSchema:
             ),
             prefix="  ",
         )
-        exc.add_note(  # type: ignore[attr-defined]
+        exc.add_note(
             f"\n🧑‍🚒 Location of last error: {location}, value:\n\n{extracted}\n"
         )
         raise exc

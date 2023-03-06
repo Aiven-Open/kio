@@ -8,12 +8,16 @@ from typing import ClassVar
 
 from kio.schema.primitive import i16
 from kio.schema.primitive import u16
+from kio.schema.request_header.v2.header import RequestHeader
 from kio.schema.types import BrokerId
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class Listener:
+    __version__: ClassVar[i16] = i16(1)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(62)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     name: str = field(metadata={"kafka_type": "string"})
     """The name of the endpoint."""
     host: str = field(metadata={"kafka_type": "string"})
@@ -26,7 +30,10 @@ class Listener:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class Feature:
+    __version__: ClassVar[i16] = i16(1)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(62)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     name: str = field(metadata={"kafka_type": "string"})
     """The feature name."""
     min_supported_version: i16 = field(metadata={"kafka_type": "int16"})
@@ -37,7 +44,10 @@ class Feature:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class BrokerRegistrationRequest:
+    __version__: ClassVar[i16] = i16(1)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(62)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     broker_id: BrokerId = field(metadata={"kafka_type": "int32"})
     """The broker ID."""
     cluster_id: str = field(metadata={"kafka_type": "string"})

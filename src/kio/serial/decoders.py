@@ -261,10 +261,7 @@ async def read_async(reader: asyncio.StreamReader, decoder: Decoder[T]) -> T:
             return exc.value  # type: ignore[no-any-return]
 
 
-def read_sync(
-    buffer: IO[bytes],
-    decoder: Decoder[T],
-) -> T:
+def read_sync(buffer: IO[bytes], decoder: Decoder[T]) -> T:
     cursor = decoder()
 
     try:

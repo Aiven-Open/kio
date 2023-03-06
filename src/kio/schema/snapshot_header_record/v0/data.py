@@ -11,6 +11,7 @@ from kio.schema.primitive import i64
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class SnapshotHeaderRecord:
+    __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     version: i16 = field(metadata={"kafka_type": "int16"})
     """The version of the snapshot header record"""

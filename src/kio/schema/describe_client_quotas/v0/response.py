@@ -8,11 +8,15 @@ from typing import ClassVar
 from kio.schema.primitive import f64
 from kio.schema.primitive import i16
 from kio.schema.primitive import i32
+from kio.schema.response_header.v0.header import ResponseHeader
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class EntityData:
+    __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = False
+    __api_key__: ClassVar[i16] = i16(48)
+    __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     entity_type: str = field(metadata={"kafka_type": "string"})
     """The entity type."""
     entity_name: str | None = field(metadata={"kafka_type": "string"})
@@ -21,7 +25,10 @@ class EntityData:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class ValueData:
+    __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = False
+    __api_key__: ClassVar[i16] = i16(48)
+    __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     key: str = field(metadata={"kafka_type": "string"})
     """The quota configuration key."""
     value: f64 = field(metadata={"kafka_type": "float64"})
@@ -30,7 +37,10 @@ class ValueData:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class EntryData:
+    __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = False
+    __api_key__: ClassVar[i16] = i16(48)
+    __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     entity: tuple[EntityData, ...]
     """The quota entity description."""
     values: tuple[ValueData, ...]
@@ -39,7 +49,10 @@ class EntryData:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class DescribeClientQuotasResponse:
+    __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = False
+    __api_key__: ClassVar[i16] = i16(48)
+    __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     throttle_time_ms: i32 = field(metadata={"kafka_type": "int32"})
     """The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota."""
     error_code: i16 = field(metadata={"kafka_type": "int16"})

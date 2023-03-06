@@ -8,12 +8,16 @@ from typing import ClassVar
 from kio.schema.primitive import i8
 from kio.schema.primitive import i16
 from kio.schema.primitive import i32
+from kio.schema.response_header.v1.header import ResponseHeader
 from kio.schema.types import TopicName
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class CreatableTopicConfigs:
+    __version__: ClassVar[i16] = i16(5)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(19)
+    __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     name: str = field(metadata={"kafka_type": "string"})
     """The configuration name."""
     value: str | None = field(metadata={"kafka_type": "string"})
@@ -28,7 +32,10 @@ class CreatableTopicConfigs:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class CreatableTopicResult:
+    __version__: ClassVar[i16] = i16(5)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(19)
+    __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     name: TopicName = field(metadata={"kafka_type": "string"})
     """The topic name."""
     error_code: i16 = field(metadata={"kafka_type": "int16"})
@@ -47,7 +54,10 @@ class CreatableTopicResult:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class CreateTopicsResponse:
+    __version__: ClassVar[i16] = i16(5)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(19)
+    __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     throttle_time_ms: i32 = field(metadata={"kafka_type": "int32"})
     """The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota."""
     topics: tuple[CreatableTopicResult, ...]

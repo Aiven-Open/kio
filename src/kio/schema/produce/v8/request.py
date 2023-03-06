@@ -7,13 +7,17 @@ from typing import ClassVar
 
 from kio.schema.primitive import i16
 from kio.schema.primitive import i32
+from kio.schema.request_header.v1.header import RequestHeader
 from kio.schema.types import TopicName
 from kio.schema.types import TransactionalId
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class PartitionProduceData:
+    __version__: ClassVar[i16] = i16(8)
     __flexible__: ClassVar[bool] = False
+    __api_key__: ClassVar[i16] = i16(0)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     index: i32 = field(metadata={"kafka_type": "int32"})
     """The partition index."""
     records: tuple[bytes | None, ...] | None = field(metadata={"kafka_type": "records"})
@@ -22,7 +26,10 @@ class PartitionProduceData:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class TopicProduceData:
+    __version__: ClassVar[i16] = i16(8)
     __flexible__: ClassVar[bool] = False
+    __api_key__: ClassVar[i16] = i16(0)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     name: TopicName = field(metadata={"kafka_type": "string"})
     """The topic name."""
     partition_data: tuple[PartitionProduceData, ...]
@@ -31,7 +38,10 @@ class TopicProduceData:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class ProduceRequest:
+    __version__: ClassVar[i16] = i16(8)
     __flexible__: ClassVar[bool] = False
+    __api_key__: ClassVar[i16] = i16(0)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     transactional_id: TransactionalId | None = field(
         metadata={"kafka_type": "string"}, default=None
     )

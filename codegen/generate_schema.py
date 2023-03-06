@@ -17,6 +17,7 @@ from typing_extensions import assert_never
 
 from .case import capitalize_first
 from .case import to_snake_case
+from .header_schema import get_header_schema_import
 from .parser import CommonStructArrayField
 from .parser import DataSchema
 from .parser import EntityArrayField
@@ -303,6 +304,20 @@ def filter_version_fields(version: int, fields: Iterable[Field]) -> Iterator[Fie
             yield field
 
 
+def message_class_vars(
+    schema: MessageSchema | HeaderSchema | DataSchema,
+) -> Iterator[str]:
+    if not isinstance(schema, MessageSchema):
+        return
+    yield f"    __api_key__: ClassVar[i16] = i16({schema.apiKey})\n"
+    if schema.type == "request":
+        yield "    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader\n"
+    elif schema.type == "response":
+        yield "    __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader\n"
+    else:
+        raise NotImplementedError("Unknown message schema type")
+
+
 # TODO: Address complexity.
 def generate_dataclass(  # noqa: C901
     schema: MessageSchema | HeaderSchema | DataSchema,
@@ -390,11 +405,10 @@ def generate_dataclass(  # noqa: C901
             class_fields.append(f'    """{field.about}"""\n')
 
     yield class_start
-    yield (
-        "    __flexible__: ClassVar[bool] = True\n"
-        if schema.flexibleVersions.matches(version)
-        else "    __flexible__: ClassVar[bool] = False\n"
-    )
+    yield f"    __version__: ClassVar[i16] = i16({version})\n"
+    is_flexible = str(schema.flexibleVersions.matches(version))
+    yield f"    __flexible__: ClassVar[bool] = {is_flexible}\n"
+    yield from message_class_vars(schema)
     yield from class_fields
 
 
@@ -474,6 +488,7 @@ def write_to_version_module(
                 imports_and_docstring.format(schema_source=schema_path.name),
                 file=fd,
             )
+            print(get_header_schema_import(schema, version), file=fd)
             entities = module_entity_dependencies[(version, schema.type)]
             for entity in entities:
                 print(entity.get_import(), file=fd)
@@ -481,9 +496,10 @@ def write_to_version_module(
     print(" done.")
 
 
-def create_module_primitive(destination: pathlib.Path) -> None:
-    source = pathlib.Path(__file__).parent.resolve() / "template/primitive.py"
-    shutil.copy(source, destination)
+def create_static_modules(destination: pathlib.Path) -> None:
+    template_dir = pathlib.Path(__file__).parent.resolve() / "template"
+    for source in template_dir.glob("*.py"):
+        shutil.copy(source, destination / source.name)
 
 
 def main() -> None:
@@ -492,14 +508,14 @@ def main() -> None:
     shutil.rmtree(schema_output_path)
     create_package(schema_output_path)
     schemas = pathlib.Path("schema/").glob("*.json")
-    create_module_primitive(schema_output_path / "primitive.py")
+    create_static_modules(schema_output_path)
     custom_types = set[CustomTypeDef]()
 
     for path in schemas:
         try:
             schema = parse_file(path)
         except ValidationError as exc:
-            exc.add_note(f"💥 Failed parsing schema in {path}")  # type: ignore[attr-defined]
+            exc.add_note(f"💥 Failed parsing schema in {path}")
             raise exc
 
         api_name = basic_name(schema.name)

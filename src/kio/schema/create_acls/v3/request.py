@@ -6,11 +6,16 @@ from dataclasses import field
 from typing import ClassVar
 
 from kio.schema.primitive import i8
+from kio.schema.primitive import i16
+from kio.schema.request_header.v2.header import RequestHeader
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class AclCreation:
+    __version__: ClassVar[i16] = i16(3)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(30)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     resource_type: i8 = field(metadata={"kafka_type": "int8"})
     """The type of the resource."""
     resource_name: str = field(metadata={"kafka_type": "string"})
@@ -29,6 +34,9 @@ class AclCreation:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class CreateAclsRequest:
+    __version__: ClassVar[i16] = i16(3)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(30)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     creations: tuple[AclCreation, ...]
     """The ACLs that we want to create."""

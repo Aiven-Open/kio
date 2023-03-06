@@ -4,10 +4,11 @@ from typing import TypeVar
 
 from typing_extensions import assert_never
 
+from kio.schema.protocol import Entity
+
 from . import decoders
 from .decoders import Cursor
 from .decoders import Decoder
-from .introspect import Entity
 from .introspect import FieldKind
 from .introspect import classify_field
 from .introspect import get_field_tag
@@ -70,7 +71,17 @@ def get_decoder(
 T = TypeVar("T")
 
 
-def get_field_decoder(entity_type: type[Entity], field: Field[T]) -> Decoder[T]:
+def get_field_decoder(
+    entity_type: type[Entity],
+    field: Field[T],
+    is_request_header: bool,
+) -> Decoder[T]:
+    # RequestHeader.client_id is special-cased by Kafka to always use the legacy string
+    # format.
+    # https://github.com/apache/kafka/blob/trunk/clients/src/main/resources/common/message/RequestHeader.json#L34-L38
+    if is_request_header and field.name == "client_id":
+        return decoders.decode_nullable_legacy_string  # type: ignore[return-value]
+
     field_kind, field_type = classify_field(field)
     flexible = entity_type.__flexible__
     array_decoder = (
@@ -81,14 +92,14 @@ def get_field_decoder(entity_type: type[Entity], field: Field[T]) -> Decoder[T]:
         case FieldKind.primitive:
             return get_decoder(
                 kafka_type=get_schema_field_type(field),
-                flexible=entity_type.__flexible__,
+                flexible=flexible,
                 optional=is_optional(field),
             )
         case FieldKind.primitive_tuple:
             return array_decoder(  # type: ignore[return-value]
                 get_decoder(
                     kafka_type=get_schema_field_type(field),
-                    flexible=entity_type.__flexible__,
+                    flexible=flexible,
                     optional=is_optional(field),
                 )
             )
@@ -107,14 +118,16 @@ E = TypeVar("E", bound=Entity)
 
 def entity_decoder(entity_type: type[E]) -> Decoder[E]:
     def decode_entity() -> Cursor[E]:
+        is_request_header = entity_type.__name__ == "RequestHeader"
         kwargs = {}
-        tagged_fields: dict[int, Field] = {}
+        tagged_fields = {}
 
         for field in fields(entity_type):
+            field_decoder = get_field_decoder(entity_type, field, is_request_header)
             if (tag := get_field_tag(field)) is not None:
-                tagged_fields[tag] = field
+                tagged_fields[tag] = field, field_decoder
             else:
-                kwargs[field.name] = yield get_field_decoder(entity_type, field)
+                kwargs[field.name] = yield field_decoder
 
         if not entity_type.__flexible__:
             # Assert we don't find tags for non-flexible models.
@@ -126,8 +139,8 @@ def entity_decoder(entity_type: type[E]) -> Decoder[E]:
         for _ in range(num_tagged_fields):
             field_tag = yield decoders.decode_unsigned_varint
             yield decoders.decode_unsigned_varint  # field length
-            field = tagged_fields[field_tag]
-            kwargs[field.name] = yield get_field_decoder(entity_type, field)
+            field, decoder = tagged_fields[field_tag]
+            kwargs[field.name] = yield decoder
 
         return entity_type(**kwargs)
 

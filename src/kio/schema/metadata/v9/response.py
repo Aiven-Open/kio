@@ -7,13 +7,17 @@ from typing import ClassVar
 
 from kio.schema.primitive import i16
 from kio.schema.primitive import i32
+from kio.schema.response_header.v1.header import ResponseHeader
 from kio.schema.types import BrokerId
 from kio.schema.types import TopicName
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class MetadataResponseBroker:
+    __version__: ClassVar[i16] = i16(9)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(3)
+    __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     node_id: BrokerId = field(metadata={"kafka_type": "int32"})
     """The broker ID."""
     host: str = field(metadata={"kafka_type": "string"})
@@ -26,7 +30,10 @@ class MetadataResponseBroker:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class MetadataResponsePartition:
+    __version__: ClassVar[i16] = i16(9)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(3)
+    __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     error_code: i16 = field(metadata={"kafka_type": "int16"})
     """The partition error, or 0 if there was no error."""
     partition_index: i32 = field(metadata={"kafka_type": "int32"})
@@ -51,7 +58,10 @@ class MetadataResponsePartition:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class MetadataResponseTopic:
+    __version__: ClassVar[i16] = i16(9)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(3)
+    __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     error_code: i16 = field(metadata={"kafka_type": "int16"})
     """The topic error, or 0 if there was no error."""
     name: TopicName = field(metadata={"kafka_type": "string"})
@@ -68,7 +78,10 @@ class MetadataResponseTopic:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class MetadataResponse:
+    __version__: ClassVar[i16] = i16(9)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(3)
+    __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     throttle_time_ms: i32 = field(metadata={"kafka_type": "int32"})
     """The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota."""
     brokers: tuple[MetadataResponseBroker, ...]

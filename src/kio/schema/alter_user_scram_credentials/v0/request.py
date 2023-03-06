@@ -6,12 +6,17 @@ from dataclasses import field
 from typing import ClassVar
 
 from kio.schema.primitive import i8
+from kio.schema.primitive import i16
 from kio.schema.primitive import i32
+from kio.schema.request_header.v2.header import RequestHeader
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class ScramCredentialDeletion:
+    __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(51)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     name: str = field(metadata={"kafka_type": "string"})
     """The user name."""
     mechanism: i8 = field(metadata={"kafka_type": "int8"})
@@ -20,7 +25,10 @@ class ScramCredentialDeletion:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class ScramCredentialUpsertion:
+    __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(51)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     name: str = field(metadata={"kafka_type": "string"})
     """The user name."""
     mechanism: i8 = field(metadata={"kafka_type": "int8"})
@@ -35,7 +43,10 @@ class ScramCredentialUpsertion:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class AlterUserScramCredentialsRequest:
+    __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(51)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     deletions: tuple[ScramCredentialDeletion, ...]
     """The SCRAM credentials to remove."""
     upsertions: tuple[ScramCredentialUpsertion, ...]

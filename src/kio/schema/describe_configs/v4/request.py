@@ -6,11 +6,16 @@ from dataclasses import field
 from typing import ClassVar
 
 from kio.schema.primitive import i8
+from kio.schema.primitive import i16
+from kio.schema.request_header.v2.header import RequestHeader
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class DescribeConfigsResource:
+    __version__: ClassVar[i16] = i16(4)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(32)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     resource_type: i8 = field(metadata={"kafka_type": "int8"})
     """The resource type."""
     resource_name: str = field(metadata={"kafka_type": "string"})
@@ -23,7 +28,10 @@ class DescribeConfigsResource:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class DescribeConfigsRequest:
+    __version__: ClassVar[i16] = i16(4)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(32)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     resources: tuple[DescribeConfigsResource, ...]
     """The resources whose configurations we want to describe."""
     include_synonyms: bool = field(metadata={"kafka_type": "bool"}, default=False)

@@ -7,15 +7,20 @@ from dataclasses import field
 from typing import ClassVar
 
 from kio.schema.primitive import i8
+from kio.schema.primitive import i16
 from kio.schema.primitive import i32
 from kio.schema.primitive import i64
+from kio.schema.request_header.v2.header import RequestHeader
 from kio.schema.types import BrokerId
 from kio.schema.types import TopicName
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class LeaderAndIsrPartitionState:
+    __version__: ClassVar[i16] = i16(6)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(4)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     partition_index: i32 = field(metadata={"kafka_type": "int32"})
     """The partition index."""
     controller_epoch: i32 = field(metadata={"kafka_type": "int32"})
@@ -46,7 +51,10 @@ class LeaderAndIsrPartitionState:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class LeaderAndIsrTopicState:
+    __version__: ClassVar[i16] = i16(6)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(4)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     topic_name: TopicName = field(metadata={"kafka_type": "string"})
     """The topic name."""
     topic_id: uuid.UUID = field(metadata={"kafka_type": "uuid"})
@@ -57,7 +65,10 @@ class LeaderAndIsrTopicState:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class LeaderAndIsrLiveLeader:
+    __version__: ClassVar[i16] = i16(6)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(4)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     broker_id: BrokerId = field(metadata={"kafka_type": "int32"})
     """The leader's broker ID."""
     host_name: str = field(metadata={"kafka_type": "string"})
@@ -68,7 +79,10 @@ class LeaderAndIsrLiveLeader:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class LeaderAndIsrRequest:
+    __version__: ClassVar[i16] = i16(6)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(4)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     controller_id: BrokerId = field(metadata={"kafka_type": "int32"})
     """The current controller ID."""
     controller_epoch: i32 = field(metadata={"kafka_type": "int32"})

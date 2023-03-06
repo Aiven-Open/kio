@@ -4,6 +4,8 @@ from typing import TypeVar
 
 from typing_extensions import assert_never
 
+from kio.schema.protocol import Entity
+
 from . import encoders
 from .encoders import Writable
 from .encoders import Writer
@@ -11,7 +13,6 @@ from .encoders import compact_array_writer
 from .encoders import legacy_array_writer
 from .encoders import write_tagged_field
 from .encoders import write_unsigned_varint
-from .introspect import Entity
 from .introspect import FieldKind
 from .introspect import classify_field
 from .introspect import get_field_tag
@@ -74,7 +75,20 @@ def get_writer(
 T = TypeVar("T")
 
 
-def get_field_writer(field: Field[T], flexible: bool) -> Writer[T]:
+def get_field_writer(
+    field: Field[T],
+    flexible: bool,
+    is_request_header: bool,
+) -> Writer[T]:
+    # RequestHeader.client_id is special-cased by Kafka to always use the legacy string
+    # format.
+    # https://github.com/apache/kafka/blob/trunk/clients/src/main/resources/common/message/RequestHeader.json#L34-L38
+    # It's odd that this choice is made, instead of addressing this only for the
+    # ApiVersions request, because it's response is already special-cased.
+    # https://github.com/apache/kafka/blob/trunk/generator/src/main/java/org/apache/kafka/message/ApiMessageTypeGenerator.java#L341
+    if is_request_header and field.name == "client_id":
+        return encoders.write_nullable_legacy_string  # type: ignore[return-value]
+
     field_kind, field_type = classify_field(field)
     array_writer = compact_array_writer if flexible else legacy_array_writer
 
@@ -103,19 +117,26 @@ def get_field_writer(field: Field[T], flexible: bool) -> Writer[T]:
             assert_never(no_match)
 
 
+def _fqn(type_: type) -> str:
+    return f"{type_.__module__}.{type_.__qualname__}"
+
+
 E = TypeVar("E", bound=Entity)
 
 
 def entity_writer(entity_type: type[E]) -> Writer[E]:
     def write_entity(buffer: Writable, entity: E) -> None:
+        is_request_header = entity_type.__name__ == "RequestHeader"
         tag_writers = {}
 
         # Loop over all fields of the entity, serializing its values to the buffer and
         # keeping track of tagged fields.
+
         for field in fields(entity):
             field_writer = get_field_writer(
                 field,
                 flexible=entity.__flexible__,
+                is_request_header=is_request_header,
             )
             field_value = getattr(entity, field.name)
 

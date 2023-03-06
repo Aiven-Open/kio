@@ -4,18 +4,12 @@ from dataclasses import is_dataclass
 from types import EllipsisType
 from types import NoneType
 from types import UnionType
-from typing import ClassVar
-from typing import Protocol
 from typing import TypeVar
 from typing import Union
 from typing import get_args
 from typing import get_origin
 
 from .errors import SchemaError
-
-
-class Entity(Protocol):
-    __flexible__: ClassVar[bool]
 
 
 def get_schema_field_type(field: Field) -> str:

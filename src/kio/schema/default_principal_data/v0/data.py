@@ -5,9 +5,12 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
 
+from kio.schema.primitive import i16
+
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class DefaultPrincipalData:
+    __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     type: str = field(metadata={"kafka_type": "string"})
     """The principal type"""

@@ -189,6 +189,27 @@ class TestDecodeUnsignedVarint(IntDecoderContract):
         with pytest.raises(ValueError, match=r"^Varint is too long"):
             self.read_sync(buffer)
 
+    @pytest.mark.parametrize(
+        "byte_value, expected",
+        [
+            (b"\x00", 0),
+            (b"\x01", 1),
+            (b"\xb9`", 12345),
+            (b"\xb1\xa8\x03", 54321),
+            (b"\xff\xff\xff\xff\x07", 2147483647),
+        ],
+    )
+    def test_can_decode_known_value(
+        self,
+        buffer: io.BytesIO,
+        byte_value: bytes,
+        expected: int,
+    ) -> None:
+        buffer.write(byte_value)
+        buffer.seek(0)
+        decoded = self.read_sync(buffer)
+        assert decoded == expected
+
 
 class TestDecodeFloat64:
     @pytest.mark.parametrize(
