@@ -67,6 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -74,6 +75,7 @@ jobs:
           cache: pip
           cache-dependency-path: setup.cfg
           check-latest: true
+
       - name: pre-commit cache
         uses: actions/cache@v3
         with:
@@ -86,7 +88,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pre-commit-3.11
             ${{ runner.os }}-pre-commit
+
       - run: pip install --upgrade .[all]
+
       - run: |
           make build-schema
           diff=$(git --no-pager diff)
