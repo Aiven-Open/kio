@@ -7,11 +7,15 @@ from typing import ClassVar
 
 from kio.schema.primitive import i16
 from kio.schema.primitive import i32
+from kio.schema.response_header.v1.header import ResponseHeader
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class MemberResponse:
+    __version__: ClassVar[i16] = i16(5)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(13)
+    __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     member_id: str = field(metadata={"kafka_type": "string"})
     """The member ID to remove from the group."""
     group_instance_id: str | None = field(metadata={"kafka_type": "string"})
@@ -22,7 +26,10 @@ class MemberResponse:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class LeaveGroupResponse:
+    __version__: ClassVar[i16] = i16(5)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(13)
+    __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     throttle_time_ms: i32 = field(metadata={"kafka_type": "int32"})
     """The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota."""
     error_code: i16 = field(metadata={"kafka_type": "int16"})

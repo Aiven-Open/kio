@@ -19,7 +19,6 @@ from kio.serial.decoders import decode_uint8
 from kio.serial.decoders import decode_unsigned_varint
 from kio.serial.encoders import Writer
 from kio.serial.encoders import write_compact_string
-from kio.serial.encoders import write_nullable_compact_string
 from kio.serial.encoders import write_tagged_field
 from kio.serial.encoders import write_uint8
 from kio.serial.encoders import write_unsigned_varint
@@ -62,13 +61,6 @@ class WritableTag(Generic[T]):
                 WritableTag(tag=1, writer=write_compact_string, value="Borduria"),
             ],
             Person(age=u8(12), country="Borduria"),
-        ),
-        (
-            [
-                WritableTag(tag=0, writer=write_uint8, value=u8(1)),
-                WritableTag(tag=1, writer=write_nullable_compact_string, value=None),
-            ],
-            Person(age=u8(1), country=None),
         ),
     ],
 )

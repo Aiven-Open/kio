@@ -6,6 +6,7 @@ from typing import cast
 
 import pytest
 
+from kio.schema.primitive import i16
 from kio.schema.primitive import i32
 from kio.schema.primitive import u8
 from kio.serial import entity_decoder
@@ -22,12 +23,14 @@ from kio.serial.errors import OutOfBoundValue
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class Child:
+    __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = False
     name: str = field(metadata={"kafka_type": "string"})
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class Parent:
+    __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = False
     name: str = field(metadata={"kafka_type": "string"})
     children: tuple[Child, ...]
@@ -74,6 +77,7 @@ def test_can_serialize_legacy_entity_array(buffer: io.BytesIO) -> None:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class Flat:
+    __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = False
     values: tuple[u8, ...] = field(metadata={"kafka_type": "uint8"})
 

@@ -174,6 +174,10 @@ class TestWriteUnsignedVarint:
             (256, b"\x80\x02"),
             (1073741823, b"\xff\xff\xff\xff\x03"),
             (2**31 - 1, b"\xff\xff\xff\xff\x07"),
+            (1, b"\x01"),
+            (12345, b"\xb9`"),
+            (54321, b"\xb1\xa8\x03"),
+            (2147483647, b"\xff\xff\xff\xff\x07"),
         ],
     )
     def test_can_write_valid_value(

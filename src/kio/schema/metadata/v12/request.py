@@ -6,12 +6,17 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
 
+from kio.schema.primitive import i16
+from kio.schema.request_header.v2.header import RequestHeader
 from kio.schema.types import TopicName
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class MetadataRequestTopic:
+    __version__: ClassVar[i16] = i16(12)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(3)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     topic_id: uuid.UUID = field(metadata={"kafka_type": "uuid"})
     """The topic id."""
     name: TopicName | None = field(metadata={"kafka_type": "string"})
@@ -20,7 +25,10 @@ class MetadataRequestTopic:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class MetadataRequest:
+    __version__: ClassVar[i16] = i16(12)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(3)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     topics: tuple[MetadataRequestTopic, ...]
     """The topics to fetch metadata for."""
     allow_auto_topic_creation: bool = field(

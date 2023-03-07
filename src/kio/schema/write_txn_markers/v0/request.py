@@ -7,13 +7,17 @@ from typing import ClassVar
 
 from kio.schema.primitive import i16
 from kio.schema.primitive import i32
+from kio.schema.request_header.v1.header import RequestHeader
 from kio.schema.types import ProducerId
 from kio.schema.types import TopicName
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class WritableTxnMarkerTopic:
+    __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = False
+    __api_key__: ClassVar[i16] = i16(27)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     name: TopicName = field(metadata={"kafka_type": "string"})
     """The topic name."""
     partition_indexes: tuple[i32, ...] = field(
@@ -24,7 +28,10 @@ class WritableTxnMarkerTopic:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class WritableTxnMarker:
+    __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = False
+    __api_key__: ClassVar[i16] = i16(27)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     producer_id: ProducerId = field(metadata={"kafka_type": "int64"})
     """The current producer ID."""
     producer_epoch: i16 = field(metadata={"kafka_type": "int16"})
@@ -39,6 +46,9 @@ class WritableTxnMarker:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class WriteTxnMarkersRequest:
+    __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = False
+    __api_key__: ClassVar[i16] = i16(27)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     markers: tuple[WritableTxnMarker, ...]
     """The transaction markers to be written."""

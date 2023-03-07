@@ -8,11 +8,15 @@ from typing import ClassVar
 from kio.schema.primitive import i16
 from kio.schema.primitive import i32
 from kio.schema.primitive import i64
+from kio.schema.response_header.v0.header import ResponseHeader
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class ApiVersion:
+    __version__: ClassVar[i16] = i16(3)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(18)
+    __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     api_key: i16 = field(metadata={"kafka_type": "int16"})
     """The API index."""
     min_version: i16 = field(metadata={"kafka_type": "int16"})
@@ -23,7 +27,10 @@ class ApiVersion:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class SupportedFeatureKey:
+    __version__: ClassVar[i16] = i16(3)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(18)
+    __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     name: str = field(metadata={"kafka_type": "string"})
     """The name of the feature."""
     min_version: i16 = field(metadata={"kafka_type": "int16"})
@@ -34,7 +41,10 @@ class SupportedFeatureKey:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class FinalizedFeatureKey:
+    __version__: ClassVar[i16] = i16(3)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(18)
+    __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     name: str = field(metadata={"kafka_type": "string"})
     """The name of the feature."""
     max_version_level: i16 = field(metadata={"kafka_type": "int16"})
@@ -45,7 +55,10 @@ class FinalizedFeatureKey:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class ApiVersionsResponse:
+    __version__: ClassVar[i16] = i16(3)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(18)
+    __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     error_code: i16 = field(metadata={"kafka_type": "int16"})
     """The top-level error code."""
     api_keys: tuple[ApiVersion, ...]

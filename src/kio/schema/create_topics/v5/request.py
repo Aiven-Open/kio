@@ -7,13 +7,17 @@ from typing import ClassVar
 
 from kio.schema.primitive import i16
 from kio.schema.primitive import i32
+from kio.schema.request_header.v2.header import RequestHeader
 from kio.schema.types import BrokerId
 from kio.schema.types import TopicName
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class CreatableReplicaAssignment:
+    __version__: ClassVar[i16] = i16(5)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(19)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     partition_index: i32 = field(metadata={"kafka_type": "int32"})
     """The partition index."""
     broker_ids: tuple[BrokerId, ...] = field(
@@ -24,7 +28,10 @@ class CreatableReplicaAssignment:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class CreateableTopicConfig:
+    __version__: ClassVar[i16] = i16(5)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(19)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     name: str = field(metadata={"kafka_type": "string"})
     """The configuration name."""
     value: str | None = field(metadata={"kafka_type": "string"})
@@ -33,7 +40,10 @@ class CreateableTopicConfig:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class CreatableTopic:
+    __version__: ClassVar[i16] = i16(5)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(19)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     name: TopicName = field(metadata={"kafka_type": "string"})
     """The topic name."""
     num_partitions: i32 = field(metadata={"kafka_type": "int32"})
@@ -48,7 +58,10 @@ class CreatableTopic:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class CreateTopicsRequest:
+    __version__: ClassVar[i16] = i16(5)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(19)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     topics: tuple[CreatableTopic, ...]
     """The topics to create."""
     timeout_ms: i32 = field(metadata={"kafka_type": "int32"}, default=i32(60000))

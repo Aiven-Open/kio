@@ -12,12 +12,14 @@ from kio.schema.types import BrokerId
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class Voter:
+    __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     voter_id: i32 = field(metadata={"kafka_type": "int32"})
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class LeaderChangeMessage:
+    __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     version: i16 = field(metadata={"kafka_type": "int16"})
     """The version of the leader change message"""

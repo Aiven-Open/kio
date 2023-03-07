@@ -7,12 +7,16 @@ from typing import ClassVar
 
 from kio.schema.primitive import i16
 from kio.schema.primitive import i32
+from kio.schema.response_header.v0.header import ResponseHeader
 from kio.schema.types import GroupId
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class DescribedGroupMember:
+    __version__: ClassVar[i16] = i16(4)
     __flexible__: ClassVar[bool] = False
+    __api_key__: ClassVar[i16] = i16(15)
+    __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     member_id: str = field(metadata={"kafka_type": "string"})
     """The member ID assigned by the group coordinator."""
     group_instance_id: str | None = field(
@@ -31,7 +35,10 @@ class DescribedGroupMember:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class DescribedGroup:
+    __version__: ClassVar[i16] = i16(4)
     __flexible__: ClassVar[bool] = False
+    __api_key__: ClassVar[i16] = i16(15)
+    __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     error_code: i16 = field(metadata={"kafka_type": "int16"})
     """The describe error, or 0 if there was no error."""
     group_id: GroupId = field(metadata={"kafka_type": "string"})
@@ -52,7 +59,10 @@ class DescribedGroup:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class DescribeGroupsResponse:
+    __version__: ClassVar[i16] = i16(4)
     __flexible__: ClassVar[bool] = False
+    __api_key__: ClassVar[i16] = i16(15)
+    __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     throttle_time_ms: i32 = field(metadata={"kafka_type": "int32"})
     """The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota."""
     groups: tuple[DescribedGroup, ...]

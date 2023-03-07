@@ -161,7 +161,7 @@ TestUnsignedVarintRoundtrip = create_integer_roundtrip_test(
     min_value=0,
     max_value=2**31 - 1,
 )
-TestArrayLengthRoundtrip = create_integer_roundtrip_test(
+TestLegacyArrayLengthRoundtrip = create_integer_roundtrip_test(
     int_writer=write_legacy_array_length,
     int_decoder=decode_legacy_array_length,
     min_value=-(2**31),

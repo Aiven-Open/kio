@@ -6,11 +6,16 @@ from dataclasses import field
 from typing import ClassVar
 
 from kio.schema.primitive import i8
+from kio.schema.primitive import i16
+from kio.schema.request_header.v1.header import RequestHeader
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class DeleteAclsFilter:
+    __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = False
+    __api_key__: ClassVar[i16] = i16(31)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     resource_type_filter: i8 = field(metadata={"kafka_type": "int8"})
     """The resource type."""
     resource_name_filter: str | None = field(metadata={"kafka_type": "string"})
@@ -27,6 +32,9 @@ class DeleteAclsFilter:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class DeleteAclsRequest:
+    __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = False
+    __api_key__: ClassVar[i16] = i16(31)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     filters: tuple[DeleteAclsFilter, ...]
     """The filters to use when deleting ACLs."""

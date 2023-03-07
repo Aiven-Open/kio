@@ -343,13 +343,17 @@ async def test_can_parse_complex_entity_async(
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class Child:
+    __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(-1)
     name: str = field(metadata={"kafka_type": "string"})
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class UniParent:
+    __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(-1)
     name: str = field(metadata={"kafka_type": "string"})
     child: Child
 
@@ -371,7 +375,9 @@ def test_can_parse_nested_non_array_entity(buffer: io.BytesIO) -> None:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class MultiParent:
+    __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(-2)
     name: str = field(metadata={"kafka_type": "string"})
     children: tuple[Child, ...]
 
@@ -399,11 +405,13 @@ def test_can_parse_nested_entity_array(buffer: io.BytesIO) -> None:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class EmptyFlexible:
+    __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class EmptyLegacy:
+    __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = False
 
 

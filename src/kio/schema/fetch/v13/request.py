@@ -7,14 +7,19 @@ from dataclasses import field
 from typing import ClassVar
 
 from kio.schema.primitive import i8
+from kio.schema.primitive import i16
 from kio.schema.primitive import i32
 from kio.schema.primitive import i64
+from kio.schema.request_header.v2.header import RequestHeader
 from kio.schema.types import BrokerId
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class FetchPartition:
+    __version__: ClassVar[i16] = i16(13)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(1)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     partition: i32 = field(metadata={"kafka_type": "int32"})
     """The partition index."""
     current_leader_epoch: i32 = field(metadata={"kafka_type": "int32"}, default=i32(-1))
@@ -31,7 +36,10 @@ class FetchPartition:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class FetchTopic:
+    __version__: ClassVar[i16] = i16(13)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(1)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     topic_id: uuid.UUID = field(metadata={"kafka_type": "uuid"})
     """The unique topic ID"""
     partitions: tuple[FetchPartition, ...]
@@ -40,7 +48,10 @@ class FetchTopic:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class ForgottenTopic:
+    __version__: ClassVar[i16] = i16(13)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(1)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     topic_id: uuid.UUID = field(metadata={"kafka_type": "uuid"})
     """The unique topic ID"""
     partitions: tuple[i32, ...] = field(metadata={"kafka_type": "int32"}, default=())
@@ -49,7 +60,10 @@ class ForgottenTopic:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class FetchRequest:
+    __version__: ClassVar[i16] = i16(13)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(1)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     cluster_id: str | None = field(
         metadata={"kafka_type": "string", "tag": 0}, default=None
     )

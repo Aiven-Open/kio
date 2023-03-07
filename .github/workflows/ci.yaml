@@ -30,19 +30,26 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.11"]
+        python-version: ["3.11"]
     steps:
       - uses: actions/checkout@v3
+
+      - name: Start Kafka backend
+        run: docker compose --file=container/compose.yml up -d
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
           cache-dependency-path: setup.cfg
+
       - name: Install requirements
         run: pip install --upgrade -e '.[test]'
+
       - name: Run test suite
         run: python -X dev -m coverage run -m pytest
+
       # TODO: Enable coverage reporting.
       # - name: Collect coverage
       #   run: |
@@ -60,6 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -67,6 +75,7 @@ jobs:
           cache: pip
           cache-dependency-path: setup.cfg
           check-latest: true
+
       - name: pre-commit cache
         uses: actions/cache@v3
         with:
@@ -79,7 +88,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pre-commit-3.11
             ${{ runner.os }}-pre-commit
+
       - run: pip install --upgrade .[all]
+
       - run: |
           make build-schema
           diff=$(git --no-pager diff)

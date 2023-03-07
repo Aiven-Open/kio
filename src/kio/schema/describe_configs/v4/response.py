@@ -8,11 +8,15 @@ from typing import ClassVar
 from kio.schema.primitive import i8
 from kio.schema.primitive import i16
 from kio.schema.primitive import i32
+from kio.schema.response_header.v1.header import ResponseHeader
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class DescribeConfigsSynonym:
+    __version__: ClassVar[i16] = i16(4)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(32)
+    __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     name: str = field(metadata={"kafka_type": "string"})
     """The synonym name."""
     value: str | None = field(metadata={"kafka_type": "string"})
@@ -23,7 +27,10 @@ class DescribeConfigsSynonym:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class DescribeConfigsResourceResult:
+    __version__: ClassVar[i16] = i16(4)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(32)
+    __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     name: str = field(metadata={"kafka_type": "string"})
     """The configuration name."""
     value: str | None = field(metadata={"kafka_type": "string"})
@@ -44,7 +51,10 @@ class DescribeConfigsResourceResult:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class DescribeConfigsResult:
+    __version__: ClassVar[i16] = i16(4)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(32)
+    __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     error_code: i16 = field(metadata={"kafka_type": "int16"})
     """The error code, or 0 if we were able to successfully describe the configurations."""
     error_message: str | None = field(metadata={"kafka_type": "string"})
@@ -59,7 +69,10 @@ class DescribeConfigsResult:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class DescribeConfigsResponse:
+    __version__: ClassVar[i16] = i16(4)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(32)
+    __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     throttle_time_ms: i32 = field(metadata={"kafka_type": "int32"})
     """The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota."""
     results: tuple[DescribeConfigsResult, ...]

@@ -16,3 +16,7 @@ class SchemaError(SerialError):
 
 class OutOfBoundValue(SerialError):
     ...
+
+
+class EncodeError(SerialError):
+    ...

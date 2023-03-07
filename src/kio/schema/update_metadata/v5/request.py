@@ -8,13 +8,17 @@ from typing import ClassVar
 from kio.schema.primitive import i16
 from kio.schema.primitive import i32
 from kio.schema.primitive import i64
+from kio.schema.request_header.v1.header import RequestHeader
 from kio.schema.types import BrokerId
 from kio.schema.types import TopicName
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class UpdateMetadataPartitionState:
+    __version__: ClassVar[i16] = i16(5)
     __flexible__: ClassVar[bool] = False
+    __api_key__: ClassVar[i16] = i16(6)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     partition_index: i32 = field(metadata={"kafka_type": "int32"})
     """The partition index."""
     controller_epoch: i32 = field(metadata={"kafka_type": "int32"})
@@ -37,7 +41,10 @@ class UpdateMetadataPartitionState:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class UpdateMetadataTopicState:
+    __version__: ClassVar[i16] = i16(5)
     __flexible__: ClassVar[bool] = False
+    __api_key__: ClassVar[i16] = i16(6)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     topic_name: TopicName = field(metadata={"kafka_type": "string"})
     """The topic name."""
     partition_states: tuple[UpdateMetadataPartitionState, ...]
@@ -46,7 +53,10 @@ class UpdateMetadataTopicState:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class UpdateMetadataEndpoint:
+    __version__: ClassVar[i16] = i16(5)
     __flexible__: ClassVar[bool] = False
+    __api_key__: ClassVar[i16] = i16(6)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     port: i32 = field(metadata={"kafka_type": "int32"})
     """The port of this endpoint"""
     host: str = field(metadata={"kafka_type": "string"})
@@ -59,7 +69,10 @@ class UpdateMetadataEndpoint:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class UpdateMetadataBroker:
+    __version__: ClassVar[i16] = i16(5)
     __flexible__: ClassVar[bool] = False
+    __api_key__: ClassVar[i16] = i16(6)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     id: BrokerId = field(metadata={"kafka_type": "int32"})
     """The broker id."""
     endpoints: tuple[UpdateMetadataEndpoint, ...]
@@ -70,7 +83,10 @@ class UpdateMetadataBroker:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class UpdateMetadataRequest:
+    __version__: ClassVar[i16] = i16(5)
     __flexible__: ClassVar[bool] = False
+    __api_key__: ClassVar[i16] = i16(6)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     controller_id: BrokerId = field(metadata={"kafka_type": "int32"})
     """The controller id."""
     controller_epoch: i32 = field(metadata={"kafka_type": "int32"})

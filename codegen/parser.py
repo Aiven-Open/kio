@@ -189,9 +189,16 @@ class PrimitiveField(_BaseField):
     default: str | int | float | bool | None
 
     def is_nullable(self, version: int) -> bool:
-        if self.nullableVersions is None:
-            return False
-        return self.nullableVersions.matches(version)
+        return (
+            # Tagged fields that are ignorable and don't have a default are optional.
+            self.get_tag(version) is not None
+            and self.ignorable
+            and self.default is None
+        ) or (
+            False
+            if self.nullableVersions is None
+            else self.nullableVersions.matches(version)
+        )
 
 
 class RecordsField(_BaseField):
@@ -298,7 +305,7 @@ def parse_file(path: pathlib.Path) -> MessageSchema | HeaderSchema | DataSchema:
             ),
             prefix="  ",
         )
-        exc.add_note(  # type: ignore[attr-defined]
+        exc.add_note(
             f"\n🧑‍🚒 Location of last error: {location}, value:\n\n{extracted}\n"
         )
         raise exc

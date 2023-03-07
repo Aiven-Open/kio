@@ -6,13 +6,17 @@ from dataclasses import field
 from typing import ClassVar
 
 from kio.schema.primitive import i16
+from kio.schema.request_header.v1.header import RequestHeader
 from kio.schema.types import ProducerId
 from kio.schema.types import TransactionalId
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class EndTxnRequest:
+    __version__: ClassVar[i16] = i16(2)
     __flexible__: ClassVar[bool] = False
+    __api_key__: ClassVar[i16] = i16(26)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     transactional_id: TransactionalId = field(metadata={"kafka_type": "string"})
     """The ID of the transaction to end."""
     producer_id: ProducerId = field(metadata={"kafka_type": "int64"})

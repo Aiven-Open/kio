@@ -11,6 +11,7 @@ from kio.schema.primitive import i32
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class RequestHeader:
+    __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = False
     request_api_key: i16 = field(metadata={"kafka_type": "int16"})
     """The API key of this request."""

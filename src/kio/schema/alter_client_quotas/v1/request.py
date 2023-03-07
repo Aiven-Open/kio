@@ -6,11 +6,16 @@ from dataclasses import field
 from typing import ClassVar
 
 from kio.schema.primitive import f64
+from kio.schema.primitive import i16
+from kio.schema.request_header.v2.header import RequestHeader
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class EntityData:
+    __version__: ClassVar[i16] = i16(1)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(49)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     entity_type: str = field(metadata={"kafka_type": "string"})
     """The entity type."""
     entity_name: str | None = field(metadata={"kafka_type": "string"})
@@ -19,7 +24,10 @@ class EntityData:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class OpData:
+    __version__: ClassVar[i16] = i16(1)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(49)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     key: str = field(metadata={"kafka_type": "string"})
     """The quota configuration key."""
     value: f64 = field(metadata={"kafka_type": "float64"})
@@ -30,7 +38,10 @@ class OpData:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class EntryData:
+    __version__: ClassVar[i16] = i16(1)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(49)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     entity: tuple[EntityData, ...]
     """The quota entity to alter."""
     ops: tuple[OpData, ...]
@@ -39,7 +50,10 @@ class EntryData:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class AlterClientQuotasRequest:
+    __version__: ClassVar[i16] = i16(1)
     __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(49)
+    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     entries: tuple[EntryData, ...]
     """The quota configuration entries to alter."""
     validate_only: bool = field(metadata={"kafka_type": "bool"})
