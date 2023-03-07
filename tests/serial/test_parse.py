@@ -151,8 +151,6 @@ def test_can_parse_legacy_entity(buffer: io.BytesIO) -> None:
     write_int32(buffer, i32(23_126))
     # rack
     write_legacy_string(buffer, "da best")
-    # tagged fields
-    write_empty_tagged_fields(buffer)
 
     buffer.seek(0)
     instance = read_sync(buffer, entity_decoder(MetadataResponseBrokerV5))

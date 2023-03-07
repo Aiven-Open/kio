@@ -108,6 +108,8 @@ def entity_writer(entity_type: type[E]) -> Writer[E]:
     def write_entity(buffer: Writable, entity: E) -> None:
         tag_writers = {}
 
+        # Loop over all fields of the entity, serializing its values to the buffer and
+        # keeping track of tagged fields.
         for field in fields(entity):
             field_writer = get_field_writer(
                 field,
@@ -115,7 +117,7 @@ def entity_writer(entity_type: type[E]) -> Writer[E]:
             )
             field_value = getattr(entity, field.name)
 
-            # Defer tag values.
+            # Record non-default valued tagged fields and defer serialization.
             if (tag := get_field_tag(field)) is not None:
                 if field_value != field.default:
                     tag_writers[tag] = (field_writer, field_value)
@@ -123,14 +125,16 @@ def entity_writer(entity_type: type[E]) -> Writer[E]:
 
             field_writer(buffer, field_value)
 
+        # For non-flexible entities we're done here.
         if not entity_type.__flexible__:
             # Assert we don't find tags for non-flexible models.
             assert not tag_writers
             return
 
-        # Number of tagged fields.
+        # Write number of tagged fields.
         write_unsigned_varint(buffer, len(tag_writers))
 
+        # Serialize tagged fields. Order is important to fulfill spec.
         for field_tag in sorted(tag_writers.keys()):
             field_writer, value = tag_writers[field_tag]
             write_tagged_field(

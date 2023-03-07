@@ -34,7 +34,8 @@ class Person:
     age: u8 = field(metadata={"kafka_type": "uint8", "tag": 0})
     # "Ignorable" tagged field shall result in None-able and default=None.
     country: str | None = field(
-        metadata={"kafka_type": "string", "tag": 1}, default=None
+        metadata={"kafka_type": "string", "tag": 1},
+        default=None,
     )
 
 
@@ -58,9 +59,9 @@ class WritableTag(Generic[T]):
         (
             [
                 WritableTag(tag=0, writer=write_uint8, value=u8(12)),
-                WritableTag(tag=1, writer=write_compact_string, value="Zubrowka"),
+                WritableTag(tag=1, writer=write_compact_string, value="Borduria"),
             ],
-            Person(age=u8(12), country="Zubrowka"),
+            Person(age=u8(12), country="Borduria"),
         ),
         (
             [
@@ -100,7 +101,7 @@ def test_raises_type_error_when_missing_required_tagged_field(
 
     write_unsigned_varint(buffer, 1)  # num tagged fields
     # Only write country, omit age.
-    write_tagged_field(buffer, 1, write_compact_string, "Zubrowka")
+    write_tagged_field(buffer, 1, write_compact_string, "Borduria")
 
     buffer.seek(0)
 
@@ -126,10 +127,10 @@ class ReadableTag(Generic[T]):
             [ReadableTag(tag=0, decoder=decode_uint8, value=u8(123))],
         ),
         (
-            Person(age=u8(12), country="Zubrowka"),
+            Person(age=u8(12), country="Borduria"),
             [
                 ReadableTag(tag=0, decoder=decode_uint8, value=u8(12)),
-                ReadableTag(tag=1, decoder=decode_compact_string, value="Zubrowka"),
+                ReadableTag(tag=1, decoder=decode_compact_string, value="Borduria"),
             ],
         ),
         (
