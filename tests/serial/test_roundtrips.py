@@ -13,7 +13,6 @@ from hypothesis.strategies import uuids
 
 from kio.schema.metadata.v12.response import MetadataResponse
 from kio.serial.decoders import Decoder
-from kio.serial.decoders import decode_array_length
 from kio.serial.decoders import decode_boolean
 from kio.serial.decoders import decode_compact_array_length
 from kio.serial.decoders import decode_compact_string
@@ -24,6 +23,7 @@ from kio.serial.decoders import decode_int8
 from kio.serial.decoders import decode_int16
 from kio.serial.decoders import decode_int32
 from kio.serial.decoders import decode_int64
+from kio.serial.decoders import decode_legacy_array_length
 from kio.serial.decoders import decode_legacy_bytes
 from kio.serial.decoders import decode_legacy_string
 from kio.serial.decoders import decode_nullable_legacy_string
@@ -36,7 +36,6 @@ from kio.serial.decoders import decode_uuid
 from kio.serial.decoders import read_async
 from kio.serial.decoders import read_sync
 from kio.serial.encoders import Writer
-from kio.serial.encoders import write_array_length
 from kio.serial.encoders import write_boolean
 from kio.serial.encoders import write_compact_array_length
 from kio.serial.encoders import write_compact_string
@@ -44,6 +43,7 @@ from kio.serial.encoders import write_int8
 from kio.serial.encoders import write_int16
 from kio.serial.encoders import write_int32
 from kio.serial.encoders import write_int64
+from kio.serial.encoders import write_legacy_array_length
 from kio.serial.encoders import write_legacy_string
 from kio.serial.encoders import write_nullable_compact_string
 from kio.serial.encoders import write_nullable_legacy_string
@@ -162,8 +162,8 @@ TestUnsignedVarintRoundtrip = create_integer_roundtrip_test(
     max_value=2**31 - 1,
 )
 TestArrayLengthRoundtrip = create_integer_roundtrip_test(
-    int_writer=write_array_length,
-    int_decoder=decode_array_length,
+    int_writer=write_legacy_array_length,
+    int_decoder=decode_legacy_array_length,
     min_value=-(2**31),
     max_value=2**31 - 1,
 )

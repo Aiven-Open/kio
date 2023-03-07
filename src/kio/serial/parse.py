@@ -73,7 +73,9 @@ T = TypeVar("T")
 def get_field_decoder(entity_type: type[Entity], field: Field[T]) -> Decoder[T]:
     field_kind, field_type = classify_field(field)
     flexible = entity_type.__flexible__
-    array_decoder = decoders.compact_array_decoder if flexible else decoders.legacy_array_decoder
+    array_decoder = (
+        decoders.compact_array_decoder if flexible else decoders.legacy_array_decoder
+    )
 
     match field_kind:
         case FieldKind.primitive:

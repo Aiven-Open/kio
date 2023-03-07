@@ -186,7 +186,7 @@ def decode_nullable_legacy_string() -> Cursor[str | None]:
     return bytes_value.decode()
 
 
-decode_array_length: Final = decode_int32
+decode_legacy_array_length: Final = decode_int32
 
 
 def decode_compact_array_length() -> Cursor[int]:
@@ -227,7 +227,7 @@ def compact_array_decoder(item_decoder: Decoder[T]) -> Decoder[tuple[T, ...]]:
 
 def legacy_array_decoder(item_decoder: Decoder[T]) -> Decoder[tuple[T, ...]]:
     def decode_compact_array() -> Cursor[tuple[T, ...]]:
-        length: int = yield decode_array_length
+        length: int = yield decode_legacy_array_length
         values = []
         for _ in range(length):
             item: T = yield item_decoder

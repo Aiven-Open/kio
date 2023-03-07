@@ -5,9 +5,10 @@ from typing import TypeVar
 from typing_extensions import assert_never
 
 from . import encoders
-from .encoders import Writable, legacy_array_writer
+from .encoders import Writable
 from .encoders import Writer
 from .encoders import compact_array_writer
+from .encoders import legacy_array_writer
 from .encoders import write_tagged_field
 from .encoders import write_unsigned_varint
 from .introspect import Entity

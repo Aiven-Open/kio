@@ -150,7 +150,7 @@ def write_empty_tagged_fields(buffer: Writable) -> None:
     write_unsigned_varint(buffer, 0)
 
 
-def write_array_length(buffer: Writable, value: i32) -> None:
+def write_legacy_array_length(buffer: Writable, value: i32) -> None:
     write_int32(buffer, value)
 
 
@@ -182,7 +182,7 @@ def legacy_array_writer(item_writer: Writer[T]) -> Writer[Sequence[T]]:
                 f"Sequence is too long for legacy array format ({len(items)} > "
                 f"{i32.__high__})"
             ) from exception
-        write_array_length(buffer, length)
+        write_legacy_array_length(buffer, length)
         for item in items:
             item_writer(buffer, item)
 
