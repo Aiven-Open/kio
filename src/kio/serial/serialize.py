@@ -1,6 +1,6 @@
 from dataclasses import Field
 from dataclasses import fields
-from typing import TypeVar
+from typing import TypeVar, TypeAlias
 
 from typing_extensions import assert_never
 
@@ -93,10 +93,10 @@ def get_field_writer(field: Field[T], flexible: bool) -> Writer[T]:
                 )
             )
         case FieldKind.entity:
-            return entity_writer(field_type)  # type: ignore[type-var]
+            return entity_writer(field_type)
         case FieldKind.entity_tuple:
             return compact_array_writer(  # type: ignore[return-value]
-                entity_writer(field_type)  # type: ignore[type-var]
+                entity_writer(field_type)
             )
         case no_match:
             assert_never(no_match)
@@ -106,10 +106,8 @@ E = TypeVar("E", bound=Entity)
 
 
 def entity_writer(entity_type: type[E]) -> Writer[E]:
-    flexible = entity_type.__flexible__
-
     def write_entity(buffer: Writable, entity: E) -> None:
-        tag_writers: dict[int, tuple[Writer[T], T]] = {}
+        tag_writers = {}
 
         for field in fields(entity):
             field_writer = get_field_writer(
