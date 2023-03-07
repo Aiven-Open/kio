@@ -1,19 +1,4 @@
 import asyncio
-from kio.schema.create_topics.v7.request import CreateTopicsRequest
-from kio.schema.create_topics.v7.response import CreateTopicsResponse
-from kio.schema.create_topics.v7.response import CreatableTopicResult
-from kio.schema.metadata.v12 import response as metadata_v12_response
-from kio.schema.metadata.v5 import response as metadata_v5_response
-from kio.schema.metadata.v12 import request as metadata_v12_request
-from kio.schema.metadata.v5 import request as metadata_v5_request
-from kio.schema.delete_topics.v6.request import DeleteTopicsRequest
-from kio.schema.delete_topics.v6.request import DeleteTopicState
-from kio.schema.delete_topics.v6.response import DeletableTopicResult
-from kio.schema.delete_topics.v6.response import DeleteTopicsResponse
-from kio.schema.api_versions.v3 import request as api_versions_v3_request
-from kio.schema.api_versions.v3 import response as api_versions_v3_response
-from kio.schema.api_versions.v2 import request as api_versions_v2_request
-from kio.schema.api_versions.v2 import response as api_versions_v2_response
 import io
 import secrets
 import uuid
@@ -30,7 +15,22 @@ import kio.schema.request_header.v1.header
 import kio.schema.request_header.v2.header
 import kio.schema.response_header.v0.header
 import kio.schema.response_header.v1.header
+from kio.schema.api_versions.v2 import request as api_versions_v2_request
+from kio.schema.api_versions.v2 import response as api_versions_v2_response
+from kio.schema.api_versions.v3 import request as api_versions_v3_request
+from kio.schema.api_versions.v3 import response as api_versions_v3_response
 from kio.schema.create_topics.v7.request import CreatableTopic
+from kio.schema.create_topics.v7.request import CreateTopicsRequest
+from kio.schema.create_topics.v7.response import CreatableTopicResult
+from kio.schema.create_topics.v7.response import CreateTopicsResponse
+from kio.schema.delete_topics.v6.request import DeleteTopicsRequest
+from kio.schema.delete_topics.v6.request import DeleteTopicState
+from kio.schema.delete_topics.v6.response import DeletableTopicResult
+from kio.schema.delete_topics.v6.response import DeleteTopicsResponse
+from kio.schema.metadata.v5 import request as metadata_v5_request
+from kio.schema.metadata.v5 import response as metadata_v5_response
+from kio.schema.metadata.v12 import request as metadata_v12_request
+from kio.schema.metadata.v12 import response as metadata_v12_response
 from kio.schema.primitive import i16
 from kio.schema.primitive import i32
 from kio.schema.protocol import Entity
@@ -156,11 +156,10 @@ async def make_request(
 
 
 async def test_roundtrip_api_versions_v3() -> None:
-    import secrets
     response = await make_request(
         request=api_versions_v3_request.ApiVersionsRequest(
-            client_software_name=secrets.token_hex(3),
-            client_software_version=secrets.token_hex(3),
+            client_software_name="foo123",
+            client_software_version="foo123",
         ),
         response_type=api_versions_v3_response.ApiVersionsResponse,
     )
@@ -303,9 +302,7 @@ async def test_roundtrip_api_versions_v2() -> None:
 async def delete_topic(topic_name: TopicName) -> DeleteTopicsResponse:
     return await make_request(
         request=DeleteTopicsRequest(
-            topics=(
-                DeleteTopicState(name=topic_name, topic_id=uuid_zero),
-            ),
+            topics=(DeleteTopicState(name=topic_name, topic_id=uuid_zero),),
             timeout_ms=i16(1000),
         ),
         response_type=DeleteTopicsResponse,
@@ -373,7 +370,7 @@ async def test_topic_and_metadata_operations() -> None:
                 error_code=mock.ANY,
                 error_message=mock.ANY,
             ),
-        )
+        ),
     )
 
     # The previous deletion call should guarantee this call succeeds.
@@ -388,15 +385,15 @@ async def test_topic_and_metadata_operations() -> None:
                 error_message=None,
                 num_partitions=i32(3),
                 replication_factor=i16(1),
-                configs=mock.ANY
+                configs=mock.ANY,
             ),
         ),
     )
-    created_topic, = create_topics_response.topics
+    (created_topic,) = create_topics_response.topics
 
     # The previous creation call should guarantee this call contains the topic.
-    response = await metadata_v12()
-    assert response == metadata_v12_response.MetadataResponse(
+    response_v12 = await metadata_v12()
+    assert response_v12 == metadata_v12_response.MetadataResponse(
         throttle_time_ms=i32(0),
         brokers=(
             metadata_v12_response.MetadataResponseBroker(
@@ -418,8 +415,8 @@ async def test_topic_and_metadata_operations() -> None:
     )
 
     # Test also with a legacy format API version, i.e. non-flexible.
-    response = await metadata_v5()
-    assert response == metadata_v5_response.MetadataResponse(
+    response_v5 = await metadata_v5()
+    assert response_v5 == metadata_v5_response.MetadataResponse(
         throttle_time_ms=i32(0),
         brokers=(
             metadata_v5_response.MetadataResponseBroker(

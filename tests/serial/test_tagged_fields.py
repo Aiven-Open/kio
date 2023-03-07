@@ -19,7 +19,6 @@ from kio.serial.decoders import decode_uint8
 from kio.serial.decoders import decode_unsigned_varint
 from kio.serial.encoders import Writer
 from kio.serial.encoders import write_compact_string
-from kio.serial.encoders import write_nullable_compact_string
 from kio.serial.encoders import write_tagged_field
 from kio.serial.encoders import write_uint8
 from kio.serial.encoders import write_unsigned_varint

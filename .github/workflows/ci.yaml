@@ -33,16 +33,23 @@ jobs:
         python-version: ["3.11"]
     steps:
       - uses: actions/checkout@v3
+
+      - name: Start Kafka backend
+        run: docker compose --file=container/compose.yml up -d
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
           cache-dependency-path: setup.cfg
+
       - name: Install requirements
         run: pip install --upgrade -e '.[test]'
+
       - name: Run test suite
         run: python -X dev -m coverage run -m pytest
+
       # TODO: Enable coverage reporting.
       # - name: Collect coverage
       #   run: |
