@@ -35,7 +35,7 @@ class CreatableTopicResult:
     """The error code, or 0 if there was no error."""
     error_message: str | None = field(metadata={"kafka_type": "string"})
     """The error message, or null if there was no error."""
-    topic_config_error_code: i16 = field(metadata={"kafka_type": "int16"})
+    topic_config_error_code: i16 = field(metadata={"kafka_type": "int16", "tag": 0})
     """Optional topic config error returned if configs are not returned in the response."""
     num_partitions: i32 = field(metadata={"kafka_type": "int32"}, default=i32(-1))
     """Number of partitions of the topic."""

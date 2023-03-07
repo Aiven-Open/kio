@@ -4,16 +4,19 @@ from typing import TypeVar
 
 from typing_extensions import assert_never
 
-from kio.serial import encoders
-from kio.serial.encoders import Writable
-from kio.serial.encoders import Writer
-from kio.serial.encoders import compact_array_writer
-from kio.serial.encoders import write_empty_tagged_fields
-from kio.serial.introspect import Entity
-from kio.serial.introspect import FieldKind
-from kio.serial.introspect import classify_field
-from kio.serial.introspect import get_schema_field_type
-from kio.serial.introspect import is_optional
+from . import encoders
+from .encoders import Writable
+from .encoders import Writer
+from .encoders import compact_array_writer
+from .encoders import legacy_array_writer
+from .encoders import write_tagged_field
+from .encoders import write_unsigned_varint
+from .introspect import Entity
+from .introspect import FieldKind
+from .introspect import classify_field
+from .introspect import get_field_tag
+from .introspect import get_schema_field_type
+from .introspect import is_optional
 
 
 def get_writer(
@@ -73,6 +76,7 @@ T = TypeVar("T")
 
 def get_field_writer(field: Field[T], flexible: bool) -> Writer[T]:
     field_kind, field_type = classify_field(field)
+    array_writer = compact_array_writer if flexible else legacy_array_writer
 
     match field_kind:
         case FieldKind.primitive:
@@ -82,7 +86,7 @@ def get_field_writer(field: Field[T], flexible: bool) -> Writer[T]:
                 optional=is_optional(field),
             )
         case FieldKind.primitive_tuple:
-            return compact_array_writer(  # type: ignore[return-value]
+            return array_writer(  # type: ignore[return-value]
                 get_writer(
                     kafka_type=get_schema_field_type(field),
                     flexible=flexible,
@@ -92,7 +96,7 @@ def get_field_writer(field: Field[T], flexible: bool) -> Writer[T]:
         case FieldKind.entity:
             return entity_writer(field_type)  # type: ignore[type-var]
         case FieldKind.entity_tuple:
-            return compact_array_writer(  # type: ignore[return-value]
+            return array_writer(  # type: ignore[return-value]
                 entity_writer(field_type)  # type: ignore[type-var]
             )
         case no_match:
@@ -103,12 +107,43 @@ E = TypeVar("E", bound=Entity)
 
 
 def entity_writer(entity_type: type[E]) -> Writer[E]:
-    flexible = entity_type.__flexible__
-
     def write_entity(buffer: Writable, entity: E) -> None:
+        tag_writers = {}
+
+        # Loop over all fields of the entity, serializing its values to the buffer and
+        # keeping track of tagged fields.
         for field in fields(entity):
-            field_writer = get_field_writer(field, flexible=flexible)
-            field_writer(buffer, getattr(entity, field.name))
-        write_empty_tagged_fields(buffer)
+            field_writer = get_field_writer(
+                field,
+                flexible=entity.__flexible__,
+            )
+            field_value = getattr(entity, field.name)
+
+            # Record non-default valued tagged fields and defer serialization.
+            if (tag := get_field_tag(field)) is not None:
+                if field_value != field.default:
+                    tag_writers[tag] = (field_writer, field_value)
+                continue
+
+            field_writer(buffer, field_value)
+
+        # For non-flexible entities we're done here.
+        if not entity_type.__flexible__:
+            # Assert we don't find tags for non-flexible models.
+            assert not tag_writers
+            return
+
+        # Write number of tagged fields.
+        write_unsigned_varint(buffer, len(tag_writers))
+
+        # Serialize tagged fields. Order is important to fulfill spec.
+        for field_tag in sorted(tag_writers.keys()):
+            field_writer, value = tag_writers[field_tag]
+            write_tagged_field(
+                buffer=buffer,
+                tag=field_tag,
+                writer=field_writer,
+                value=value,
+            )
 
     return write_entity

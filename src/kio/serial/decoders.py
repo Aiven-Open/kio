@@ -21,7 +21,8 @@ from kio.schema.primitive import u8
 from kio.schema.primitive import u16
 from kio.schema.primitive import u32
 from kio.schema.primitive import u64
-from kio.serial.errors import UnexpectedNull
+
+from .errors import UnexpectedNull
 
 T = TypeVar("T")
 Cursor: TypeAlias = Generator["int | Decoder[object]", Any, T]
@@ -185,7 +186,7 @@ def decode_nullable_legacy_string() -> Cursor[str | None]:
     return bytes_value.decode()
 
 
-decode_array_length: Final = decode_int32
+decode_legacy_array_length: Final = decode_int32
 
 
 def decode_compact_array_length() -> Cursor[int]:
@@ -224,12 +225,27 @@ def compact_array_decoder(item_decoder: Decoder[T]) -> Decoder[tuple[T, ...]]:
     return decode_compact_array
 
 
-async def read_async(
-    reader: asyncio.StreamReader,
-    decoder: Decoder[T],
-) -> T:
+def legacy_array_decoder(item_decoder: Decoder[T]) -> Decoder[tuple[T, ...]]:
+    def decode_compact_array() -> Cursor[tuple[T, ...]]:
+        length: int = yield decode_legacy_array_length
+        values = []
+        for _ in range(length):
+            item: T = yield item_decoder
+            values.append(item)
+        return tuple(values)
+
+    return decode_compact_array
+
+
+async def read_async(reader: asyncio.StreamReader, decoder: Decoder[T]) -> T:
     cursor = decoder()
-    instruction = next(cursor)
+
+    try:
+        instruction = next(cursor)
+    except StopIteration as exc:
+        # Handle the special case of non-flexible empty models.
+        return exc.value  # type: ignore[no-any-return]
+
     step_value: Any
     while True:
         if isinstance(instruction, int):
@@ -250,7 +266,13 @@ def read_sync(
     decoder: Decoder[T],
 ) -> T:
     cursor = decoder()
-    instruction = next(cursor)
+
+    try:
+        instruction = next(cursor)
+    except StopIteration as exc:
+        # Handle the special case of non-flexible empty models.
+        return exc.value  # type: ignore[no-any-return]
+
     step_value: Any
     while True:
         if isinstance(instruction, int):

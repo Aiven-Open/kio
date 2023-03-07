@@ -50,7 +50,9 @@ class ForgottenTopic:
 @dataclass(frozen=True, slots=True, kw_only=True)
 class FetchRequest:
     __flexible__: ClassVar[bool] = True
-    cluster_id: str | None = field(metadata={"kafka_type": "string"}, default=None)
+    cluster_id: str | None = field(
+        metadata={"kafka_type": "string", "tag": 0}, default=None
+    )
     """The clusterId if known. This is used to validate metadata fetches prior to broker registration."""
     replica_id: BrokerId = field(metadata={"kafka_type": "int32"})
     """The broker ID of the follower, of -1 if this request is from a consumer."""

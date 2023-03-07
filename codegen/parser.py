@@ -7,12 +7,14 @@ import re
 import textwrap
 from collections.abc import Callable
 from collections.abc import Iterator
+from collections.abc import Mapping
 from typing import Annotated
 from typing import Literal
 from typing import NamedTuple
 from typing import TypeAlias
 
 import pydantic
+from pydantic import root_validator
 from typing_extensions import assert_never
 
 from .util import BaseModel
@@ -150,9 +152,34 @@ class _BaseField(BaseModel):
     mapKey: bool = False
     about: str | None = None
     entityType: str | None = None
+    tag: int | None = None
+    taggedVersions: VersionRange | None = None
+
+    @classmethod
+    @root_validator
+    def validate_tag_tagged_versions_composite(
+        cls,
+        values: Mapping[str, object],
+    ) -> Mapping[str, object]:
+        tag = values["tag"]
+        tagged_versions = values["taggedVersions"]
+        if (tag is None and tagged_versions is not None) or (
+            tag is not None and tagged_versions is None
+        ):
+            raise ValueError(
+                f"`tag` and `taggedVersions` must either both be set or both be "
+                f"omitted, got {tag=!r} {tagged_versions=!r}"
+            )
+        return values
+
+    def get_tag(self, version: int) -> int | None:
+        if self.taggedVersions is None or not self.taggedVersions.matches(version):
+            return None
+        assert self.tag is not None  # guaranteed by model validator
+        return self.tag
 
 
-# Defining these unions before its members allows not having to call
+# Defining this union before its members allows not having to call
 # EntityField.update_forward_refs().
 Field: TypeAlias = "PrimitiveField | PrimitiveArrayField | EntityArrayField | CommonStructArrayField | EntityField"
 

@@ -1,7 +1,9 @@
 import asyncio
+import io
 import struct
 from collections.abc import Callable
 from collections.abc import Sequence
+from contextlib import closing
 from typing import IO
 from typing import Final
 from typing import TypeAlias
@@ -16,7 +18,8 @@ from kio.schema.primitive import u8
 from kio.schema.primitive import u16
 from kio.schema.primitive import u32
 from kio.schema.primitive import u64
-from kio.serial.errors import OutOfBoundValue
+
+from .errors import OutOfBoundValue
 
 Writable: TypeAlias = asyncio.StreamWriter | IO[bytes]
 T = TypeVar("T")
@@ -147,7 +150,7 @@ def write_empty_tagged_fields(buffer: Writable) -> None:
     write_unsigned_varint(buffer, 0)
 
 
-def write_array_length(buffer: Writable, value: i32) -> None:
+def write_legacy_array_length(buffer: Writable, value: i32) -> None:
     write_int32(buffer, value)
 
 
@@ -168,3 +171,38 @@ def compact_array_writer(item_writer: Writer[T]) -> Writer[Sequence[T]]:
             item_writer(buffer, item)
 
     return write_compact_array
+
+
+def legacy_array_writer(item_writer: Writer[T]) -> Writer[Sequence[T]]:
+    def write_legacy_array(buffer: Writable, items: Sequence[T]) -> None:
+        try:
+            length = i32(len(items))
+        except TypeError as exception:
+            raise OutOfBoundValue(
+                f"Sequence is too long for legacy array format ({len(items)} > "
+                f"{i32.__high__})"
+            ) from exception
+        write_legacy_array_length(buffer, length)
+        for item in items:
+            item_writer(buffer, item)
+
+    return write_legacy_array
+
+
+def write_tagged_field(
+    buffer: Writable,
+    tag: int,
+    writer: Writer[T],
+    value: T,
+) -> None:
+    # See KIP-482 for details.
+    # https://cwiki.apache.org/confluence/display/KAFKA/KIP-482%3A+The+Kafka+Protocol+should+Support+Optional+Tagged+Fields#KIP482:TheKafkaProtocolshouldSupportOptionalTaggedFields-SpecifyingTaggedFields
+
+    # Write encoded value to a temporary buffer.
+    with closing(io.BytesIO()) as value_buffer:
+        writer(value_buffer, value)
+        encoded = value_buffer.getvalue()
+
+    write_unsigned_varint(buffer, tag)  # tag
+    write_unsigned_varint(buffer, len(encoded))  # length
+    buffer.write(encoded)  # data

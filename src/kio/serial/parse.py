@@ -4,15 +4,13 @@ from typing import TypeVar
 
 from typing_extensions import assert_never
 
-from kio.serial.decoders import Cursor
-from kio.serial.decoders import Decoder
-from kio.serial.decoders import compact_array_decoder
-from kio.serial.decoders import skip_tagged_fields
-
 from . import decoders
+from .decoders import Cursor
+from .decoders import Decoder
 from .introspect import Entity
 from .introspect import FieldKind
 from .introspect import classify_field
+from .introspect import get_field_tag
 from .introspect import get_schema_field_type
 from .introspect import is_optional
 
@@ -74,6 +72,10 @@ T = TypeVar("T")
 
 def get_field_decoder(entity_type: type[Entity], field: Field[T]) -> Decoder[T]:
     field_kind, field_type = classify_field(field)
+    flexible = entity_type.__flexible__
+    array_decoder = (
+        decoders.compact_array_decoder if flexible else decoders.legacy_array_decoder
+    )
 
     match field_kind:
         case FieldKind.primitive:
@@ -83,7 +85,7 @@ def get_field_decoder(entity_type: type[Entity], field: Field[T]) -> Decoder[T]:
                 optional=is_optional(field),
             )
         case FieldKind.primitive_tuple:
-            return compact_array_decoder(  # type: ignore[return-value]
+            return array_decoder(  # type: ignore[return-value]
                 get_decoder(
                     kafka_type=get_schema_field_type(field),
                     flexible=entity_type.__flexible__,
@@ -93,7 +95,7 @@ def get_field_decoder(entity_type: type[Entity], field: Field[T]) -> Decoder[T]:
         case FieldKind.entity:
             return entity_decoder(field_type)  # type: ignore[type-var]
         case FieldKind.entity_tuple:
-            return compact_array_decoder(  # type: ignore[return-value]
+            return array_decoder(  # type: ignore[return-value]
                 entity_decoder(field_type)  # type: ignore[type-var]
             )
         case no_match:
@@ -106,9 +108,27 @@ E = TypeVar("E", bound=Entity)
 def entity_decoder(entity_type: type[E]) -> Decoder[E]:
     def decode_entity() -> Cursor[E]:
         kwargs = {}
+        tagged_fields: dict[int, Field] = {}
+
         for field in fields(entity_type):
+            if (tag := get_field_tag(field)) is not None:
+                tagged_fields[tag] = field
+            else:
+                kwargs[field.name] = yield get_field_decoder(entity_type, field)
+
+        if not entity_type.__flexible__:
+            # Assert we don't find tags for non-flexible models.
+            assert not tagged_fields
+            return entity_type(**kwargs)
+
+        num_tagged_fields = yield decoders.decode_unsigned_varint
+
+        for _ in range(num_tagged_fields):
+            field_tag = yield decoders.decode_unsigned_varint
+            yield decoders.decode_unsigned_varint  # field length
+            field = tagged_fields[field_tag]
             kwargs[field.name] = yield get_field_decoder(entity_type, field)
-        yield skip_tagged_fields
+
         return entity_type(**kwargs)
 
     return decode_entity

@@ -52,13 +52,19 @@ class ApiVersionsResponse:
     """The APIs supported by the broker."""
     throttle_time_ms: i32 = field(metadata={"kafka_type": "int32"})
     """The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota."""
-    supported_features: tuple[SupportedFeatureKey, ...]
+    supported_features: tuple[SupportedFeatureKey, ...] = field(
+        metadata={"tag": 0}, default=()
+    )
     """Features supported by the broker."""
     finalized_features_epoch: i64 = field(
-        metadata={"kafka_type": "int64"}, default=i64(-1)
+        metadata={"kafka_type": "int64", "tag": 1}, default=i64(-1)
     )
     """The monotonically increasing epoch for the finalized features information. Valid values are >= 0. A value of -1 is special and represents unknown epoch."""
-    finalized_features: tuple[FinalizedFeatureKey, ...]
+    finalized_features: tuple[FinalizedFeatureKey, ...] = field(
+        metadata={"tag": 2}, default=()
+    )
     """List of cluster-wide finalized features. The information is valid only if FinalizedFeaturesEpoch >= 0."""
-    zk_migration_ready: bool = field(metadata={"kafka_type": "bool"}, default=False)
+    zk_migration_ready: bool = field(
+        metadata={"kafka_type": "bool", "tag": 3}, default=False
+    )
     """Set by a KRaft controller if the required configurations for ZK migration are present"""

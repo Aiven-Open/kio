@@ -151,8 +151,6 @@ def test_can_parse_legacy_entity(buffer: io.BytesIO) -> None:
     write_int32(buffer, i32(23_126))
     # rack
     write_legacy_string(buffer, "da best")
-    # tagged fields
-    write_empty_tagged_fields(buffer)
 
     buffer.seek(0)
     instance = read_sync(buffer, entity_decoder(MetadataResponseBrokerV5))
@@ -397,3 +395,44 @@ def test_can_parse_nested_entity_array(buffer: io.BytesIO) -> None:
             Child(name="second child"),
         ),
     )
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class EmptyFlexible:
+    __flexible__: ClassVar[bool] = True
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class EmptyLegacy:
+    __flexible__: ClassVar[bool] = False
+
+
+def test_can_read_empty_flexible_entity(buffer: io.BytesIO) -> None:
+    write_empty_tagged_fields(buffer)
+    buffer.seek(0)
+    instance = read_sync(buffer, entity_decoder(EmptyFlexible))
+    assert instance == EmptyFlexible()
+
+
+def test_can_read_empty_legacy_entity(buffer: io.BytesIO) -> None:
+    instance = read_sync(buffer, entity_decoder(EmptyLegacy))
+    assert instance == EmptyLegacy()
+
+
+async def test_can_read_empty_flexible_entity_async(
+    stream_writer: asyncio.StreamWriter,
+    stream_reader: asyncio.StreamReader,
+) -> None:
+    write_empty_tagged_fields(stream_writer)
+    await stream_writer.drain()
+    instance = await read_async(stream_reader, entity_decoder(EmptyFlexible))
+    assert instance == EmptyFlexible()
+
+
+async def test_can_read_empty_legacy_entity_async(
+    stream_writer: asyncio.StreamWriter,
+    stream_reader: asyncio.StreamReader,
+) -> None:
+    await stream_writer.drain()
+    instance = await read_async(stream_reader, entity_decoder(EmptyLegacy))
+    assert instance == EmptyLegacy()
