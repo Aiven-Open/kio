@@ -58,10 +58,10 @@ class PartitionData:
     """The last stable offset (or LSO) of the partition. This is the last offset such that the state of all transactional records prior to this offset have been decided (ABORTED or COMMITTED)"""
     log_start_offset: i64 = field(metadata={"kafka_type": "int64"}, default=i64(-1))
     """The current log start offset."""
-    diverging_epoch: EpochEndOffset
+    diverging_epoch: EpochEndOffset = field(metadata={"tag": 0})
     """In case divergence is detected based on the `LastFetchedEpoch` and `FetchOffset` in the request, this field indicates the largest epoch and its end offset such that subsequent records are known to diverge"""
-    current_leader: LeaderIdAndEpoch
-    snapshot_id: SnapshotId
+    current_leader: LeaderIdAndEpoch = field(metadata={"tag": 1})
+    snapshot_id: SnapshotId = field(metadata={"tag": 2})
     """In the case of fetching an offset less than the LogStartOffset, this is the end offset and epoch that should be used in the FetchSnapshot request."""
     aborted_transactions: tuple[AbortedTransaction, ...]
     """The aborted transactions."""

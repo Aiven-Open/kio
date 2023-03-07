@@ -37,7 +37,7 @@ class PartitionSnapshot:
     """The error code, or 0 if there was no fetch error."""
     snapshot_id: SnapshotId
     """The snapshot endOffset and epoch fetched"""
-    current_leader: LeaderIdAndEpoch
+    current_leader: LeaderIdAndEpoch = field(metadata={"tag": 0})
     size: i64 = field(metadata={"kafka_type": "int64"})
     """The total size of the snapshot."""
     position: i64 = field(metadata={"kafka_type": "int64"})
