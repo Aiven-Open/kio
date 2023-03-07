@@ -5,7 +5,7 @@ from typing import TypeVar
 from typing_extensions import assert_never
 
 from . import encoders
-from .encoders import Writable
+from .encoders import Writable, legacy_array_writer
 from .encoders import Writer
 from .encoders import compact_array_writer
 from .encoders import write_tagged_field
@@ -75,6 +75,7 @@ T = TypeVar("T")
 
 def get_field_writer(field: Field[T], flexible: bool) -> Writer[T]:
     field_kind, field_type = classify_field(field)
+    array_writer = compact_array_writer if flexible else legacy_array_writer
 
     match field_kind:
         case FieldKind.primitive:
@@ -84,7 +85,7 @@ def get_field_writer(field: Field[T], flexible: bool) -> Writer[T]:
                 optional=is_optional(field),
             )
         case FieldKind.primitive_tuple:
-            return compact_array_writer(  # type: ignore[return-value]
+            return array_writer(  # type: ignore[return-value]
                 get_writer(
                     kafka_type=get_schema_field_type(field),
                     flexible=flexible,
@@ -94,7 +95,7 @@ def get_field_writer(field: Field[T], flexible: bool) -> Writer[T]:
         case FieldKind.entity:
             return entity_writer(field_type)  # type: ignore[type-var]
         case FieldKind.entity_tuple:
-            return compact_array_writer(  # type: ignore[return-value]
+            return array_writer(  # type: ignore[return-value]
                 entity_writer(field_type)  # type: ignore[type-var]
             )
         case no_match:

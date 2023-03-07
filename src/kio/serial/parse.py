@@ -72,6 +72,8 @@ T = TypeVar("T")
 
 def get_field_decoder(entity_type: type[Entity], field: Field[T]) -> Decoder[T]:
     field_kind, field_type = classify_field(field)
+    flexible = entity_type.__flexible__
+    array_decoder = decoders.compact_array_decoder if flexible else decoders.legacy_array_decoder
 
     match field_kind:
         case FieldKind.primitive:
@@ -81,7 +83,7 @@ def get_field_decoder(entity_type: type[Entity], field: Field[T]) -> Decoder[T]:
                 optional=is_optional(field),
             )
         case FieldKind.primitive_tuple:
-            return decoders.compact_array_decoder(  # type: ignore[return-value]
+            return array_decoder(  # type: ignore[return-value]
                 get_decoder(
                     kafka_type=get_schema_field_type(field),
                     flexible=entity_type.__flexible__,
@@ -91,7 +93,7 @@ def get_field_decoder(entity_type: type[Entity], field: Field[T]) -> Decoder[T]:
         case FieldKind.entity:
             return entity_decoder(field_type)  # type: ignore[type-var]
         case FieldKind.entity_tuple:
-            return decoders.compact_array_decoder(  # type: ignore[return-value]
+            return array_decoder(  # type: ignore[return-value]
                 entity_decoder(field_type)  # type: ignore[type-var]
             )
         case no_match:
