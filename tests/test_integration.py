@@ -100,13 +100,11 @@ async def send(
     write_request(buffer, payload)
 
     # Write message size.
-    message_size = i32(buffer.getbuffer().nbytes)
-    write_int32(stream, message_size)
+    write_int32(stream, i32(buffer.tell()))
 
-    # Write message.
+    # Write message to connection stream.
     buffer.seek(0)
-    while chunk := buffer.read(1024):
-        stream.write(chunk)
+    stream.write(buffer.getvalue())
 
     # Draining the stream to make sure full message is sent.
     await stream.drain()
