@@ -235,7 +235,7 @@ async def read_async(
         instruction = next(cursor)
     except StopIteration as exc:
         # Handle the special case of non-flexible empty models.
-        return exc.value
+        return exc.value  # type: ignore[no-any-return]
 
     step_value: Any
     while True:
@@ -262,7 +262,7 @@ def read_sync(
         instruction = next(cursor)
     except StopIteration as exc:
         # Handle the special case of non-flexible empty models.
-        return exc.value
+        return exc.value  # type: ignore[no-any-return]
 
     step_value: Any
     while True:
