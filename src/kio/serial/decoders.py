@@ -230,7 +230,13 @@ async def read_async(
     decoder: Decoder[T],
 ) -> T:
     cursor = decoder()
-    instruction = next(cursor)
+
+    try:
+        instruction = next(cursor)
+    except StopIteration as exc:
+        # Handle the special case of non-flexible empty models.
+        return exc.value
+
     step_value: Any
     while True:
         if isinstance(instruction, int):
@@ -251,7 +257,13 @@ def read_sync(
     decoder: Decoder[T],
 ) -> T:
     cursor = decoder()
-    instruction = next(cursor)
+
+    try:
+        instruction = next(cursor)
+    except StopIteration as exc:
+        # Handle the special case of non-flexible empty models.
+        return exc.value
+
     step_value: Any
     while True:
         if isinstance(instruction, int):
