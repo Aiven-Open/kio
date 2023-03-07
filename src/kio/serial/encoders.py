@@ -18,7 +18,8 @@ from kio.schema.primitive import u8
 from kio.schema.primitive import u16
 from kio.schema.primitive import u32
 from kio.schema.primitive import u64
-from kio.serial.errors import OutOfBoundValue
+
+from .errors import OutOfBoundValue
 
 Writable: TypeAlias = asyncio.StreamWriter | IO[bytes]
 T = TypeVar("T")

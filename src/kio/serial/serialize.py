@@ -1,10 +1,8 @@
 from dataclasses import Field
 from dataclasses import fields
-from typing import TypeVar, TypeAlias
+from typing import TypeVar
 
 from typing_extensions import assert_never
-
-from kio.schema.protocol import Entity
 
 from . import encoders
 from .encoders import Writable
@@ -12,6 +10,7 @@ from .encoders import Writer
 from .encoders import compact_array_writer
 from .encoders import write_tagged_field
 from .encoders import write_unsigned_varint
+from .introspect import Entity
 from .introspect import FieldKind
 from .introspect import classify_field
 from .introspect import get_field_tag
@@ -93,10 +92,10 @@ def get_field_writer(field: Field[T], flexible: bool) -> Writer[T]:
                 )
             )
         case FieldKind.entity:
-            return entity_writer(field_type)
+            return entity_writer(field_type)  # type: ignore[type-var]
         case FieldKind.entity_tuple:
             return compact_array_writer(  # type: ignore[return-value]
-                entity_writer(field_type)
+                entity_writer(field_type)  # type: ignore[type-var]
             )
         case no_match:
             assert_never(no_match)

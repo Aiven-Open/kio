@@ -21,7 +21,8 @@ from kio.schema.primitive import u8
 from kio.schema.primitive import u16
 from kio.schema.primitive import u32
 from kio.schema.primitive import u64
-from kio.serial.errors import UnexpectedNull
+
+from .errors import UnexpectedNull
 
 T = TypeVar("T")
 Cursor: TypeAlias = Generator["int | Decoder[object]", Any, T]

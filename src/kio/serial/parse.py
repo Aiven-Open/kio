@@ -4,12 +4,9 @@ from typing import TypeVar
 
 from typing_extensions import assert_never
 
-from kio.serial.decoders import Cursor
-from kio.serial.decoders import Decoder
-from kio.serial.decoders import compact_array_decoder
-from kio.serial.decoders import decode_unsigned_varint
-
 from . import decoders
+from .decoders import Cursor
+from .decoders import Decoder
 from .introspect import Entity
 from .introspect import FieldKind
 from .introspect import classify_field
@@ -84,7 +81,7 @@ def get_field_decoder(entity_type: type[Entity], field: Field[T]) -> Decoder[T]:
                 optional=is_optional(field),
             )
         case FieldKind.primitive_tuple:
-            return compact_array_decoder(  # type: ignore[return-value]
+            return decoders.compact_array_decoder(  # type: ignore[return-value]
                 get_decoder(
                     kafka_type=get_schema_field_type(field),
                     flexible=entity_type.__flexible__,
@@ -94,7 +91,7 @@ def get_field_decoder(entity_type: type[Entity], field: Field[T]) -> Decoder[T]:
         case FieldKind.entity:
             return entity_decoder(field_type)  # type: ignore[type-var]
         case FieldKind.entity_tuple:
-            return compact_array_decoder(  # type: ignore[return-value]
+            return decoders.compact_array_decoder(  # type: ignore[return-value]
                 entity_decoder(field_type)  # type: ignore[type-var]
             )
         case no_match:
@@ -120,11 +117,11 @@ def entity_decoder(entity_type: type[E]) -> Decoder[E]:
             assert not tagged_fields
             return entity_type(**kwargs)
 
-        num_tagged_fields = yield decode_unsigned_varint
+        num_tagged_fields = yield decoders.decode_unsigned_varint
 
         for _ in range(num_tagged_fields):
-            field_tag = yield decode_unsigned_varint
-            yield decode_unsigned_varint  # field length
+            field_tag = yield decoders.decode_unsigned_varint
+            yield decoders.decode_unsigned_varint  # field length
             field = tagged_fields[field_tag]
             kwargs[field.name] = yield get_field_decoder(entity_type, field)
 
