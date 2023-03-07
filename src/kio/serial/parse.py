@@ -7,12 +7,13 @@ from typing_extensions import assert_never
 from kio.serial.decoders import Cursor
 from kio.serial.decoders import Decoder
 from kio.serial.decoders import compact_array_decoder
-from kio.serial.decoders import skip_tagged_fields
+from kio.serial.decoders import decode_unsigned_varint
 
 from . import decoders
 from .introspect import Entity
 from .introspect import FieldKind
 from .introspect import classify_field
+from .introspect import get_field_tag
 from .introspect import get_schema_field_type
 from .introspect import is_optional
 
@@ -106,9 +107,27 @@ E = TypeVar("E", bound=Entity)
 def entity_decoder(entity_type: type[E]) -> Decoder[E]:
     def decode_entity() -> Cursor[E]:
         kwargs = {}
+        tagged_fields: dict[int, Field] = {}
+
         for field in fields(entity_type):
+            if (tag := get_field_tag(field)) is not None:
+                tagged_fields[tag] = field
+            else:
+                kwargs[field.name] = yield get_field_decoder(entity_type, field)
+
+        if not entity_type.__flexible__:
+            # Assert we don't find tags for non-flexible models.
+            assert not tagged_fields
+            return entity_type(**kwargs)
+
+        num_tagged_fields = yield decode_unsigned_varint
+
+        for _ in range(num_tagged_fields):
+            field_tag = yield decode_unsigned_varint
+            yield decode_unsigned_varint  # field length
+            field = tagged_fields[field_tag]
             kwargs[field.name] = yield get_field_decoder(entity_type, field)
-        yield skip_tagged_fields
+
         return entity_type(**kwargs)
 
     return decode_entity

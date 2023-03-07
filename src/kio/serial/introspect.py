@@ -76,3 +76,10 @@ def classify_field(field: Field[T]) -> tuple[FieldKind, type[T]]:
             return FieldKind.primitive_tuple, inner_type
 
     raise SchemaError(f"Field {field.name} has invalid tuple type args: {type_args}")
+
+
+def get_field_tag(field: Field) -> int | None:
+    try:
+        return int(field.metadata["tag"])
+    except KeyError:
+        return None

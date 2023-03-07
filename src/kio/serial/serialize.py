@@ -4,16 +4,19 @@ from typing import TypeVar
 
 from typing_extensions import assert_never
 
-from kio.serial import encoders
-from kio.serial.encoders import Writable
-from kio.serial.encoders import Writer
-from kio.serial.encoders import compact_array_writer
-from kio.serial.encoders import write_empty_tagged_fields
-from kio.serial.introspect import Entity
-from kio.serial.introspect import FieldKind
-from kio.serial.introspect import classify_field
-from kio.serial.introspect import get_schema_field_type
-from kio.serial.introspect import is_optional
+from kio.schema.protocol import Entity
+
+from . import encoders
+from .encoders import Writable
+from .encoders import Writer
+from .encoders import compact_array_writer
+from .encoders import write_tagged_field
+from .encoders import write_unsigned_varint
+from .introspect import FieldKind
+from .introspect import classify_field
+from .introspect import get_field_tag
+from .introspect import get_schema_field_type
+from .introspect import is_optional
 
 
 def get_writer(
@@ -106,9 +109,38 @@ def entity_writer(entity_type: type[E]) -> Writer[E]:
     flexible = entity_type.__flexible__
 
     def write_entity(buffer: Writable, entity: E) -> None:
+        tag_writers: dict[int, tuple[Writer[T], T]] = {}
+
         for field in fields(entity):
-            field_writer = get_field_writer(field, flexible=flexible)
-            field_writer(buffer, getattr(entity, field.name))
-        write_empty_tagged_fields(buffer)
+            field_writer = get_field_writer(
+                field,
+                flexible=entity.__flexible__,
+            )
+            field_value = getattr(entity, field.name)
+
+            # Defer tag values.
+            if (tag := get_field_tag(field)) is not None:
+                if field_value != field.default:
+                    tag_writers[tag] = (field_writer, field_value)
+                continue
+
+            field_writer(buffer, field_value)
+
+        if not entity_type.__flexible__:
+            # Assert we don't find tags for non-flexible models.
+            assert not tag_writers
+            return
+
+        # Number of tagged fields.
+        write_unsigned_varint(buffer, len(tag_writers))
+
+        for field_tag in sorted(tag_writers.keys()):
+            field_writer, value = tag_writers[field_tag]
+            write_tagged_field(
+                buffer=buffer,
+                tag=field_tag,
+                writer=field_writer,
+                value=value,
+            )
 
     return write_entity
