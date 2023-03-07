@@ -63,13 +63,6 @@ class WritableTag(Generic[T]):
             ],
             Person(age=u8(12), country="Borduria"),
         ),
-        (
-            [
-                WritableTag(tag=0, writer=write_uint8, value=u8(1)),
-                WritableTag(tag=1, writer=write_nullable_compact_string, value=None),
-            ],
-            Person(age=u8(1), country=None),
-        ),
     ],
 )
 def test_can_parse_tagged_fields(

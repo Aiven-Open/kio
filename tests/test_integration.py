@@ -1,4 +1,19 @@
 import asyncio
+from kio.schema.create_topics.v7.request import CreateTopicsRequest
+from kio.schema.create_topics.v7.response import CreateTopicsResponse
+from kio.schema.create_topics.v7.response import CreatableTopicResult
+from kio.schema.metadata.v12 import response as metadata_v12_response
+from kio.schema.metadata.v5 import response as metadata_v5_response
+from kio.schema.metadata.v12 import request as metadata_v12_request
+from kio.schema.metadata.v5 import request as metadata_v5_request
+from kio.schema.delete_topics.v6.request import DeleteTopicsRequest
+from kio.schema.delete_topics.v6.request import DeleteTopicState
+from kio.schema.delete_topics.v6.response import DeletableTopicResult
+from kio.schema.delete_topics.v6.response import DeleteTopicsResponse
+from kio.schema.api_versions.v3 import request as api_versions_v3_request
+from kio.schema.api_versions.v3 import response as api_versions_v3_response
+from kio.schema.api_versions.v2 import request as api_versions_v2_request
+from kio.schema.api_versions.v2 import response as api_versions_v2_response
 import io
 import secrets
 import uuid
@@ -9,8 +24,6 @@ from typing import Any
 from typing import Final
 from typing import TypeVar
 from unittest import mock
-
-import pytest
 
 import kio.schema.request_header.v0.header
 import kio.schema.request_header.v1.header
@@ -65,10 +78,6 @@ def write_request_header(
     else:
         raise NotImplementedError(f"Unknown request header schema: {header_schema}")
 
-    print(f"request {header=}")
-    print(f"request {header.__version__=}")
-    print(f"request {header.__flexible__=}")
-
     entity_writer(header_schema)(buffer, header)  # type: ignore[type-var]
 
 
@@ -115,19 +124,14 @@ async def receive(
     response_type: type[R],
     correlation_id: i32,
 ) -> R:
-    # I don't think it makes sense to use this value to read the exact length from the
-    # buffer directly. I think it makes sense to keep reading from the buffer ad-hoc.
-    # However, we could use this to introduce some wrapper around the buffer, so that it
-    # raises an error once the value has been (or is about to be) exceeded.
-    message_length = await read_async(stream, decode_int32)
-    print(f"received {message_length=}")
-
-    # fixme
+    # Note: I don't think it makes sense to use this value to read the exact length from
+    # the buffer directly. I think it makes sense to keep reading from the buffer
+    # ad-hoc. However, we could use this to introduce some wrapper around the buffer, so
+    # that it raises an error once the value has been (or is about to be) exceeded.
+    await read_async(stream, decode_int32)  # message length
     header_schema: Any = response_type.__header_schema__
     read_header = entity_decoder(header_schema)
     header = await read_async(stream, read_header)
-
-    print(f"response {header=}")
 
     if header.correlation_id != correlation_id:
         raise CorrelationIdMismatch
@@ -151,89 +155,95 @@ async def make_request(
             return await receive(stream_reader, response_type, correlation_id)
 
 
-async def test_roundtrip_metadata():
-    from kio.schema.metadata.v12.request import MetadataRequest
-    from kio.schema.metadata.v12.request import MetadataRequestTopic
-    from kio.schema.metadata.v12.response import MetadataResponse
-    from kio.schema.metadata.v12.response import MetadataResponseBroker
-
+async def test_roundtrip_api_versions_v3() -> None:
+    import secrets
     response = await make_request(
-        request=MetadataRequest(
-            topics=(
-                MetadataRequestTopic(
-                    topic_id=uuid_zero,
-                    name=TopicName("le-topic"),
-                ),
-            ),
-            allow_auto_topic_creation=True,
-            include_topic_authorized_operations=False,
+        request=api_versions_v3_request.ApiVersionsRequest(
+            client_software_name=secrets.token_hex(3),
+            client_software_version=secrets.token_hex(3),
         ),
-        response_type=MetadataResponse,
+        response_type=api_versions_v3_response.ApiVersionsResponse,
     )
-    print(f"{response=}")
-
-    assert response == MetadataResponse(
+    ApiVersion = api_versions_v3_response.ApiVersion
+    assert response == api_versions_v3_response.ApiVersionsResponse(
+        error_code=i16(0),
         throttle_time_ms=i32(0),
-        brokers=(
-            MetadataResponseBroker(
-                node_id=BrokerId(1),
-                host="broker",
-                port=i32(9092),
+        supported_features=(
+            api_versions_v3_response.SupportedFeatureKey(
+                name="metadata.version",
+                min_version=i16(1),
+                max_version=i16(7),
             ),
         ),
-        cluster_id=mock.ANY,
-        controller_id=BrokerId(1),
-        # Should maybe reset cluster between tests to enable checking this.
-        topics=mock.ANY,
-    )
-
-
-async def test_roundtrip_v5_metadata():
-    from kio.schema.metadata.v5.request import MetadataRequest
-    from kio.schema.metadata.v5.request import MetadataRequestTopic
-    from kio.schema.metadata.v5.response import MetadataResponse
-    from kio.schema.metadata.v5.response import MetadataResponseBroker
-
-    response = await make_request(
-        request=MetadataRequest(
-            topics=(MetadataRequestTopic(name=TopicName("le-topic")),),
-        ),
-        response_type=MetadataResponse,
-    )
-    print(f"{response=}")
-
-    assert response == MetadataResponse(
-        throttle_time_ms=i32(0),
-        brokers=(
-            MetadataResponseBroker(
-                node_id=BrokerId(1),
-                host="broker",
-                port=i32(9092),
+        finalized_features=(
+            api_versions_v3_response.FinalizedFeatureKey(
+                name="metadata.version",
+                min_version_level=i16(7),
+                max_version_level=i16(7),
             ),
         ),
-        # le-topic might or might not exist.
-        topics=mock.ANY,
-        controller_id=BrokerId(1),
-        cluster_id=mock.ANY,
-    )
-
-
-async def test_roundtrip_api_versions():
-    # FIXME: Why is v3 not working?! Something else that's undocumented and
-    #  special-cased?
-    from kio.schema.api_versions.v2.request import ApiVersionsRequest
-    from kio.schema.api_versions.v2.response import ApiVersion
-    from kio.schema.api_versions.v2.response import ApiVersionsResponse
-
-    response = await make_request(
-        request=ApiVersionsRequest(
-            # client_software_name="",
-            # client_software_version="",
+        finalized_features_epoch=mock.ANY,
+        api_keys=(
+            ApiVersion(api_key=i16(0), min_version=i16(0), max_version=i16(9)),
+            ApiVersion(api_key=i16(1), min_version=i16(0), max_version=i16(13)),
+            ApiVersion(api_key=i16(2), min_version=i16(0), max_version=i16(7)),
+            ApiVersion(api_key=i16(3), min_version=i16(0), max_version=i16(12)),
+            ApiVersion(api_key=i16(8), min_version=i16(0), max_version=i16(8)),
+            ApiVersion(api_key=i16(9), min_version=i16(0), max_version=i16(8)),
+            ApiVersion(api_key=i16(10), min_version=i16(0), max_version=i16(4)),
+            ApiVersion(api_key=i16(11), min_version=i16(0), max_version=i16(9)),
+            ApiVersion(api_key=i16(12), min_version=i16(0), max_version=i16(4)),
+            ApiVersion(api_key=i16(13), min_version=i16(0), max_version=i16(5)),
+            ApiVersion(api_key=i16(14), min_version=i16(0), max_version=i16(5)),
+            ApiVersion(api_key=i16(15), min_version=i16(0), max_version=i16(5)),
+            ApiVersion(api_key=i16(16), min_version=i16(0), max_version=i16(4)),
+            ApiVersion(api_key=i16(17), min_version=i16(0), max_version=i16(1)),
+            ApiVersion(api_key=i16(18), min_version=i16(0), max_version=i16(3)),
+            ApiVersion(api_key=i16(19), min_version=i16(0), max_version=i16(7)),
+            ApiVersion(api_key=i16(20), min_version=i16(0), max_version=i16(6)),
+            ApiVersion(api_key=i16(21), min_version=i16(0), max_version=i16(2)),
+            ApiVersion(api_key=i16(22), min_version=i16(0), max_version=i16(4)),
+            ApiVersion(api_key=i16(23), min_version=i16(0), max_version=i16(4)),
+            ApiVersion(api_key=i16(24), min_version=i16(0), max_version=i16(3)),
+            ApiVersion(api_key=i16(25), min_version=i16(0), max_version=i16(3)),
+            ApiVersion(api_key=i16(26), min_version=i16(0), max_version=i16(3)),
+            ApiVersion(api_key=i16(27), min_version=i16(0), max_version=i16(1)),
+            ApiVersion(api_key=i16(28), min_version=i16(0), max_version=i16(3)),
+            ApiVersion(api_key=i16(29), min_version=i16(0), max_version=i16(3)),
+            ApiVersion(api_key=i16(30), min_version=i16(0), max_version=i16(3)),
+            ApiVersion(api_key=i16(31), min_version=i16(0), max_version=i16(3)),
+            ApiVersion(api_key=i16(32), min_version=i16(0), max_version=i16(4)),
+            ApiVersion(api_key=i16(33), min_version=i16(0), max_version=i16(2)),
+            ApiVersion(api_key=i16(34), min_version=i16(0), max_version=i16(2)),
+            ApiVersion(api_key=i16(35), min_version=i16(0), max_version=i16(4)),
+            ApiVersion(api_key=i16(36), min_version=i16(0), max_version=i16(2)),
+            ApiVersion(api_key=i16(37), min_version=i16(0), max_version=i16(3)),
+            ApiVersion(api_key=i16(42), min_version=i16(0), max_version=i16(2)),
+            ApiVersion(api_key=i16(43), min_version=i16(0), max_version=i16(2)),
+            ApiVersion(api_key=i16(44), min_version=i16(0), max_version=i16(1)),
+            ApiVersion(api_key=i16(45), min_version=i16(0), max_version=i16(0)),
+            ApiVersion(api_key=i16(46), min_version=i16(0), max_version=i16(0)),
+            ApiVersion(api_key=i16(47), min_version=i16(0), max_version=i16(0)),
+            ApiVersion(api_key=i16(48), min_version=i16(0), max_version=i16(1)),
+            ApiVersion(api_key=i16(49), min_version=i16(0), max_version=i16(1)),
+            ApiVersion(api_key=i16(55), min_version=i16(0), max_version=i16(1)),
+            ApiVersion(api_key=i16(57), min_version=i16(0), max_version=i16(1)),
+            ApiVersion(api_key=i16(60), min_version=i16(0), max_version=i16(0)),
+            ApiVersion(api_key=i16(61), min_version=i16(0), max_version=i16(0)),
+            ApiVersion(api_key=i16(64), min_version=i16(0), max_version=i16(0)),
+            ApiVersion(api_key=i16(65), min_version=i16(0), max_version=i16(0)),
+            ApiVersion(api_key=i16(66), min_version=i16(0), max_version=i16(0)),
         ),
-        response_type=ApiVersionsResponse,
     )
-    print(f"{response=}")
-    assert response == ApiVersionsResponse(
+
+
+async def test_roundtrip_api_versions_v2() -> None:
+    response = await make_request(
+        request=api_versions_v2_request.ApiVersionsRequest(),
+        response_type=api_versions_v2_response.ApiVersionsResponse,
+    )
+    ApiVersion = api_versions_v2_response.ApiVersion
+    assert response == api_versions_v2_response.ApiVersionsResponse(
         error_code=i16(0),
         throttle_time_ms=i32(0),
         api_keys=(
@@ -288,55 +298,43 @@ async def test_roundtrip_api_versions():
             ApiVersion(api_key=i16(66), min_version=i16(0), max_version=i16(0)),
         ),
     )
-    mapped = {api_version.api_key: api_version for api_version in response.api_keys}
-    create_topics = mapped[i16(19)]
-    print(f"{create_topics=}")
 
 
-@pytest.mark.xfail
-async def test_multiple_stuff():
-    # Some issue with v2 request headers ..., versions v5+ don't work. Kafka expects a
-    # longer header than what we are producing.
-    # FIXME: Update, above solved. Now, Kafka responds with a too short response ...
-    # TopicConfigErrorCode is a prime suspect, when uncommented, the response parses
-    # successfully. It has a schema feature that we haven't implemented: "tag": 0.
-    # ... needs more research ...
+async def delete_topic(topic_name: TopicName) -> DeleteTopicsResponse:
+    return await make_request(
+        request=DeleteTopicsRequest(
+            topics=(
+                DeleteTopicState(name=topic_name, topic_id=uuid_zero),
+            ),
+            timeout_ms=i16(1000),
+        ),
+        response_type=DeleteTopicsResponse,
+    )
 
-    # This is likely it! So, need to somehow split things up in a way that makes sense
-    # ... maybe just xfail this test for now?
 
-    from kio.schema.create_topics.v7.request import CreateTopicsRequest
-    from kio.schema.create_topics.v7.response import CreateTopicsResponse
-    from kio.schema.metadata.v12.request import MetadataRequest
-    from kio.schema.metadata.v12.request import MetadataRequestTopic
-    from kio.schema.metadata.v12.response import MetadataResponse
-    from kio.schema.metadata.v12.response import MetadataResponseBroker
-
-    create_topics_response = await make_request(
+async def create_topic(topic_name: TopicName) -> CreateTopicsResponse:
+    return await make_request(
         request=CreateTopicsRequest(
             topics=(
                 CreatableTopic(
-                    name=TopicName("le-topic"),
+                    name=topic_name,
                     num_partitions=i32(3),
                     replication_factor=i16(1),
                     assignments=(),
                     configs=(),
                 ),
             ),
-            timeout_ms=i16(30_000),
+            timeout_ms=i16(1000),
         ),
         response_type=CreateTopicsResponse,
     )
-    print(f"{create_topics_response=}")
-    assert create_topics_response == CreateTopicsResponse(
-        throttle_time_ms=i32(0),
-        topics=(),
-    )
 
-    response = await make_request(
-        request=MetadataRequest(
+
+async def metadata_v12() -> metadata_v12_response.MetadataResponse:
+    return await make_request(
+        request=metadata_v12_request.MetadataRequest(
             topics=(
-                MetadataRequestTopic(
+                metadata_v12_request.MetadataRequestTopic(
                     topic_id=uuid_zero,
                     name=TopicName("le-topic"),
                 ),
@@ -344,13 +342,64 @@ async def test_multiple_stuff():
             allow_auto_topic_creation=True,
             include_topic_authorized_operations=False,
         ),
-        response_type=MetadataResponse,
+        response_type=metadata_v12_response.MetadataResponse,
     )
-    print(f"{response=}")
-    assert response == MetadataResponse(
+
+
+async def metadata_v5() -> metadata_v5_response.MetadataResponse:
+    return await make_request(
+        request=metadata_v5_request.MetadataRequest(
+            topics=(
+                metadata_v5_request.MetadataRequestTopic(
+                    name=TopicName("le-topic"),
+                ),
+            ),
+        ),
+        response_type=metadata_v5_response.MetadataResponse,
+    )
+
+
+async def test_topic_and_metadata_operations() -> None:
+    topic_name = TopicName("le-topic")
+
+    # Test delete topic which might or might not exist.
+    delete_topics_response = await delete_topic(topic_name)
+    assert delete_topics_response == DeleteTopicsResponse(
+        throttle_time_ms=i32(0),
+        responses=(
+            DeletableTopicResult(
+                name=topic_name,
+                topic_id=mock.ANY,
+                error_code=mock.ANY,
+                error_message=mock.ANY,
+            ),
+        )
+    )
+
+    # The previous deletion call should guarantee this call succeeds.
+    create_topics_response = await create_topic(topic_name)
+    assert create_topics_response == CreateTopicsResponse(
+        throttle_time_ms=i32(0),
+        topics=(
+            CreatableTopicResult(
+                name=topic_name,
+                topic_id=mock.ANY,
+                error_code=i16(0),
+                error_message=None,
+                num_partitions=i32(3),
+                replication_factor=i16(1),
+                configs=mock.ANY
+            ),
+        ),
+    )
+    created_topic, = create_topics_response.topics
+
+    # The previous creation call should guarantee this call contains the topic.
+    response = await metadata_v12()
+    assert response == metadata_v12_response.MetadataResponse(
         throttle_time_ms=i32(0),
         brokers=(
-            MetadataResponseBroker(
+            metadata_v12_response.MetadataResponseBroker(
                 node_id=BrokerId(1),
                 host="broker",
                 port=i32(9092),
@@ -358,5 +407,34 @@ async def test_multiple_stuff():
         ),
         cluster_id=mock.ANY,
         controller_id=BrokerId(1),
-        topics=(),
+        topics=(
+            metadata_v12_response.MetadataResponseTopic(
+                error_code=i16(0),
+                name=created_topic.name,
+                topic_id=created_topic.topic_id,
+                partitions=mock.ANY,
+            ),
+        ),
+    )
+
+    # Test also with a legacy format API version, i.e. non-flexible.
+    response = await metadata_v5()
+    assert response == metadata_v5_response.MetadataResponse(
+        throttle_time_ms=i32(0),
+        brokers=(
+            metadata_v5_response.MetadataResponseBroker(
+                node_id=BrokerId(1),
+                host="broker",
+                port=i32(9092),
+            ),
+        ),
+        topics=(
+            metadata_v5_response.MetadataResponseTopic(
+                error_code=i16(0),
+                name=created_topic.name,
+                partitions=mock.ANY,
+            ),
+        ),
+        controller_id=BrokerId(1),
+        cluster_id=mock.ANY,
     )

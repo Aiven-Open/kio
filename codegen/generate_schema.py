@@ -104,6 +104,7 @@ def format_dataclass_field(
     optional: bool,
     custom_type: CustomTypeDef | None,
     tag: int | None,
+    ignorable: bool,
 ) -> str:
     metadata: dict[str, object] = {}
     inner_type = (
@@ -128,6 +129,8 @@ def format_dataclass_field(
         field_kwargs["default"] = format_default(
             field_type, default, optional, custom_type
         )
+    elif tag is not None and ignorable:
+        field_kwargs["default"] = "None"
 
     if not field_kwargs:
         return ""
@@ -204,6 +207,7 @@ def generate_primitive_field(
         optional=optional,
         custom_type=custom_type,
         tag=field.get_tag(version),
+        ignorable=field.ignorable,
     )
     type_hint = (
         field.type.get_type_hint(optional)
@@ -230,6 +234,7 @@ def generate_primitive_array_field(
         optional=False,
         custom_type=None,
         tag=field.get_tag(version),
+        ignorable=field.ignorable,
     )
     return (
         f"    {to_snake_case(field.name)}: "
@@ -275,11 +280,12 @@ def generate_entity_field(field: EntityField, version: int) -> str:
     field_call = format_dataclass_field(
         field_type=field.type,
         default=None,
-        optional=field.nullableVersions.matches(version)
-        if field.nullableVersions
-        else False,
+        optional=(
+            field.nullableVersions.matches(version) if field.nullableVersions else False
+        ),
         custom_type=None,
         tag=field.get_tag(version),
+        ignorable=field.ignorable,
     )
     return f"    {to_snake_case(field.name)}: {field.type}{field_call}\n"
 

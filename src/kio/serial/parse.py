@@ -75,6 +75,7 @@ def get_field_decoder(
     entity_type: type[Entity],
     field: Field[T],
     is_request_header: bool,
+    is_tagged_field: bool,
 ) -> Decoder[T]:
     # RequestHeader.client_id is special-cased by Kafka to always use the legacy string
     # format.
@@ -93,14 +94,14 @@ def get_field_decoder(
             return get_decoder(
                 kafka_type=get_schema_field_type(field),
                 flexible=flexible,
-                optional=is_optional(field),
+                optional=is_optional(field) and not is_tagged_field,
             )
         case FieldKind.primitive_tuple:
             return array_decoder(  # type: ignore[return-value]
                 get_decoder(
                     kafka_type=get_schema_field_type(field),
                     flexible=flexible,
-                    optional=is_optional(field),
+                    optional=is_optional(field) and not is_tagged_field,
                 )
             )
         case FieldKind.entity:
@@ -123,8 +124,14 @@ def entity_decoder(entity_type: type[E]) -> Decoder[E]:
         tagged_fields = {}
 
         for field in fields(entity_type):
-            field_decoder = get_field_decoder(entity_type, field, is_request_header)
-            if (tag := get_field_tag(field)) is not None:
+            tag = get_field_tag(field)
+            field_decoder = get_field_decoder(
+                entity_type=entity_type,
+                field=field,
+                is_request_header=is_request_header,
+                is_tagged_field=tag is not None,
+            )
+            if tag is not None:
                 tagged_fields[tag] = field, field_decoder
             else:
                 kwargs[field.name] = yield field_decoder

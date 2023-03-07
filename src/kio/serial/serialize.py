@@ -133,12 +133,17 @@ def entity_writer(entity_type: type[E]) -> Writer[E]:
         # keeping track of tagged fields.
 
         for field in fields(entity):
+            tag = get_field_tag(field)
+            field_value = getattr(entity, field.name)
+
+            if tag is not None and field_value == field.default:
+                continue
+
             field_writer = get_field_writer(
                 field,
                 flexible=entity.__flexible__,
                 is_request_header=is_request_header,
             )
-            field_value = getattr(entity, field.name)
 
             # Record non-default valued tagged fields and defer serialization.
             if (tag := get_field_tag(field)) is not None:
