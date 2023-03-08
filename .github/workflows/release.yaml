@@ -6,6 +6,6 @@ on:
 
 jobs:
   build-and-publish:
-    uses: less-action/reusables/.github/workflows/python-publish.yaml@main
+    uses: less-action/reusables/.github/workflows/python-publish.yaml@0afb53ddb81137deb9d41e7d911eb1755bb451e3
     secrets:
       pypi_api_token: ${{ secrets.PYPI_API_TOKEN }}

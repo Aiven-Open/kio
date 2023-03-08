@@ -17,13 +17,13 @@ env:
 jobs:
   lint:
     name: Static analysis
-    uses: less-action/reusables/.github/workflows/pre-commit.yaml@main
+    uses: less-action/reusables/.github/workflows/pre-commit.yaml@0afb53ddb81137deb9d41e7d911eb1755bb451e3
     with:
       python-version: "3.11"
 
   check-build:
     name: Check packaging metadata
-    uses: less-action/reusables/.github/workflows/python-test-build.yaml@main
+    uses: less-action/reusables/.github/workflows/python-test-build.yaml@0afb53ddb81137deb9d41e7d911eb1755bb451e3
 
   test:
     name: Test
