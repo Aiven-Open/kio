@@ -11,7 +11,7 @@
 ## Features
 
 - Exposes immutable dataclass entities for all Kafka Protocol messages, generated from
-  the same source as Kafka's internals.
+  the [same source][schema-source] as used by Kafka's internals.
 - Message classes are simply light-weight data containers and does not inherit anything
   or expose any methods other than a vanilla dataclass. Encoding and decoding is enabled
   by making all the necessary details about Kafka encoding introspectable.
@@ -19,6 +19,9 @@
 - Supports asynchronous encoding and decoding with `asyncio.StreamReader` and
   `asyncio.StreamWriter`.
 - Test suite with focus on roundtrip property tests using Hypothesis.
+
+[schema-source]:
+  https://github.com/apache/kafka/tree/trunk/clients/src/main/resources/common/message
 
 ## Usage
 
