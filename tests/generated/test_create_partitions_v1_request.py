@@ -3,6 +3,8 @@ from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.create_partitions.v1.request import CreatePartitionsAssignment
+from kio.schema.create_partitions.v1.request import CreatePartitionsRequest
+from kio.schema.create_partitions.v1.request import CreatePartitionsTopic
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
 from kio.serial import read_sync
@@ -22,9 +24,6 @@ def test_create_partitions_assignment_roundtrip(
     assert instance == result
 
 
-from kio.schema.create_partitions.v1.request import CreatePartitionsTopic
-
-
 @given(from_type(CreatePartitionsTopic))
 @settings(max_examples=1)
 def test_create_partitions_topic_roundtrip(instance: CreatePartitionsTopic) -> None:
@@ -34,9 +33,6 @@ def test_create_partitions_topic_roundtrip(instance: CreatePartitionsTopic) -> N
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(CreatePartitionsTopic))
     assert instance == result
-
-
-from kio.schema.create_partitions.v1.request import CreatePartitionsRequest
 
 
 @given(from_type(CreatePartitionsRequest))

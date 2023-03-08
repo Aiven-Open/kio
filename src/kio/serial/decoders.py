@@ -9,9 +9,8 @@ from typing import Any
 from typing import Final
 from typing import TypeAlias
 from typing import TypeVar
+from typing import assert_never
 from uuid import UUID
-
-from typing_extensions import assert_never
 
 from kio.schema.primitive import i8
 from kio.schema.primitive import i16

@@ -2,6 +2,7 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.delete_topics.v6.request import DeleteTopicsRequest
 from kio.schema.delete_topics.v6.request import DeleteTopicState
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
@@ -18,9 +19,6 @@ def test_delete_topic_state_roundtrip(instance: DeleteTopicState) -> None:
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(DeleteTopicState))
     assert instance == result
-
-
-from kio.schema.delete_topics.v6.request import DeleteTopicsRequest
 
 
 @given(from_type(DeleteTopicsRequest))

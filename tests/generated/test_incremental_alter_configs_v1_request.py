@@ -3,6 +3,10 @@ from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.incremental_alter_configs.v1.request import AlterableConfig
+from kio.schema.incremental_alter_configs.v1.request import AlterConfigsResource
+from kio.schema.incremental_alter_configs.v1.request import (
+    IncrementalAlterConfigsRequest,
+)
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
 from kio.serial import read_sync
@@ -20,9 +24,6 @@ def test_alterable_config_roundtrip(instance: AlterableConfig) -> None:
     assert instance == result
 
 
-from kio.schema.incremental_alter_configs.v1.request import AlterConfigsResource
-
-
 @given(from_type(AlterConfigsResource))
 @settings(max_examples=1)
 def test_alter_configs_resource_roundtrip(instance: AlterConfigsResource) -> None:
@@ -32,11 +33,6 @@ def test_alter_configs_resource_roundtrip(instance: AlterConfigsResource) -> Non
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(AlterConfigsResource))
     assert instance == result
-
-
-from kio.schema.incremental_alter_configs.v1.request import (
-    IncrementalAlterConfigsRequest,
-)
 
 
 @given(from_type(IncrementalAlterConfigsRequest))

@@ -2,6 +2,7 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.consumer_protocol_assignment.v3.data import ConsumerProtocolAssignment
 from kio.schema.consumer_protocol_assignment.v3.data import TopicPartition
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
@@ -18,9 +19,6 @@ def test_topic_partition_roundtrip(instance: TopicPartition) -> None:
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(TopicPartition))
     assert instance == result
-
-
-from kio.schema.consumer_protocol_assignment.v3.data import ConsumerProtocolAssignment
 
 
 @given(from_type(ConsumerProtocolAssignment))

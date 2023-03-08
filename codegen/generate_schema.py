@@ -1,3 +1,5 @@
+# ruff: noqa: T201
+
 from __future__ import annotations
 
 import pathlib
@@ -11,9 +13,9 @@ from dataclasses import dataclass
 from typing import Final
 from typing import Literal
 from typing import TypeAlias
+from typing import assert_never
 
 from pydantic import ValidationError
-from typing_extensions import assert_never
 
 from .case import capitalize_first
 from .case import to_snake_case
@@ -36,6 +38,9 @@ imports_and_docstring: Final = '''\
 """
 Generated from {schema_source}.
 """
+
+# ruff: noqa: A003
+
 from dataclasses import dataclass, field
 from typing import Annotated, ClassVar
 import uuid
@@ -108,10 +113,12 @@ def format_dataclass_field(
 ) -> str:
     metadata: dict[str, object] = {}
     inner_type = (
-        field_type.type if isinstance(field_type, PrimitiveArrayType) else field_type
+        field_type.item_type
+        if isinstance(field_type, PrimitiveArrayType)
+        else field_type
     )
 
-    if isinstance(field_type, (Primitive, PrimitiveArrayType)):
+    if isinstance(field_type, Primitive | PrimitiveArrayType):
         metadata["kafka_type"] = inner_type.value  # type: ignore[union-attr]
 
     if tag is not None:
@@ -148,14 +155,8 @@ class CustomTypeDef:
 
     def get_definition(self) -> str:
         type_hint = self.type_.get_type_hint()
-        if self.type_ is Primitive.string:
-            return textwrap.dedent(
-                f"""\
-                class {self.name}({type_hint}):
-                    ...
-                """
-            )
-        elif self.type_ in (
+        if self.type_ in (
+            Primitive.string,
             Primitive.int8,
             Primitive.int16,
             Primitive.int32,
@@ -296,7 +297,7 @@ def generate_common_struct_array_field(
 ) -> str:
     field_call = format_array_field_call(field, version)
     return (
-        f"    {to_snake_case(field.name)}: tuple[{field.type.type.name}, ...]"
+        f"    {to_snake_case(field.name)}: tuple[{field.type.item_type.name}, ...]"
         f"{field_call}\n"
     )
 
@@ -359,7 +360,7 @@ def generate_dataclass(  # noqa: C901
                 )
             )
         elif isinstance(field, PrimitiveArrayField):
-            inner_type = field.type.type
+            inner_type = field.type.item_type
             custom_type = (
                 generate_custom_type(field.entityType, inner_type)
                 if field.entityType is not None
@@ -399,8 +400,8 @@ def generate_dataclass(  # noqa: C901
         elif isinstance(field, CommonStructArrayField):
             yield from generate_dataclass(
                 schema=schema,
-                name=field.type.type.name,
-                fields=field.type.type.fields,
+                name=field.type.item_type.name,
+                fields=field.type.item_type.fields,
                 version=version,
             )
             class_fields.append(generate_common_struct_array_field(field, version))
@@ -421,7 +422,7 @@ def generate_dataclass(  # noqa: C901
 def generate_models(
     schema: MessageSchema | HeaderSchema | DataSchema,
 ) -> Iterator[tuple[int, str | CustomTypeDef]]:
-    for version in schema.validVersions.iter():
+    for version in schema.validVersions.iterator():
         accumulated_code = ""
         for item in generate_dataclass(
             schema=schema,

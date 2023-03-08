@@ -10,6 +10,7 @@ repos:
       - id: trailing-whitespace
       - id: debug-statements
       - id: detect-private-key
+
   - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
     rev: "2.6.1"
     hooks:
@@ -17,53 +18,28 @@ repos:
         alias: ec
         args:
           - -disable-indent-size
-  - repo: https://github.com/asottile/pyupgrade
-    rev: "v3.2.2"
+
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: "v0.0.254"
     hooks:
-      - id: pyupgrade
-        name: pyupgrade[codegen,tests]
-        args:
-          # --py311-plus replaces assert_never import, which isn't compatible with mypy yet.
-          - --py310-plus
-        exclude: ^src
-      - id: pyupgrade
-        name: pyupgrade[src]
-        args:
-          - --py310-plus
-        exclude: ^(codegen|tests)
-  - repo: https://github.com/pycqa/autoflake
-    rev: "v1.7.7"
-    hooks:
-      - id: autoflake
-        args:
-          - --in-place
-          - --remove-all-unused-imports
-          - --ignore-init-module-imports
-  - repo: https://github.com/pycqa/isort
-    rev: "5.12.0"
-    hooks:
-      - id: isort
+      - id: ruff
+
   - repo: https://github.com/psf/black
     rev: "22.10.0"
     hooks:
       - id: black
+
   - repo: https://github.com/asottile/blacken-docs
     rev: "v1.12.1"
     hooks:
       - id: blacken-docs
         additional_dependencies: ["black==22.10.0"]
-  - repo: https://github.com/pycqa/flake8
-    rev: "5.0.4"
-    hooks:
-      - id: flake8
-        additional_dependencies:
-          - flake8-bugbear
-          - flake8-comprehensions
-        exclude: ^tests/generated/.*
+
   - repo: https://github.com/sirosen/check-jsonschema
     rev: "0.19.2"
     hooks:
       - id: check-github-workflows
+
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: "v1.0.1"
     hooks:
@@ -77,6 +53,7 @@ repos:
           - types-setuptools==65.6.0.2
           - phantom-types==1.2.0
           - types-requests==2.28.11.14
+
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: "v2.7.1"
     hooks:
@@ -87,10 +64,11 @@ repos:
           - --parser=markdown
           - --print-width=88
           - --prose-wrap=always
+
   - repo: https://github.com/mgedmin/check-manifest
     rev: "0.48"
     hooks:
       - id: check-manifest
         args: ["--no-build-isolation"]
         additional_dependencies:
-          - setuptools==65.6.3
+          - setuptools==67.6.0

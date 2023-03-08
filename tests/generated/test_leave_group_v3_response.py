@@ -2,6 +2,7 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.leave_group.v3.response import LeaveGroupResponse
 from kio.schema.leave_group.v3.response import MemberResponse
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
@@ -18,9 +19,6 @@ def test_member_response_roundtrip(instance: MemberResponse) -> None:
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(MemberResponse))
     assert instance == result
-
-
-from kio.schema.leave_group.v3.response import LeaveGroupResponse
 
 
 @given(from_type(LeaveGroupResponse))

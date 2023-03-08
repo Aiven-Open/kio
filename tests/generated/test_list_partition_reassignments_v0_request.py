@@ -3,6 +3,9 @@ from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.list_partition_reassignments.v0.request import (
+    ListPartitionReassignmentsRequest,
+)
+from kio.schema.list_partition_reassignments.v0.request import (
     ListPartitionReassignmentsTopics,
 )
 from kio.serial import entity_decoder
@@ -22,11 +25,6 @@ def test_list_partition_reassignments_topics_roundtrip(
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(ListPartitionReassignmentsTopics))
     assert instance == result
-
-
-from kio.schema.list_partition_reassignments.v0.request import (
-    ListPartitionReassignmentsRequest,
-)
 
 
 @given(from_type(ListPartitionReassignmentsRequest))

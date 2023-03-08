@@ -1,8 +1,7 @@
 from dataclasses import Field
 from dataclasses import fields
 from typing import TypeVar
-
-from typing_extensions import assert_never
+from typing import assert_never
 
 from kio.schema.protocol import Entity
 

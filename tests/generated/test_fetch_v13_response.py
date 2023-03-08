@@ -2,7 +2,13 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.fetch.v13.response import AbortedTransaction
 from kio.schema.fetch.v13.response import EpochEndOffset
+from kio.schema.fetch.v13.response import FetchableTopicResponse
+from kio.schema.fetch.v13.response import FetchResponse
+from kio.schema.fetch.v13.response import LeaderIdAndEpoch
+from kio.schema.fetch.v13.response import PartitionData
+from kio.schema.fetch.v13.response import SnapshotId
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
 from kio.serial import read_sync
@@ -20,9 +26,6 @@ def test_epoch_end_offset_roundtrip(instance: EpochEndOffset) -> None:
     assert instance == result
 
 
-from kio.schema.fetch.v13.response import LeaderIdAndEpoch
-
-
 @given(from_type(LeaderIdAndEpoch))
 @settings(max_examples=1)
 def test_leader_id_and_epoch_roundtrip(instance: LeaderIdAndEpoch) -> None:
@@ -32,9 +35,6 @@ def test_leader_id_and_epoch_roundtrip(instance: LeaderIdAndEpoch) -> None:
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(LeaderIdAndEpoch))
     assert instance == result
-
-
-from kio.schema.fetch.v13.response import SnapshotId
 
 
 @given(from_type(SnapshotId))
@@ -48,9 +48,6 @@ def test_snapshot_id_roundtrip(instance: SnapshotId) -> None:
     assert instance == result
 
 
-from kio.schema.fetch.v13.response import AbortedTransaction
-
-
 @given(from_type(AbortedTransaction))
 @settings(max_examples=1)
 def test_aborted_transaction_roundtrip(instance: AbortedTransaction) -> None:
@@ -60,9 +57,6 @@ def test_aborted_transaction_roundtrip(instance: AbortedTransaction) -> None:
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(AbortedTransaction))
     assert instance == result
-
-
-from kio.schema.fetch.v13.response import PartitionData
 
 
 @given(from_type(PartitionData))
@@ -76,9 +70,6 @@ def test_partition_data_roundtrip(instance: PartitionData) -> None:
     assert instance == result
 
 
-from kio.schema.fetch.v13.response import FetchableTopicResponse
-
-
 @given(from_type(FetchableTopicResponse))
 @settings(max_examples=1)
 def test_fetchable_topic_response_roundtrip(instance: FetchableTopicResponse) -> None:
@@ -88,9 +79,6 @@ def test_fetchable_topic_response_roundtrip(instance: FetchableTopicResponse) ->
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(FetchableTopicResponse))
     assert instance == result
-
-
-from kio.schema.fetch.v13.response import FetchResponse
 
 
 @given(from_type(FetchResponse))

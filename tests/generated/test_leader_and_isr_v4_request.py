@@ -2,7 +2,10 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.leader_and_isr.v4.request import LeaderAndIsrLiveLeader
 from kio.schema.leader_and_isr.v4.request import LeaderAndIsrPartitionState
+from kio.schema.leader_and_isr.v4.request import LeaderAndIsrRequest
+from kio.schema.leader_and_isr.v4.request import LeaderAndIsrTopicState
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
 from kio.serial import read_sync
@@ -22,9 +25,6 @@ def test_leader_and_isr_partition_state_roundtrip(
     assert instance == result
 
 
-from kio.schema.leader_and_isr.v4.request import LeaderAndIsrTopicState
-
-
 @given(from_type(LeaderAndIsrTopicState))
 @settings(max_examples=1)
 def test_leader_and_isr_topic_state_roundtrip(instance: LeaderAndIsrTopicState) -> None:
@@ -36,9 +36,6 @@ def test_leader_and_isr_topic_state_roundtrip(instance: LeaderAndIsrTopicState) 
     assert instance == result
 
 
-from kio.schema.leader_and_isr.v4.request import LeaderAndIsrLiveLeader
-
-
 @given(from_type(LeaderAndIsrLiveLeader))
 @settings(max_examples=1)
 def test_leader_and_isr_live_leader_roundtrip(instance: LeaderAndIsrLiveLeader) -> None:
@@ -48,9 +45,6 @@ def test_leader_and_isr_live_leader_roundtrip(instance: LeaderAndIsrLiveLeader) 
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(LeaderAndIsrLiveLeader))
     assert instance == result
-
-
-from kio.schema.leader_and_isr.v4.request import LeaderAndIsrRequest
 
 
 @given(from_type(LeaderAndIsrRequest))

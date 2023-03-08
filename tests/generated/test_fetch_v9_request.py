@@ -3,6 +3,9 @@ from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.fetch.v9.request import FetchPartition
+from kio.schema.fetch.v9.request import FetchRequest
+from kio.schema.fetch.v9.request import FetchTopic
+from kio.schema.fetch.v9.request import ForgottenTopic
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
 from kio.serial import read_sync
@@ -20,9 +23,6 @@ def test_fetch_partition_roundtrip(instance: FetchPartition) -> None:
     assert instance == result
 
 
-from kio.schema.fetch.v9.request import FetchTopic
-
-
 @given(from_type(FetchTopic))
 @settings(max_examples=1)
 def test_fetch_topic_roundtrip(instance: FetchTopic) -> None:
@@ -34,9 +34,6 @@ def test_fetch_topic_roundtrip(instance: FetchTopic) -> None:
     assert instance == result
 
 
-from kio.schema.fetch.v9.request import ForgottenTopic
-
-
 @given(from_type(ForgottenTopic))
 @settings(max_examples=1)
 def test_forgotten_topic_roundtrip(instance: ForgottenTopic) -> None:
@@ -46,9 +43,6 @@ def test_forgotten_topic_roundtrip(instance: ForgottenTopic) -> None:
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(ForgottenTopic))
     assert instance == result
-
-
-from kio.schema.fetch.v9.request import FetchRequest
 
 
 @given(from_type(FetchRequest))

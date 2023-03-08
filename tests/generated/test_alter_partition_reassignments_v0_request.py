@@ -2,7 +2,11 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.alter_partition_reassignments.v0.request import (
+    AlterPartitionReassignmentsRequest,
+)
 from kio.schema.alter_partition_reassignments.v0.request import ReassignablePartition
+from kio.schema.alter_partition_reassignments.v0.request import ReassignableTopic
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
 from kio.serial import read_sync
@@ -20,9 +24,6 @@ def test_reassignable_partition_roundtrip(instance: ReassignablePartition) -> No
     assert instance == result
 
 
-from kio.schema.alter_partition_reassignments.v0.request import ReassignableTopic
-
-
 @given(from_type(ReassignableTopic))
 @settings(max_examples=1)
 def test_reassignable_topic_roundtrip(instance: ReassignableTopic) -> None:
@@ -32,11 +33,6 @@ def test_reassignable_topic_roundtrip(instance: ReassignableTopic) -> None:
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(ReassignableTopic))
     assert instance == result
-
-
-from kio.schema.alter_partition_reassignments.v0.request import (
-    AlterPartitionReassignmentsRequest,
-)
 
 
 @given(from_type(AlterPartitionReassignmentsRequest))

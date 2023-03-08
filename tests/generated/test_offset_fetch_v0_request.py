@@ -2,6 +2,7 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.offset_fetch.v0.request import OffsetFetchRequest
 from kio.schema.offset_fetch.v0.request import OffsetFetchRequestTopic
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
@@ -20,9 +21,6 @@ def test_offset_fetch_request_topic_roundtrip(
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(OffsetFetchRequestTopic))
     assert instance == result
-
-
-from kio.schema.offset_fetch.v0.request import OffsetFetchRequest
 
 
 @given(from_type(OffsetFetchRequest))

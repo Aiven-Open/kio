@@ -3,6 +3,12 @@ from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.describe_user_scram_credentials.v0.response import CredentialInfo
+from kio.schema.describe_user_scram_credentials.v0.response import (
+    DescribeUserScramCredentialsResponse,
+)
+from kio.schema.describe_user_scram_credentials.v0.response import (
+    DescribeUserScramCredentialsResult,
+)
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
 from kio.serial import read_sync
@@ -20,11 +26,6 @@ def test_credential_info_roundtrip(instance: CredentialInfo) -> None:
     assert instance == result
 
 
-from kio.schema.describe_user_scram_credentials.v0.response import (
-    DescribeUserScramCredentialsResult,
-)
-
-
 @given(from_type(DescribeUserScramCredentialsResult))
 @settings(max_examples=1)
 def test_describe_user_scram_credentials_result_roundtrip(
@@ -36,11 +37,6 @@ def test_describe_user_scram_credentials_result_roundtrip(
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(DescribeUserScramCredentialsResult))
     assert instance == result
-
-
-from kio.schema.describe_user_scram_credentials.v0.response import (
-    DescribeUserScramCredentialsResponse,
-)
 
 
 @given(from_type(DescribeUserScramCredentialsResponse))

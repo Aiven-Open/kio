@@ -1,6 +1,9 @@
 """
 Generated from ApiVersionsRequest.json.
 """
+
+# ruff: noqa: A003
+
 from dataclasses import dataclass
 from typing import ClassVar
 

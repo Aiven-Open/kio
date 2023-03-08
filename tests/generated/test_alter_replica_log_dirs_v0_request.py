@@ -2,6 +2,8 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.alter_replica_log_dirs.v0.request import AlterReplicaLogDir
+from kio.schema.alter_replica_log_dirs.v0.request import AlterReplicaLogDirsRequest
 from kio.schema.alter_replica_log_dirs.v0.request import AlterReplicaLogDirTopic
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
@@ -22,9 +24,6 @@ def test_alter_replica_log_dir_topic_roundtrip(
     assert instance == result
 
 
-from kio.schema.alter_replica_log_dirs.v0.request import AlterReplicaLogDir
-
-
 @given(from_type(AlterReplicaLogDir))
 @settings(max_examples=1)
 def test_alter_replica_log_dir_roundtrip(instance: AlterReplicaLogDir) -> None:
@@ -34,9 +33,6 @@ def test_alter_replica_log_dir_roundtrip(instance: AlterReplicaLogDir) -> None:
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(AlterReplicaLogDir))
     assert instance == result
-
-
-from kio.schema.alter_replica_log_dirs.v0.request import AlterReplicaLogDirsRequest
 
 
 @given(from_type(AlterReplicaLogDirsRequest))

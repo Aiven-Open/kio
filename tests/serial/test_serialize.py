@@ -161,64 +161,64 @@ async def test_serialize_complex_entity_async(
     await stream_writer.drain()
 
     # throttle time
-    assert 123 == await read_async(stream_reader, decode_int32)
+    assert await read_async(stream_reader, decode_int32) == 123
 
     # brokers
-    assert 2 == await read_async(stream_reader, decode_compact_array_length)
+    assert await read_async(stream_reader, decode_compact_array_length) == 2
     for i in range(1, 3):
         # node_id
         assert i == await read_async(stream_reader, decode_int32)
         # host
-        assert "foo.bar" == await read_async(stream_reader, decode_compact_string)
+        assert await read_async(stream_reader, decode_compact_string) == "foo.bar"
         # port
-        assert 1234 == await read_async(stream_reader, decode_int32)
+        assert await read_async(stream_reader, decode_int32) == 1234
         # rack
         assert await read_async(stream_reader, decode_compact_string_nullable) is None
         # tagged fields
         assert await read_async(stream_reader, decode_unsigned_varint) == 0
 
     # cluster_id
-    assert "556" == await read_async(stream_reader, decode_compact_string_nullable)
+    assert await read_async(stream_reader, decode_compact_string_nullable) == "556"
 
     # controller id
-    assert 3 == await read_async(stream_reader, decode_int32)
+    assert await read_async(stream_reader, decode_int32) == 3
 
     # topics
-    assert 1 == await read_async(stream_reader, decode_compact_array_length)
+    assert await read_async(stream_reader, decode_compact_array_length) == 1
     for _ in range(1):
         # error code
-        assert 123 == await read_async(stream_reader, decode_int16)
+        assert await read_async(stream_reader, decode_int16) == 123
         # name
-        assert "topic 1" == await read_async(
-            stream_reader, decode_compact_string_nullable
+        assert (
+            await read_async(stream_reader, decode_compact_string_nullable) == "topic 1"
         )
         # topic id
         assert topic_id == await read_async(stream_reader, decode_uuid)
         # is internal
         assert await read_async(stream_reader, decode_boolean) is False
         # partitions
-        assert 1 == await read_async(stream_reader, decode_compact_array_length)
+        assert await read_async(stream_reader, decode_compact_array_length) == 1
         for __ in range(1):
             # error code
-            assert 8765 == await read_async(stream_reader, decode_int16)
+            assert await read_async(stream_reader, decode_int16) == 8765
             # partition index
-            assert 5679 == await read_async(stream_reader, decode_int32)
+            assert await read_async(stream_reader, decode_int32) == 5679
             # leader id
-            assert 2345 == await read_async(stream_reader, decode_int32)
+            assert await read_async(stream_reader, decode_int32) == 2345
             # leader epoch
-            assert 6445678 == await read_async(stream_reader, decode_int32)
+            assert await read_async(stream_reader, decode_int32) == 6445678
             # replica nodes
-            assert 2 == await read_async(stream_reader, decode_compact_array_length)
-            assert 12345 == await read_async(stream_reader, decode_int32)
-            assert 7651 == await read_async(stream_reader, decode_int32)
+            assert await read_async(stream_reader, decode_compact_array_length) == 2
+            assert await read_async(stream_reader, decode_int32) == 12345
+            assert await read_async(stream_reader, decode_int32) == 7651
             # isr nodes
-            assert 0 == await read_async(stream_reader, decode_compact_array_length)
+            assert await read_async(stream_reader, decode_compact_array_length) == 0
             # offline replicas
-            assert 0 == await read_async(stream_reader, decode_compact_array_length)
+            assert await read_async(stream_reader, decode_compact_array_length) == 0
             # partition tagged fields
             assert await read_async(stream_reader, decode_unsigned_varint) == 0
         # topic authorized operations
-        assert 765443 == await read_async(stream_reader, decode_int32)
+        assert await read_async(stream_reader, decode_int32) == 765443
         # topic tagged fields
         assert await read_async(stream_reader, decode_unsigned_varint) == 0
 

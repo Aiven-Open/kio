@@ -2,7 +2,9 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.txn_offset_commit.v0.request import TxnOffsetCommitRequest
 from kio.schema.txn_offset_commit.v0.request import TxnOffsetCommitRequestPartition
+from kio.schema.txn_offset_commit.v0.request import TxnOffsetCommitRequestTopic
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
 from kio.serial import read_sync
@@ -22,9 +24,6 @@ def test_txn_offset_commit_request_partition_roundtrip(
     assert instance == result
 
 
-from kio.schema.txn_offset_commit.v0.request import TxnOffsetCommitRequestTopic
-
-
 @given(from_type(TxnOffsetCommitRequestTopic))
 @settings(max_examples=1)
 def test_txn_offset_commit_request_topic_roundtrip(
@@ -36,9 +35,6 @@ def test_txn_offset_commit_request_topic_roundtrip(
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(TxnOffsetCommitRequestTopic))
     assert instance == result
-
-
-from kio.schema.txn_offset_commit.v0.request import TxnOffsetCommitRequest
 
 
 @given(from_type(TxnOffsetCommitRequest))

@@ -65,8 +65,8 @@ def write_request_header(
     elif issubclass(
         header_schema,
         (
-            kio.schema.request_header.v1.header.RequestHeader,
-            kio.schema.request_header.v2.header.RequestHeader,
+            kio.schema.request_header.v1.header.RequestHeader
+            | kio.schema.request_header.v2.header.RequestHeader
         ),
     ):
         header = header_schema(

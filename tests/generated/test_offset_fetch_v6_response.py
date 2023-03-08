@@ -2,7 +2,9 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.offset_fetch.v6.response import OffsetFetchResponse
 from kio.schema.offset_fetch.v6.response import OffsetFetchResponsePartition
+from kio.schema.offset_fetch.v6.response import OffsetFetchResponseTopic
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
 from kio.serial import read_sync
@@ -22,9 +24,6 @@ def test_offset_fetch_response_partition_roundtrip(
     assert instance == result
 
 
-from kio.schema.offset_fetch.v6.response import OffsetFetchResponseTopic
-
-
 @given(from_type(OffsetFetchResponseTopic))
 @settings(max_examples=1)
 def test_offset_fetch_response_topic_roundtrip(
@@ -36,9 +35,6 @@ def test_offset_fetch_response_topic_roundtrip(
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(OffsetFetchResponseTopic))
     assert instance == result
-
-
-from kio.schema.offset_fetch.v6.response import OffsetFetchResponse
 
 
 @given(from_type(OffsetFetchResponse))

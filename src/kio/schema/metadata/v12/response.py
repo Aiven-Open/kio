@@ -1,6 +1,9 @@
 """
 Generated from MetadataResponse.json.
 """
+
+# ruff: noqa: A003
+
 import uuid
 from dataclasses import dataclass
 from dataclasses import field

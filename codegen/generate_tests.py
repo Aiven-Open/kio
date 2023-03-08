@@ -1,14 +1,16 @@
 import os
 import shutil
+from collections import defaultdict
 from collections.abc import Iterator
 from importlib import import_module
+from itertools import chain
 from pathlib import Path
 from pkgutil import walk_packages
 from types import ModuleType
 
-from codegen.case import to_snake_case
-
 import kio.schema
+
+from .case import to_snake_case
 
 
 def generate_modules(parent: ModuleType) -> Iterator[ModuleType]:
@@ -49,9 +51,10 @@ from tests.conftest import setup_buffer
 from kio.serial import read_sync
 from kio.serial import entity_decoder
 """
-test_code = """\
+import_code = """\
 from {entity_module} import {entity_type}
-
+"""
+test_code = """\
 @given(from_type({entity_type}))
 @settings(max_examples=1)
 def test_{entity_snake_case}_roundtrip(instance: {entity_type}) -> None:
@@ -80,20 +83,29 @@ def main() -> None:
     os.mkdir(generated_tests_module)
     (generated_tests_module / "__init__.py").touch()
 
+    module_imports = defaultdict(list)
+    module_code = defaultdict(list)
+
     for entity_type, file in get_entities():
         module_path = generated_tests_module / build_filename(file)
-        write_imports = not module_path.exists()
-        with module_path.open("a") as fd:
-            if write_imports:
-                print(imports, file=fd)
-            print(
-                test_code.format(
-                    entity_module=entity_type.__module__,
-                    entity_type=entity_type.__name__,
-                    entity_snake_case=to_snake_case(entity_type.__name__),
-                ),
-                file=fd,
+        module_imports[module_path].append(
+            import_code.format(
+                entity_module=entity_type.__module__,
+                entity_type=entity_type.__name__,
             )
+        )
+        module_code[module_path].append(
+            test_code.format(
+                entity_type=entity_type.__name__,
+                entity_snake_case=to_snake_case(entity_type.__name__),
+            )
+        )
+
+    for module_path, entity_imports in module_imports.items():
+        with module_path.open("w") as fd:
+            print(imports, file=fd)
+            for code in chain(entity_imports, module_code[module_path]):
+                print(code, file=fd)
 
 
 if __name__ == "__main__":

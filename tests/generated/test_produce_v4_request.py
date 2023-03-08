@@ -3,6 +3,8 @@ from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.produce.v4.request import PartitionProduceData
+from kio.schema.produce.v4.request import ProduceRequest
+from kio.schema.produce.v4.request import TopicProduceData
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
 from kio.serial import read_sync
@@ -20,9 +22,6 @@ def test_partition_produce_data_roundtrip(instance: PartitionProduceData) -> Non
     assert instance == result
 
 
-from kio.schema.produce.v4.request import TopicProduceData
-
-
 @given(from_type(TopicProduceData))
 @settings(max_examples=1)
 def test_topic_produce_data_roundtrip(instance: TopicProduceData) -> None:
@@ -32,9 +31,6 @@ def test_topic_produce_data_roundtrip(instance: TopicProduceData) -> None:
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(TopicProduceData))
     assert instance == result
-
-
-from kio.schema.produce.v4.request import ProduceRequest
 
 
 @given(from_type(ProduceRequest))

@@ -13,6 +13,7 @@ concurrency:
 
 env:
   COLUMNS: "120"
+  FORCE_COLOR: "1"
 
 jobs:
   lint:

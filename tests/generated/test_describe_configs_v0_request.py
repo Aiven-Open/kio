@@ -2,6 +2,7 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.describe_configs.v0.request import DescribeConfigsRequest
 from kio.schema.describe_configs.v0.request import DescribeConfigsResource
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
@@ -18,9 +19,6 @@ def test_describe_configs_resource_roundtrip(instance: DescribeConfigsResource) 
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(DescribeConfigsResource))
     assert instance == result
-
-
-from kio.schema.describe_configs.v0.request import DescribeConfigsRequest
 
 
 @given(from_type(DescribeConfigsRequest))

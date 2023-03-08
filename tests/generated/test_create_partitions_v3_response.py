@@ -2,6 +2,7 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.create_partitions.v3.response import CreatePartitionsResponse
 from kio.schema.create_partitions.v3.response import CreatePartitionsTopicResult
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
@@ -20,9 +21,6 @@ def test_create_partitions_topic_result_roundtrip(
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(CreatePartitionsTopicResult))
     assert instance == result
-
-
-from kio.schema.create_partitions.v3.response import CreatePartitionsResponse
 
 
 @given(from_type(CreatePartitionsResponse))

@@ -3,6 +3,9 @@ from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.fetch.v8.response import AbortedTransaction
+from kio.schema.fetch.v8.response import FetchableTopicResponse
+from kio.schema.fetch.v8.response import FetchResponse
+from kio.schema.fetch.v8.response import PartitionData
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
 from kio.serial import read_sync
@@ -20,9 +23,6 @@ def test_aborted_transaction_roundtrip(instance: AbortedTransaction) -> None:
     assert instance == result
 
 
-from kio.schema.fetch.v8.response import PartitionData
-
-
 @given(from_type(PartitionData))
 @settings(max_examples=1)
 def test_partition_data_roundtrip(instance: PartitionData) -> None:
@@ -34,9 +34,6 @@ def test_partition_data_roundtrip(instance: PartitionData) -> None:
     assert instance == result
 
 
-from kio.schema.fetch.v8.response import FetchableTopicResponse
-
-
 @given(from_type(FetchableTopicResponse))
 @settings(max_examples=1)
 def test_fetchable_topic_response_roundtrip(instance: FetchableTopicResponse) -> None:
@@ -46,9 +43,6 @@ def test_fetchable_topic_response_roundtrip(instance: FetchableTopicResponse) ->
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(FetchableTopicResponse))
     assert instance == result
-
-
-from kio.schema.fetch.v8.response import FetchResponse
 
 
 @given(from_type(FetchResponse))

@@ -2,6 +2,8 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.offset_fetch.v8.request import OffsetFetchRequest
+from kio.schema.offset_fetch.v8.request import OffsetFetchRequestGroup
 from kio.schema.offset_fetch.v8.request import OffsetFetchRequestTopics
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
@@ -22,9 +24,6 @@ def test_offset_fetch_request_topics_roundtrip(
     assert instance == result
 
 
-from kio.schema.offset_fetch.v8.request import OffsetFetchRequestGroup
-
-
 @given(from_type(OffsetFetchRequestGroup))
 @settings(max_examples=1)
 def test_offset_fetch_request_group_roundtrip(
@@ -36,9 +35,6 @@ def test_offset_fetch_request_group_roundtrip(
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(OffsetFetchRequestGroup))
     assert instance == result
-
-
-from kio.schema.offset_fetch.v8.request import OffsetFetchRequest
 
 
 @given(from_type(OffsetFetchRequest))

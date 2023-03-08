@@ -2,6 +2,7 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.join_group.v5.response import JoinGroupResponse
 from kio.schema.join_group.v5.response import JoinGroupResponseMember
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
@@ -20,9 +21,6 @@ def test_join_group_response_member_roundtrip(
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(JoinGroupResponseMember))
     assert instance == result
-
-
-from kio.schema.join_group.v5.response import JoinGroupResponse
 
 
 @given(from_type(JoinGroupResponse))

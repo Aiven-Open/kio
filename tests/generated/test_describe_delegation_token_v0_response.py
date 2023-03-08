@@ -2,8 +2,12 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.describe_delegation_token.v0.response import DescribedDelegationToken
 from kio.schema.describe_delegation_token.v0.response import (
     DescribedDelegationTokenRenewer,
+)
+from kio.schema.describe_delegation_token.v0.response import (
+    DescribeDelegationTokenResponse,
 )
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
@@ -24,9 +28,6 @@ def test_described_delegation_token_renewer_roundtrip(
     assert instance == result
 
 
-from kio.schema.describe_delegation_token.v0.response import DescribedDelegationToken
-
-
 @given(from_type(DescribedDelegationToken))
 @settings(max_examples=1)
 def test_described_delegation_token_roundtrip(
@@ -38,11 +39,6 @@ def test_described_delegation_token_roundtrip(
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(DescribedDelegationToken))
     assert instance == result
-
-
-from kio.schema.describe_delegation_token.v0.response import (
-    DescribeDelegationTokenResponse,
-)
 
 
 @given(from_type(DescribeDelegationTokenResponse))

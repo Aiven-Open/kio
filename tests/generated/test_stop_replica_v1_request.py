@@ -2,6 +2,7 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.stop_replica.v1.request import StopReplicaRequest
 from kio.schema.stop_replica.v1.request import StopReplicaTopicV1
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
@@ -18,9 +19,6 @@ def test_stop_replica_topic_v1_roundtrip(instance: StopReplicaTopicV1) -> None:
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(StopReplicaTopicV1))
     assert instance == result
-
-
-from kio.schema.stop_replica.v1.request import StopReplicaRequest
 
 
 @given(from_type(StopReplicaRequest))
