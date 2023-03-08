@@ -3,6 +3,9 @@ from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.produce.v9.response import BatchIndexAndErrorMessage
+from kio.schema.produce.v9.response import PartitionProduceResponse
+from kio.schema.produce.v9.response import ProduceResponse
+from kio.schema.produce.v9.response import TopicProduceResponse
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
 from kio.serial import read_sync
@@ -22,9 +25,6 @@ def test_batch_index_and_error_message_roundtrip(
     assert instance == result
 
 
-from kio.schema.produce.v9.response import PartitionProduceResponse
-
-
 @given(from_type(PartitionProduceResponse))
 @settings(max_examples=1)
 def test_partition_produce_response_roundtrip(
@@ -38,9 +38,6 @@ def test_partition_produce_response_roundtrip(
     assert instance == result
 
 
-from kio.schema.produce.v9.response import TopicProduceResponse
-
-
 @given(from_type(TopicProduceResponse))
 @settings(max_examples=1)
 def test_topic_produce_response_roundtrip(instance: TopicProduceResponse) -> None:
@@ -50,9 +47,6 @@ def test_topic_produce_response_roundtrip(instance: TopicProduceResponse) -> Non
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(TopicProduceResponse))
     assert instance == result
-
-
-from kio.schema.produce.v9.response import ProduceResponse
 
 
 @given(from_type(ProduceResponse))

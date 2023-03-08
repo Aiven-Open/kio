@@ -28,7 +28,11 @@ def fetch_file(content_file: ContentFile) -> None:
     file_path = schema_dir / content_file.name
     with (
         file_path.open("wb") as fd,
-        requests.get(content_file.download_url, stream=True) as stream_response,
+        requests.get(
+            content_file.download_url,
+            stream=True,
+            timeout=5,
+        ) as stream_response,
     ):
         stream_response.raise_for_status()
         for chunk in stream_response.iter_content(chunk_size=131_072):
@@ -42,7 +46,7 @@ def main() -> None:
     schema_dir.mkdir(parents=True)
 
     # Fetch and parse file list.
-    response = requests.get(list_url)
+    response = requests.get(list_url, timeout=5)
     response.raise_for_status()
     parsed_response = ContentsResponse.parse_raw(response.content)
 

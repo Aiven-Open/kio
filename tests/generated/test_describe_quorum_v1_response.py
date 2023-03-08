@@ -2,7 +2,10 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.describe_quorum.v1.response import DescribeQuorumResponse
+from kio.schema.describe_quorum.v1.response import PartitionData
 from kio.schema.describe_quorum.v1.response import ReplicaState
+from kio.schema.describe_quorum.v1.response import TopicData
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
 from kio.serial import read_sync
@@ -20,9 +23,6 @@ def test_replica_state_roundtrip(instance: ReplicaState) -> None:
     assert instance == result
 
 
-from kio.schema.describe_quorum.v1.response import PartitionData
-
-
 @given(from_type(PartitionData))
 @settings(max_examples=1)
 def test_partition_data_roundtrip(instance: PartitionData) -> None:
@@ -34,9 +34,6 @@ def test_partition_data_roundtrip(instance: PartitionData) -> None:
     assert instance == result
 
 
-from kio.schema.describe_quorum.v1.response import TopicData
-
-
 @given(from_type(TopicData))
 @settings(max_examples=1)
 def test_topic_data_roundtrip(instance: TopicData) -> None:
@@ -46,9 +43,6 @@ def test_topic_data_roundtrip(instance: TopicData) -> None:
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(TopicData))
     assert instance == result
-
-
-from kio.schema.describe_quorum.v1.response import DescribeQuorumResponse
 
 
 @given(from_type(DescribeQuorumResponse))

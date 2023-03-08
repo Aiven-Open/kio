@@ -2,7 +2,11 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.fetch_snapshot.v0.response import FetchSnapshotResponse
+from kio.schema.fetch_snapshot.v0.response import LeaderIdAndEpoch
+from kio.schema.fetch_snapshot.v0.response import PartitionSnapshot
 from kio.schema.fetch_snapshot.v0.response import SnapshotId
+from kio.schema.fetch_snapshot.v0.response import TopicSnapshot
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
 from kio.serial import read_sync
@@ -20,9 +24,6 @@ def test_snapshot_id_roundtrip(instance: SnapshotId) -> None:
     assert instance == result
 
 
-from kio.schema.fetch_snapshot.v0.response import LeaderIdAndEpoch
-
-
 @given(from_type(LeaderIdAndEpoch))
 @settings(max_examples=1)
 def test_leader_id_and_epoch_roundtrip(instance: LeaderIdAndEpoch) -> None:
@@ -32,9 +33,6 @@ def test_leader_id_and_epoch_roundtrip(instance: LeaderIdAndEpoch) -> None:
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(LeaderIdAndEpoch))
     assert instance == result
-
-
-from kio.schema.fetch_snapshot.v0.response import PartitionSnapshot
 
 
 @given(from_type(PartitionSnapshot))
@@ -48,9 +46,6 @@ def test_partition_snapshot_roundtrip(instance: PartitionSnapshot) -> None:
     assert instance == result
 
 
-from kio.schema.fetch_snapshot.v0.response import TopicSnapshot
-
-
 @given(from_type(TopicSnapshot))
 @settings(max_examples=1)
 def test_topic_snapshot_roundtrip(instance: TopicSnapshot) -> None:
@@ -60,9 +55,6 @@ def test_topic_snapshot_roundtrip(instance: TopicSnapshot) -> None:
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(TopicSnapshot))
     assert instance == result
-
-
-from kio.schema.fetch_snapshot.v0.response import FetchSnapshotResponse
 
 
 @given(from_type(FetchSnapshotResponse))

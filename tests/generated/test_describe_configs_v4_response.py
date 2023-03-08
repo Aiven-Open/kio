@@ -2,6 +2,9 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.describe_configs.v4.response import DescribeConfigsResourceResult
+from kio.schema.describe_configs.v4.response import DescribeConfigsResponse
+from kio.schema.describe_configs.v4.response import DescribeConfigsResult
 from kio.schema.describe_configs.v4.response import DescribeConfigsSynonym
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
@@ -20,9 +23,6 @@ def test_describe_configs_synonym_roundtrip(instance: DescribeConfigsSynonym) ->
     assert instance == result
 
 
-from kio.schema.describe_configs.v4.response import DescribeConfigsResourceResult
-
-
 @given(from_type(DescribeConfigsResourceResult))
 @settings(max_examples=1)
 def test_describe_configs_resource_result_roundtrip(
@@ -36,9 +36,6 @@ def test_describe_configs_resource_result_roundtrip(
     assert instance == result
 
 
-from kio.schema.describe_configs.v4.response import DescribeConfigsResult
-
-
 @given(from_type(DescribeConfigsResult))
 @settings(max_examples=1)
 def test_describe_configs_result_roundtrip(instance: DescribeConfigsResult) -> None:
@@ -48,9 +45,6 @@ def test_describe_configs_result_roundtrip(instance: DescribeConfigsResult) -> N
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(DescribeConfigsResult))
     assert instance == result
-
-
-from kio.schema.describe_configs.v4.response import DescribeConfigsResponse
 
 
 @given(from_type(DescribeConfigsResponse))

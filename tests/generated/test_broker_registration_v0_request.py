@@ -2,6 +2,8 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.broker_registration.v0.request import BrokerRegistrationRequest
+from kio.schema.broker_registration.v0.request import Feature
 from kio.schema.broker_registration.v0.request import Listener
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
@@ -20,9 +22,6 @@ def test_listener_roundtrip(instance: Listener) -> None:
     assert instance == result
 
 
-from kio.schema.broker_registration.v0.request import Feature
-
-
 @given(from_type(Feature))
 @settings(max_examples=1)
 def test_feature_roundtrip(instance: Feature) -> None:
@@ -32,9 +31,6 @@ def test_feature_roundtrip(instance: Feature) -> None:
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(Feature))
     assert instance == result
-
-
-from kio.schema.broker_registration.v0.request import BrokerRegistrationRequest
 
 
 @given(from_type(BrokerRegistrationRequest))

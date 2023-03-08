@@ -3,6 +3,7 @@ from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.create_acls.v1.response import AclCreationResult
+from kio.schema.create_acls.v1.response import CreateAclsResponse
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
 from kio.serial import read_sync
@@ -18,9 +19,6 @@ def test_acl_creation_result_roundtrip(instance: AclCreationResult) -> None:
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(AclCreationResult))
     assert instance == result
-
-
-from kio.schema.create_acls.v1.response import CreateAclsResponse
 
 
 @given(from_type(CreateAclsResponse))

@@ -2,6 +2,7 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.controlled_shutdown.v1.response import ControlledShutdownResponse
 from kio.schema.controlled_shutdown.v1.response import RemainingPartition
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
@@ -18,9 +19,6 @@ def test_remaining_partition_roundtrip(instance: RemainingPartition) -> None:
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(RemainingPartition))
     assert instance == result
-
-
-from kio.schema.controlled_shutdown.v1.response import ControlledShutdownResponse
 
 
 @given(from_type(ControlledShutdownResponse))

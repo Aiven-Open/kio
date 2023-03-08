@@ -82,12 +82,12 @@ class IntDecoderContract:
     ) -> None:
         stream_writer.write(self.zero_as_bytes)
         await stream_writer.drain()
-        assert 0 == await self.read_async(stream_reader)
+        assert await self.read_async(stream_reader) == 0
 
     def test_can_read_zero_sync(self, buffer: io.BytesIO) -> None:
         buffer.write(self.zero_as_bytes)
         buffer.seek(0)
-        assert 0 == self.read_sync(buffer)
+        assert self.read_sync(buffer) == 0
 
 
 class TestDecodeInt8(IntDecoderContract):

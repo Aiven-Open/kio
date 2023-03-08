@@ -3,6 +3,9 @@ from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.create_topics.v1.request import CreatableReplicaAssignment
+from kio.schema.create_topics.v1.request import CreatableTopic
+from kio.schema.create_topics.v1.request import CreateableTopicConfig
+from kio.schema.create_topics.v1.request import CreateTopicsRequest
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
 from kio.serial import read_sync
@@ -22,9 +25,6 @@ def test_creatable_replica_assignment_roundtrip(
     assert instance == result
 
 
-from kio.schema.create_topics.v1.request import CreateableTopicConfig
-
-
 @given(from_type(CreateableTopicConfig))
 @settings(max_examples=1)
 def test_createable_topic_config_roundtrip(instance: CreateableTopicConfig) -> None:
@@ -36,9 +36,6 @@ def test_createable_topic_config_roundtrip(instance: CreateableTopicConfig) -> N
     assert instance == result
 
 
-from kio.schema.create_topics.v1.request import CreatableTopic
-
-
 @given(from_type(CreatableTopic))
 @settings(max_examples=1)
 def test_creatable_topic_roundtrip(instance: CreatableTopic) -> None:
@@ -48,9 +45,6 @@ def test_creatable_topic_roundtrip(instance: CreatableTopic) -> None:
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(CreatableTopic))
     assert instance == result
-
-
-from kio.schema.create_topics.v1.request import CreateTopicsRequest
 
 
 @given(from_type(CreateTopicsRequest))

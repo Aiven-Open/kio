@@ -3,8 +3,12 @@ from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.list_partition_reassignments.v0.response import (
+    ListPartitionReassignmentsResponse,
+)
+from kio.schema.list_partition_reassignments.v0.response import (
     OngoingPartitionReassignment,
 )
+from kio.schema.list_partition_reassignments.v0.response import OngoingTopicReassignment
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
 from kio.serial import read_sync
@@ -24,9 +28,6 @@ def test_ongoing_partition_reassignment_roundtrip(
     assert instance == result
 
 
-from kio.schema.list_partition_reassignments.v0.response import OngoingTopicReassignment
-
-
 @given(from_type(OngoingTopicReassignment))
 @settings(max_examples=1)
 def test_ongoing_topic_reassignment_roundtrip(
@@ -38,11 +39,6 @@ def test_ongoing_topic_reassignment_roundtrip(
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(OngoingTopicReassignment))
     assert instance == result
-
-
-from kio.schema.list_partition_reassignments.v0.response import (
-    ListPartitionReassignmentsResponse,
-)
 
 
 @given(from_type(ListPartitionReassignmentsResponse))

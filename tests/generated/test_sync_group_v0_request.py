@@ -2,6 +2,7 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.sync_group.v0.request import SyncGroupRequest
 from kio.schema.sync_group.v0.request import SyncGroupRequestAssignment
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
@@ -20,9 +21,6 @@ def test_sync_group_request_assignment_roundtrip(
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(SyncGroupRequestAssignment))
     assert instance == result
-
-
-from kio.schema.sync_group.v0.request import SyncGroupRequest
 
 
 @given(from_type(SyncGroupRequest))

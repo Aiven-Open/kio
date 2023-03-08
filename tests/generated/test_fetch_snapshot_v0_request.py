@@ -2,7 +2,10 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.fetch_snapshot.v0.request import FetchSnapshotRequest
+from kio.schema.fetch_snapshot.v0.request import PartitionSnapshot
 from kio.schema.fetch_snapshot.v0.request import SnapshotId
+from kio.schema.fetch_snapshot.v0.request import TopicSnapshot
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
 from kio.serial import read_sync
@@ -20,9 +23,6 @@ def test_snapshot_id_roundtrip(instance: SnapshotId) -> None:
     assert instance == result
 
 
-from kio.schema.fetch_snapshot.v0.request import PartitionSnapshot
-
-
 @given(from_type(PartitionSnapshot))
 @settings(max_examples=1)
 def test_partition_snapshot_roundtrip(instance: PartitionSnapshot) -> None:
@@ -34,9 +34,6 @@ def test_partition_snapshot_roundtrip(instance: PartitionSnapshot) -> None:
     assert instance == result
 
 
-from kio.schema.fetch_snapshot.v0.request import TopicSnapshot
-
-
 @given(from_type(TopicSnapshot))
 @settings(max_examples=1)
 def test_topic_snapshot_roundtrip(instance: TopicSnapshot) -> None:
@@ -46,9 +43,6 @@ def test_topic_snapshot_roundtrip(instance: TopicSnapshot) -> None:
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(TopicSnapshot))
     assert instance == result
-
-
-from kio.schema.fetch_snapshot.v0.request import FetchSnapshotRequest
 
 
 @given(from_type(FetchSnapshotRequest))

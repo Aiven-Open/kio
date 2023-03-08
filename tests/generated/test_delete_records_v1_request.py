@@ -3,6 +3,8 @@ from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.delete_records.v1.request import DeleteRecordsPartition
+from kio.schema.delete_records.v1.request import DeleteRecordsRequest
+from kio.schema.delete_records.v1.request import DeleteRecordsTopic
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
 from kio.serial import read_sync
@@ -20,9 +22,6 @@ def test_delete_records_partition_roundtrip(instance: DeleteRecordsPartition) ->
     assert instance == result
 
 
-from kio.schema.delete_records.v1.request import DeleteRecordsTopic
-
-
 @given(from_type(DeleteRecordsTopic))
 @settings(max_examples=1)
 def test_delete_records_topic_roundtrip(instance: DeleteRecordsTopic) -> None:
@@ -32,9 +31,6 @@ def test_delete_records_topic_roundtrip(instance: DeleteRecordsTopic) -> None:
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(DeleteRecordsTopic))
     assert instance == result
-
-
-from kio.schema.delete_records.v1.request import DeleteRecordsRequest
 
 
 @given(from_type(DeleteRecordsRequest))

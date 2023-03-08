@@ -2,6 +2,7 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.leader_change_message.v0.data import LeaderChangeMessage
 from kio.schema.leader_change_message.v0.data import Voter
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
@@ -18,9 +19,6 @@ def test_voter_roundtrip(instance: Voter) -> None:
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(Voter))
     assert instance == result
-
-
-from kio.schema.leader_change_message.v0.data import LeaderChangeMessage
 
 
 @given(from_type(LeaderChangeMessage))

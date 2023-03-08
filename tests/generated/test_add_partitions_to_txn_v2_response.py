@@ -5,6 +5,8 @@ from hypothesis.strategies import from_type
 from kio.schema.add_partitions_to_txn.v2.response import (
     AddPartitionsToTxnPartitionResult,
 )
+from kio.schema.add_partitions_to_txn.v2.response import AddPartitionsToTxnResponse
+from kio.schema.add_partitions_to_txn.v2.response import AddPartitionsToTxnTopicResult
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
 from kio.serial import read_sync
@@ -24,9 +26,6 @@ def test_add_partitions_to_txn_partition_result_roundtrip(
     assert instance == result
 
 
-from kio.schema.add_partitions_to_txn.v2.response import AddPartitionsToTxnTopicResult
-
-
 @given(from_type(AddPartitionsToTxnTopicResult))
 @settings(max_examples=1)
 def test_add_partitions_to_txn_topic_result_roundtrip(
@@ -38,9 +37,6 @@ def test_add_partitions_to_txn_topic_result_roundtrip(
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(AddPartitionsToTxnTopicResult))
     assert instance == result
-
-
-from kio.schema.add_partitions_to_txn.v2.response import AddPartitionsToTxnResponse
 
 
 @given(from_type(AddPartitionsToTxnResponse))

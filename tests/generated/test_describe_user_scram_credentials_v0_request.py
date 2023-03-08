@@ -2,6 +2,9 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.describe_user_scram_credentials.v0.request import (
+    DescribeUserScramCredentialsRequest,
+)
 from kio.schema.describe_user_scram_credentials.v0.request import UserName
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
@@ -18,11 +21,6 @@ def test_user_name_roundtrip(instance: UserName) -> None:
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(UserName))
     assert instance == result
-
-
-from kio.schema.describe_user_scram_credentials.v0.request import (
-    DescribeUserScramCredentialsRequest,
-)
 
 
 @given(from_type(DescribeUserScramCredentialsRequest))

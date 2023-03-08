@@ -3,6 +3,8 @@ from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.offset_for_leader_epoch.v2.response import EpochEndOffset
+from kio.schema.offset_for_leader_epoch.v2.response import OffsetForLeaderEpochResponse
+from kio.schema.offset_for_leader_epoch.v2.response import OffsetForLeaderTopicResult
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
 from kio.serial import read_sync
@@ -20,9 +22,6 @@ def test_epoch_end_offset_roundtrip(instance: EpochEndOffset) -> None:
     assert instance == result
 
 
-from kio.schema.offset_for_leader_epoch.v2.response import OffsetForLeaderTopicResult
-
-
 @given(from_type(OffsetForLeaderTopicResult))
 @settings(max_examples=1)
 def test_offset_for_leader_topic_result_roundtrip(
@@ -34,9 +33,6 @@ def test_offset_for_leader_topic_result_roundtrip(
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(OffsetForLeaderTopicResult))
     assert instance == result
-
-
-from kio.schema.offset_for_leader_epoch.v2.response import OffsetForLeaderEpochResponse
 
 
 @given(from_type(OffsetForLeaderEpochResponse))

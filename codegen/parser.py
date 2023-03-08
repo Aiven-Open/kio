@@ -1,3 +1,5 @@
+# ruff: noqa: A003
+
 from __future__ import annotations
 
 import enum
@@ -12,10 +14,10 @@ from typing import Annotated
 from typing import Literal
 from typing import NamedTuple
 from typing import TypeAlias
+from typing import assert_never
 
 import pydantic
 from pydantic import root_validator
-from typing_extensions import assert_never
 
 from .util import BaseModel
 from .versions import VersionRange
@@ -104,7 +106,7 @@ class Primitive(enum.Enum):
 
 
 class PrimitiveArrayType(NamedTuple):
-    type: Primitive
+    item_type: Primitive
 
     @classmethod
     def __get_validators__(cls) -> Iterator[Callable[[object], PrimitiveArrayType]]:
@@ -120,7 +122,7 @@ class PrimitiveArrayType(NamedTuple):
 
 
 class CommonStructArrayType(NamedTuple):
-    type: CommonStruct
+    item_type: CommonStruct
 
     @classmethod
     def __get_validators__(cls) -> Iterator[Callable[[object], CommonStructArrayType]]:

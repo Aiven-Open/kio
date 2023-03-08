@@ -2,7 +2,11 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.alter_user_scram_credentials.v0.request import (
+    AlterUserScramCredentialsRequest,
+)
 from kio.schema.alter_user_scram_credentials.v0.request import ScramCredentialDeletion
+from kio.schema.alter_user_scram_credentials.v0.request import ScramCredentialUpsertion
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
 from kio.serial import read_sync
@@ -20,9 +24,6 @@ def test_scram_credential_deletion_roundtrip(instance: ScramCredentialDeletion) 
     assert instance == result
 
 
-from kio.schema.alter_user_scram_credentials.v0.request import ScramCredentialUpsertion
-
-
 @given(from_type(ScramCredentialUpsertion))
 @settings(max_examples=1)
 def test_scram_credential_upsertion_roundtrip(
@@ -34,11 +35,6 @@ def test_scram_credential_upsertion_roundtrip(
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(ScramCredentialUpsertion))
     assert instance == result
-
-
-from kio.schema.alter_user_scram_credentials.v0.request import (
-    AlterUserScramCredentialsRequest,
-)
 
 
 @given(from_type(AlterUserScramCredentialsRequest))

@@ -2,6 +2,7 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.add_partitions_to_txn.v0.request import AddPartitionsToTxnRequest
 from kio.schema.add_partitions_to_txn.v0.request import AddPartitionsToTxnTopic
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
@@ -20,9 +21,6 @@ def test_add_partitions_to_txn_topic_roundtrip(
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(AddPartitionsToTxnTopic))
     assert instance == result
-
-
-from kio.schema.add_partitions_to_txn.v0.request import AddPartitionsToTxnRequest
 
 
 @given(from_type(AddPartitionsToTxnRequest))

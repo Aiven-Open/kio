@@ -2,6 +2,7 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.leave_group.v4.request import LeaveGroupRequest
 from kio.schema.leave_group.v4.request import MemberIdentity
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
@@ -18,9 +19,6 @@ def test_member_identity_roundtrip(instance: MemberIdentity) -> None:
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(MemberIdentity))
     assert instance == result
-
-
-from kio.schema.leave_group.v4.request import LeaveGroupRequest
 
 
 @given(from_type(LeaveGroupRequest))

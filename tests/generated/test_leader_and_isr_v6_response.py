@@ -3,6 +3,8 @@ from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.leader_and_isr.v6.response import LeaderAndIsrPartitionError
+from kio.schema.leader_and_isr.v6.response import LeaderAndIsrResponse
+from kio.schema.leader_and_isr.v6.response import LeaderAndIsrTopicError
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
 from kio.serial import read_sync
@@ -22,9 +24,6 @@ def test_leader_and_isr_partition_error_roundtrip(
     assert instance == result
 
 
-from kio.schema.leader_and_isr.v6.response import LeaderAndIsrTopicError
-
-
 @given(from_type(LeaderAndIsrTopicError))
 @settings(max_examples=1)
 def test_leader_and_isr_topic_error_roundtrip(instance: LeaderAndIsrTopicError) -> None:
@@ -34,9 +33,6 @@ def test_leader_and_isr_topic_error_roundtrip(instance: LeaderAndIsrTopicError) 
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(LeaderAndIsrTopicError))
     assert instance == result
-
-
-from kio.schema.leader_and_isr.v6.response import LeaderAndIsrResponse
 
 
 @given(from_type(LeaderAndIsrResponse))

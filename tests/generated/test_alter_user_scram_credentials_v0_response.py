@@ -3,6 +3,9 @@ from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.alter_user_scram_credentials.v0.response import (
+    AlterUserScramCredentialsResponse,
+)
+from kio.schema.alter_user_scram_credentials.v0.response import (
     AlterUserScramCredentialsResult,
 )
 from kio.serial import entity_decoder
@@ -22,11 +25,6 @@ def test_alter_user_scram_credentials_result_roundtrip(
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(AlterUserScramCredentialsResult))
     assert instance == result
-
-
-from kio.schema.alter_user_scram_credentials.v0.response import (
-    AlterUserScramCredentialsResponse,
-)
 
 
 @given(from_type(AlterUserScramCredentialsResponse))

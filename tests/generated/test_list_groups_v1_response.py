@@ -3,6 +3,7 @@ from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.list_groups.v1.response import ListedGroup
+from kio.schema.list_groups.v1.response import ListGroupsResponse
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
 from kio.serial import read_sync
@@ -18,9 +19,6 @@ def test_listed_group_roundtrip(instance: ListedGroup) -> None:
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(ListedGroup))
     assert instance == result
-
-
-from kio.schema.list_groups.v1.response import ListGroupsResponse
 
 
 @given(from_type(ListGroupsResponse))

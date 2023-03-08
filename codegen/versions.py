@@ -42,10 +42,10 @@ class VersionRange(NamedTuple):
         yield parse_valid_versions
 
     @property
-    def range(self) -> range:
+    def int_range(self) -> range:
         assert isinstance(self.low, int)
         assert isinstance(self.high, int)
         return range(self.low, self.high + 1)
 
-    def iter(self) -> Iterator[int]:
-        return iter(self.range)
+    def iterator(self) -> Iterator[int]:
+        return iter(self.int_range)

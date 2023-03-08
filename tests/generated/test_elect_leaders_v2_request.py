@@ -2,6 +2,7 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.elect_leaders.v2.request import ElectLeadersRequest
 from kio.schema.elect_leaders.v2.request import TopicPartitions
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
@@ -18,9 +19,6 @@ def test_topic_partitions_roundtrip(instance: TopicPartitions) -> None:
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(TopicPartitions))
     assert instance == result
-
-
-from kio.schema.elect_leaders.v2.request import ElectLeadersRequest
 
 
 @given(from_type(ElectLeadersRequest))

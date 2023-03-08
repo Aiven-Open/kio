@@ -2,7 +2,9 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.write_txn_markers.v1.request import WritableTxnMarker
 from kio.schema.write_txn_markers.v1.request import WritableTxnMarkerTopic
+from kio.schema.write_txn_markers.v1.request import WriteTxnMarkersRequest
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
 from kio.serial import read_sync
@@ -20,9 +22,6 @@ def test_writable_txn_marker_topic_roundtrip(instance: WritableTxnMarkerTopic) -
     assert instance == result
 
 
-from kio.schema.write_txn_markers.v1.request import WritableTxnMarker
-
-
 @given(from_type(WritableTxnMarker))
 @settings(max_examples=1)
 def test_writable_txn_marker_roundtrip(instance: WritableTxnMarker) -> None:
@@ -32,9 +31,6 @@ def test_writable_txn_marker_roundtrip(instance: WritableTxnMarker) -> None:
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(WritableTxnMarker))
     assert instance == result
-
-
-from kio.schema.write_txn_markers.v1.request import WriteTxnMarkersRequest
 
 
 @given(from_type(WriteTxnMarkersRequest))

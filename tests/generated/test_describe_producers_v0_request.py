@@ -2,6 +2,7 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.describe_producers.v0.request import DescribeProducersRequest
 from kio.schema.describe_producers.v0.request import TopicRequest
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
@@ -18,9 +19,6 @@ def test_topic_request_roundtrip(instance: TopicRequest) -> None:
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(TopicRequest))
     assert instance == result
-
-
-from kio.schema.describe_producers.v0.request import DescribeProducersRequest
 
 
 @given(from_type(DescribeProducersRequest))

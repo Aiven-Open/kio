@@ -3,6 +3,9 @@ from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.describe_delegation_token.v0.request import DescribeDelegationTokenOwner
+from kio.schema.describe_delegation_token.v0.request import (
+    DescribeDelegationTokenRequest,
+)
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
 from kio.serial import read_sync
@@ -20,11 +23,6 @@ def test_describe_delegation_token_owner_roundtrip(
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(DescribeDelegationTokenOwner))
     assert instance == result
-
-
-from kio.schema.describe_delegation_token.v0.request import (
-    DescribeDelegationTokenRequest,
-)
 
 
 @given(from_type(DescribeDelegationTokenRequest))

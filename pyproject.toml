@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=65.6.3", "wheel"]
+requires = ["setuptools>=67.6.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.black]
@@ -7,5 +7,61 @@ target-version = ["py311"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "src"]
-addopts = "--doctest-modules --color=yes"
+addopts = "--doctest-modules"
 asyncio_mode = "auto"
+
+[tool.ruff]
+fix = true
+target-version = "py311"
+extend-select = [
+  # bugbear
+  "B",
+  # comprehensions
+  "C4",
+  # mccabe
+  "C90",
+  # bandit
+  "S",
+  # blind exception
+  # Bare excepts are caught without this, but this also catches `except Exception: ...`.
+  "BLE",
+  # builtins
+  "A",
+  # Enforce valid noqa comments.
+  "RUF100",
+  # isort
+  "I",
+  # pycodestyle
+  "W",
+  # pyupgrade
+  "UP",
+  # debugger
+  "T10",
+  # print
+  "T20",
+  # quotes
+  "Q",
+  # simplify
+  "SIM",
+  # tidy imports
+  # We use this to only outlaw relative _parent_ imports, other relative imports are OK.
+  "TID",
+]
+extend-ignore = [
+  # There's no reason to outlaw asserts.
+  # https://stackoverflow.com/a/68429294/1220706
+  "S101",
+  # Ignore line-length. This is enforced by black, but all cases cannot be handled.
+  # Ideally we'd only suppress this in generated files.
+  "E501",
+]
+
+[tool.ruff.isort]
+force-single-line = true
+known-first-party = ["kio", "tests", "codegen"]
+
+[tool.ruff.mccabe]
+max-complexity = 10
+
+[tool.ruff.flake8-tidy-imports]
+ban-relative-imports = "parents"

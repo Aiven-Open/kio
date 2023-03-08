@@ -2,6 +2,7 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
+from kio.schema.list_transactions.v0.response import ListTransactionsResponse
 from kio.schema.list_transactions.v0.response import TransactionState
 from kio.serial import entity_decoder
 from kio.serial import entity_writer
@@ -18,9 +19,6 @@ def test_transaction_state_roundtrip(instance: TransactionState) -> None:
         buffer.seek(0)
         result = read_sync(buffer, entity_decoder(TransactionState))
     assert instance == result
-
-
-from kio.schema.list_transactions.v0.response import ListTransactionsResponse
 
 
 @given(from_type(ListTransactionsResponse))
