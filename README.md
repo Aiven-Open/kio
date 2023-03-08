@@ -126,14 +126,26 @@ def get_metadata(request: MetadataRequest) -> MetadataResponse:
 
 ## Development
 
-Fetch, generate, and format schema.
+Install development requirements.
 
 ```shell
-$ make build-schema
+$ python3 -m pip install -e .[all]
 ```
 
 Run tests.
 
 ```shell
-$ python -X dev -m pytest --cov
+$ python3 -X dev -m pytest --cov
+```
+
+Setup pre-commit to run on push.
+
+```shell
+$ pre-commit install -t pre-push
+```
+
+Fetch, generate, and format schema.
+
+```shell
+$ make build-schema
 ```
