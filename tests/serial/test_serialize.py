@@ -18,9 +18,9 @@ from kio.serial.decoders import decode_compact_string
 from kio.serial.decoders import decode_compact_string_nullable
 from kio.serial.decoders import decode_int16
 from kio.serial.decoders import decode_int32
+from kio.serial.decoders import decode_unsigned_varint
 from kio.serial.decoders import decode_uuid
 from kio.serial.decoders import read_async
-from kio.serial.decoders import skip_tagged_fields
 from kio.serial.serialize import entity_writer
 from kio.serial.serialize import get_writer
 
@@ -175,7 +175,7 @@ async def test_serialize_complex_entity_async(
         # rack
         assert await read_async(stream_reader, decode_compact_string_nullable) is None
         # tagged fields
-        await read_async(stream_reader, skip_tagged_fields)
+        assert await read_async(stream_reader, decode_unsigned_varint) == 0
 
     # cluster_id
     assert "556" == await read_async(stream_reader, decode_compact_string_nullable)
@@ -216,11 +216,11 @@ async def test_serialize_complex_entity_async(
             # offline replicas
             assert 0 == await read_async(stream_reader, decode_compact_array_length)
             # partition tagged fields
-            await read_async(stream_reader, skip_tagged_fields)
+            assert await read_async(stream_reader, decode_unsigned_varint) == 0
         # topic authorized operations
         assert 765443 == await read_async(stream_reader, decode_int32)
         # topic tagged fields
-        await read_async(stream_reader, skip_tagged_fields)
+        assert await read_async(stream_reader, decode_unsigned_varint) == 0
 
     # main entity tagged fields
-    await read_async(stream_reader, skip_tagged_fields)
+    assert await read_async(stream_reader, decode_unsigned_varint) == 0
