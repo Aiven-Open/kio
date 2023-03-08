@@ -132,6 +132,14 @@ Install development requirements.
 $ python3 -m pip install -e .[all]
 ```
 
+The test suite contains integration tests that expects to be able to connect to a Kafka
+instance running on `127.0.0.1:9092`. There is a Docker Compose file in
+`container/compose.yml` that you can use to conveniently start up a Kafka instance.
+
+```shell
+$ docker compose --file=container/compose.yml up -d
+```
+
 Run tests.
 
 ```shell
