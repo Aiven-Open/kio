@@ -7,8 +7,13 @@ target-version = ["py311"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "src"]
-addopts = "--doctest-modules"
+addopts = """\
+--doctest-modules \
+--random-order-bucket=global \
+"""
 asyncio_mode = "auto"
+# Promote warnings to errors.
+filterwarnings = ["error"]
 
 [tool.ruff]
 fix = true
