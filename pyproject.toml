@@ -2,8 +2,10 @@
 requires = ["setuptools>=67.6.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
+
 [tool.black]
 target-version = ["py311"]
+
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "src"]
@@ -14,6 +16,7 @@ addopts = """\
 asyncio_mode = "auto"
 # Promote warnings to errors.
 filterwarnings = ["error"]
+
 
 [tool.ruff]
 fix = true
@@ -70,3 +73,37 @@ max-complexity = 10
 
 [tool.ruff.flake8-tidy-imports]
 ban-relative-imports = "parents"
+
+
+[tool.importlinter]
+root_packages = ["kio", "codegen", "tests"]
+
+[[tool.importlinter.contracts]]
+name = "kio.schema.* does not depend on kio.serial.*"
+type = "forbidden"
+source_modules = "kio.schema"
+forbidden_modules = "kio.serial"
+
+[[tool.importlinter.contracts]]
+name = "kio does not depend on codegen"
+type = "forbidden"
+source_modules = "kio"
+forbidden_modules = "codegen"
+
+[[tool.importlinter.contracts]]
+name = "kio does not depend on tests"
+type = "forbidden"
+source_modules = "kio"
+forbidden_modules = "tests"
+
+[[tool.importlinter.contracts]]
+name = "codegen does not depend on tests"
+type = "forbidden"
+source_modules = "codegen"
+forbidden_modules = "tests"
+
+[[tool.importlinter.contracts]]
+name = "kio.schema.primitive is independent"
+type = "forbidden"
+source_modules = "kio.schema.primitive"
+forbidden_modules = ["kio.*", "kio.schema.*"]
