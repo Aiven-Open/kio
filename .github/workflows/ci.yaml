@@ -90,6 +90,11 @@ jobs:
             ${{ runner.os }}-pre-commit-3.11
             ${{ runner.os }}-pre-commit
 
+      - name: Schema cache
+        uses: actions/cache@v3
+        with:
+          path: schema
+
       - run: pip install --upgrade .[all]
 
       - run: |
