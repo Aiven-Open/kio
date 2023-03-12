@@ -11,7 +11,8 @@ import requests
 from pydantic import BaseModel
 from pydantic import HttpUrl
 
-build_tag: Final = "3.4.0"
+from . import build_tag
+
 base: Final = Path(__file__).parent.parent.resolve() / "schema"
 schema_dir: Final = base / build_tag
 cache_dir: Final = base / "cache"
