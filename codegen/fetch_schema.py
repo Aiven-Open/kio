@@ -46,7 +46,6 @@ def fetch_file(content_file: ContentFile) -> None:
 
     # Use cached file if exists and hash matches.
     if cache_path.exists() and (content_file.sha == git_hash(cache_path)):
-        print(f"Using up-to-date {file_path.name} from cache.", file=sys.stderr)
         shutil.move(cache_path, file_path)
         return
 
