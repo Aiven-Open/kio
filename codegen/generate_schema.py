@@ -17,6 +17,7 @@ from typing import assert_never
 
 from pydantic import ValidationError
 
+from . import build_tag
 from .case import capitalize_first
 from .case import to_snake_case
 from .header_schema import get_header_schema_import
@@ -514,7 +515,7 @@ def main() -> None:
     types_module_path = schema_output_path / "types.py"
     shutil.rmtree(schema_output_path)
     create_package(schema_output_path)
-    schemas = pathlib.Path("schema/").glob("*.json")
+    schemas = (pathlib.Path("schema") / build_tag).glob("*.json")
     create_static_modules(schema_output_path)
     custom_types = set[CustomTypeDef]()
 

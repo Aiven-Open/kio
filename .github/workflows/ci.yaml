@@ -90,10 +90,19 @@ jobs:
             ${{ runner.os }}-pre-commit-3.11
             ${{ runner.os }}-pre-commit
 
+      - name: Schema cache
+        uses: actions/cache@v3
+        with:
+          path: schema
+          key: schema-${{ hashFiles('codegen/fetch_schema.py') }}
+          restore-keys: schema
+
       - run: pip install --upgrade .[all]
 
+      - run: make fetch-schema-src
+
       - run: |
-          make build-schema
+          make generate-schema
           diff=$(git --no-pager diff)
           if [[ ! -z "$diff" ]]; then
             echo "💥 Non-empty output from git diff."
