@@ -94,6 +94,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: schema
+          key: schema-${{ hashFiles('codegen/fetch_schema.py') }}
+          restore-keys: schema
 
       - run: pip install --upgrade .[all]
 
