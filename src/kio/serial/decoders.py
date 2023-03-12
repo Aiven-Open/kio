@@ -12,6 +12,7 @@ from typing import TypeVar
 from typing import assert_never
 from uuid import UUID
 
+from kio.constants import uuid_zero
 from kio.schema.primitive import i8
 from kio.schema.primitive import i16
 from kio.schema.primitive import i32
@@ -194,8 +195,10 @@ def decode_compact_array_length() -> Cursor[int]:
     return decoded_value - 1
 
 
-def decode_uuid() -> Cursor[UUID]:
+def decode_uuid() -> Cursor[UUID | None]:
     byte_value: bytes = yield 16
+    if byte_value == uuid_zero.bytes:
+        return None
     return UUID(bytes=byte_value)
 
 

@@ -1,12 +1,10 @@
 import asyncio
 import io
 import secrets
-import uuid
 from asyncio import StreamReader
 from asyncio import StreamWriter
 from contextlib import closing
 from typing import Any
-from typing import Final
 from typing import TypeVar
 from unittest import mock
 
@@ -15,6 +13,7 @@ import kio.schema.request_header.v1.header
 import kio.schema.request_header.v2.header
 import kio.schema.response_header.v0.header
 import kio.schema.response_header.v1.header
+from kio.constants import uuid_zero
 from kio.schema.api_versions.v2 import request as api_versions_v2_request
 from kio.schema.api_versions.v2 import response as api_versions_v2_response
 from kio.schema.api_versions.v3 import request as api_versions_v3_request
@@ -43,8 +42,6 @@ from kio.serial import read_async
 from kio.serial.decoders import decode_int32
 from kio.serial.encoders import Writable
 from kio.serial.encoders import write_int32
-
-uuid_zero: Final = uuid.UUID(int=0)
 
 
 def write_request_header(
