@@ -97,10 +97,12 @@ jobs:
           key: schema-${{ hashFiles('codegen/fetch_schema.py') }}
           restore-keys: schema
 
+      - run: make fetch-schema-src
+
       - run: pip install --upgrade .[all]
 
       - run: |
-          make build-schema
+          make generate-schema
           diff=$(git --no-pager diff)
           if [[ ! -z "$diff" ]]; then
             echo "💥 Non-empty output from git diff."
