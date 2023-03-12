@@ -10,6 +10,7 @@ from typing import TypeAlias
 from typing import TypeVar
 from uuid import UUID
 
+from kio.constants import uuid_zero
 from kio.schema.primitive import i8
 from kio.schema.primitive import i16
 from kio.schema.primitive import i32
@@ -160,8 +161,11 @@ def write_compact_array_length(buffer: Writable, value: int) -> None:
     write_unsigned_varint(buffer, value + 1)
 
 
-def write_uuid(buffer: Writable, value: UUID) -> None:
-    buffer.write(value.bytes)
+def write_uuid(buffer: Writable, value: UUID | None) -> None:
+    if value is None:
+        buffer.write(uuid_zero.bytes)
+    else:
+        buffer.write(value.bytes)
 
 
 def compact_array_writer(item_writer: Writer[T]) -> Writer[Sequence[T]]:

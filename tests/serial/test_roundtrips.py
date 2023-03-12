@@ -290,8 +290,8 @@ async def test_legacy_bytes_roundtrip_async(a: bytes, b: bytes) -> None:
         assert b == await read_async(stream_reader, decode_legacy_bytes)
 
 
-@given(uuids(), uuids())
-def test_uuid_roundtrip_sync(a: uuid.UUID, b: uuid.UUID) -> None:
+@given(uuids() | none(), uuids() | none())
+def test_uuid_roundtrip_sync(a: uuid.UUID | None, b: uuid.UUID | None) -> None:
     buffer = io.BytesIO()
     write_uuid(buffer, a)
     write_uuid(buffer, b)

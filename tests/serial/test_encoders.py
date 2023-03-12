@@ -1,12 +1,14 @@
 import io
 import struct
 import sys
+import uuid
 from contextlib import closing
 from typing import Generic
 from typing import TypeVar
 
 import pytest
 
+from kio.constants import uuid_zero
 from kio.serial.encoders import Writer
 from kio.serial.encoders import write_compact_string
 from kio.serial.encoders import write_empty_tagged_fields
@@ -23,6 +25,7 @@ from kio.serial.encoders import write_uint16
 from kio.serial.encoders import write_uint32
 from kio.serial.encoders import write_uint64
 from kio.serial.encoders import write_unsigned_varint
+from kio.serial.encoders import write_uuid
 from kio.serial.errors import OutOfBoundValue
 
 _I = TypeVar("_I", bound=int, contravariant=True)
@@ -298,3 +301,16 @@ class TestWriteNullableLegacyString:
     ) -> None:
         with pytest.raises(OutOfBoundValue):
             write_nullable_legacy_string(buffer, 2**15 * "a")
+
+
+class TestWriteUUID:
+    def test_writes_none_as_uuid_zero(self, buffer: io.BytesIO) -> None:
+        write_uuid(buffer, None)
+        buffer.seek(0)
+        assert buffer.read(16) == uuid_zero.bytes
+
+    def test_can_write_uuid4(self, buffer: io.BytesIO) -> None:
+        value = uuid.uuid4()
+        write_uuid(buffer, value)
+        buffer.seek(0)
+        assert buffer.read(16) == value.bytes

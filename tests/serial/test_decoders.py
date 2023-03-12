@@ -2,10 +2,12 @@ import asyncio
 import io
 import struct
 import sys
+import uuid
 from typing import IO
 
 import pytest
 
+from kio.constants import uuid_zero
 from kio.serial.decoders import Decoder
 from kio.serial.decoders import decode_compact_string
 from kio.serial.decoders import decode_compact_string_as_bytes
@@ -26,6 +28,7 @@ from kio.serial.decoders import decode_uint16
 from kio.serial.decoders import decode_uint32
 from kio.serial.decoders import decode_uint64
 from kio.serial.decoders import decode_unsigned_varint
+from kio.serial.decoders import decode_uuid
 from kio.serial.decoders import read_async
 from kio.serial.decoders import read_sync
 from kio.serial.errors import UnexpectedNull
@@ -631,3 +634,16 @@ class TestDecodeLegacyBytes:
         stream_writer.write(byte_value)
         await stream_writer.drain()
         assert byte_value == await read_async(stream_reader, decode_legacy_bytes)
+
+
+class TestDecodeUUID:
+    def test_decodes_zero_as_none(self, buffer: io.BytesIO) -> None:
+        buffer.write(uuid_zero.bytes)
+        buffer.seek(0)
+        assert read_sync(buffer, decode_uuid) is None
+
+    def test_can_decode_uuid4(self, buffer: io.BytesIO) -> None:
+        value = uuid.uuid4()
+        buffer.write(value.bytes)
+        buffer.seek(0)
+        assert read_sync(buffer, decode_uuid) == value
