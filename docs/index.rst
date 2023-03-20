@@ -12,4 +12,5 @@ Documentation sections
 
   pages/schema.rst
   pages/serial.rst
+  pages/usage.rst
   pages/goals.rst
