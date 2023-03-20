@@ -24,8 +24,11 @@ def test_acl_description_roundtrip(instance: AclDescription) -> None:
     writer = entity_writer(AclDescription)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_acl_description(buffer)
+        result, _ = read_acl_description(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -38,8 +41,11 @@ def test_describe_acls_resource_roundtrip(instance: DescribeAclsResource) -> Non
     writer = entity_writer(DescribeAclsResource)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_describe_acls_resource(buffer)
+        result, _ = read_describe_acls_resource(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -52,8 +58,11 @@ def test_describe_acls_response_roundtrip(instance: DescribeAclsResponse) -> Non
     writer = entity_writer(DescribeAclsResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_describe_acls_response(buffer)
+        result, _ = read_describe_acls_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

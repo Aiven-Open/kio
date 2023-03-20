@@ -24,8 +24,11 @@ def test_writable_txn_marker_topic_roundtrip(instance: WritableTxnMarkerTopic) -
     writer = entity_writer(WritableTxnMarkerTopic)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_writable_txn_marker_topic(buffer)
+        result, _ = read_writable_txn_marker_topic(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -38,8 +41,11 @@ def test_writable_txn_marker_roundtrip(instance: WritableTxnMarker) -> None:
     writer = entity_writer(WritableTxnMarker)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_writable_txn_marker(buffer)
+        result, _ = read_writable_txn_marker(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -52,8 +58,11 @@ def test_write_txn_markers_request_roundtrip(instance: WriteTxnMarkersRequest) -
     writer = entity_writer(WriteTxnMarkersRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_write_txn_markers_request(buffer)
+        result, _ = read_write_txn_markers_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

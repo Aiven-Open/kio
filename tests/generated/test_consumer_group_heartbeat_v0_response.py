@@ -26,8 +26,11 @@ def test_topic_partitions_roundtrip(instance: TopicPartitions) -> None:
     writer = entity_writer(TopicPartitions)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_topic_partitions(buffer)
+        result, _ = read_topic_partitions(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -40,8 +43,11 @@ def test_assignment_roundtrip(instance: Assignment) -> None:
     writer = entity_writer(Assignment)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_assignment(buffer)
+        result, _ = read_assignment(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -58,8 +64,11 @@ def test_consumer_group_heartbeat_response_roundtrip(
     writer = entity_writer(ConsumerGroupHeartbeatResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_consumer_group_heartbeat_response(buffer)
+        result, _ = read_consumer_group_heartbeat_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

@@ -25,8 +25,11 @@ def test_join_group_response_member_roundtrip(
     writer = entity_writer(JoinGroupResponseMember)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_join_group_response_member(buffer)
+        result, _ = read_join_group_response_member(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -39,8 +42,11 @@ def test_join_group_response_roundtrip(instance: JoinGroupResponse) -> None:
     writer = entity_writer(JoinGroupResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_join_group_response(buffer)
+        result, _ = read_join_group_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

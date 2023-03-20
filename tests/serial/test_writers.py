@@ -109,7 +109,7 @@ class IntWriterContract(Generic[_I]):
 
 
 class TestWriteInt8(IntWriterContract):
-    write_function = write_int8
+    write_function = staticmethod(write_int8)
     lower_limit = -128
     lower_limit_as_bytes = b"\x80"
     upper_limit = 127
@@ -118,7 +118,7 @@ class TestWriteInt8(IntWriterContract):
 
 
 class TestWriteInt16(IntWriterContract):
-    write_function = write_int16
+    write_function = staticmethod(write_int16)
     lower_limit = -(2**15)
     lower_limit_as_bytes = b"\x80\x00"
     upper_limit = 2**15 - 1
@@ -127,7 +127,7 @@ class TestWriteInt16(IntWriterContract):
 
 
 class TestWriteInt32(IntWriterContract):
-    write_function = write_int32
+    write_function = staticmethod(write_int32)
     lower_limit = -(2**31)
     lower_limit_as_bytes = b"\x80\x00\x00\x00"
     upper_limit = 2**31 - 1
@@ -136,7 +136,7 @@ class TestWriteInt32(IntWriterContract):
 
 
 class TestWriteInt64(IntWriterContract):
-    write_function = write_int64
+    write_function = staticmethod(write_int64)
     lower_limit = -(2**63)
     lower_limit_as_bytes = b"\x80\x00\x00\x00\x00\x00\x00\x00"
     upper_limit = 2**63 - 1
@@ -153,7 +153,7 @@ class TestWriteInt64(IntWriterContract):
 
 
 class TestWriteUint8(IntWriterContract):
-    write_function = write_uint8
+    write_function = staticmethod(write_uint8)
     lower_limit = 0
     lower_limit_as_bytes = zero_as_bytes = b"\x00"
     upper_limit = 2**8 - 1
@@ -161,7 +161,7 @@ class TestWriteUint8(IntWriterContract):
 
 
 class TestWriteUint16(IntWriterContract):
-    write_function = write_uint16
+    write_function = staticmethod(write_uint16)
     lower_limit = 0
     lower_limit_as_bytes = zero_as_bytes = b"\x00\x00"
     upper_limit = 2**16 - 1
@@ -177,7 +177,7 @@ class TestWriteUint16(IntWriterContract):
 
 
 class TestWriteUint32(IntWriterContract):
-    write_function = write_uint32
+    write_function = staticmethod(write_uint32)
     lower_limit = 0
     lower_limit_as_bytes = zero_as_bytes = b"\x00\x00\x00\x00"
     upper_limit = 2**32 - 1
@@ -193,7 +193,7 @@ class TestWriteUint32(IntWriterContract):
 
 
 class TestWriteUint64(IntWriterContract):
-    write_function = write_uint64
+    write_function = staticmethod(write_uint64)
     lower_limit = 0
     lower_limit_as_bytes = zero_as_bytes = b"\x00\x00\x00\x00\x00\x00\x00\x00"
     upper_limit = 2**64 - 1

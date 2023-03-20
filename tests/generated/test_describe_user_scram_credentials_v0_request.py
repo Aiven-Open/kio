@@ -25,8 +25,11 @@ def test_user_name_roundtrip(instance: UserName) -> None:
     writer = entity_writer(UserName)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_user_name(buffer)
+        result, _ = read_user_name(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -43,8 +46,11 @@ def test_describe_user_scram_credentials_request_roundtrip(
     writer = entity_writer(DescribeUserScramCredentialsRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_describe_user_scram_credentials_request(buffer)
+        result, _ = read_describe_user_scram_credentials_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

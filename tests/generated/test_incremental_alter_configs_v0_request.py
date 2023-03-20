@@ -26,8 +26,11 @@ def test_alterable_config_roundtrip(instance: AlterableConfig) -> None:
     writer = entity_writer(AlterableConfig)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_alterable_config(buffer)
+        result, _ = read_alterable_config(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -40,8 +43,11 @@ def test_alter_configs_resource_roundtrip(instance: AlterConfigsResource) -> Non
     writer = entity_writer(AlterConfigsResource)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_alter_configs_resource(buffer)
+        result, _ = read_alter_configs_resource(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -58,8 +64,11 @@ def test_incremental_alter_configs_request_roundtrip(
     writer = entity_writer(IncrementalAlterConfigsRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_incremental_alter_configs_request(buffer)
+        result, _ = read_incremental_alter_configs_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

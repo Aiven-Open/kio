@@ -25,8 +25,11 @@ def test_join_group_request_protocol_roundtrip(
     writer = entity_writer(JoinGroupRequestProtocol)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_join_group_request_protocol(buffer)
+        result, _ = read_join_group_request_protocol(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -39,8 +42,11 @@ def test_join_group_request_roundtrip(instance: JoinGroupRequest) -> None:
     writer = entity_writer(JoinGroupRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_join_group_request(buffer)
+        result, _ = read_join_group_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

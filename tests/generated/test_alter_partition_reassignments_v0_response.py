@@ -34,8 +34,11 @@ def test_reassignable_partition_response_roundtrip(
     writer = entity_writer(ReassignablePartitionResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_reassignable_partition_response(buffer)
+        result, _ = read_reassignable_partition_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -50,8 +53,11 @@ def test_reassignable_topic_response_roundtrip(
     writer = entity_writer(ReassignableTopicResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_reassignable_topic_response(buffer)
+        result, _ = read_reassignable_topic_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -68,8 +74,11 @@ def test_alter_partition_reassignments_response_roundtrip(
     writer = entity_writer(AlterPartitionReassignmentsResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_alter_partition_reassignments_response(buffer)
+        result, _ = read_alter_partition_reassignments_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

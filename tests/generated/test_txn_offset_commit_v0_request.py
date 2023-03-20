@@ -28,8 +28,11 @@ def test_txn_offset_commit_request_partition_roundtrip(
     writer = entity_writer(TxnOffsetCommitRequestPartition)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_txn_offset_commit_request_partition(buffer)
+        result, _ = read_txn_offset_commit_request_partition(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -44,8 +47,11 @@ def test_txn_offset_commit_request_topic_roundtrip(
     writer = entity_writer(TxnOffsetCommitRequestTopic)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_txn_offset_commit_request_topic(buffer)
+        result, _ = read_txn_offset_commit_request_topic(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -58,8 +64,11 @@ def test_txn_offset_commit_request_roundtrip(instance: TxnOffsetCommitRequest) -
     writer = entity_writer(TxnOffsetCommitRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_txn_offset_commit_request(buffer)
+        result, _ = read_txn_offset_commit_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

@@ -23,8 +23,11 @@ def test_remaining_partition_roundtrip(instance: RemainingPartition) -> None:
     writer = entity_writer(RemainingPartition)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_remaining_partition(buffer)
+        result, _ = read_remaining_partition(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -39,8 +42,11 @@ def test_controlled_shutdown_response_roundtrip(
     writer = entity_writer(ControlledShutdownResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_controlled_shutdown_response(buffer)
+        result, _ = read_controlled_shutdown_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

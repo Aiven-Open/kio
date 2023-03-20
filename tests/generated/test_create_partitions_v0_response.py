@@ -25,8 +25,11 @@ def test_create_partitions_topic_result_roundtrip(
     writer = entity_writer(CreatePartitionsTopicResult)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_create_partitions_topic_result(buffer)
+        result, _ = read_create_partitions_topic_result(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -41,8 +44,11 @@ def test_create_partitions_response_roundtrip(
     writer = entity_writer(CreatePartitionsResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_create_partitions_response(buffer)
+        result, _ = read_create_partitions_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

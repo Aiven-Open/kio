@@ -25,8 +25,11 @@ def test_describe_configs_synonym_roundtrip(instance: DescribeConfigsSynonym) ->
     writer = entity_writer(DescribeConfigsSynonym)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_describe_configs_synonym(buffer)
+        result, _ = read_describe_configs_synonym(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -43,8 +46,11 @@ def test_describe_configs_resource_result_roundtrip(
     writer = entity_writer(DescribeConfigsResourceResult)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_describe_configs_resource_result(buffer)
+        result, _ = read_describe_configs_resource_result(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -57,8 +63,11 @@ def test_describe_configs_result_roundtrip(instance: DescribeConfigsResult) -> N
     writer = entity_writer(DescribeConfigsResult)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_describe_configs_result(buffer)
+        result, _ = read_describe_configs_result(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -71,8 +80,11 @@ def test_describe_configs_response_roundtrip(instance: DescribeConfigsResponse) 
     writer = entity_writer(DescribeConfigsResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_describe_configs_response(buffer)
+        result, _ = read_describe_configs_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

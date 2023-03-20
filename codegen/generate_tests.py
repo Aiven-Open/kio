@@ -13,7 +13,6 @@ from kio.static.constants import EntityType
 from .case import to_snake_case
 from .introspect_schema import base_dir
 from .introspect_schema import get_entities
-from .introspect_schema import schema_src_dir
 
 imports = """\
 from __future__ import annotations
@@ -41,8 +40,11 @@ def test_{entity_snake_case}_roundtrip(instance: {entity_type}) -> None:
     writer = entity_writer({entity_type})
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_{entity_snake_case}(buffer)
+        result, _ = read_{entity_snake_case}(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 """
 
@@ -57,10 +59,9 @@ def test_{entity_snake_case}_java(instance: {entity_type}, java_tester: JavaTest
 generated_tests_module = base_dir / "tests" / "generated"
 
 
-def build_filename(source_path: str) -> str:
-    return "test_" + str(Path(source_path).relative_to(schema_src_dir)).replace(
-        "/", "_"
-    )
+def build_filename(source_path: Path) -> str:
+    schema_parent = next(path for path in source_path.parents if path.name == "schema")
+    return "test_" + str(source_path.relative_to(schema_parent)).replace("/", "_")
 
 
 def main() -> None:
@@ -73,7 +74,7 @@ def main() -> None:
     module_code = defaultdict(list)
 
     for entity_type, file in get_entities():
-        module_path = generated_tests_module / build_filename(file)
+        module_path = generated_tests_module / build_filename(Path(file))
         module_imports[module_path].append(
             import_code.format(
                 entity_module=entity_type.__module__,

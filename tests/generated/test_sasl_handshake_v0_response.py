@@ -22,8 +22,11 @@ def test_sasl_handshake_response_roundtrip(instance: SaslHandshakeResponse) -> N
     writer = entity_writer(SaslHandshakeResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_sasl_handshake_response(buffer)
+        result, _ = read_sasl_handshake_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

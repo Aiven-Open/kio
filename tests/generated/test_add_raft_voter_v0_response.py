@@ -22,8 +22,11 @@ def test_add_raft_voter_response_roundtrip(instance: AddRaftVoterResponse) -> No
     writer = entity_writer(AddRaftVoterResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_add_raft_voter_response(buffer)
+        result, _ = read_add_raft_voter_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

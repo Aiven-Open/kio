@@ -23,8 +23,11 @@ def test_transaction_state_roundtrip(instance: TransactionState) -> None:
     writer = entity_writer(TransactionState)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_transaction_state(buffer)
+        result, _ = read_transaction_state(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -39,8 +42,11 @@ def test_list_transactions_response_roundtrip(
     writer = entity_writer(ListTransactionsResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_list_transactions_response(buffer)
+        result, _ = read_list_transactions_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

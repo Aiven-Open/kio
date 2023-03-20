@@ -23,8 +23,11 @@ def test_listed_group_roundtrip(instance: ListedGroup) -> None:
     writer = entity_writer(ListedGroup)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_listed_group(buffer)
+        result, _ = read_listed_group(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -37,8 +40,11 @@ def test_list_groups_response_roundtrip(instance: ListGroupsResponse) -> None:
     writer = entity_writer(ListGroupsResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_list_groups_response(buffer)
+        result, _ = read_list_groups_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

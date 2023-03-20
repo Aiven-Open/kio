@@ -22,8 +22,11 @@ def test_broker_heartbeat_request_roundtrip(instance: BrokerHeartbeatRequest) ->
     writer = entity_writer(BrokerHeartbeatRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_broker_heartbeat_request(buffer)
+        result, _ = read_broker_heartbeat_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

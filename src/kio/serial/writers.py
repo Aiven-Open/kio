@@ -198,10 +198,13 @@ def write_legacy_array_length(buffer: Writable, value: i32) -> None:
     write_int32(buffer, value)
 
 
-def write_compact_array_length(buffer: Writable, value: int) -> None:
-    # Apache Kafka® uses the array size plus 1 to ensure that `None` can be
-    # distinguished from empty.
-    write_unsigned_varint(buffer, uvarint(value + 1))
+def write_compact_array_length(buffer: Writable, value: int | None) -> None:
+    if value is None:
+        write_unsigned_varint(buffer, uvarint(0))
+    else:
+        # Apache Kafka® uses the array size plus 1 to ensure that `None` can be
+        # distinguished from empty.
+        write_unsigned_varint(buffer, uvarint(value + 1))
 
 
 def write_uuid(buffer: Writable, value: UUID | None) -> None:

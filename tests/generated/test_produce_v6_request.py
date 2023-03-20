@@ -24,8 +24,11 @@ def test_partition_produce_data_roundtrip(instance: PartitionProduceData) -> Non
     writer = entity_writer(PartitionProduceData)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_partition_produce_data(buffer)
+        result, _ = read_partition_produce_data(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -38,8 +41,11 @@ def test_topic_produce_data_roundtrip(instance: TopicProduceData) -> None:
     writer = entity_writer(TopicProduceData)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_topic_produce_data(buffer)
+        result, _ = read_topic_produce_data(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -52,8 +58,11 @@ def test_produce_request_roundtrip(instance: ProduceRequest) -> None:
     writer = entity_writer(ProduceRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_produce_request(buffer)
+        result, _ = read_produce_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

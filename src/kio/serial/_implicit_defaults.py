@@ -87,6 +87,7 @@ def get_tagged_field_default(field: Field[U]) -> U:
     if isinstance(field_class, PrimitiveField):
         return get_implicit_default(field_class.type_)
     elif isinstance(field_class, EntityField):
+        assert not isinstance(field.type, str)
         return field.type(
             **{
                 nested_field.name: get_tagged_field_default(nested_field)

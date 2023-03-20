@@ -20,6 +20,8 @@ from kio.static.constants import EntityType
 from kio.static.primitive import i16
 from kio.static.primitive import i32
 from kio.static.primitive import u8
+from tests.read import exhaust
+from tests.read import read
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -47,9 +49,7 @@ def test_can_parse_legacy_entity_array(buffer: io.BytesIO) -> None:
     # Second child
     write_legacy_string(buffer, "Child 2")
 
-    buffer.seek(0)
-
-    instance = entity_reader(Parent)(buffer)
+    instance = exhaust(entity_reader(Parent), buffer.getvalue())
 
     assert instance == Parent(
         name="Parent Name",
@@ -70,12 +70,15 @@ def test_can_serialize_legacy_entity_array(buffer: io.BytesIO) -> None:
         ),
     )
     write_parent(buffer, instance)
-    buffer.seek(0)
 
-    assert read_legacy_string(buffer) == "Parent Name"
-    assert read_legacy_array_length(buffer) == 2
-    assert read_legacy_string(buffer) == "Child 1"
-    assert read_legacy_string(buffer) == "Child 2"
+    parent_name, remaining = read(read_legacy_string, buffer.getvalue())
+    assert parent_name == "Parent Name"
+    array_length, remaining = read(read_legacy_array_length, remaining)
+    assert array_length == 2
+    value, remaining = read(read_legacy_string, remaining)
+    assert value == "Child 1"
+    value = exhaust(read_legacy_string, remaining)
+    assert value == "Child 2"
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -91,9 +94,8 @@ def test_can_parse_legacy_primitive_array(buffer: io.BytesIO) -> None:
     write_uint8(buffer, u8(123))
     write_uint8(buffer, u8(0))
     write_uint8(buffer, u8(255))
-    buffer.seek(0)
 
-    instance = entity_reader(Flat)(buffer)
+    instance = exhaust(entity_reader(Flat), buffer.getvalue())
 
     assert instance == Flat(values=(u8(123), u8(0), u8(255)))
 
@@ -102,12 +104,15 @@ def test_can_serialize_legacy_primitive_array(buffer: io.BytesIO) -> None:
     write_flat = entity_writer(Flat)
     instance = Flat(values=(u8(123), u8(0), u8(255)))
     write_flat(buffer, instance)
-    buffer.seek(0)
 
-    assert read_legacy_array_length(buffer) == 3
-    assert read_uint8(buffer) == 123
-    assert read_uint8(buffer) == 0
-    assert read_uint8(buffer) == 255
+    array_length, remaining = read(read_legacy_array_length, buffer.getvalue())
+    assert array_length == 3
+    value, remaining = read(read_uint8, remaining)
+    assert value == 123
+    value, remaining = read(read_uint8, remaining)
+    assert value == 0
+    value = exhaust(read_uint8, remaining)
+    assert value == 255
 
 
 def test_serializing_raises_out_of_bound_error_for_too_large_array(

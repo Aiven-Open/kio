@@ -24,8 +24,11 @@ def test_partition_data_roundtrip(instance: PartitionData) -> None:
     writer = entity_writer(PartitionData)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_partition_data(buffer)
+        result, _ = read_partition_data(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -38,8 +41,11 @@ def test_delete_state_data_roundtrip(instance: DeleteStateData) -> None:
     writer = entity_writer(DeleteStateData)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_delete_state_data(buffer)
+        result, _ = read_delete_state_data(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -56,8 +62,11 @@ def test_delete_share_group_state_request_roundtrip(
     writer = entity_writer(DeleteShareGroupStateRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_delete_share_group_state_request(buffer)
+        result, _ = read_delete_share_group_state_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

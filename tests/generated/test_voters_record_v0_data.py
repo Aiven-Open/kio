@@ -25,8 +25,11 @@ def test_endpoint_roundtrip(instance: Endpoint) -> None:
     writer = entity_writer(Endpoint)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_endpoint(buffer)
+        result, _ = read_endpoint(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -39,8 +42,11 @@ def test_k_raft_version_feature_roundtrip(instance: KRaftVersionFeature) -> None
     writer = entity_writer(KRaftVersionFeature)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_k_raft_version_feature(buffer)
+        result, _ = read_k_raft_version_feature(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -53,8 +59,11 @@ def test_voter_roundtrip(instance: Voter) -> None:
     writer = entity_writer(Voter)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_voter(buffer)
+        result, _ = read_voter(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -67,8 +76,11 @@ def test_voters_record_roundtrip(instance: VotersRecord) -> None:
     writer = entity_writer(VotersRecord)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_voters_record(buffer)
+        result, _ = read_voters_record(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

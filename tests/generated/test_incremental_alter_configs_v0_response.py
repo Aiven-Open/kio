@@ -31,8 +31,11 @@ def test_alter_configs_resource_response_roundtrip(
     writer = entity_writer(AlterConfigsResourceResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_alter_configs_resource_response(buffer)
+        result, _ = read_alter_configs_resource_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -49,8 +52,11 @@ def test_incremental_alter_configs_response_roundtrip(
     writer = entity_writer(IncrementalAlterConfigsResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_incremental_alter_configs_response(buffer)
+        result, _ = read_incremental_alter_configs_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
