@@ -1,7 +1,7 @@
 kafka-protocol
 ==============
 
-Python schema models for the Kafka protocol.
+Fundamentals for parsing and serializing Kafka protocol messages in Python.
 
 
 Documentation sections
