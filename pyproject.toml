@@ -19,7 +19,9 @@ classifiers = [
   "Typing :: Typed",
   "Topic :: Database",
 ]
-dynamic = ["version", "readme"]
+readme = "README.md"
+# Note: this is dynamicly overwritten by the build_kio.py script at build time.
+version = "0.0.0"
 dependencies = [
   "typing-extensions>=4.6.0",
   "crc32c>=2.3",
@@ -50,19 +52,16 @@ all = [
 "Bug Tracker" = "https://github.com/Aiven-Open/kio/issues"
 
 [build-system]
-requires = ["setuptools==80.9.0", "setuptools-scm==9.2.2", "wheel==0.45.1"]
-build-backend = "setuptools.build_meta"
+requires = ["maturin==1.12.5", "setuptools-scm==9.2.2"]
+build-backend = "build_kio"
+backend-path = ["."]
 
-[tool.setuptools]
-include-package-data = true
 
-[tool.setuptools.dynamic]
-version = {attr = "kio.__version__"}
-readme = {file = "README.md", content-type = "text/markdown; charset=UTF-8"}
-
-[tool.setuptools.packages.find]
-where = ["src"]
-namespaces = false
+[tool.maturin]
+features = ["pyo3/extension-module"]
+python-source = "src"
+module-name = "kio._kio_native"
+include = ["MANIFEST.in", "README.md"]
 
 
 [tool.setuptools_scm]
@@ -104,41 +103,11 @@ target-version = "py311"
 
 [tool.ruff.lint]
 extend-select = [
-  # bugbear
-  "B",
-  # comprehensions
-  "C4",
-  # mccabe
-  "C90",
-  # bandit
-  "S",
-  # blind exception
-  # Bare excepts are caught without this, but this also catches `except Exception: ...`.
-  "BLE",
-  # builtins
-  "A",
-  # Enforce valid noqa comments.
-  "RUF100",
-  # isort
-  "I",
-  # pycodestyle
-  "W",
-  # pyupgrade
-  "UP",
-  # debugger
-  "T10",
-  # print
-  "T20",
-  # quotes
-  "Q",
-  # simplify
-  "SIM",
-  # tidy imports
-  # We use this to only outlaw relative _parent_ imports, other relative imports are OK.
-  "TID",
+  "B", "C4", "C90", "S",  "A", "I", "W", "UP", "T10", "T20", "Q", "SIM", "BLE",
+  "RUF100", "TID",
 ]
 extend-ignore = [
-  # There's no reason to outlaw asserts.
+  # There's no reason to outlaw asserts. This reasoning is sensible:
   # https://stackoverflow.com/a/68429294/1220706
   "S101",
   # Ignore line-length. This is enforced by black, but all cases cannot be handled.

@@ -121,7 +121,7 @@ class IntReaderContract:
 
 
 class TestReadInt8(IntReaderContract, BufferUnderflowContract):
-    reader = read_int8
+    reader = staticmethod(read_int8)
     byte_size = 1
     lower_limit = -128
     lower_limit_as_bytes = b"\x80"
@@ -132,7 +132,7 @@ class TestReadInt8(IntReaderContract, BufferUnderflowContract):
 
 
 class TestReadInt16(IntReaderContract, BufferUnderflowContract):
-    reader = read_int16
+    reader = staticmethod(read_int16)
     byte_size = 2
     lower_limit = -(2**15)
     lower_limit_as_bytes = b"\x80\x00"
@@ -143,7 +143,7 @@ class TestReadInt16(IntReaderContract, BufferUnderflowContract):
 
 
 class TestReadInt32(IntReaderContract, BufferUnderflowContract):
-    reader = read_int32
+    reader = staticmethod(read_int32)
     byte_size = 4
     lower_limit = -(2**31)
     lower_limit_as_bytes = b"\x80\x00\x00\x00"
@@ -154,7 +154,7 @@ class TestReadInt32(IntReaderContract, BufferUnderflowContract):
 
 
 class TestReadInt64(IntReaderContract, BufferUnderflowContract):
-    reader = read_int64
+    reader = staticmethod(read_int64)
     byte_size = 8
     lower_limit = -(2**63)
     lower_limit_as_bytes = b"\x80\x00\x00\x00\x00\x00\x00\x00"
@@ -165,7 +165,7 @@ class TestReadInt64(IntReaderContract, BufferUnderflowContract):
 
 
 class TestReadUint8(IntReaderContract, BufferUnderflowContract):
-    reader = read_uint8
+    reader = staticmethod(read_uint8)
     byte_size = 1
     lower_limit = 0
     lower_limit_as_bytes = zero_as_bytes = b"\x00"
@@ -175,7 +175,7 @@ class TestReadUint8(IntReaderContract, BufferUnderflowContract):
 
 
 class TestReadUint16(IntReaderContract, BufferUnderflowContract):
-    reader = read_uint16
+    reader = staticmethod(read_uint16)
     byte_size = 2
     lower_limit = 0
     lower_limit_as_bytes = zero_as_bytes = b"\x00\x00"
@@ -186,7 +186,7 @@ class TestReadUint16(IntReaderContract, BufferUnderflowContract):
 
 
 class TestReadUint32(IntReaderContract, BufferUnderflowContract):
-    reader = read_uint32
+    reader = staticmethod(read_uint32)
     byte_size = 4
     lower_limit = 0
     lower_limit_as_bytes = zero_as_bytes = b"\x00\x00\x00\x00"
@@ -197,7 +197,7 @@ class TestReadUint32(IntReaderContract, BufferUnderflowContract):
 
 
 class TestReadUint64(IntReaderContract, BufferUnderflowContract):
-    reader = read_uint64
+    reader = staticmethod(read_uint64)
     byte_size = 8
     lower_limit = 0
     lower_limit_as_bytes = zero_as_bytes = b"\x00\x00\x00\x00\x00\x00\x00\x00"
@@ -240,7 +240,7 @@ class TestReadUnsignedVarint(BufferUnderflowContract):
 
 
 class TestReadFloat64(BufferUnderflowContract):
-    reader = read_float64
+    reader = staticmethod(read_float64)
     valid_serialization = struct.pack(">d", 0)
 
     @pytest.mark.parametrize(
@@ -488,7 +488,7 @@ class TestReadCompactArrayLength:
 
 
 class TestReadUUID(BufferUnderflowContract):
-    reader = read_uuid
+    reader = staticmethod(read_uuid)
     valid_serialization = uuid_zero.bytes
 
     def test_reads_zero_as_none(self, buffer: io.BytesIO) -> None:
