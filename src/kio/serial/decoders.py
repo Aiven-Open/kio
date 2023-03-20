@@ -83,13 +83,11 @@ def decode_uint64() -> Cursor[u64]:
     return value  # type: ignore[no-any-return]
 
 
+# See description and Kafka implementation.
+# https://developers.google.com/protocol-buffers/docs/encoding?csw=1#varints
+# https://github.com/apache/kafka/blob/ef96ac07f565a73e35c5b0f4c56c8e87cfbaaf59/clients/src/main/java/org/apache/kafka/common/utils/ByteUtils.java#L262
 def decode_unsigned_varint() -> Cursor[int]:
-    """Deserialize an integer stored into variable number of bytes (1-5).
-
-    See description and Kafka implementation:
-    - https://developers.google.com/protocol-buffers/docs/encoding?csw=1#varints
-    - https://github.com/apache/kafka/blob/ef96ac07f565a73e35c5b0f4c56c8e87cfbaaf59/clients/src/main/java/org/apache/kafka/common/utils/ByteUtils.java#L262
-    """
+    """Deserialize an integer stored into variable number of bytes (1-5)."""
     result = 0
     # Increase shift by 7 on each iteration, looping at most 5 times.
     for shift in range(0, 4 * 7 + 1, 7):
