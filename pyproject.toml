@@ -1,6 +1,17 @@
 [build-system]
-requires = ["setuptools>=67.6.0", "wheel"]
-build-backend = "setuptools.build_meta"
+# requires = ["setuptools>=67.6.0", "wheel"]
+# build-backend = "setuptools.build_meta"
+requires = ["maturin>=0.14,<0.15"]
+build-backend = "maturin"
+
+
+[project]
+name = "kio"
+requires-python = ">=3.11"
+
+
+[tool.maturin]
+features = ["pyo3/extension-module"]
 
 
 [tool.black]
@@ -22,41 +33,11 @@ filterwarnings = ["error"]
 fix = true
 target-version = "py311"
 extend-select = [
-  # bugbear
-  "B",
-  # comprehensions
-  "C4",
-  # mccabe
-  "C90",
-  # bandit
-  "S",
-  # blind exception
-  # Bare excepts are caught without this, but this also catches `except Exception: ...`.
-  "BLE",
-  # builtins
-  "A",
-  # Enforce valid noqa comments.
-  "RUF100",
-  # isort
-  "I",
-  # pycodestyle
-  "W",
-  # pyupgrade
-  "UP",
-  # debugger
-  "T10",
-  # print
-  "T20",
-  # quotes
-  "Q",
-  # simplify
-  "SIM",
-  # tidy imports
-  # We use this to only outlaw relative _parent_ imports, other relative imports are OK.
-  "TID",
+  "B", "C4", "C90", "S",  "A", "I", "W", "UP", "T10", "T20", "Q", "SIM", "BLE",
+  "RUF100", "TID",
 ]
 extend-ignore = [
-  # There's no reason to outlaw asserts.
+  # There's no reason to outlaw asserts. This reasoning is sensible:
   # https://stackoverflow.com/a/68429294/1220706
   "S101",
   # Ignore line-length. This is enforced by black, but all cases cannot be handled.
@@ -73,6 +54,7 @@ known-first-party = ["kio", "tests", "codegen"]
 [tool.ruff.mccabe]
 max-complexity = 10
 
+# We use this to only outlaw relative _parent_ imports, other relative imports are OK.
 [tool.ruff.flake8-tidy-imports]
 ban-relative-imports = "parents"
 

@@ -1,0 +1,14 @@
+[package]
+name = "python-kafka-protocol"
+version = "0.0.0"
+edition = "2021"
+
+[package.metadata.maturin]
+name = "kio._kio_core"
+
+[lib]
+name = "_kio_core"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = "0.18.1"
