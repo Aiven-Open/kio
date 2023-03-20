@@ -1,0 +1,10 @@
+sphinx
+sphinx-autodoc-typehints
+recommonmark
+m2r2
+mistune<2
+
+furo
+
+typing-extensions
+phantom-types

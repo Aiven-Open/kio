@@ -1,5 +1,6 @@
 exclude .editorconfig
 recursive-exclude .github *
+recursive-exclude docs *
 recursive-exclude tests *
 recursive-exclude codegen *
 recursive-exclude container *

@@ -66,14 +66,13 @@ def write_uint64(buffer: Writable, value: u64) -> None:
 unsigned_varint_upper_limit: Final = 2**31 - 1
 
 
+# See description and Kafka implementation.
+# https://developers.google.com/protocol-buffers/docs/encoding?csw=1#varints
+# https://github.com/apache/kafka/blob/ef96ac07f565a73e35c5b0f4c56c8e87cfbaaf59/clients/src/main/java/org/apache/kafka/common/utils/ByteUtils.java#L262
 def write_unsigned_varint(buffer: Writable, value: int) -> None:
     """
     Serialize an integer value between 0 and 2^31 - 1 to bytearray using 1-5
     bytes depending on value size.
-
-    See description and Kafka implementation:
-    - https://developers.google.com/protocol-buffers/docs/encoding?csw=1#varints
-    - https://github.com/apache/kafka/blob/ef96ac07f565a73e35c5b0f4c56c8e87cfbaaf59/clients/src/main/java/org/apache/kafka/common/utils/ByteUtils.java#L262
     """
     if value < 0:
         raise ValueError("Value must be positive")
