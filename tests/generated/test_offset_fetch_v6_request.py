@@ -1,13 +1,18 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.offset_fetch.v6.request import OffsetFetchRequest
 from kio.schema.offset_fetch.v6.request import OffsetFetchRequestTopic
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_offset_fetch_request_topic: Final = entity_reader(OffsetFetchRequestTopic)
 
 
 @given(from_type(OffsetFetchRequestTopic))
@@ -19,8 +24,11 @@ def test_offset_fetch_request_topic_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(OffsetFetchRequestTopic))
+        result = read_offset_fetch_request_topic(buffer)
     assert instance == result
+
+
+read_offset_fetch_request: Final = entity_reader(OffsetFetchRequest)
 
 
 @given(from_type(OffsetFetchRequest))
@@ -30,5 +38,5 @@ def test_offset_fetch_request_roundtrip(instance: OffsetFetchRequest) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(OffsetFetchRequest))
+        result = read_offset_fetch_request(buffer)
     assert instance == result

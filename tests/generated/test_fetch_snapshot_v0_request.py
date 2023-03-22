@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -6,10 +10,11 @@ from kio.schema.fetch_snapshot.v0.request import FetchSnapshotRequest
 from kio.schema.fetch_snapshot.v0.request import PartitionSnapshot
 from kio.schema.fetch_snapshot.v0.request import SnapshotId
 from kio.schema.fetch_snapshot.v0.request import TopicSnapshot
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_snapshot_id: Final = entity_reader(SnapshotId)
 
 
 @given(from_type(SnapshotId))
@@ -19,8 +24,11 @@ def test_snapshot_id_roundtrip(instance: SnapshotId) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(SnapshotId))
+        result = read_snapshot_id(buffer)
     assert instance == result
+
+
+read_partition_snapshot: Final = entity_reader(PartitionSnapshot)
 
 
 @given(from_type(PartitionSnapshot))
@@ -30,8 +38,11 @@ def test_partition_snapshot_roundtrip(instance: PartitionSnapshot) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(PartitionSnapshot))
+        result = read_partition_snapshot(buffer)
     assert instance == result
+
+
+read_topic_snapshot: Final = entity_reader(TopicSnapshot)
 
 
 @given(from_type(TopicSnapshot))
@@ -41,8 +52,11 @@ def test_topic_snapshot_roundtrip(instance: TopicSnapshot) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(TopicSnapshot))
+        result = read_topic_snapshot(buffer)
     assert instance == result
+
+
+read_fetch_snapshot_request: Final = entity_reader(FetchSnapshotRequest)
 
 
 @given(from_type(FetchSnapshotRequest))
@@ -52,5 +66,5 @@ def test_fetch_snapshot_request_roundtrip(instance: FetchSnapshotRequest) -> Non
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(FetchSnapshotRequest))
+        result = read_fetch_snapshot_request(buffer)
     assert instance == result

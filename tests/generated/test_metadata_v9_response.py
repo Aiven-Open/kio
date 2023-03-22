@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -6,10 +10,11 @@ from kio.schema.metadata.v9.response import MetadataResponse
 from kio.schema.metadata.v9.response import MetadataResponseBroker
 from kio.schema.metadata.v9.response import MetadataResponsePartition
 from kio.schema.metadata.v9.response import MetadataResponseTopic
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_metadata_response_broker: Final = entity_reader(MetadataResponseBroker)
 
 
 @given(from_type(MetadataResponseBroker))
@@ -19,8 +24,11 @@ def test_metadata_response_broker_roundtrip(instance: MetadataResponseBroker) ->
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(MetadataResponseBroker))
+        result = read_metadata_response_broker(buffer)
     assert instance == result
+
+
+read_metadata_response_partition: Final = entity_reader(MetadataResponsePartition)
 
 
 @given(from_type(MetadataResponsePartition))
@@ -32,8 +40,11 @@ def test_metadata_response_partition_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(MetadataResponsePartition))
+        result = read_metadata_response_partition(buffer)
     assert instance == result
+
+
+read_metadata_response_topic: Final = entity_reader(MetadataResponseTopic)
 
 
 @given(from_type(MetadataResponseTopic))
@@ -43,8 +54,11 @@ def test_metadata_response_topic_roundtrip(instance: MetadataResponseTopic) -> N
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(MetadataResponseTopic))
+        result = read_metadata_response_topic(buffer)
     assert instance == result
+
+
+read_metadata_response: Final = entity_reader(MetadataResponse)
 
 
 @given(from_type(MetadataResponse))
@@ -54,5 +68,5 @@ def test_metadata_response_roundtrip(instance: MetadataResponse) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(MetadataResponse))
+        result = read_metadata_response(buffer)
     assert instance == result

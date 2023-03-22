@@ -36,12 +36,11 @@ from kio.schema.protocol import Entity
 from kio.schema.protocol import Payload
 from kio.schema.types import BrokerId
 from kio.schema.types import TopicName
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_async
-from kio.serial.decoders import decode_int32
-from kio.serial.encoders import Writable
-from kio.serial.encoders import write_int32
+from kio.serial.readers import read_int32
+from kio.serial.writers import Writable
+from kio.serial.writers import write_int32
 
 
 def write_request_header(
@@ -111,28 +110,29 @@ class CorrelationIdMismatch(RuntimeError):
     ...
 
 
+async def read_response_bytes(stream: StreamReader) -> io.BytesIO:
+    response_length_bytes = await stream.read(4)
+    response_length = read_int32(io.BytesIO(response_length_bytes))
+    return io.BytesIO(await stream.read(response_length))
+
+
 R = TypeVar("R", bound=Payload)
 
 
-async def receive(
-    stream: StreamReader,
+def parse_response(
+    buffer: io.BytesIO,
     response_type: type[R],
     correlation_id: i32,
 ) -> R:
-    # Note: I don't think it makes sense to use this value to read the exact length from
-    # the buffer directly. I think it makes sense to keep reading from the buffer
-    # ad-hoc. However, we could use this to introduce some wrapper around the buffer, so
-    # that it raises an error once the value has been (or is about to be) exceeded.
-    await read_async(stream, decode_int32)  # message length
     header_schema: Any = response_type.__header_schema__
-    read_header = entity_decoder(header_schema)
-    header = await read_async(stream, read_header)
+    read_header = entity_reader(header_schema)
+    header = read_header(buffer)
 
     if header.correlation_id != correlation_id:
         raise CorrelationIdMismatch
 
-    read_payload = entity_decoder(response_type)
-    return await read_async(stream, read_payload)
+    read_payload = entity_reader(response_type)
+    return read_payload(buffer)
 
 
 async def make_request(
@@ -144,10 +144,18 @@ async def make_request(
         host="127.0.0.1",
         port=9092,
     )
+
+    # We use asynchronous facilities to send the request and read the raw response into
+    # a BytesIO buffer.
     with closing(stream_writer):
         async with asyncio.timeout(1):
             await send(stream_writer, request, correlation_id)
-            return await receive(stream_reader, response_type, correlation_id)
+            response = await read_response_bytes(stream_reader)
+
+    # After this point, the connection is closed, and we're making synchronously reading
+    # the response from the in-memory buffer.
+    with response as open_message_buffer:
+        return parse_response(open_message_buffer, response_type, correlation_id)
 
 
 async def test_roundtrip_api_versions_v3() -> None:

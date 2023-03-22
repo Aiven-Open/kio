@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -5,10 +9,11 @@ from hypothesis.strategies import from_type
 from kio.schema.list_offsets.v1.request import ListOffsetsPartition
 from kio.schema.list_offsets.v1.request import ListOffsetsRequest
 from kio.schema.list_offsets.v1.request import ListOffsetsTopic
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_list_offsets_partition: Final = entity_reader(ListOffsetsPartition)
 
 
 @given(from_type(ListOffsetsPartition))
@@ -18,8 +23,11 @@ def test_list_offsets_partition_roundtrip(instance: ListOffsetsPartition) -> Non
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(ListOffsetsPartition))
+        result = read_list_offsets_partition(buffer)
     assert instance == result
+
+
+read_list_offsets_topic: Final = entity_reader(ListOffsetsTopic)
 
 
 @given(from_type(ListOffsetsTopic))
@@ -29,8 +37,11 @@ def test_list_offsets_topic_roundtrip(instance: ListOffsetsTopic) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(ListOffsetsTopic))
+        result = read_list_offsets_topic(buffer)
     assert instance == result
+
+
+read_list_offsets_request: Final = entity_reader(ListOffsetsRequest)
 
 
 @given(from_type(ListOffsetsRequest))
@@ -40,5 +51,5 @@ def test_list_offsets_request_roundtrip(instance: ListOffsetsRequest) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(ListOffsetsRequest))
+        result = read_list_offsets_request(buffer)
     assert instance == result

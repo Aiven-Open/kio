@@ -57,7 +57,7 @@ def classify_field(field: Field[T]) -> tuple[FieldKind, type[T]]:
 
     if type_origin is not tuple:
         return (
-            (FieldKind.entity, field.type)
+            (FieldKind.entity, field.type)  # type: ignore[return-value]
             if is_dataclass(field.type)
             else (FieldKind.primitive, field.type)
         )

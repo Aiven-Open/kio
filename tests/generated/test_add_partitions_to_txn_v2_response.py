@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -7,10 +11,13 @@ from kio.schema.add_partitions_to_txn.v2.response import (
 )
 from kio.schema.add_partitions_to_txn.v2.response import AddPartitionsToTxnResponse
 from kio.schema.add_partitions_to_txn.v2.response import AddPartitionsToTxnTopicResult
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_add_partitions_to_txn_partition_result: Final = entity_reader(
+    AddPartitionsToTxnPartitionResult
+)
 
 
 @given(from_type(AddPartitionsToTxnPartitionResult))
@@ -22,8 +29,13 @@ def test_add_partitions_to_txn_partition_result_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(AddPartitionsToTxnPartitionResult))
+        result = read_add_partitions_to_txn_partition_result(buffer)
     assert instance == result
+
+
+read_add_partitions_to_txn_topic_result: Final = entity_reader(
+    AddPartitionsToTxnTopicResult
+)
 
 
 @given(from_type(AddPartitionsToTxnTopicResult))
@@ -35,8 +47,11 @@ def test_add_partitions_to_txn_topic_result_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(AddPartitionsToTxnTopicResult))
+        result = read_add_partitions_to_txn_topic_result(buffer)
     assert instance == result
+
+
+read_add_partitions_to_txn_response: Final = entity_reader(AddPartitionsToTxnResponse)
 
 
 @given(from_type(AddPartitionsToTxnResponse))
@@ -48,5 +63,5 @@ def test_add_partitions_to_txn_response_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(AddPartitionsToTxnResponse))
+        result = read_add_partitions_to_txn_response(buffer)
     assert instance == result

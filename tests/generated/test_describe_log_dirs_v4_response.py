@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -6,10 +10,11 @@ from kio.schema.describe_log_dirs.v4.response import DescribeLogDirsPartition
 from kio.schema.describe_log_dirs.v4.response import DescribeLogDirsResponse
 from kio.schema.describe_log_dirs.v4.response import DescribeLogDirsResult
 from kio.schema.describe_log_dirs.v4.response import DescribeLogDirsTopic
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_describe_log_dirs_partition: Final = entity_reader(DescribeLogDirsPartition)
 
 
 @given(from_type(DescribeLogDirsPartition))
@@ -21,8 +26,11 @@ def test_describe_log_dirs_partition_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(DescribeLogDirsPartition))
+        result = read_describe_log_dirs_partition(buffer)
     assert instance == result
+
+
+read_describe_log_dirs_topic: Final = entity_reader(DescribeLogDirsTopic)
 
 
 @given(from_type(DescribeLogDirsTopic))
@@ -32,8 +40,11 @@ def test_describe_log_dirs_topic_roundtrip(instance: DescribeLogDirsTopic) -> No
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(DescribeLogDirsTopic))
+        result = read_describe_log_dirs_topic(buffer)
     assert instance == result
+
+
+read_describe_log_dirs_result: Final = entity_reader(DescribeLogDirsResult)
 
 
 @given(from_type(DescribeLogDirsResult))
@@ -43,8 +54,11 @@ def test_describe_log_dirs_result_roundtrip(instance: DescribeLogDirsResult) -> 
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(DescribeLogDirsResult))
+        result = read_describe_log_dirs_result(buffer)
     assert instance == result
+
+
+read_describe_log_dirs_response: Final = entity_reader(DescribeLogDirsResponse)
 
 
 @given(from_type(DescribeLogDirsResponse))
@@ -56,5 +70,5 @@ def test_describe_log_dirs_response_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(DescribeLogDirsResponse))
+        result = read_describe_log_dirs_response(buffer)
     assert instance == result

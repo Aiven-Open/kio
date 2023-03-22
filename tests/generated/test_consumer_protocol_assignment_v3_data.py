@@ -1,13 +1,18 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.consumer_protocol_assignment.v3.data import ConsumerProtocolAssignment
 from kio.schema.consumer_protocol_assignment.v3.data import TopicPartition
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_topic_partition: Final = entity_reader(TopicPartition)
 
 
 @given(from_type(TopicPartition))
@@ -17,8 +22,11 @@ def test_topic_partition_roundtrip(instance: TopicPartition) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(TopicPartition))
+        result = read_topic_partition(buffer)
     assert instance == result
+
+
+read_consumer_protocol_assignment: Final = entity_reader(ConsumerProtocolAssignment)
 
 
 @given(from_type(ConsumerProtocolAssignment))
@@ -30,5 +38,5 @@ def test_consumer_protocol_assignment_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(ConsumerProtocolAssignment))
+        result = read_consumer_protocol_assignment(buffer)
     assert instance == result

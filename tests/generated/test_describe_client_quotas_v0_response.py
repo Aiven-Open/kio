@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -6,10 +10,11 @@ from kio.schema.describe_client_quotas.v0.response import DescribeClientQuotasRe
 from kio.schema.describe_client_quotas.v0.response import EntityData
 from kio.schema.describe_client_quotas.v0.response import EntryData
 from kio.schema.describe_client_quotas.v0.response import ValueData
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_entity_data: Final = entity_reader(EntityData)
 
 
 @given(from_type(EntityData))
@@ -19,8 +24,11 @@ def test_entity_data_roundtrip(instance: EntityData) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(EntityData))
+        result = read_entity_data(buffer)
     assert instance == result
+
+
+read_value_data: Final = entity_reader(ValueData)
 
 
 @given(from_type(ValueData))
@@ -30,8 +38,11 @@ def test_value_data_roundtrip(instance: ValueData) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(ValueData))
+        result = read_value_data(buffer)
     assert instance == result
+
+
+read_entry_data: Final = entity_reader(EntryData)
 
 
 @given(from_type(EntryData))
@@ -41,8 +52,13 @@ def test_entry_data_roundtrip(instance: EntryData) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(EntryData))
+        result = read_entry_data(buffer)
     assert instance == result
+
+
+read_describe_client_quotas_response: Final = entity_reader(
+    DescribeClientQuotasResponse
+)
 
 
 @given(from_type(DescribeClientQuotasResponse))
@@ -54,5 +70,5 @@ def test_describe_client_quotas_response_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(DescribeClientQuotasResponse))
+        result = read_describe_client_quotas_response(buffer)
     assert instance == result

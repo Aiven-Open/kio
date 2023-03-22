@@ -1,13 +1,18 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.delete_groups.v1.response import DeletableGroupResult
 from kio.schema.delete_groups.v1.response import DeleteGroupsResponse
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_deletable_group_result: Final = entity_reader(DeletableGroupResult)
 
 
 @given(from_type(DeletableGroupResult))
@@ -17,8 +22,11 @@ def test_deletable_group_result_roundtrip(instance: DeletableGroupResult) -> Non
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(DeletableGroupResult))
+        result = read_deletable_group_result(buffer)
     assert instance == result
+
+
+read_delete_groups_response: Final = entity_reader(DeleteGroupsResponse)
 
 
 @given(from_type(DeleteGroupsResponse))
@@ -28,5 +36,5 @@ def test_delete_groups_response_roundtrip(instance: DeleteGroupsResponse) -> Non
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(DeleteGroupsResponse))
+        result = read_delete_groups_response(buffer)
     assert instance == result

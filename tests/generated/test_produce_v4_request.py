@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -5,10 +9,11 @@ from hypothesis.strategies import from_type
 from kio.schema.produce.v4.request import PartitionProduceData
 from kio.schema.produce.v4.request import ProduceRequest
 from kio.schema.produce.v4.request import TopicProduceData
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_partition_produce_data: Final = entity_reader(PartitionProduceData)
 
 
 @given(from_type(PartitionProduceData))
@@ -18,8 +23,11 @@ def test_partition_produce_data_roundtrip(instance: PartitionProduceData) -> Non
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(PartitionProduceData))
+        result = read_partition_produce_data(buffer)
     assert instance == result
+
+
+read_topic_produce_data: Final = entity_reader(TopicProduceData)
 
 
 @given(from_type(TopicProduceData))
@@ -29,8 +37,11 @@ def test_topic_produce_data_roundtrip(instance: TopicProduceData) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(TopicProduceData))
+        result = read_topic_produce_data(buffer)
     assert instance == result
+
+
+read_produce_request: Final = entity_reader(ProduceRequest)
 
 
 @given(from_type(ProduceRequest))
@@ -40,5 +51,5 @@ def test_produce_request_roundtrip(instance: ProduceRequest) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(ProduceRequest))
+        result = read_produce_request(buffer)
     assert instance == result

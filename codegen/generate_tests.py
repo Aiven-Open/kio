@@ -43,18 +43,24 @@ def get_entities() -> Iterator[tuple[type, str]]:
 
 
 imports = """\
+from __future__ import annotations
 import io
 from hypothesis import given, settings
 from hypothesis.strategies import from_type
 from kio.serial import entity_writer
 from tests.conftest import setup_buffer
-from kio.serial import read_sync
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
+from typing import Final
 """
 import_code = """\
 from {entity_module} import {entity_type}
 """
 test_code = """\
+
+
+read_{entity_snake_case}: Final = entity_reader({entity_type})
+
+
 @given(from_type({entity_type}))
 @settings(max_examples=1)
 def test_{entity_snake_case}_roundtrip(instance: {entity_type}) -> None:
@@ -62,7 +68,7 @@ def test_{entity_snake_case}_roundtrip(instance: {entity_type}) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder({entity_type}))
+        result = read_{entity_snake_case}(buffer)
     assert instance == result
 """
 

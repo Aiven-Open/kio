@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -5,10 +9,11 @@ from hypothesis.strategies import from_type
 from kio.schema.offset_for_leader_epoch.v1.response import EpochEndOffset
 from kio.schema.offset_for_leader_epoch.v1.response import OffsetForLeaderEpochResponse
 from kio.schema.offset_for_leader_epoch.v1.response import OffsetForLeaderTopicResult
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_epoch_end_offset: Final = entity_reader(EpochEndOffset)
 
 
 @given(from_type(EpochEndOffset))
@@ -18,8 +23,11 @@ def test_epoch_end_offset_roundtrip(instance: EpochEndOffset) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(EpochEndOffset))
+        result = read_epoch_end_offset(buffer)
     assert instance == result
+
+
+read_offset_for_leader_topic_result: Final = entity_reader(OffsetForLeaderTopicResult)
 
 
 @given(from_type(OffsetForLeaderTopicResult))
@@ -31,8 +39,13 @@ def test_offset_for_leader_topic_result_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(OffsetForLeaderTopicResult))
+        result = read_offset_for_leader_topic_result(buffer)
     assert instance == result
+
+
+read_offset_for_leader_epoch_response: Final = entity_reader(
+    OffsetForLeaderEpochResponse
+)
 
 
 @given(from_type(OffsetForLeaderEpochResponse))
@@ -44,5 +57,5 @@ def test_offset_for_leader_epoch_response_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(OffsetForLeaderEpochResponse))
+        result = read_offset_for_leader_epoch_response(buffer)
     assert instance == result

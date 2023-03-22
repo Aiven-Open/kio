@@ -10,18 +10,17 @@ import pytest
 
 from kio.schema.primitive import i16
 from kio.schema.primitive import u8
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
-from kio.serial.decoders import Decoder
-from kio.serial.decoders import decode_compact_string
-from kio.serial.decoders import decode_uint8
-from kio.serial.decoders import decode_unsigned_varint
-from kio.serial.encoders import Writer
-from kio.serial.encoders import write_compact_string
-from kio.serial.encoders import write_tagged_field
-from kio.serial.encoders import write_uint8
-from kio.serial.encoders import write_unsigned_varint
+from kio.serial.readers import Reader
+from kio.serial.readers import read_compact_string
+from kio.serial.readers import read_uint8
+from kio.serial.readers import read_unsigned_varint
+from kio.serial.writers import Writer
+from kio.serial.writers import write_compact_string
+from kio.serial.writers import write_tagged_field
+from kio.serial.writers import write_uint8
+from kio.serial.writers import write_unsigned_varint
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -37,6 +36,8 @@ class Person:
         default=None,
     )
 
+
+read_person = entity_reader(Person)
 
 T = TypeVar("T")
 
@@ -81,9 +82,8 @@ def test_can_parse_tagged_fields(
         )
 
     buffer.seek(0)
-    instance = read_sync(buffer, entity_decoder(Person))
 
-    assert instance == expected
+    assert read_person(buffer) == expected
 
 
 def test_raises_type_error_when_missing_required_tagged_field(
@@ -101,13 +101,13 @@ def test_raises_type_error_when_missing_required_tagged_field(
         TypeError,
         match=r"missing 1 required keyword-only argument: 'age'",
     ):
-        read_sync(buffer, entity_decoder(Person))
+        read_person(buffer)
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class ReadableTag(Generic[T]):
     tag: int
-    decoder: Decoder[T]
+    reader: Reader[T]
     value: T
 
 
@@ -116,18 +116,18 @@ class ReadableTag(Generic[T]):
     [
         (
             Person(age=u8(123)),
-            [ReadableTag(tag=0, decoder=decode_uint8, value=u8(123))],
+            [ReadableTag(tag=0, reader=read_uint8, value=u8(123))],
         ),
         (
             Person(age=u8(12), country="Borduria"),
             [
-                ReadableTag(tag=0, decoder=decode_uint8, value=u8(12)),
-                ReadableTag(tag=1, decoder=decode_compact_string, value="Borduria"),
+                ReadableTag(tag=0, reader=read_uint8, value=u8(12)),
+                ReadableTag(tag=1, reader=read_compact_string, value="Borduria"),
             ],
         ),
         (
             Person(age=u8(1), country=None),
-            [ReadableTag(tag=0, decoder=decode_uint8, value=u8(1))],
+            [ReadableTag(tag=0, reader=read_uint8, value=u8(1))],
         ),
     ],
 )
@@ -140,11 +140,11 @@ def test_can_serialize_tagged_fields(
 
     buffer.seek(0)
 
-    assert read_sync(buffer, decode_compact_string) == "Almaszout"  # name
+    assert read_compact_string(buffer) == "Almaszout"  # name
 
-    num_tagged_values = read_sync(buffer, decode_unsigned_varint)
+    num_tagged_values = read_unsigned_varint(buffer)
     assert num_tagged_values == len(expected_tags)
     for tag in expected_tags:
-        assert read_sync(buffer, decode_unsigned_varint) == tag.tag
-        read_sync(buffer, decode_unsigned_varint)  # length
-        assert read_sync(buffer, tag.decoder) == tag.value
+        assert read_unsigned_varint(buffer) == tag.tag
+        read_unsigned_varint(buffer)  # length
+        assert tag.reader(buffer) == tag.value

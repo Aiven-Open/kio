@@ -1,13 +1,18 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.stop_replica.v0.request import StopReplicaPartitionV0
 from kio.schema.stop_replica.v0.request import StopReplicaRequest
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_stop_replica_partition_v0: Final = entity_reader(StopReplicaPartitionV0)
 
 
 @given(from_type(StopReplicaPartitionV0))
@@ -17,8 +22,11 @@ def test_stop_replica_partition_v0_roundtrip(instance: StopReplicaPartitionV0) -
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(StopReplicaPartitionV0))
+        result = read_stop_replica_partition_v0(buffer)
     assert instance == result
+
+
+read_stop_replica_request: Final = entity_reader(StopReplicaRequest)
 
 
 @given(from_type(StopReplicaRequest))
@@ -28,5 +36,5 @@ def test_stop_replica_request_roundtrip(instance: StopReplicaRequest) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(StopReplicaRequest))
+        result = read_stop_replica_request(buffer)
     assert instance == result

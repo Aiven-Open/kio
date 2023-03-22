@@ -1,12 +1,17 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.end_txn.v3.response import EndTxnResponse
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_end_txn_response: Final = entity_reader(EndTxnResponse)
 
 
 @given(from_type(EndTxnResponse))
@@ -16,5 +21,5 @@ def test_end_txn_response_roundtrip(instance: EndTxnResponse) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(EndTxnResponse))
+        result = read_end_txn_response(buffer)
     assert instance == result

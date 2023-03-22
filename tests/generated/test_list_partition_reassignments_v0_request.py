@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -8,10 +12,13 @@ from kio.schema.list_partition_reassignments.v0.request import (
 from kio.schema.list_partition_reassignments.v0.request import (
     ListPartitionReassignmentsTopics,
 )
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_list_partition_reassignments_topics: Final = entity_reader(
+    ListPartitionReassignmentsTopics
+)
 
 
 @given(from_type(ListPartitionReassignmentsTopics))
@@ -23,8 +30,13 @@ def test_list_partition_reassignments_topics_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(ListPartitionReassignmentsTopics))
+        result = read_list_partition_reassignments_topics(buffer)
     assert instance == result
+
+
+read_list_partition_reassignments_request: Final = entity_reader(
+    ListPartitionReassignmentsRequest
+)
 
 
 @given(from_type(ListPartitionReassignmentsRequest))
@@ -36,5 +48,5 @@ def test_list_partition_reassignments_request_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(ListPartitionReassignmentsRequest))
+        result = read_list_partition_reassignments_request(buffer)
     assert instance == result

@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -6,10 +10,11 @@ from kio.schema.alter_client_quotas.v0.request import AlterClientQuotasRequest
 from kio.schema.alter_client_quotas.v0.request import EntityData
 from kio.schema.alter_client_quotas.v0.request import EntryData
 from kio.schema.alter_client_quotas.v0.request import OpData
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_entity_data: Final = entity_reader(EntityData)
 
 
 @given(from_type(EntityData))
@@ -19,8 +24,11 @@ def test_entity_data_roundtrip(instance: EntityData) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(EntityData))
+        result = read_entity_data(buffer)
     assert instance == result
+
+
+read_op_data: Final = entity_reader(OpData)
 
 
 @given(from_type(OpData))
@@ -30,8 +38,11 @@ def test_op_data_roundtrip(instance: OpData) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(OpData))
+        result = read_op_data(buffer)
     assert instance == result
+
+
+read_entry_data: Final = entity_reader(EntryData)
 
 
 @given(from_type(EntryData))
@@ -41,8 +52,11 @@ def test_entry_data_roundtrip(instance: EntryData) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(EntryData))
+        result = read_entry_data(buffer)
     assert instance == result
+
+
+read_alter_client_quotas_request: Final = entity_reader(AlterClientQuotasRequest)
 
 
 @given(from_type(AlterClientQuotasRequest))
@@ -54,5 +68,5 @@ def test_alter_client_quotas_request_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(AlterClientQuotasRequest))
+        result = read_alter_client_quotas_request(buffer)
     assert instance == result

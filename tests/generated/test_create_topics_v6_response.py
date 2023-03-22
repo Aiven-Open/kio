@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -5,10 +9,11 @@ from hypothesis.strategies import from_type
 from kio.schema.create_topics.v6.response import CreatableTopicConfigs
 from kio.schema.create_topics.v6.response import CreatableTopicResult
 from kio.schema.create_topics.v6.response import CreateTopicsResponse
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_creatable_topic_configs: Final = entity_reader(CreatableTopicConfigs)
 
 
 @given(from_type(CreatableTopicConfigs))
@@ -18,8 +23,11 @@ def test_creatable_topic_configs_roundtrip(instance: CreatableTopicConfigs) -> N
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(CreatableTopicConfigs))
+        result = read_creatable_topic_configs(buffer)
     assert instance == result
+
+
+read_creatable_topic_result: Final = entity_reader(CreatableTopicResult)
 
 
 @given(from_type(CreatableTopicResult))
@@ -29,8 +37,11 @@ def test_creatable_topic_result_roundtrip(instance: CreatableTopicResult) -> Non
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(CreatableTopicResult))
+        result = read_creatable_topic_result(buffer)
     assert instance == result
+
+
+read_create_topics_response: Final = entity_reader(CreateTopicsResponse)
 
 
 @given(from_type(CreateTopicsResponse))
@@ -40,5 +51,5 @@ def test_create_topics_response_roundtrip(instance: CreateTopicsResponse) -> Non
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(CreateTopicsResponse))
+        result = read_create_topics_response(buffer)
     assert instance == result
