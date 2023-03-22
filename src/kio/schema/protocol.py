@@ -1,13 +1,21 @@
 # Note! This file is auto-generated from a template, make changes in
 # codegen/template/protocol.py.
 
+from typing import TYPE_CHECKING
 from typing import ClassVar
 from typing import Protocol
 
 from .primitive import i16
 
+if TYPE_CHECKING:
+    from _typeshed import DataclassInstance
+else:
 
-class Entity(Protocol):
+    class DataclassInstance(Protocol):
+        ...
+
+
+class Entity(DataclassInstance, Protocol):
     """All schema entities adhere to this protocol."""
 
     __version__: ClassVar[i16]
@@ -22,7 +30,7 @@ class Entity(Protocol):
 # Kafka calls this "message", but it also calls the whole message (header +
 # payload) "message", so to disambiguate, we call this part of the message
 # "payload" instead.
-class Payload(Protocol):
+class Payload(DataclassInstance, Protocol):
     """
     All payload entities, i.e. `requests and responses
     <https://kafka.apache.org/protocol#protocol_api_keys>`_, adhere to this protocol.

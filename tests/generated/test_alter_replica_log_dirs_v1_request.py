@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -5,10 +9,11 @@ from hypothesis.strategies import from_type
 from kio.schema.alter_replica_log_dirs.v1.request import AlterReplicaLogDir
 from kio.schema.alter_replica_log_dirs.v1.request import AlterReplicaLogDirsRequest
 from kio.schema.alter_replica_log_dirs.v1.request import AlterReplicaLogDirTopic
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_alter_replica_log_dir_topic: Final = entity_reader(AlterReplicaLogDirTopic)
 
 
 @given(from_type(AlterReplicaLogDirTopic))
@@ -20,8 +25,11 @@ def test_alter_replica_log_dir_topic_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(AlterReplicaLogDirTopic))
+        result = read_alter_replica_log_dir_topic(buffer)
     assert instance == result
+
+
+read_alter_replica_log_dir: Final = entity_reader(AlterReplicaLogDir)
 
 
 @given(from_type(AlterReplicaLogDir))
@@ -31,8 +39,11 @@ def test_alter_replica_log_dir_roundtrip(instance: AlterReplicaLogDir) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(AlterReplicaLogDir))
+        result = read_alter_replica_log_dir(buffer)
     assert instance == result
+
+
+read_alter_replica_log_dirs_request: Final = entity_reader(AlterReplicaLogDirsRequest)
 
 
 @given(from_type(AlterReplicaLogDirsRequest))
@@ -44,5 +55,5 @@ def test_alter_replica_log_dirs_request_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(AlterReplicaLogDirsRequest))
+        result = read_alter_replica_log_dirs_request(buffer)
     assert instance == result

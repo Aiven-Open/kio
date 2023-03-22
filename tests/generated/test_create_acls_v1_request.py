@@ -1,13 +1,18 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.create_acls.v1.request import AclCreation
 from kio.schema.create_acls.v1.request import CreateAclsRequest
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_acl_creation: Final = entity_reader(AclCreation)
 
 
 @given(from_type(AclCreation))
@@ -17,8 +22,11 @@ def test_acl_creation_roundtrip(instance: AclCreation) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(AclCreation))
+        result = read_acl_creation(buffer)
     assert instance == result
+
+
+read_create_acls_request: Final = entity_reader(CreateAclsRequest)
 
 
 @given(from_type(CreateAclsRequest))
@@ -28,5 +36,5 @@ def test_create_acls_request_roundtrip(instance: CreateAclsRequest) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(CreateAclsRequest))
+        result = read_create_acls_request(buffer)
     assert instance == result

@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -6,10 +10,13 @@ from kio.schema.describe_delegation_token.v1.request import DescribeDelegationTo
 from kio.schema.describe_delegation_token.v1.request import (
     DescribeDelegationTokenRequest,
 )
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_describe_delegation_token_owner: Final = entity_reader(
+    DescribeDelegationTokenOwner
+)
 
 
 @given(from_type(DescribeDelegationTokenOwner))
@@ -21,8 +28,13 @@ def test_describe_delegation_token_owner_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(DescribeDelegationTokenOwner))
+        result = read_describe_delegation_token_owner(buffer)
     assert instance == result
+
+
+read_describe_delegation_token_request: Final = entity_reader(
+    DescribeDelegationTokenRequest
+)
 
 
 @given(from_type(DescribeDelegationTokenRequest))
@@ -34,5 +46,5 @@ def test_describe_delegation_token_request_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(DescribeDelegationTokenRequest))
+        result = read_describe_delegation_token_request(buffer)
     assert instance == result

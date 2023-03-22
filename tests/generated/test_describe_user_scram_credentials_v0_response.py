@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -9,10 +13,11 @@ from kio.schema.describe_user_scram_credentials.v0.response import (
 from kio.schema.describe_user_scram_credentials.v0.response import (
     DescribeUserScramCredentialsResult,
 )
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_credential_info: Final = entity_reader(CredentialInfo)
 
 
 @given(from_type(CredentialInfo))
@@ -22,8 +27,13 @@ def test_credential_info_roundtrip(instance: CredentialInfo) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(CredentialInfo))
+        result = read_credential_info(buffer)
     assert instance == result
+
+
+read_describe_user_scram_credentials_result: Final = entity_reader(
+    DescribeUserScramCredentialsResult
+)
 
 
 @given(from_type(DescribeUserScramCredentialsResult))
@@ -35,8 +45,13 @@ def test_describe_user_scram_credentials_result_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(DescribeUserScramCredentialsResult))
+        result = read_describe_user_scram_credentials_result(buffer)
     assert instance == result
+
+
+read_describe_user_scram_credentials_response: Final = entity_reader(
+    DescribeUserScramCredentialsResponse
+)
 
 
 @given(from_type(DescribeUserScramCredentialsResponse))
@@ -48,5 +63,5 @@ def test_describe_user_scram_credentials_response_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(DescribeUserScramCredentialsResponse))
+        result = read_describe_user_scram_credentials_response(buffer)
     assert instance == result

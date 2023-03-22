@@ -15,9 +15,7 @@
 - Message classes are simply light-weight data containers and does not inherit anything
   or expose any methods other than a vanilla dataclass. Encoding and decoding is enabled
   by making all the necessary details about Kafka encoding introspectable.
-- Supports synchronous encoding and decoding of messages with `IO[bytes]`.
-- Supports asynchronous encoding and decoding with `asyncio.StreamReader` and
-  `asyncio.StreamWriter`.
+- Supports encoding and decoding of messages through `IO[bytes]`.
 - Test suite with focus on roundtrip property tests using Hypothesis.
 
 [schema-source]:

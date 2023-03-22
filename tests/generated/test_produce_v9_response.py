@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -6,10 +10,11 @@ from kio.schema.produce.v9.response import BatchIndexAndErrorMessage
 from kio.schema.produce.v9.response import PartitionProduceResponse
 from kio.schema.produce.v9.response import ProduceResponse
 from kio.schema.produce.v9.response import TopicProduceResponse
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_batch_index_and_error_message: Final = entity_reader(BatchIndexAndErrorMessage)
 
 
 @given(from_type(BatchIndexAndErrorMessage))
@@ -21,8 +26,11 @@ def test_batch_index_and_error_message_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(BatchIndexAndErrorMessage))
+        result = read_batch_index_and_error_message(buffer)
     assert instance == result
+
+
+read_partition_produce_response: Final = entity_reader(PartitionProduceResponse)
 
 
 @given(from_type(PartitionProduceResponse))
@@ -34,8 +42,11 @@ def test_partition_produce_response_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(PartitionProduceResponse))
+        result = read_partition_produce_response(buffer)
     assert instance == result
+
+
+read_topic_produce_response: Final = entity_reader(TopicProduceResponse)
 
 
 @given(from_type(TopicProduceResponse))
@@ -45,8 +56,11 @@ def test_topic_produce_response_roundtrip(instance: TopicProduceResponse) -> Non
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(TopicProduceResponse))
+        result = read_topic_produce_response(buffer)
     assert instance == result
+
+
+read_produce_response: Final = entity_reader(ProduceResponse)
 
 
 @given(from_type(ProduceResponse))
@@ -56,5 +70,5 @@ def test_produce_response_roundtrip(instance: ProduceResponse) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(ProduceResponse))
+        result = read_produce_response(buffer)
     assert instance == result

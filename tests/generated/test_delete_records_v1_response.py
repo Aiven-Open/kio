@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -5,10 +9,13 @@ from hypothesis.strategies import from_type
 from kio.schema.delete_records.v1.response import DeleteRecordsPartitionResult
 from kio.schema.delete_records.v1.response import DeleteRecordsResponse
 from kio.schema.delete_records.v1.response import DeleteRecordsTopicResult
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_delete_records_partition_result: Final = entity_reader(
+    DeleteRecordsPartitionResult
+)
 
 
 @given(from_type(DeleteRecordsPartitionResult))
@@ -20,8 +27,11 @@ def test_delete_records_partition_result_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(DeleteRecordsPartitionResult))
+        result = read_delete_records_partition_result(buffer)
     assert instance == result
+
+
+read_delete_records_topic_result: Final = entity_reader(DeleteRecordsTopicResult)
 
 
 @given(from_type(DeleteRecordsTopicResult))
@@ -33,8 +43,11 @@ def test_delete_records_topic_result_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(DeleteRecordsTopicResult))
+        result = read_delete_records_topic_result(buffer)
     assert instance == result
+
+
+read_delete_records_response: Final = entity_reader(DeleteRecordsResponse)
 
 
 @given(from_type(DeleteRecordsResponse))
@@ -44,5 +57,5 @@ def test_delete_records_response_roundtrip(instance: DeleteRecordsResponse) -> N
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(DeleteRecordsResponse))
+        result = read_delete_records_response(buffer)
     assert instance == result

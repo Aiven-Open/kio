@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -5,10 +9,13 @@ from hypothesis.strategies import from_type
 from kio.schema.txn_offset_commit.v1.request import TxnOffsetCommitRequest
 from kio.schema.txn_offset_commit.v1.request import TxnOffsetCommitRequestPartition
 from kio.schema.txn_offset_commit.v1.request import TxnOffsetCommitRequestTopic
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_txn_offset_commit_request_partition: Final = entity_reader(
+    TxnOffsetCommitRequestPartition
+)
 
 
 @given(from_type(TxnOffsetCommitRequestPartition))
@@ -20,8 +27,11 @@ def test_txn_offset_commit_request_partition_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(TxnOffsetCommitRequestPartition))
+        result = read_txn_offset_commit_request_partition(buffer)
     assert instance == result
+
+
+read_txn_offset_commit_request_topic: Final = entity_reader(TxnOffsetCommitRequestTopic)
 
 
 @given(from_type(TxnOffsetCommitRequestTopic))
@@ -33,8 +43,11 @@ def test_txn_offset_commit_request_topic_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(TxnOffsetCommitRequestTopic))
+        result = read_txn_offset_commit_request_topic(buffer)
     assert instance == result
+
+
+read_txn_offset_commit_request: Final = entity_reader(TxnOffsetCommitRequest)
 
 
 @given(from_type(TxnOffsetCommitRequest))
@@ -44,5 +57,5 @@ def test_txn_offset_commit_request_roundtrip(instance: TxnOffsetCommitRequest) -
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(TxnOffsetCommitRequest))
+        result = read_txn_offset_commit_request(buffer)
     assert instance == result

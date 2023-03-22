@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -5,10 +9,11 @@ from hypothesis.strategies import from_type
 from kio.schema.fetch.v0.response import FetchableTopicResponse
 from kio.schema.fetch.v0.response import FetchResponse
 from kio.schema.fetch.v0.response import PartitionData
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_partition_data: Final = entity_reader(PartitionData)
 
 
 @given(from_type(PartitionData))
@@ -18,8 +23,11 @@ def test_partition_data_roundtrip(instance: PartitionData) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(PartitionData))
+        result = read_partition_data(buffer)
     assert instance == result
+
+
+read_fetchable_topic_response: Final = entity_reader(FetchableTopicResponse)
 
 
 @given(from_type(FetchableTopicResponse))
@@ -29,8 +37,11 @@ def test_fetchable_topic_response_roundtrip(instance: FetchableTopicResponse) ->
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(FetchableTopicResponse))
+        result = read_fetchable_topic_response(buffer)
     assert instance == result
+
+
+read_fetch_response: Final = entity_reader(FetchResponse)
 
 
 @given(from_type(FetchResponse))
@@ -40,5 +51,5 @@ def test_fetch_response_roundtrip(instance: FetchResponse) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(FetchResponse))
+        result = read_fetch_response(buffer)
     assert instance == result

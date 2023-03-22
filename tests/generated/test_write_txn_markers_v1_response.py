@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -6,10 +10,13 @@ from kio.schema.write_txn_markers.v1.response import WritableTxnMarkerPartitionR
 from kio.schema.write_txn_markers.v1.response import WritableTxnMarkerResult
 from kio.schema.write_txn_markers.v1.response import WritableTxnMarkerTopicResult
 from kio.schema.write_txn_markers.v1.response import WriteTxnMarkersResponse
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_writable_txn_marker_partition_result: Final = entity_reader(
+    WritableTxnMarkerPartitionResult
+)
 
 
 @given(from_type(WritableTxnMarkerPartitionResult))
@@ -21,8 +28,13 @@ def test_writable_txn_marker_partition_result_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(WritableTxnMarkerPartitionResult))
+        result = read_writable_txn_marker_partition_result(buffer)
     assert instance == result
+
+
+read_writable_txn_marker_topic_result: Final = entity_reader(
+    WritableTxnMarkerTopicResult
+)
 
 
 @given(from_type(WritableTxnMarkerTopicResult))
@@ -34,8 +46,11 @@ def test_writable_txn_marker_topic_result_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(WritableTxnMarkerTopicResult))
+        result = read_writable_txn_marker_topic_result(buffer)
     assert instance == result
+
+
+read_writable_txn_marker_result: Final = entity_reader(WritableTxnMarkerResult)
 
 
 @given(from_type(WritableTxnMarkerResult))
@@ -47,8 +62,11 @@ def test_writable_txn_marker_result_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(WritableTxnMarkerResult))
+        result = read_writable_txn_marker_result(buffer)
     assert instance == result
+
+
+read_write_txn_markers_response: Final = entity_reader(WriteTxnMarkersResponse)
 
 
 @given(from_type(WriteTxnMarkersResponse))
@@ -60,5 +78,5 @@ def test_write_txn_markers_response_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(WriteTxnMarkersResponse))
+        result = read_write_txn_markers_response(buffer)
     assert instance == result

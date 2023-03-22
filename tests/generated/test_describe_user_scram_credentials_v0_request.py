@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -6,10 +10,11 @@ from kio.schema.describe_user_scram_credentials.v0.request import (
     DescribeUserScramCredentialsRequest,
 )
 from kio.schema.describe_user_scram_credentials.v0.request import UserName
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_user_name: Final = entity_reader(UserName)
 
 
 @given(from_type(UserName))
@@ -19,8 +24,13 @@ def test_user_name_roundtrip(instance: UserName) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(UserName))
+        result = read_user_name(buffer)
     assert instance == result
+
+
+read_describe_user_scram_credentials_request: Final = entity_reader(
+    DescribeUserScramCredentialsRequest
+)
 
 
 @given(from_type(DescribeUserScramCredentialsRequest))
@@ -32,5 +42,5 @@ def test_describe_user_scram_credentials_request_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(DescribeUserScramCredentialsRequest))
+        result = read_describe_user_scram_credentials_request(buffer)
     assert instance == result

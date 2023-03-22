@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -5,10 +9,11 @@ from hypothesis.strategies import from_type
 from kio.schema.delete_acls.v0.response import DeleteAclsFilterResult
 from kio.schema.delete_acls.v0.response import DeleteAclsMatchingAcl
 from kio.schema.delete_acls.v0.response import DeleteAclsResponse
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_delete_acls_matching_acl: Final = entity_reader(DeleteAclsMatchingAcl)
 
 
 @given(from_type(DeleteAclsMatchingAcl))
@@ -18,8 +23,11 @@ def test_delete_acls_matching_acl_roundtrip(instance: DeleteAclsMatchingAcl) -> 
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(DeleteAclsMatchingAcl))
+        result = read_delete_acls_matching_acl(buffer)
     assert instance == result
+
+
+read_delete_acls_filter_result: Final = entity_reader(DeleteAclsFilterResult)
 
 
 @given(from_type(DeleteAclsFilterResult))
@@ -29,8 +37,11 @@ def test_delete_acls_filter_result_roundtrip(instance: DeleteAclsFilterResult) -
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(DeleteAclsFilterResult))
+        result = read_delete_acls_filter_result(buffer)
     assert instance == result
+
+
+read_delete_acls_response: Final = entity_reader(DeleteAclsResponse)
 
 
 @given(from_type(DeleteAclsResponse))
@@ -40,5 +51,5 @@ def test_delete_acls_response_roundtrip(instance: DeleteAclsResponse) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(DeleteAclsResponse))
+        result = read_delete_acls_response(buffer)
     assert instance == result

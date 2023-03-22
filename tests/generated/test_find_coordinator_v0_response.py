@@ -1,12 +1,17 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.find_coordinator.v0.response import FindCoordinatorResponse
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_find_coordinator_response: Final = entity_reader(FindCoordinatorResponse)
 
 
 @given(from_type(FindCoordinatorResponse))
@@ -16,5 +21,5 @@ def test_find_coordinator_response_roundtrip(instance: FindCoordinatorResponse) 
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(FindCoordinatorResponse))
+        result = read_find_coordinator_response(buffer)
     assert instance == result

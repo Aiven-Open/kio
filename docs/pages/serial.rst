@@ -4,7 +4,7 @@ Serialization and parsing
 Decoders
 --------
 
-.. automodule:: kio.serial.decoders
+.. automodule:: kio.serial.readers
     :members:
     :undoc-members:
     :show-inheritance:
@@ -12,7 +12,7 @@ Decoders
 Encoders
 --------
 
-.. automodule:: kio.serial.encoders
+.. automodule:: kio.serial.writers
     :members:
     :undoc-members:
     :show-inheritance:

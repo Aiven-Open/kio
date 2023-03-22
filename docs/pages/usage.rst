@@ -20,8 +20,8 @@ to Kafka, and receive and parse the response into a full entity.
     from kio.serial import entity_decoder
     from kio.serial import entity_writer
     from kio.serial import read_async
-    from kio.serial.decoders import decode_int32
-    from kio.serial.encoders import write_int32
+    from kio.serial.readers import decode_int32
+    from kio.serial.writers import write_int32
 
     write_metadata = entity_writer(MetadataRequest)
     decode_metadata = entity_decoder(MetadataResponse)
@@ -81,8 +81,8 @@ blocking facilities for IO.
     from kio.serial import entity_decoder
     from kio.serial import entity_writer
     from kio.serial import read_sync
-    from kio.serial.decoders import decode_int32
-    from kio.serial.encoders import write_int32
+    from kio.serial.readers import decode_int32
+    from kio.serial.writers import write_int32
 
     write_metadata = entity_writer(MetadataRequest)
     decode_metadata = entity_decoder(MetadataResponse)

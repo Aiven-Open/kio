@@ -1,13 +1,18 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.metadata.v5.request import MetadataRequest
 from kio.schema.metadata.v5.request import MetadataRequestTopic
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_metadata_request_topic: Final = entity_reader(MetadataRequestTopic)
 
 
 @given(from_type(MetadataRequestTopic))
@@ -17,8 +22,11 @@ def test_metadata_request_topic_roundtrip(instance: MetadataRequestTopic) -> Non
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(MetadataRequestTopic))
+        result = read_metadata_request_topic(buffer)
     assert instance == result
+
+
+read_metadata_request: Final = entity_reader(MetadataRequest)
 
 
 @given(from_type(MetadataRequest))
@@ -28,5 +36,5 @@ def test_metadata_request_roundtrip(instance: MetadataRequest) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(MetadataRequest))
+        result = read_metadata_request(buffer)
     assert instance == result

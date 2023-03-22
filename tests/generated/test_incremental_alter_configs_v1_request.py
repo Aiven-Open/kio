@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -7,10 +11,11 @@ from kio.schema.incremental_alter_configs.v1.request import AlterConfigsResource
 from kio.schema.incremental_alter_configs.v1.request import (
     IncrementalAlterConfigsRequest,
 )
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_alterable_config: Final = entity_reader(AlterableConfig)
 
 
 @given(from_type(AlterableConfig))
@@ -20,8 +25,11 @@ def test_alterable_config_roundtrip(instance: AlterableConfig) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(AlterableConfig))
+        result = read_alterable_config(buffer)
     assert instance == result
+
+
+read_alter_configs_resource: Final = entity_reader(AlterConfigsResource)
 
 
 @given(from_type(AlterConfigsResource))
@@ -31,8 +39,13 @@ def test_alter_configs_resource_roundtrip(instance: AlterConfigsResource) -> Non
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(AlterConfigsResource))
+        result = read_alter_configs_resource(buffer)
     assert instance == result
+
+
+read_incremental_alter_configs_request: Final = entity_reader(
+    IncrementalAlterConfigsRequest
+)
 
 
 @given(from_type(IncrementalAlterConfigsRequest))
@@ -44,5 +57,5 @@ def test_incremental_alter_configs_request_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(IncrementalAlterConfigsRequest))
+        result = read_incremental_alter_configs_request(buffer)
     assert instance == result

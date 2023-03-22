@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -5,10 +9,11 @@ from hypothesis.strategies import from_type
 from kio.schema.describe_groups.v5.response import DescribedGroup
 from kio.schema.describe_groups.v5.response import DescribedGroupMember
 from kio.schema.describe_groups.v5.response import DescribeGroupsResponse
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_described_group_member: Final = entity_reader(DescribedGroupMember)
 
 
 @given(from_type(DescribedGroupMember))
@@ -18,8 +23,11 @@ def test_described_group_member_roundtrip(instance: DescribedGroupMember) -> Non
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(DescribedGroupMember))
+        result = read_described_group_member(buffer)
     assert instance == result
+
+
+read_described_group: Final = entity_reader(DescribedGroup)
 
 
 @given(from_type(DescribedGroup))
@@ -29,8 +37,11 @@ def test_described_group_roundtrip(instance: DescribedGroup) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(DescribedGroup))
+        result = read_described_group(buffer)
     assert instance == result
+
+
+read_describe_groups_response: Final = entity_reader(DescribeGroupsResponse)
 
 
 @given(from_type(DescribeGroupsResponse))
@@ -40,5 +51,5 @@ def test_describe_groups_response_roundtrip(instance: DescribeGroupsResponse) ->
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(DescribeGroupsResponse))
+        result = read_describe_groups_response(buffer)
     assert instance == result

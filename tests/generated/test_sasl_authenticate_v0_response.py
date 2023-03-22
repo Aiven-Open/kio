@@ -1,12 +1,17 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.sasl_authenticate.v0.response import SaslAuthenticateResponse
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_sasl_authenticate_response: Final = entity_reader(SaslAuthenticateResponse)
 
 
 @given(from_type(SaslAuthenticateResponse))
@@ -18,5 +23,5 @@ def test_sasl_authenticate_response_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(SaslAuthenticateResponse))
+        result = read_sasl_authenticate_response(buffer)
     assert instance == result

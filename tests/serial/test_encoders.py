@@ -9,24 +9,24 @@ from typing import TypeVar
 import pytest
 
 from kio.constants import uuid_zero
-from kio.serial.encoders import Writer
-from kio.serial.encoders import write_compact_string
-from kio.serial.encoders import write_empty_tagged_fields
-from kio.serial.encoders import write_float64
-from kio.serial.encoders import write_int8
-from kio.serial.encoders import write_int16
-from kio.serial.encoders import write_int32
-from kio.serial.encoders import write_int64
-from kio.serial.encoders import write_legacy_string
-from kio.serial.encoders import write_nullable_compact_string
-from kio.serial.encoders import write_nullable_legacy_string
-from kio.serial.encoders import write_uint8
-from kio.serial.encoders import write_uint16
-from kio.serial.encoders import write_uint32
-from kio.serial.encoders import write_uint64
-from kio.serial.encoders import write_unsigned_varint
-from kio.serial.encoders import write_uuid
 from kio.serial.errors import OutOfBoundValue
+from kio.serial.writers import Writer
+from kio.serial.writers import write_compact_string
+from kio.serial.writers import write_empty_tagged_fields
+from kio.serial.writers import write_float64
+from kio.serial.writers import write_int8
+from kio.serial.writers import write_int16
+from kio.serial.writers import write_int32
+from kio.serial.writers import write_int64
+from kio.serial.writers import write_legacy_string
+from kio.serial.writers import write_nullable_compact_string
+from kio.serial.writers import write_nullable_legacy_string
+from kio.serial.writers import write_uint8
+from kio.serial.writers import write_uint16
+from kio.serial.writers import write_uint32
+from kio.serial.writers import write_uint64
+from kio.serial.writers import write_unsigned_varint
+from kio.serial.writers import write_uuid
 
 _I = TypeVar("_I", bound=int, contravariant=True)
 

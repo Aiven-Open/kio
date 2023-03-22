@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -5,10 +9,11 @@ from hypothesis.strategies import from_type
 from kio.schema.broker_registration.v1.request import BrokerRegistrationRequest
 from kio.schema.broker_registration.v1.request import Feature
 from kio.schema.broker_registration.v1.request import Listener
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_listener: Final = entity_reader(Listener)
 
 
 @given(from_type(Listener))
@@ -18,8 +23,11 @@ def test_listener_roundtrip(instance: Listener) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(Listener))
+        result = read_listener(buffer)
     assert instance == result
+
+
+read_feature: Final = entity_reader(Feature)
 
 
 @given(from_type(Feature))
@@ -29,8 +37,11 @@ def test_feature_roundtrip(instance: Feature) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(Feature))
+        result = read_feature(buffer)
     assert instance == result
+
+
+read_broker_registration_request: Final = entity_reader(BrokerRegistrationRequest)
 
 
 @given(from_type(BrokerRegistrationRequest))
@@ -42,5 +53,5 @@ def test_broker_registration_request_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(BrokerRegistrationRequest))
+        result = read_broker_registration_request(buffer)
     assert instance == result

@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -5,10 +9,11 @@ from hypothesis.strategies import from_type
 from kio.schema.describe_acls.v1.response import AclDescription
 from kio.schema.describe_acls.v1.response import DescribeAclsResource
 from kio.schema.describe_acls.v1.response import DescribeAclsResponse
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_acl_description: Final = entity_reader(AclDescription)
 
 
 @given(from_type(AclDescription))
@@ -18,8 +23,11 @@ def test_acl_description_roundtrip(instance: AclDescription) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(AclDescription))
+        result = read_acl_description(buffer)
     assert instance == result
+
+
+read_describe_acls_resource: Final = entity_reader(DescribeAclsResource)
 
 
 @given(from_type(DescribeAclsResource))
@@ -29,8 +37,11 @@ def test_describe_acls_resource_roundtrip(instance: DescribeAclsResource) -> Non
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(DescribeAclsResource))
+        result = read_describe_acls_resource(buffer)
     assert instance == result
+
+
+read_describe_acls_response: Final = entity_reader(DescribeAclsResponse)
 
 
 @given(from_type(DescribeAclsResponse))
@@ -40,5 +51,5 @@ def test_describe_acls_response_roundtrip(instance: DescribeAclsResponse) -> Non
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(DescribeAclsResponse))
+        result = read_describe_acls_response(buffer)
     assert instance == result

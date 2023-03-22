@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -6,10 +10,11 @@ from kio.schema.create_topics.v4.request import CreatableReplicaAssignment
 from kio.schema.create_topics.v4.request import CreatableTopic
 from kio.schema.create_topics.v4.request import CreateableTopicConfig
 from kio.schema.create_topics.v4.request import CreateTopicsRequest
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_creatable_replica_assignment: Final = entity_reader(CreatableReplicaAssignment)
 
 
 @given(from_type(CreatableReplicaAssignment))
@@ -21,8 +26,11 @@ def test_creatable_replica_assignment_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(CreatableReplicaAssignment))
+        result = read_creatable_replica_assignment(buffer)
     assert instance == result
+
+
+read_createable_topic_config: Final = entity_reader(CreateableTopicConfig)
 
 
 @given(from_type(CreateableTopicConfig))
@@ -32,8 +40,11 @@ def test_createable_topic_config_roundtrip(instance: CreateableTopicConfig) -> N
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(CreateableTopicConfig))
+        result = read_createable_topic_config(buffer)
     assert instance == result
+
+
+read_creatable_topic: Final = entity_reader(CreatableTopic)
 
 
 @given(from_type(CreatableTopic))
@@ -43,8 +54,11 @@ def test_creatable_topic_roundtrip(instance: CreatableTopic) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(CreatableTopic))
+        result = read_creatable_topic(buffer)
     assert instance == result
+
+
+read_create_topics_request: Final = entity_reader(CreateTopicsRequest)
 
 
 @given(from_type(CreateTopicsRequest))
@@ -54,5 +68,5 @@ def test_create_topics_request_roundtrip(instance: CreateTopicsRequest) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(CreateTopicsRequest))
+        result = read_create_topics_request(buffer)
     assert instance == result

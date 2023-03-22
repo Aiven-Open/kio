@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -6,10 +10,11 @@ from kio.schema.describe_quorum.v0.response import DescribeQuorumResponse
 from kio.schema.describe_quorum.v0.response import PartitionData
 from kio.schema.describe_quorum.v0.response import ReplicaState
 from kio.schema.describe_quorum.v0.response import TopicData
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_replica_state: Final = entity_reader(ReplicaState)
 
 
 @given(from_type(ReplicaState))
@@ -19,8 +24,11 @@ def test_replica_state_roundtrip(instance: ReplicaState) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(ReplicaState))
+        result = read_replica_state(buffer)
     assert instance == result
+
+
+read_partition_data: Final = entity_reader(PartitionData)
 
 
 @given(from_type(PartitionData))
@@ -30,8 +38,11 @@ def test_partition_data_roundtrip(instance: PartitionData) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(PartitionData))
+        result = read_partition_data(buffer)
     assert instance == result
+
+
+read_topic_data: Final = entity_reader(TopicData)
 
 
 @given(from_type(TopicData))
@@ -41,8 +52,11 @@ def test_topic_data_roundtrip(instance: TopicData) -> None:
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(TopicData))
+        result = read_topic_data(buffer)
     assert instance == result
+
+
+read_describe_quorum_response: Final = entity_reader(DescribeQuorumResponse)
 
 
 @given(from_type(DescribeQuorumResponse))
@@ -52,5 +66,5 @@ def test_describe_quorum_response_roundtrip(instance: DescribeQuorumResponse) ->
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(DescribeQuorumResponse))
+        result = read_describe_quorum_response(buffer)
     assert instance == result

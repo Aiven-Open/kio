@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Final
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -6,10 +10,11 @@ from kio.schema.describe_configs.v4.response import DescribeConfigsResourceResul
 from kio.schema.describe_configs.v4.response import DescribeConfigsResponse
 from kio.schema.describe_configs.v4.response import DescribeConfigsResult
 from kio.schema.describe_configs.v4.response import DescribeConfigsSynonym
-from kio.serial import entity_decoder
+from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial import read_sync
 from tests.conftest import setup_buffer
+
+read_describe_configs_synonym: Final = entity_reader(DescribeConfigsSynonym)
 
 
 @given(from_type(DescribeConfigsSynonym))
@@ -19,8 +24,13 @@ def test_describe_configs_synonym_roundtrip(instance: DescribeConfigsSynonym) ->
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(DescribeConfigsSynonym))
+        result = read_describe_configs_synonym(buffer)
     assert instance == result
+
+
+read_describe_configs_resource_result: Final = entity_reader(
+    DescribeConfigsResourceResult
+)
 
 
 @given(from_type(DescribeConfigsResourceResult))
@@ -32,8 +42,11 @@ def test_describe_configs_resource_result_roundtrip(
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(DescribeConfigsResourceResult))
+        result = read_describe_configs_resource_result(buffer)
     assert instance == result
+
+
+read_describe_configs_result: Final = entity_reader(DescribeConfigsResult)
 
 
 @given(from_type(DescribeConfigsResult))
@@ -43,8 +56,11 @@ def test_describe_configs_result_roundtrip(instance: DescribeConfigsResult) -> N
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(DescribeConfigsResult))
+        result = read_describe_configs_result(buffer)
     assert instance == result
+
+
+read_describe_configs_response: Final = entity_reader(DescribeConfigsResponse)
 
 
 @given(from_type(DescribeConfigsResponse))
@@ -54,5 +70,5 @@ def test_describe_configs_response_roundtrip(instance: DescribeConfigsResponse) 
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_sync(buffer, entity_decoder(DescribeConfigsResponse))
+        result = read_describe_configs_response(buffer)
     assert instance == result
