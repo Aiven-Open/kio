@@ -129,4 +129,4 @@ jobs:
       - name: Build docs
         # Should use -W here to promote warnings to errors, but can't for now because of
         # a false positive for usage of _typeshed.DataclassInstance.
-        run: sphinx-build -W -b html docs docs/_build
+        run: sphinx-build -b html docs docs/_build
