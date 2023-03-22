@@ -59,7 +59,7 @@ class IntReaderContract:
         assert self.read(buffer) == 0
 
 
-class TestDecodeInt8(IntReaderContract):
+class TestReadInt8(IntReaderContract):
     reader = read_int8
     lower_limit = -128
     lower_limit_as_bytes = b"\x80"
@@ -68,7 +68,7 @@ class TestDecodeInt8(IntReaderContract):
     zero_as_bytes = b"\x00"
 
 
-class TestDecodeInt16(IntReaderContract):
+class TestReadInt16(IntReaderContract):
     reader = read_int16
     lower_limit = -(2**15)
     lower_limit_as_bytes = b"\x80\x00"
@@ -77,7 +77,7 @@ class TestDecodeInt16(IntReaderContract):
     zero_as_bytes = b"\x00\x00"
 
 
-class TestDecodeInt32(IntReaderContract):
+class TestReadInt32(IntReaderContract):
     reader = read_int32
     lower_limit = -(2**31)
     lower_limit_as_bytes = b"\x80\x00\x00\x00"
@@ -86,7 +86,7 @@ class TestDecodeInt32(IntReaderContract):
     zero_as_bytes = b"\x00\x00\x00\x00"
 
 
-class TestDecodeInt64(IntReaderContract):
+class TestReadInt64(IntReaderContract):
     reader = read_int64
     lower_limit = -(2**63)
     lower_limit_as_bytes = b"\x80\x00\x00\x00\x00\x00\x00\x00"
@@ -95,7 +95,7 @@ class TestDecodeInt64(IntReaderContract):
     zero_as_bytes = b"\x00\x00\x00\x00\x00\x00\x00\x00"
 
 
-class TestDecodeUint8(IntReaderContract):
+class TestReadUint8(IntReaderContract):
     reader = read_uint8
     lower_limit = 0
     lower_limit_as_bytes = zero_as_bytes = b"\x00"
@@ -103,7 +103,7 @@ class TestDecodeUint8(IntReaderContract):
     upper_limit_as_bytes = b"\xff"
 
 
-class TestDecodeUint16(IntReaderContract):
+class TestReadUint16(IntReaderContract):
     reader = read_uint16
     lower_limit = 0
     lower_limit_as_bytes = zero_as_bytes = b"\x00\x00"
@@ -112,7 +112,7 @@ class TestDecodeUint16(IntReaderContract):
     lower_limit_error_message = "argument out of range"
 
 
-class TestDecodeUint32(IntReaderContract):
+class TestReadUint32(IntReaderContract):
     reader = read_uint32
     lower_limit = 0
     lower_limit_as_bytes = zero_as_bytes = b"\x00\x00\x00\x00"
@@ -121,7 +121,7 @@ class TestDecodeUint32(IntReaderContract):
     lower_limit_error_message = "argument out of range"
 
 
-class TestDecodeUint64(IntReaderContract):
+class TestReadUint64(IntReaderContract):
     reader = read_uint64
     lower_limit = 0
     lower_limit_as_bytes = zero_as_bytes = b"\x00\x00\x00\x00\x00\x00\x00\x00"
@@ -130,7 +130,7 @@ class TestDecodeUint64(IntReaderContract):
     match_error_message = r"int too large to convert"
 
 
-class TestDecodeUnsignedVarint(IntReaderContract):
+class TestReadUnsignedVarint(IntReaderContract):
     reader = read_unsigned_varint
     lower_limit = 0
     lower_limit_as_bytes = zero_as_bytes = b"\x00"
@@ -165,7 +165,7 @@ class TestDecodeUnsignedVarint(IntReaderContract):
         assert self.read(buffer) == expected
 
 
-class TestDecodeFloat64:
+class TestReadFloat64:
     @pytest.mark.parametrize(
         "value",
         (
@@ -184,7 +184,7 @@ class TestDecodeFloat64:
         assert read_float64(buffer) == value
 
 
-class TestDecodeCompactStringAsBytes:
+class TestReadCompactStringAsBytes:
     def test_raises_unexpected_null_for_negative_length_sync(
         self,
         buffer: io.BytesIO,
@@ -206,7 +206,7 @@ class TestDecodeCompactStringAsBytes:
         assert value == read_compact_string_as_bytes(buffer)
 
 
-class TestDecodeCompactStringAsBytesNullable:
+class TestReadCompactStringAsBytesNullable:
     def test_returns_null_for_negative_length_sync(
         self,
         buffer: io.BytesIO,
@@ -227,7 +227,7 @@ class TestDecodeCompactStringAsBytesNullable:
         assert value == read_compact_string_as_bytes_nullable(buffer)
 
 
-class TestDecodeCompactString:
+class TestReadCompactString:
     def test_raises_unexpected_null_for_negative_length_sync(
         self,
         buffer: io.BytesIO,
@@ -250,7 +250,7 @@ class TestDecodeCompactString:
         assert value == read_compact_string(buffer)
 
 
-class TestDecodeCompactStringNullable:
+class TestReadCompactStringNullable:
     def test_returns_null_for_negative_length_sync(
         self,
         buffer: io.BytesIO,
@@ -272,7 +272,7 @@ class TestDecodeCompactStringNullable:
         assert value == read_compact_string_nullable(buffer)
 
 
-class TestDecodeRawBytes:
+class TestReadRawBytes:
     def test_returns_null_for_negative_length_sync(
         self,
         buffer: io.BytesIO,
@@ -293,7 +293,7 @@ class TestDecodeRawBytes:
         assert value == read_raw_bytes(buffer)
 
 
-class TestDecodeNullableLegacyBytes:
+class TestReadNullableLegacyBytes:
     def test_returns_none_for_negative_length_sync(
         self,
         buffer: io.BytesIO,
@@ -314,7 +314,7 @@ class TestDecodeNullableLegacyBytes:
         assert value == read_nullable_legacy_bytes(buffer)
 
 
-class TestDecodeLegacyString:
+class TestReadLegacyString:
     def test_raises_unexpected_null_for_negative_length_sync(
         self,
         buffer: io.BytesIO,
@@ -337,7 +337,7 @@ class TestDecodeLegacyString:
         assert value == read_legacy_string(buffer)
 
 
-class TestDecodeNullableLegacyString:
+class TestReadNullableLegacyString:
     def test_returns_null_for_negative_length_sync(
         self,
         buffer: io.BytesIO,
@@ -359,7 +359,7 @@ class TestDecodeNullableLegacyString:
         assert value == read_nullable_legacy_string(buffer)
 
 
-class TestDecodeLegacyBytes:
+class TestReadLegacyBytes:
     def test_raises_unexpected_null_for_negative_length_sync(
         self,
         buffer: io.BytesIO,
@@ -382,8 +382,8 @@ class TestDecodeLegacyBytes:
         assert byte_value == read_legacy_bytes(buffer)
 
 
-class TestDecodeUUID:
-    def test_decodes_zero_as_none(self, buffer: io.BytesIO) -> None:
+class TestReadUUID:
+    def test_reads_zero_as_none(self, buffer: io.BytesIO) -> None:
         buffer.write(uuid_zero.bytes)
         buffer.seek(0)
         assert read_uuid(buffer) is None

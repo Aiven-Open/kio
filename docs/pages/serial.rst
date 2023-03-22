@@ -1,16 +1,16 @@
 Serialization and parsing
 =========================
 
-Decoders
---------
+Readers
+-------
 
 .. automodule:: kio.serial.readers
     :members:
     :undoc-members:
     :show-inheritance:
 
-Encoders
---------
+Writers
+-------
 
 .. automodule:: kio.serial.writers
     :members:

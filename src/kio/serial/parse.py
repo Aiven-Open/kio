@@ -62,7 +62,7 @@ def get_reader(
             return readers.read_boolean
 
     raise NotImplementedError(
-        f"Failed identifying decoder for {kafka_type!r} field {flexible=} {optional=}"
+        f"Failed identifying reader for {kafka_type!r} field {flexible=} {optional=}"
     )
 
 
@@ -144,8 +144,8 @@ def entity_reader(entity_type: type[E]) -> readers.Reader[E]:
         for _ in range(num_tagged_fields):
             field_tag = readers.read_unsigned_varint(buffer)
             readers.read_unsigned_varint(buffer)  # field length
-            field, decoder = tagged_fields[field_tag]
-            kwargs[field.name] = decoder(buffer)
+            field, read_field = tagged_fields[field_tag]
+            kwargs[field.name] = read_field(buffer)
 
         return entity_type(**kwargs)
 

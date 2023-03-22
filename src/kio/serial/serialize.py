@@ -67,7 +67,7 @@ def get_writer(
             return writers.write_boolean
 
     raise NotImplementedError(
-        f"Failed identifying encoder for {kafka_type!r} field {flexible=} {optional=}"
+        f"Failed identifying writer for {kafka_type!r} field {flexible=} {optional=}"
     )
 
 

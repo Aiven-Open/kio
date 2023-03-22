@@ -207,7 +207,7 @@ class TestWriteFloat64:
             sys.float_info.max,
         ),
     )
-    def test_can_decode_value(self, buffer: io.BytesIO, value: float) -> None:
+    def test_can_read_value(self, buffer: io.BytesIO, value: float) -> None:
         write_float64(buffer, value)
         buffer.seek(0)
         (unpacked,) = struct.unpack(">d", buffer.read(8))

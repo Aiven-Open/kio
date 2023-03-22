@@ -17,16 +17,15 @@ to Kafka, and receive and parse the response into a full entity.
     from kio.schema.metadata.v12.request import MetadataRequest
     from kio.schema.metadata.v12.response import MetadataResponse
     from kio.schema.primitive import i32
-    from kio.serial import entity_decoder
+    from kio.serial import entity_reader
     from kio.serial import entity_writer
-    from kio.serial import read_async
-    from kio.serial.readers import decode_int32
+    from kio.serial.readers import read_int32
     from kio.serial.writers import write_int32
 
     write_metadata = entity_writer(MetadataRequest)
-    decode_metadata = entity_decoder(MetadataResponse)
+    read_metadata = entity_reader(MetadataResponse)
     write_header = entity_writer(MetadataRequest.__header_schema__)
-    decode_header = entity_decoder(MetadataResponse.__header_schema__)
+    read_header = entity_reader(MetadataResponse.__header_schema__)
 
 
     async def get_metadata(request: MetadataRequest) -> MetadataResponse:
@@ -44,22 +43,28 @@ to Kafka, and receive and parse the response into a full entity.
         # Open connection with broker.
         stream_reader, stream_writer = await asyncio.open_connection("127.0.0.1", 9092)
 
-        with closing(stream_writer), io.BytesIO() as message_buffer:
-            # Write message to a temporary buffer.
-            write_header(message_buffer, request_header)
-            write_metadata(message_buffer, request)
+        with (
+            closing(stream_writer),
+            io.BytesIO() as request_buffer,
+        ):
+            # Write request to a temporary buffer.
+            write_header(request_buffer, request_header)
+            write_metadata(request_buffer, request)
 
             # Write message size, then message itself, to the connection stream.
-            write_int32(stream_writer, i32(message_buffer.tell()))
-            message_buffer.seek(0)
-            stream_writer.write(message_buffer.getvalue())
+            write_int32(stream_writer, i32(request_buffer.tell()))
+            request_buffer.seek(0)
+            stream_writer.write(request_buffer.getvalue())
             await stream_writer.drain()
 
-            # Read message size, header, and payload from connection stream.
-            await read_async(stream_reader, decode_int32)
-            response_header = await read_async(stream_reader, decode_header)
-            assert response_header.correlation_id == correlation_id
-            return await read_async(stream_reader, decode_metadata)
+            # Read response into a temporary buffer.
+            response_length = read_int32(stream_reader)
+            response_buffer = io.BytesIO(await stream_reader.read(response_length))
+
+        # Parse header and payload from response buffer.
+        response_header = read_header(response_buffer)
+        assert response_header.correlation_id == correlation_id
+        return read_metadata(response_buffer)
 
 
 Synchronous writing and reading
@@ -78,16 +83,15 @@ blocking facilities for IO.
     from kio.schema.metadata.v12.request import MetadataRequest
     from kio.schema.metadata.v12.response import MetadataResponse
     from kio.schema.primitive import i32
-    from kio.serial import entity_decoder
+    from kio.serial import entity_reader
     from kio.serial import entity_writer
-    from kio.serial import read_sync
-    from kio.serial.readers import decode_int32
+    from kio.serial.readers import read_int32
     from kio.serial.writers import write_int32
 
     write_metadata = entity_writer(MetadataRequest)
-    decode_metadata = entity_decoder(MetadataResponse)
+    read_metadata = entity_reader(MetadataResponse)
     write_header = entity_writer(MetadataRequest.__header_schema__)
-    decode_header = entity_decoder(MetadataResponse.__header_schema__)
+    read_header = entity_reader(MetadataResponse.__header_schema__)
 
 
     def get_metadata(request: MetadataRequest) -> MetadataResponse:
@@ -119,8 +123,11 @@ blocking facilities for IO.
             stream.write(message_buffer.getvalue())
             stream.flush()
 
-            # Read message size, header, and payload from connection stream.
-            read_sync(stream, decode_int32)
-            response_header = read_sync(stream, decode_header)
-            assert response_header.correlation_id == correlation_id
-            return read_sync(stream, decode_metadata)
+            # Read response into a buffer.
+            response_length = read_int32(stream)
+            response_buffer = io.BytesIO(stream.read(response_length))
+
+        # Parse header and payload from response buffer.
+        response_header = read_header(response_buffer)
+        assert response_header.correlation_id == correlation_id
+        return read_metadata(response_buffer)

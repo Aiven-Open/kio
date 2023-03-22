@@ -29,7 +29,7 @@ from kio.serial.writers import write_nullable_compact_string
 from kio.serial.writers import write_uuid
 
 
-class TestGetDecoder:
+class TestGetReader:
     @pytest.mark.parametrize(
         "kafka_type, flexible, optional, expected",
         (
@@ -67,7 +67,7 @@ class TestGetDecoder:
             ("bool", True, False, readers.read_boolean),
         ),
     )
-    def test_can_match_kafka_type_with_decoder(
+    def test_can_match_kafka_type_with_reader(
         self,
         kafka_type: str,
         flexible: bool,
