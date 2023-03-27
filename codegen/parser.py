@@ -68,6 +68,7 @@ class Primitive(enum.Enum):
     bytes_ = "bytes"
     uuid = "uuid"
     records = "records"
+    error_code = "error_code"
 
     def get_type_hint(self, optional: bool = False) -> str:
         match self:
@@ -97,6 +98,8 @@ class Primitive(enum.Enum):
                 hint = "uuid.UUID"
             case Primitive.records:
                 return "tuple[bytes | None, ...]"
+            case Primitive.error_code:
+                hint = "ErrorCode"
             case no_match:
                 assert_never(no_match)
 
@@ -201,6 +204,16 @@ class PrimitiveField(_BaseField):
             if self.nullableVersions is None
             else self.nullableVersions.matches(version)
         )
+
+    @root_validator(pre=True)
+    @classmethod
+    def special_case_error_code(
+        cls,
+        values: Mapping[str, object],
+    ) -> Mapping[str, object]:
+        if values["name"] == "ErrorCode":
+            return values | {"type": "error_code"}
+        return values
 
 
 class RecordsField(_BaseField):

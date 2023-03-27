@@ -1,5 +1,5 @@
-from kio.schema.primitive import i32
-from kio.schema.primitive import i64
+from kio.static.primitive import i32
+from kio.static.primitive import i64
 
 
 class BrokerId(i32):

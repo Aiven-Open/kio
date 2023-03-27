@@ -8,15 +8,16 @@ from typing import TypeAlias
 from typing import TypeVar
 from uuid import UUID
 
-from kio.constants import uuid_zero
-from kio.schema.primitive import i8
-from kio.schema.primitive import i16
-from kio.schema.primitive import i32
-from kio.schema.primitive import i64
-from kio.schema.primitive import u8
-from kio.schema.primitive import u16
-from kio.schema.primitive import u32
-from kio.schema.primitive import u64
+from kio.static.constants import ErrorCode
+from kio.static.constants import uuid_zero
+from kio.static.primitive import i8
+from kio.static.primitive import i16
+from kio.static.primitive import i32
+from kio.static.primitive import i64
+from kio.static.primitive import u8
+from kio.static.primitive import u16
+from kio.static.primitive import u32
+from kio.static.primitive import u64
 
 from .errors import UnexpectedNull
 
@@ -180,3 +181,7 @@ def legacy_array_reader(item_reader: Reader[T]) -> Reader[tuple[T, ...]]:
         )
 
     return read_compact_array
+
+
+def read_error_code(buffer: IO[bytes]) -> ErrorCode:
+    return ErrorCode(read_int16(buffer))

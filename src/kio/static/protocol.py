@@ -1,6 +1,3 @@
-# Note! This file is auto-generated from a template, make changes in
-# codegen/template/protocol.py.
-
 from typing import TYPE_CHECKING
 from typing import ClassVar
 from typing import Protocol

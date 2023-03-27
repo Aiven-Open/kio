@@ -8,10 +8,10 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
 
-from kio.schema.primitive import i16
-from kio.schema.primitive import i32
 from kio.schema.request_header.v1.header import RequestHeader
 from kio.schema.types import TransactionalId
+from kio.static.primitive import i16
+from kio.static.primitive import i32
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

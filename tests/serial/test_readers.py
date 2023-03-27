@@ -6,7 +6,6 @@ from typing import IO
 
 import pytest
 
-from kio.constants import uuid_zero
 from kio.serial.errors import UnexpectedNull
 from kio.serial.readers import Reader
 from kio.serial.readers import read_compact_string
@@ -29,6 +28,7 @@ from kio.serial.readers import read_uint32
 from kio.serial.readers import read_uint64
 from kio.serial.readers import read_unsigned_varint
 from kio.serial.readers import read_uuid
+from kio.static.constants import uuid_zero
 
 
 class IntReaderContract:

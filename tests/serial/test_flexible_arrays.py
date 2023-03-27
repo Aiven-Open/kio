@@ -3,8 +3,6 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
 
-from kio.schema.primitive import i16
-from kio.schema.primitive import u8
 from kio.serial import entity_reader
 from kio.serial import entity_writer
 from kio.serial.readers import read_compact_array_length
@@ -15,6 +13,8 @@ from kio.serial.writers import write_compact_array_length
 from kio.serial.writers import write_compact_string
 from kio.serial.writers import write_empty_tagged_fields
 from kio.serial.writers import write_uint8
+from kio.static.primitive import i16
+from kio.static.primitive import u8
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

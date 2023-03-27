@@ -45,7 +45,8 @@ Generated from {schema_source}.
 from dataclasses import dataclass, field
 from typing import Annotated, ClassVar
 import uuid
-from kio.schema.primitive import i8, i16, i32, i64, u8, u16, u32, u64, f64
+from kio.static.primitive import i8, i16, i32, i64, u8, u16, u32, u64, f64
+from kio.static.constants import ErrorCode
 '''
 
 
@@ -98,6 +99,8 @@ def format_default(
             return f"{custom_type_open}{value}{custom_type_close}"
         case Primitive.float64, default:
             return f"{custom_type_open}{default}{custom_type_close}"
+        case Primitive.error_code, default:
+            return f"ErrorCode({default})"
 
     raise NotImplementedError(
         f"Failed parsing default for {type_.value=} field: {default=!r}"
@@ -453,7 +456,7 @@ def create_package(path: pathlib.Path) -> None:
 seen_custom_types = set[str]()
 custom_type_imports = """\
 from typing import NewType
-from kio.schema.primitive import i8, i16, i32, i64, u8, u16, u32, u64, f64
+from kio.static.primitive import i8, i16, i32, i64, u8, u16, u32, u64, f64
 from phantom import Phantom
 """
 
@@ -504,19 +507,12 @@ def write_to_version_module(
     print(" done.")
 
 
-def create_static_modules(destination: pathlib.Path) -> None:
-    template_dir = pathlib.Path(__file__).parent.resolve() / "template"
-    for source in template_dir.glob("*.py"):
-        shutil.copy(source, destination / source.name)
-
-
 def main() -> None:
     schema_output_path = pathlib.Path("src/kio/schema/")
     types_module_path = schema_output_path / "types.py"
     shutil.rmtree(schema_output_path)
     create_package(schema_output_path)
     schemas = (pathlib.Path("schema") / build_tag).glob("*.json")
-    create_static_modules(schema_output_path)
     custom_types = set[CustomTypeDef]()
 
     for path in schemas:

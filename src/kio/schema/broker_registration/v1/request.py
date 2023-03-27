@@ -9,10 +9,10 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
 
-from kio.schema.primitive import i16
-from kio.schema.primitive import u16
 from kio.schema.request_header.v2.header import RequestHeader
 from kio.schema.types import BrokerId
+from kio.static.primitive import i16
+from kio.static.primitive import u16
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

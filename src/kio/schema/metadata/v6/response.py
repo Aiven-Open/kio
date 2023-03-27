@@ -8,11 +8,12 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
 
-from kio.schema.primitive import i16
-from kio.schema.primitive import i32
 from kio.schema.response_header.v0.header import ResponseHeader
 from kio.schema.types import BrokerId
 from kio.schema.types import TopicName
+from kio.static.constants import ErrorCode
+from kio.static.primitive import i16
+from kio.static.primitive import i32
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -37,7 +38,7 @@ class MetadataResponsePartition:
     __flexible__: ClassVar[bool] = False
     __api_key__: ClassVar[i16] = i16(3)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
-    error_code: i16 = field(metadata={"kafka_type": "int16"})
+    error_code: ErrorCode = field(metadata={"kafka_type": "error_code"})
     """The partition error, or 0 if there was no error."""
     partition_index: i32 = field(metadata={"kafka_type": "int32"})
     """The partition index."""
@@ -63,7 +64,7 @@ class MetadataResponseTopic:
     __flexible__: ClassVar[bool] = False
     __api_key__: ClassVar[i16] = i16(3)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
-    error_code: i16 = field(metadata={"kafka_type": "int16"})
+    error_code: ErrorCode = field(metadata={"kafka_type": "error_code"})
     """The topic error, or 0 if there was no error."""
     name: TopicName = field(metadata={"kafka_type": "string"})
     """The topic name."""
