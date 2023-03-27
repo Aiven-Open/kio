@@ -44,7 +44,7 @@ class PartitionData:
     """The last stable offset (or LSO) of the partition. This is the last offset such that the state of all transactional records prior to this offset have been decided (ABORTED or COMMITTED)"""
     aborted_transactions: tuple[AbortedTransaction, ...]
     """The aborted transactions."""
-    records: tuple[bytes | None, ...] | None = field(metadata={"kafka_type": "records"})
+    records: tuple[bytes | None, ...] = field(metadata={"kafka_type": "records"})
     """The record data."""
 
 
