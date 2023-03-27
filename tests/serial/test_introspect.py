@@ -5,11 +5,11 @@ from dataclasses import fields
 
 import pytest
 
+from kio.serial._introspect import FieldKind
+from kio.serial._introspect import classify_field
+from kio.serial._introspect import get_schema_field_type
+from kio.serial._introspect import is_optional
 from kio.serial.errors import SchemaError
-from kio.serial.introspect import FieldKind
-from kio.serial.introspect import classify_field
-from kio.serial.introspect import get_schema_field_type
-from kio.serial.introspect import is_optional
 
 
 @dataclass

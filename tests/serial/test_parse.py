@@ -13,9 +13,9 @@ from kio.schema.metadata.v12.response import MetadataResponse
 from kio.schema.metadata.v12.response import (
     MetadataResponseBroker as MetadataResponseBrokerV12,
 )
+from kio.serial import entity_reader
 from kio.serial import readers
-from kio.serial.parse import entity_reader
-from kio.serial.parse import get_reader
+from kio.serial._parse import get_reader
 from kio.serial.writers import write_boolean
 from kio.serial.writers import write_compact_array_length
 from kio.serial.writers import write_compact_string

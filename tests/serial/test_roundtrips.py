@@ -12,7 +12,8 @@ from hypothesis.strategies import text
 from hypothesis.strategies import uuids
 
 from kio.schema.metadata.v12.response import MetadataResponse
-from kio.serial.parse import entity_reader
+from kio.serial import entity_reader
+from kio.serial import entity_writer
 from kio.serial.readers import Reader
 from kio.serial.readers import read_boolean
 from kio.serial.readers import read_compact_array_length
@@ -34,7 +35,6 @@ from kio.serial.readers import read_uint32
 from kio.serial.readers import read_uint64
 from kio.serial.readers import read_unsigned_varint
 from kio.serial.readers import read_uuid
-from kio.serial.serialize import entity_writer
 from kio.serial.writers import Writer
 from kio.serial.writers import write_boolean
 from kio.serial.writers import write_compact_array_length

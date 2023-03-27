@@ -1,6 +1,14 @@
 Serialization and parsing
 =========================
 
+Serial
+------
+
+.. automodule:: kio.serial
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 Readers
 -------
 
@@ -21,22 +29,6 @@ Errors
 ------
 
 .. automodule:: kio.serial.errors
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-Parse
------
-
-.. automodule:: kio.serial.parse
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-Serialize
----------
-
-.. automodule:: kio.serial.serialize
     :members:
     :undoc-members:
     :show-inheritance:
