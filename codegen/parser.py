@@ -96,7 +96,7 @@ class Primitive(enum.Enum):
             case Primitive.uuid:
                 hint = "uuid.UUID"
             case Primitive.records:
-                hint = "tuple[bytes | None, ...]"
+                return "tuple[bytes | None, ...]"
             case no_match:
                 assert_never(no_match)
 
