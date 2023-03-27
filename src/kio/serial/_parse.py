@@ -7,11 +7,11 @@ from typing import assert_never
 from kio.static.protocol import Entity
 
 from . import readers
-from .introspect import FieldKind
-from .introspect import classify_field
-from .introspect import get_field_tag
-from .introspect import get_schema_field_type
-from .introspect import is_optional
+from ._introspect import FieldKind
+from ._introspect import classify_field
+from ._introspect import get_field_tag
+from ._introspect import get_schema_field_type
+from ._introspect import is_optional
 
 
 def get_reader(

@@ -9,7 +9,9 @@ from kio.schema.metadata.v12.response import MetadataResponsePartition
 from kio.schema.metadata.v12.response import MetadataResponseTopic
 from kio.schema.types import BrokerId
 from kio.schema.types import TopicName
+from kio.serial import entity_writer
 from kio.serial import writers
+from kio.serial._serialize import get_writer
 from kio.serial.readers import read_boolean
 from kio.serial.readers import read_compact_array_length
 from kio.serial.readers import read_compact_string
@@ -18,8 +20,6 @@ from kio.serial.readers import read_int16
 from kio.serial.readers import read_int32
 from kio.serial.readers import read_unsigned_varint
 from kio.serial.readers import read_uuid
-from kio.serial.serialize import entity_writer
-from kio.serial.serialize import get_writer
 from kio.static.constants import ErrorCode
 from kio.static.primitive import i32
 

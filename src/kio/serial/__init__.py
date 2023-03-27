@@ -1,5 +1,5 @@
-from .parse import entity_reader
-from .serialize import entity_writer
+from ._parse import entity_reader
+from ._serialize import entity_writer
 
 __all__ = (
     "entity_reader",

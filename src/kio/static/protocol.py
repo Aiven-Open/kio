@@ -12,6 +12,9 @@ else:
         ...
 
 
+__all__ = ("Entity", "Payload")
+
+
 class Entity(DataclassInstance, Protocol):
     """All schema entities adhere to this protocol."""
 
