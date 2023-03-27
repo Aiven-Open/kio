@@ -8,10 +8,11 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
 
-from kio.schema.primitive import i8
-from kio.schema.primitive import i16
-from kio.schema.primitive import i32
 from kio.schema.response_header.v1.header import ResponseHeader
+from kio.static.constants import ErrorCode
+from kio.static.primitive import i8
+from kio.static.primitive import i16
+from kio.static.primitive import i32
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -34,7 +35,7 @@ class DescribeUserScramCredentialsResult:
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     user: str = field(metadata={"kafka_type": "string"})
     """The user name."""
-    error_code: i16 = field(metadata={"kafka_type": "int16"})
+    error_code: ErrorCode = field(metadata={"kafka_type": "error_code"})
     """The user-level error code."""
     error_message: str | None = field(metadata={"kafka_type": "string"})
     """The user-level error message, if any."""
@@ -50,7 +51,7 @@ class DescribeUserScramCredentialsResponse:
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     throttle_time_ms: i32 = field(metadata={"kafka_type": "int32"})
     """The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota."""
-    error_code: i16 = field(metadata={"kafka_type": "int16"})
+    error_code: ErrorCode = field(metadata={"kafka_type": "error_code"})
     """The message-level error code, 0 except for user authorization or infrastructure issues."""
     error_message: str | None = field(metadata={"kafka_type": "string"})
     """The message-level error message, if any."""

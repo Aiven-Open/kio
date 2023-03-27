@@ -6,9 +6,6 @@ from typing import cast
 
 import pytest
 
-from kio.schema.primitive import i16
-from kio.schema.primitive import i32
-from kio.schema.primitive import u8
 from kio.serial import entity_reader
 from kio.serial import entity_writer
 from kio.serial.errors import OutOfBoundValue
@@ -18,6 +15,9 @@ from kio.serial.readers import read_uint8
 from kio.serial.writers import write_legacy_array_length
 from kio.serial.writers import write_legacy_string
 from kio.serial.writers import write_uint8
+from kio.static.primitive import i16
+from kio.static.primitive import i32
+from kio.static.primitive import u8
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

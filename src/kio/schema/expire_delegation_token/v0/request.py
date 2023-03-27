@@ -8,9 +8,9 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
 
-from kio.schema.primitive import i16
-from kio.schema.primitive import i64
 from kio.schema.request_header.v1.header import RequestHeader
+from kio.static.primitive import i16
+from kio.static.primitive import i64
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

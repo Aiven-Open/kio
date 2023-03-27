@@ -16,7 +16,7 @@ to Kafka, and receive and parse the response into a full entity.
 
     from kio.schema.metadata.v12.request import MetadataRequest
     from kio.schema.metadata.v12.response import MetadataResponse
-    from kio.schema.primitive import i32
+    from kio.static.primitive import i32
     from kio.serial import entity_reader
     from kio.serial import entity_writer
     from kio.serial.readers import read_int32
@@ -82,7 +82,7 @@ blocking facilities for IO.
 
     from kio.schema.metadata.v12.request import MetadataRequest
     from kio.schema.metadata.v12.response import MetadataResponse
-    from kio.schema.primitive import i32
+    from kio.static.primitive import i32
     from kio.serial import entity_reader
     from kio.serial import entity_writer
     from kio.serial.readers import read_int32

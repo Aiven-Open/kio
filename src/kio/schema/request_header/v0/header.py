@@ -8,8 +8,8 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
 
-from kio.schema.primitive import i16
-from kio.schema.primitive import i32
+from kio.static.primitive import i16
+from kio.static.primitive import i32
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

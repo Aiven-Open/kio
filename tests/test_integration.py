@@ -13,7 +13,6 @@ import kio.schema.request_header.v1.header
 import kio.schema.request_header.v2.header
 import kio.schema.response_header.v0.header
 import kio.schema.response_header.v1.header
-from kio.constants import uuid_zero
 from kio.schema.api_versions.v2 import request as api_versions_v2_request
 from kio.schema.api_versions.v2 import response as api_versions_v2_response
 from kio.schema.api_versions.v3 import request as api_versions_v3_request
@@ -30,10 +29,6 @@ from kio.schema.metadata.v5 import request as metadata_v5_request
 from kio.schema.metadata.v5 import response as metadata_v5_response
 from kio.schema.metadata.v12 import request as metadata_v12_request
 from kio.schema.metadata.v12 import response as metadata_v12_response
-from kio.schema.primitive import i16
-from kio.schema.primitive import i32
-from kio.schema.protocol import Entity
-from kio.schema.protocol import Payload
 from kio.schema.types import BrokerId
 from kio.schema.types import TopicName
 from kio.serial import entity_reader
@@ -41,6 +36,12 @@ from kio.serial import entity_writer
 from kio.serial.readers import read_int32
 from kio.serial.writers import Writable
 from kio.serial.writers import write_int32
+from kio.static.constants import ErrorCode
+from kio.static.constants import uuid_zero
+from kio.static.primitive import i16
+from kio.static.primitive import i32
+from kio.static.protocol import Entity
+from kio.static.protocol import Payload
 
 
 def write_request_header(
@@ -168,7 +169,7 @@ async def test_roundtrip_api_versions_v3() -> None:
     )
     ApiVersion = api_versions_v3_response.ApiVersion
     assert response == api_versions_v3_response.ApiVersionsResponse(
-        error_code=i16(0),
+        error_code=ErrorCode.none,
         throttle_time_ms=i32(0),
         supported_features=(
             api_versions_v3_response.SupportedFeatureKey(
@@ -246,7 +247,7 @@ async def test_roundtrip_api_versions_v2() -> None:
     )
     ApiVersion = api_versions_v2_response.ApiVersion
     assert response == api_versions_v2_response.ApiVersionsResponse(
-        error_code=i16(0),
+        error_code=ErrorCode.none,
         throttle_time_ms=i32(0),
         api_keys=(
             ApiVersion(api_key=i16(0), min_version=i16(0), max_version=i16(9)),
@@ -384,7 +385,7 @@ async def test_topic_and_metadata_operations() -> None:
             CreatableTopicResult(
                 name=topic_name,
                 topic_id=mock.ANY,
-                error_code=i16(0),
+                error_code=ErrorCode.none,
                 error_message=None,
                 num_partitions=i32(3),
                 replication_factor=i16(1),
@@ -409,7 +410,7 @@ async def test_topic_and_metadata_operations() -> None:
         controller_id=BrokerId(1),
         topics=(
             metadata_v12_response.MetadataResponseTopic(
-                error_code=i16(0),
+                error_code=ErrorCode.none,
                 name=created_topic.name,
                 topic_id=created_topic.topic_id,
                 partitions=mock.ANY,
@@ -430,7 +431,7 @@ async def test_topic_and_metadata_operations() -> None:
         ),
         topics=(
             metadata_v5_response.MetadataResponseTopic(
-                error_code=i16(0),
+                error_code=ErrorCode.none,
                 name=created_topic.name,
                 partitions=mock.ANY,
             ),

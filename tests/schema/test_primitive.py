@@ -4,14 +4,14 @@ from hypothesis import given
 from hypothesis.strategies import from_type
 from hypothesis.strategies import integers
 
-from kio.schema.primitive import i8
-from kio.schema.primitive import i16
-from kio.schema.primitive import i32
-from kio.schema.primitive import i64
-from kio.schema.primitive import u8
-from kio.schema.primitive import u16
-from kio.schema.primitive import u32
-from kio.schema.primitive import u64
+from kio.static.primitive import i8
+from kio.static.primitive import i16
+from kio.static.primitive import i32
+from kio.static.primitive import i64
+from kio.static.primitive import u8
+from kio.static.primitive import u16
+from kio.static.primitive import u32
+from kio.static.primitive import u64
 
 
 class TestU8:

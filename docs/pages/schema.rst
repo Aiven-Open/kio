@@ -16,7 +16,7 @@ response for version 12 of the metadata API, you would import it like so.
 Introspection protocols
 -----------------------
 
-.. automodule:: kio.schema.protocol
+.. automodule:: kio.static.protocol
     :members:
     :show-inheritance:
     :special-members: __version__, __flexible__, __api_key__, __header_schema__
@@ -24,7 +24,7 @@ Introspection protocols
 Primitives
 ----------
 
-.. automodule:: kio.schema.primitive
+.. automodule:: kio.static.primitive
     :members:
     :show-inheritance:
 
@@ -32,5 +32,12 @@ Types
 -----
 
 .. automodule:: kio.schema.types
+    :members:
+    :show-inheritance:
+
+Constants
+---------
+
+.. automodule:: kio.static.constants
     :members:
     :show-inheritance:

@@ -103,7 +103,7 @@ source_modules = "codegen"
 forbidden_modules = "tests"
 
 [[tool.importlinter.contracts]]
-name = "kio.schema.primitive is independent"
+name = "kio.static.primitive is independent"
 type = "forbidden"
-source_modules = "kio.schema.primitive"
+source_modules = "kio.static.primitive"
 forbidden_modules = ["kio.*", "kio.schema.*"]
