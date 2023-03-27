@@ -1,5 +1,3 @@
-# Note! This file is auto-generated from a template, make changes in
-# codegen/template/primitive.py.
 from __future__ import annotations
 
 import math

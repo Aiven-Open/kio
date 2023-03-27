@@ -4,7 +4,7 @@ from typing import IO
 from typing import TypeVar
 from typing import assert_never
 
-from kio.schema.protocol import Entity
+from kio.static.protocol import Entity
 
 from . import readers
 from .introspect import FieldKind
@@ -60,6 +60,8 @@ def get_reader(
             return readers.read_uuid
         case ("bool", _, False):
             return readers.read_boolean
+        case ("error_code", _, False):
+            return readers.read_error_code
 
     raise NotImplementedError(
         f"Failed identifying reader for {kafka_type!r} field {flexible=} {optional=}"

@@ -10,15 +10,16 @@ from typing import TypeAlias
 from typing import TypeVar
 from uuid import UUID
 
-from kio.constants import uuid_zero
-from kio.schema.primitive import i8
-from kio.schema.primitive import i16
-from kio.schema.primitive import i32
-from kio.schema.primitive import i64
-from kio.schema.primitive import u8
-from kio.schema.primitive import u16
-from kio.schema.primitive import u32
-from kio.schema.primitive import u64
+from kio.static.constants import ErrorCode
+from kio.static.constants import uuid_zero
+from kio.static.primitive import i8
+from kio.static.primitive import i16
+from kio.static.primitive import i32
+from kio.static.primitive import i64
+from kio.static.primitive import u8
+from kio.static.primitive import u16
+from kio.static.primitive import u32
+from kio.static.primitive import u64
 
 from .errors import OutOfBoundValue
 
@@ -209,3 +210,7 @@ def write_tagged_field(
     write_unsigned_varint(buffer, tag)  # tag
     write_unsigned_varint(buffer, len(encoded))  # length
     buffer.write(encoded)  # data
+
+
+def write_error_code(buffer: Writable, error_code: ErrorCode) -> None:
+    write_int16(buffer, error_code.value)

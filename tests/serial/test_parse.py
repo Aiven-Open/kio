@@ -13,8 +13,6 @@ from kio.schema.metadata.v12.response import MetadataResponse
 from kio.schema.metadata.v12.response import (
     MetadataResponseBroker as MetadataResponseBrokerV12,
 )
-from kio.schema.primitive import i16
-from kio.schema.primitive import i32
 from kio.serial import readers
 from kio.serial.parse import entity_reader
 from kio.serial.parse import get_reader
@@ -27,6 +25,8 @@ from kio.serial.writers import write_int32
 from kio.serial.writers import write_legacy_string
 from kio.serial.writers import write_nullable_compact_string
 from kio.serial.writers import write_uuid
+from kio.static.primitive import i16
+from kio.static.primitive import i32
 
 
 class TestGetReader:

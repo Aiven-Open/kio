@@ -7,8 +7,6 @@ from kio.schema.metadata.v12.response import MetadataResponse
 from kio.schema.metadata.v12.response import MetadataResponseBroker
 from kio.schema.metadata.v12.response import MetadataResponsePartition
 from kio.schema.metadata.v12.response import MetadataResponseTopic
-from kio.schema.primitive import i16
-from kio.schema.primitive import i32
 from kio.schema.types import BrokerId
 from kio.schema.types import TopicName
 from kio.serial import writers
@@ -22,6 +20,8 @@ from kio.serial.readers import read_unsigned_varint
 from kio.serial.readers import read_uuid
 from kio.serial.serialize import entity_writer
 from kio.serial.serialize import get_writer
+from kio.static.constants import ErrorCode
+from kio.static.primitive import i32
 
 
 class TestGetWriter:
@@ -134,13 +134,13 @@ async def test_serialize_complex_entity(buffer: io.BytesIO) -> None:
         controller_id=BrokerId(3),
         topics=(
             MetadataResponseTopic(
-                error_code=i16(123),
+                error_code=ErrorCode.kafka_storage_error,
                 name=TopicName("topic 1"),
                 topic_id=topic_id,
                 is_internal=False,
                 partitions=(
                     MetadataResponsePartition(
-                        error_code=i16(8765),
+                        error_code=ErrorCode.delegation_token_expired,
                         partition_index=i32(5679),
                         leader_id=BrokerId(2345),
                         leader_epoch=i32(6445678),
@@ -183,7 +183,7 @@ async def test_serialize_complex_entity(buffer: io.BytesIO) -> None:
     assert read_compact_array_length(buffer) == 1
     for _ in range(1):
         # error code
-        assert read_int16(buffer) == 123
+        assert read_int16(buffer) == ErrorCode.kafka_storage_error.value
         # name
         assert read_compact_string_nullable(buffer) == "topic 1"
         # topic id
@@ -194,7 +194,7 @@ async def test_serialize_complex_entity(buffer: io.BytesIO) -> None:
         assert read_compact_array_length(buffer) == 1
         for __ in range(1):
             # error code
-            assert read_int16(buffer) == 8765
+            assert read_int16(buffer) == ErrorCode.delegation_token_expired.value
             # partition index
             assert read_int32(buffer) == 5679
             # leader id

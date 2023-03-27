@@ -3,7 +3,7 @@ from dataclasses import fields
 from typing import TypeVar
 from typing import assert_never
 
-from kio.schema.protocol import Entity
+from kio.static.protocol import Entity
 
 from . import writers
 from .introspect import FieldKind
@@ -65,6 +65,8 @@ def get_writer(
             return writers.write_uuid
         case ("bool", _, False):
             return writers.write_boolean
+        case ("error_code", _, False):
+            return writers.write_error_code
 
     raise NotImplementedError(
         f"Failed identifying writer for {kafka_type!r} field {flexible=} {optional=}"

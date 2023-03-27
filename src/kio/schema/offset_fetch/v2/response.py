@@ -8,11 +8,12 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
 
-from kio.schema.primitive import i16
-from kio.schema.primitive import i32
-from kio.schema.primitive import i64
 from kio.schema.response_header.v0.header import ResponseHeader
 from kio.schema.types import TopicName
+from kio.static.constants import ErrorCode
+from kio.static.primitive import i16
+from kio.static.primitive import i32
+from kio.static.primitive import i64
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -27,7 +28,7 @@ class OffsetFetchResponsePartition:
     """The committed message offset."""
     metadata: str | None = field(metadata={"kafka_type": "string"})
     """The partition metadata."""
-    error_code: i16 = field(metadata={"kafka_type": "int16"})
+    error_code: ErrorCode = field(metadata={"kafka_type": "error_code"})
     """The error code, or 0 if there was no error."""
 
 
@@ -51,5 +52,7 @@ class OffsetFetchResponse:
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     topics: tuple[OffsetFetchResponseTopic, ...]
     """The responses per topic."""
-    error_code: i16 = field(metadata={"kafka_type": "int16"}, default=i16(0))
+    error_code: ErrorCode = field(
+        metadata={"kafka_type": "error_code"}, default=ErrorCode(0)
+    )
     """The top-level error code, or 0 if there was no error."""

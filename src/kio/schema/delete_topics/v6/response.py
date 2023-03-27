@@ -9,10 +9,11 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
 
-from kio.schema.primitive import i16
-from kio.schema.primitive import i32
 from kio.schema.response_header.v1.header import ResponseHeader
 from kio.schema.types import TopicName
+from kio.static.constants import ErrorCode
+from kio.static.primitive import i16
+from kio.static.primitive import i32
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -25,7 +26,7 @@ class DeletableTopicResult:
     """The topic name"""
     topic_id: uuid.UUID = field(metadata={"kafka_type": "uuid"})
     """the unique topic ID"""
-    error_code: i16 = field(metadata={"kafka_type": "int16"})
+    error_code: ErrorCode = field(metadata={"kafka_type": "error_code"})
     """The deletion error, or 0 if the deletion succeeded."""
     error_message: str | None = field(metadata={"kafka_type": "string"}, default=None)
     """The error message, or null if there was no error."""
