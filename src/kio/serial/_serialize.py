@@ -61,7 +61,7 @@ def get_writer(
             return writers.write_nullable_legacy_string
         case ("records", _, True):
             return writers.write_nullable_legacy_string
-        case ("uuid", _, False):
+        case ("uuid", _, _):
             return writers.write_uuid
         case ("bool", _, False):
             return writers.write_boolean

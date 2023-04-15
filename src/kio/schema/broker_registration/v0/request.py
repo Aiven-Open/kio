@@ -55,7 +55,7 @@ class BrokerRegistrationRequest:
     """The broker ID."""
     cluster_id: str = field(metadata={"kafka_type": "string"})
     """The cluster id of the broker process."""
-    incarnation_id: uuid.UUID = field(metadata={"kafka_type": "uuid"})
+    incarnation_id: uuid.UUID | None = field(metadata={"kafka_type": "uuid"})
     """The incarnation id of the broker process."""
     listeners: tuple[Listener, ...]
     """The listeners of this broker"""

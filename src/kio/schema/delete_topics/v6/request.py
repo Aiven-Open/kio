@@ -23,7 +23,7 @@ class DeleteTopicState:
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     name: TopicName | None = field(metadata={"kafka_type": "string"}, default=None)
     """The topic name"""
-    topic_id: uuid.UUID = field(metadata={"kafka_type": "uuid"})
+    topic_id: uuid.UUID | None = field(metadata={"kafka_type": "uuid"})
     """The unique topic ID"""
 
 
