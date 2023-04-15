@@ -17,14 +17,14 @@ from kio.schema.api_versions.v2 import request as api_versions_v2_request
 from kio.schema.api_versions.v2 import response as api_versions_v2_response
 from kio.schema.api_versions.v3 import request as api_versions_v3_request
 from kio.schema.api_versions.v3 import response as api_versions_v3_response
+from kio.schema.create_topics.v7 import CreateTopicsRequest
+from kio.schema.create_topics.v7 import CreateTopicsResponse
 from kio.schema.create_topics.v7.request import CreatableTopic
-from kio.schema.create_topics.v7.request import CreateTopicsRequest
 from kio.schema.create_topics.v7.response import CreatableTopicResult
-from kio.schema.create_topics.v7.response import CreateTopicsResponse
-from kio.schema.delete_topics.v6.request import DeleteTopicsRequest
+from kio.schema.delete_topics.v6 import DeleteTopicsRequest
+from kio.schema.delete_topics.v6 import DeleteTopicsResponse
 from kio.schema.delete_topics.v6.request import DeleteTopicState
 from kio.schema.delete_topics.v6.response import DeletableTopicResult
-from kio.schema.delete_topics.v6.response import DeleteTopicsResponse
 from kio.schema.metadata.v5 import request as metadata_v5_request
 from kio.schema.metadata.v5 import response as metadata_v5_response
 from kio.schema.metadata.v12 import request as metadata_v12_request

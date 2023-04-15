@@ -14,8 +14,8 @@ to Kafka, and receive and parse the response into a full entity.
     import random
     from contextlib import closing
 
-    from kio.schema.metadata.v12.request import MetadataRequest
-    from kio.schema.metadata.v12.response import MetadataResponse
+    from kio.schema.metadata.v12 import MetadataRequest
+    from kio.schema.metadata.v12 import MetadataResponse
     from kio.static.primitive import i32
     from kio.serial import entity_reader
     from kio.serial import entity_writer
@@ -80,8 +80,8 @@ blocking facilities for IO.
     import socket
     from contextlib import closing
 
-    from kio.schema.metadata.v12.request import MetadataRequest
-    from kio.schema.metadata.v12.response import MetadataResponse
+    from kio.schema.metadata.v12 import MetadataRequest
+    from kio.schema.metadata.v12 import MetadataResponse
     from kio.static.primitive import i32
     from kio.serial import entity_reader
     from kio.serial import entity_writer

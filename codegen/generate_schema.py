@@ -1,4 +1,5 @@
 # ruff: noqa: T201
+# ruff: noqa: A003
 
 from __future__ import annotations
 
@@ -10,6 +11,7 @@ from collections.abc import Iterable
 from collections.abc import Iterator
 from collections.abc import Sequence
 from dataclasses import dataclass
+from operator import attrgetter
 from typing import Final
 from typing import Literal
 from typing import TypeAlias
@@ -329,13 +331,22 @@ def message_class_vars(
         raise NotImplementedError("Unknown message schema type")
 
 
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ExportName:
+    name: str
+    type: Literal["request", "response", "header", "data"]
+
+    def get_import(self) -> str:
+        return f"from .{self.type} import {self.name}"
+
+
 # TODO: Address complexity.
 def generate_dataclass(  # noqa: C901
     schema: MessageSchema | HeaderSchema | DataSchema,
     name: str,
     fields: Sequence[Field],
     version: int,
-) -> Iterator[str | CustomTypeDef]:
+) -> Iterator[str | CustomTypeDef | ExportName]:
     if (name, version) in seen:
         return
     seen.add((name, version))
@@ -422,12 +433,16 @@ def generate_dataclass(  # noqa: C901
     yield from message_class_vars(schema)
     yield from class_fields
 
+    if name.endswith(capitalize_first(schema.type)):
+        yield ExportName(name=name, type=schema.type)
+
 
 def generate_models(
     schema: MessageSchema | HeaderSchema | DataSchema,
-) -> Iterator[tuple[int, str | CustomTypeDef]]:
+) -> Iterator[tuple[int, str | CustomTypeDef | ExportName]]:
     for version in schema.validVersions.iterator():
         accumulated_code = ""
+        export = None
         for item in generate_dataclass(
             schema=schema,
             name=schema.name,
@@ -435,13 +450,17 @@ def generate_models(
             version=version,
         ):
             match item:
-                case CustomTypeDef() as custom_type:
-                    yield version, custom_type
+                case CustomTypeDef() as instruction:
+                    yield version, instruction
+                case ExportName() as instruction:
+                    export = instruction
                 case str(code):
                     accumulated_code += code
                 case no_match:
                     assert_never(no_match)
         yield version, accumulated_code
+        if export is not None:
+            yield version, export
 
 
 def basic_name(schema_name: str) -> str:
@@ -507,6 +526,32 @@ def write_to_version_module(
     print(" done.")
 
 
+module_exports = defaultdict[pathlib.Path, set[ExportName]](set)
+
+
+def write_version_export(
+    api_name: str,
+    api_package_path: pathlib.Path,
+    name: ExportName,
+    version: int,
+) -> None:
+    print(f"-> [{name.type}] {api_name} Exporting {name.name} v{version} ...", end="")
+    module_path = api_package_path / f"v{version}" / "__init__.py"
+    module_exports[module_path].add(name)
+    with module_path.open("a") as fd:
+        print(name.get_import(), file=fd, flush=True)
+    print(" done.")
+
+
+def finalize_exports() -> None:
+    for path, names in module_exports.items():
+        with path.open("a") as fd:
+            print("__all__ = (", file=fd)
+            for name in sorted(names, key=attrgetter("name")):
+                print(f'    "{name.name}",', file=fd)
+            print(")", file=fd, flush=True)
+
+
 def main() -> None:
     schema_output_path = pathlib.Path("src/kio/schema/")
     types_module_path = schema_output_path / "types.py"
@@ -533,6 +578,13 @@ def main() -> None:
                     key = (version, schema.type)
                     module_entity_dependencies[key].append(custom_type)
                     custom_types.add(custom_type)
+                case (version, ExportName() as name):
+                    write_version_export(  # type: ignore[unreachable]
+                        api_name=api_name,
+                        api_package_path=api_package,
+                        name=name,
+                        version=version,
+                    )
                 case (version, code):
                     write_to_version_module(  # type: ignore[unreachable]
                         schema=schema,
@@ -550,3 +602,6 @@ def main() -> None:
     for custom_type in sorted(custom_types):
         print(f"-> [custom type] {custom_type.name}")
         write_custom_type(types_module_path, custom_type)
+
+    # Generate __all__ for accumulated module exports.
+    finalize_exports()
