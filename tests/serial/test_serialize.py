@@ -3,7 +3,7 @@ import uuid
 
 import pytest
 
-from kio.schema.metadata.v12.response import MetadataResponse
+from kio.schema.metadata.v12 import MetadataResponse
 from kio.schema.metadata.v12.response import MetadataResponseBroker
 from kio.schema.metadata.v12.response import MetadataResponsePartition
 from kio.schema.metadata.v12.response import MetadataResponseTopic
