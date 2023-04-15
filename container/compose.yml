@@ -1,4 +1,5 @@
 version: '2'
+name: python-kafka-protocol
 services:
   # Adopted from
   # https://github.com/confluentinc/cp-all-in-one/tree/6.2.0-post/cp-all-in-one-kraft
@@ -8,7 +9,6 @@ services:
     container_name: broker
     ports:
       - "9092:9092"
-    #   - "9101:9101"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
@@ -17,8 +17,6 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      # KAFKA_JMX_PORT: 9101
-      # KAFKA_JMX_HOSTNAME: localhost
       KAFKA_PROCESS_ROLES: 'broker,controller'
       KAFKA_NODE_ID: 1
       KAFKA_CONTROLLER_QUORUM_VOTERS: '1@broker:29093'
