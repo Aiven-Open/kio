@@ -99,7 +99,7 @@ class FetchableTopicResponse:
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(1)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
-    topic_id: uuid.UUID = field(metadata={"kafka_type": "uuid"})
+    topic_id: uuid.UUID | None = field(metadata={"kafka_type": "uuid"})
     """The unique topic ID"""
     partitions: tuple[PartitionData, ...]
     """The topic partitions."""

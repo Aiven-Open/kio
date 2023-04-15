@@ -58,7 +58,7 @@ class LeaderAndIsrTopicState:
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     topic_name: TopicName = field(metadata={"kafka_type": "string"})
     """The topic name."""
-    topic_id: uuid.UUID = field(metadata={"kafka_type": "uuid"})
+    topic_id: uuid.UUID | None = field(metadata={"kafka_type": "uuid"})
     """The unique topic ID."""
     partition_states: tuple[LeaderAndIsrPartitionState, ...]
     """The state of each partition"""

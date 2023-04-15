@@ -51,7 +51,7 @@ class UpdateMetadataTopicState:
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     topic_name: TopicName = field(metadata={"kafka_type": "string"})
     """The topic name."""
-    topic_id: uuid.UUID = field(metadata={"kafka_type": "uuid"})
+    topic_id: uuid.UUID | None = field(metadata={"kafka_type": "uuid"})
     """The topic id."""
     partition_states: tuple[UpdateMetadataPartitionState, ...]
     """The partition that we would like to update."""

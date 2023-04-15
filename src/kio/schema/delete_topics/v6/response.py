@@ -24,7 +24,7 @@ class DeletableTopicResult:
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     name: TopicName | None = field(metadata={"kafka_type": "string"})
     """The topic name"""
-    topic_id: uuid.UUID = field(metadata={"kafka_type": "uuid"})
+    topic_id: uuid.UUID | None = field(metadata={"kafka_type": "uuid"})
     """the unique topic ID"""
     error_code: ErrorCode = field(metadata={"kafka_type": "error_code"})
     """The deletion error, or 0 if the deletion succeeded."""

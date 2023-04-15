@@ -20,7 +20,7 @@ class MetadataRequestTopic:
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(3)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
-    topic_id: uuid.UUID = field(metadata={"kafka_type": "uuid"})
+    topic_id: uuid.UUID | None = field(metadata={"kafka_type": "uuid"})
     """The topic id."""
     name: TopicName | None = field(metadata={"kafka_type": "string"})
     """The topic name."""

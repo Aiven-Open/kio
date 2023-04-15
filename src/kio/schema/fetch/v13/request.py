@@ -43,7 +43,7 @@ class FetchTopic:
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(1)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
-    topic_id: uuid.UUID = field(metadata={"kafka_type": "uuid"})
+    topic_id: uuid.UUID | None = field(metadata={"kafka_type": "uuid"})
     """The unique topic ID"""
     partitions: tuple[FetchPartition, ...]
     """The partitions to fetch."""
@@ -55,7 +55,7 @@ class ForgottenTopic:
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(1)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
-    topic_id: uuid.UUID = field(metadata={"kafka_type": "uuid"})
+    topic_id: uuid.UUID | None = field(metadata={"kafka_type": "uuid"})
     """The unique topic ID"""
     partitions: tuple[i32, ...] = field(metadata={"kafka_type": "int32"}, default=())
     """The partitions indexes to forget."""

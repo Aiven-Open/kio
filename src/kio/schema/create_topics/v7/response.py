@@ -43,7 +43,7 @@ class CreatableTopicResult:
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     name: TopicName = field(metadata={"kafka_type": "string"})
     """The topic name."""
-    topic_id: uuid.UUID = field(metadata={"kafka_type": "uuid"})
+    topic_id: uuid.UUID | None = field(metadata={"kafka_type": "uuid"})
     """The unique topic ID"""
     error_code: ErrorCode = field(metadata={"kafka_type": "error_code"})
     """The error code, or 0 if there was no error."""

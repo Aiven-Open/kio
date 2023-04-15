@@ -71,7 +71,7 @@ class MetadataResponseTopic:
     """The topic error, or 0 if there was no error."""
     name: TopicName | None = field(metadata={"kafka_type": "string"})
     """The topic name."""
-    topic_id: uuid.UUID = field(metadata={"kafka_type": "uuid"})
+    topic_id: uuid.UUID | None = field(metadata={"kafka_type": "uuid"})
     """The topic id."""
     is_internal: bool = field(metadata={"kafka_type": "bool"}, default=False)
     """True if the topic is internal."""
