@@ -19,6 +19,7 @@ classifiers = [
 dynamic = ["version", "readme"]
 dependencies = [
   "typing-extensions>=4.6.0",
+  "crc32c>=2.3",
 ]
 
 [project.optional-dependencies]

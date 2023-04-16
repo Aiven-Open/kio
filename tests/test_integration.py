@@ -33,8 +33,15 @@ from kio.schema.metadata.v5 import request as metadata_v5_request
 from kio.schema.metadata.v5 import response as metadata_v5_response
 from kio.schema.metadata.v12 import request as metadata_v12_request
 from kio.schema.metadata.v12 import response as metadata_v12_response
+from kio.schema.produce.v9.request import PartitionProduceData
+from kio.schema.produce.v9.request import ProduceRequest
+from kio.schema.produce.v9.request import TopicProduceData
+from kio.schema.produce.v9.response import PartitionProduceResponse
+from kio.schema.produce.v9.response import ProduceResponse
+from kio.schema.produce.v9.response import TopicProduceResponse
 from kio.schema.types import BrokerId
 from kio.schema.types import TopicName
+from kio.schema.types import TransactionalId
 from kio.serial import entity_reader
 from kio.serial import entity_writer
 from kio.serial.readers import read_int32
@@ -47,6 +54,8 @@ from kio.static.primitive import i32
 from kio.static.primitive import i32Timedelta
 from kio.static.protocol import Entity
 from kio.static.protocol import Payload
+from tests.message import Record
+from tests.message import RecordBatch
 
 pytestmark = pytest.mark.integration
 
@@ -342,13 +351,13 @@ async def create_topic(topic_name: TopicName) -> CreateTopicsResponse:
     )
 
 
-async def metadata_v12() -> metadata_v12_response.MetadataResponse:
+async def metadata_v12(topic: TopicName) -> metadata_v12_response.MetadataResponse:
     return await make_request(
         request=metadata_v12_request.MetadataRequest(
             topics=(
                 metadata_v12_request.MetadataRequestTopic(
                     topic_id=uuid_zero,
-                    name=TopicName("le-topic"),
+                    name=topic,
                 ),
             ),
             allow_auto_topic_creation=True,
@@ -450,3 +459,106 @@ async def test_topic_and_metadata_operations() -> None:
         controller_id=BrokerId(1),
         cluster_id=mock.ANY,
     )
+
+
+async def test_produce_consume() -> None:
+    topic_name = TopicName("le-topic-2")
+
+    # Test delete topic which might or might not exist.
+    delete_topics_response = await delete_topic(topic_name)
+    assert delete_topics_response == DeleteTopicsResponse(
+        throttle_time_ms=i32(0),
+        responses=(
+            DeletableTopicResult(
+                name=topic_name,
+                topic_id=mock.ANY,
+                error_code=mock.ANY,
+                error_message=mock.ANY,
+            ),
+        ),
+    )
+
+    # The previous deletion call should guarantee this call succeeds.
+    create_topics_response = await create_topic(topic_name)
+    assert create_topics_response == CreateTopicsResponse(
+        throttle_time_ms=i32(0),
+        topics=(
+            CreatableTopicResult(
+                name=topic_name,
+                topic_id=mock.ANY,
+                error_code=ErrorCode.none,
+                error_message=None,
+                num_partitions=i32(3),
+                replication_factor=i16(1),
+                configs=mock.ANY,
+            ),
+        ),
+    )
+    (created_topic,) = create_topics_response.topics
+
+    metadata = await metadata_v12(topic_name)
+    (topic,) = metadata.topics
+    partition, _, _ = topic.partitions
+
+    batch = RecordBatch(
+        base_offset=14,
+        batch_length=1,
+        partition_leader_epoch=partition.leader_epoch,
+        attributes=0,
+        last_offset_delta=0,
+        base_timestamp=0,
+        max_timestamp=0,
+        producer_id=0,
+        producer_epoch=0,
+        base_sequence=0,
+        records=(
+            Record(
+                attributes=0,
+                timestamp_delta=0,
+                offset_delta=1,
+                key=b"foo",
+                value=b"bar",
+                headers=(),
+            ),
+        ),
+    )
+    batch_buffer = io.BytesIO()
+    batch.write(batch_buffer)
+
+    produce_request = ProduceRequest(
+        transactional_id=TransactionalId("foo"),
+        acks=i16(0),
+        timeout_ms=i32(1000),
+        topic_data=(
+            TopicProduceData(
+                name=topic_name,
+                partition_data=(
+                    PartitionProduceData(
+                        index=partition.partition_index,
+                        records=batch_buffer.getvalue(),
+                    ),
+                ),
+            ),
+        ),
+    )
+    breakpoint()
+    produce_response = await make_request(produce_request, ProduceResponse)
+
+    print(produce_response)
+
+    match produce_response:
+        case ProduceResponse(
+            responses=(
+                TopicProduceResponse(
+                    name=matching_topic_name,
+                    partition_responses=(
+                        PartitionProduceResponse(
+                            error_code=ErrorCode.none,
+                        ),
+                    ),
+                ),
+            )
+        ) if matching_topic_name == topic_name:
+            ...
+        case no_match:
+            raise AssertionError()

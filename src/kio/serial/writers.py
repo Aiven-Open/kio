@@ -13,7 +13,7 @@ from uuid import UUID
 
 from kio.static.constants import ErrorCode
 from kio.static.constants import uuid_zero
-from kio.static.primitive import i8
+from kio.static.primitive import i8, uvarint
 from kio.static.primitive import i16
 from kio.static.primitive import i32
 from kio.static.primitive import i32Timedelta
@@ -67,22 +67,10 @@ def write_uint64(buffer: Writable, value: u64) -> None:
     buffer.write(struct.pack(">Q", value))
 
 
-unsigned_varint_upper_limit: Final = 2**31 - 1
-
-
 # See description and upstream implementation.
 # https://developers.google.com/protocol-buffers/docs/encoding?csw=1#varints
 # https://github.com/apache/kafka/blob/ef96ac07f565a73e35c5b0f4c56c8e87cfbaaf59/clients/src/main/java/org/apache/kafka/common/utils/ByteUtils.java#L262
-def write_unsigned_varint(buffer: Writable, value: int) -> None:
-    """
-    Serialize an integer value between 0 and 2^31 - 1 to bytearray using 1-5
-    bytes depending on value size.
-    """
-    if value < 0:
-        raise ValueError("Value must be positive")
-    if value > unsigned_varint_upper_limit:
-        raise ValueError(f"Value cannot exceed {unsigned_varint_upper_limit}")
-
+def _write_varint(buffer: Writable, value: int) -> None:
     # Read value by 7-bit chunks, shift.
     seven_bit_chunk = value & 0b01111111
     value >>= 7
@@ -97,6 +85,31 @@ def write_unsigned_varint(buffer: Writable, value: int) -> None:
     # Add (implicitly) 0 as the most significant bit - the indicator of the last
     # 7-bit chunk.
     buffer.write(seven_bit_chunk.to_bytes(1, "little"))
+
+
+unsigned_varint_upper_limit: Final = 2**31 - 1
+
+
+def write_unsigned_varint(buffer: Writable, value: uvarint) -> None:
+    _write_varint(buffer, value)
+
+
+def write_unsigned_varlong(buffer: Writable, value: int) -> None:
+    _write_varint(buffer, value)
+
+
+def write_signed_varint(buffer: Writable, value: int) -> None:
+    _write_varint(
+        buffer=buffer,
+        value=(value << 1) ^ (value >> 31),
+    )
+
+
+def write_signed_varlong(buffer: Writable, value: int) -> None:
+    _write_varint(
+        buffer=buffer,
+        value = (value << 1) ^ (value >> 63),
+    )
 
 
 def write_float64(buffer: Writable, value: float) -> None:

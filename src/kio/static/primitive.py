@@ -71,11 +71,19 @@ class i8(i16, low=-128, high=127):
     ...
 
 
-class u64(Interval, low=0, high=2**64 - 1):
+class uvarlong(Interval, low=0, high=2**70 - 1):
     ...
 
 
-class u32(u64, high=2**32 - 1):
+class u64(uvarlong, high=2**64 - 1):
+    ...
+
+
+class uvarint(u64, high=2**35 - 1):
+    ...
+
+
+class u32(uvarint, high=2**32 - 1):
     ...
 
 
@@ -84,6 +92,14 @@ class u16(u32, high=2**16 - 1):
 
 
 class u8(u16, high=2**8 - 1):
+    ...
+
+
+class svarint(Interval, low=-(2**34), high=2**34 - 1):
+    ...
+
+
+class svarlong(Interval, low=-(2**69), high=2**69 - 1):
     ...
 
 
