@@ -4,6 +4,7 @@ Generated from AlterPartitionReassignmentsRequest.json.
 
 # ruff: noqa: A003
 
+import datetime
 from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
@@ -13,6 +14,7 @@ from kio.schema.types import BrokerId
 from kio.schema.types import TopicName
 from kio.static.primitive import i16
 from kio.static.primitive import i32
+from kio.static.primitive import i32Timedelta
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -45,7 +47,10 @@ class AlterPartitionReassignmentsRequest:
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(45)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
-    timeout_ms: i32 = field(metadata={"kafka_type": "int32"}, default=i32(60000))
+    timeout: i32Timedelta = field(
+        metadata={"kafka_type": "timedelta_i32"},
+        default=i32Timedelta.parse(datetime.timedelta(milliseconds=60000)),
+    )
     """The time in ms to wait for the request to complete."""
     topics: tuple[ReassignableTopic, ...]
     """The topics to reassign."""

@@ -13,6 +13,7 @@ from kio.schema.types import TopicName
 from kio.schema.types import TransactionalId
 from kio.static.primitive import i16
 from kio.static.primitive import i32
+from kio.static.primitive import i32Timedelta
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -51,7 +52,7 @@ class ProduceRequest:
     """The transactional ID, or null if the producer is not transactional."""
     acks: i16 = field(metadata={"kafka_type": "int16"})
     """The number of acknowledgments the producer requires the leader to have received before considering a request complete. Allowed values: 0 for no acknowledgments, 1 for only the leader and -1 for the full ISR."""
-    timeout_ms: i32 = field(metadata={"kafka_type": "int32"})
+    timeout: i32Timedelta = field(metadata={"kafka_type": "timedelta_i32"})
     """The timeout to await a response in milliseconds."""
     topic_data: tuple[TopicProduceData, ...]
     """Each topic to produce to."""

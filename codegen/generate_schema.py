@@ -44,11 +44,13 @@ Generated from {schema_source}.
 
 # ruff: noqa: A003
 
+import datetime
 from dataclasses import dataclass, field
 from typing import Annotated, ClassVar
 import uuid
-from kio.static.primitive import i8, i16, i32, i64, u8, u16, u32, u64, f64
+from kio.static.primitive import i8, i16, i32, i64, u8, u16, u32, u64, f64, i32Timedelta, i64Timedelta
 from kio.static.constants import ErrorCode
+from phantom.datetime import TZAware
 '''
 
 
@@ -103,6 +105,15 @@ def format_default(
             return f"{custom_type_open}{default}{custom_type_close}"
         case Primitive.error_code, default:
             return f"ErrorCode({default})"
+        case Primitive.timedelta_i32, str(default):
+            millis = int(default)
+            return f"i32Timedelta.parse(datetime.timedelta(milliseconds={millis}))"
+        case Primitive.timedelta_i64, str(default):
+            millis = int(default)
+            return f"i64Timedelta.parse(datetime.timedelta(milliseconds={millis}))"
+        case Primitive.datetime_i64, "-1":
+            assert optional
+            return "None"
 
     raise NotImplementedError(
         f"Failed parsing default for {type_.value=} field: {default=!r}"

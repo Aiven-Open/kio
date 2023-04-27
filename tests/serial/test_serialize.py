@@ -1,3 +1,4 @@
+import datetime
 import io
 import uuid
 
@@ -22,6 +23,7 @@ from kio.serial.readers import read_unsigned_varint
 from kio.serial.readers import read_uuid
 from kio.static.constants import ErrorCode
 from kio.static.primitive import i32
+from kio.static.primitive import i32Timedelta
 
 
 class TestGetWriter:
@@ -115,7 +117,7 @@ async def test_serialize_complex_entity(buffer: io.BytesIO) -> None:
 
     topic_id = uuid.uuid4()
     instance = MetadataResponse(
-        throttle_time_ms=i32(123),
+        throttle_time=i32Timedelta.parse(datetime.timedelta(milliseconds=123)),
         brokers=(
             MetadataResponseBroker(
                 node_id=BrokerId(1),

@@ -4,6 +4,7 @@ Generated from SaslAuthenticateResponse.json.
 
 # ruff: noqa: A003
 
+import datetime
 from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
@@ -11,7 +12,7 @@ from typing import ClassVar
 from kio.schema.response_header.v1.header import ResponseHeader
 from kio.static.constants import ErrorCode
 from kio.static.primitive import i16
-from kio.static.primitive import i64
+from kio.static.primitive import i64Timedelta
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -26,5 +27,8 @@ class SaslAuthenticateResponse:
     """The error message, or null if there was no error."""
     auth_bytes: bytes = field(metadata={"kafka_type": "bytes"})
     """The SASL authentication bytes from the server, as defined by the SASL mechanism."""
-    session_lifetime_ms: i64 = field(metadata={"kafka_type": "int64"}, default=i64(0))
+    session_lifetime: i64Timedelta = field(
+        metadata={"kafka_type": "timedelta_i64"},
+        default=i64Timedelta.parse(datetime.timedelta(milliseconds=0)),
+    )
     """The SASL authentication bytes from the server, as defined by the SASL mechanism."""

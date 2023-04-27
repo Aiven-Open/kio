@@ -67,6 +67,14 @@ def get_writer(
             return writers.write_boolean
         case ("error_code", _, False):
             return writers.write_error_code
+        case ("timedelta_i32", _, False):
+            return writers.write_timedelta_i32
+        case ("timedelta_i64", _, False):
+            return writers.write_timedelta_i64
+        case ("datetime_i64", _, False):
+            return writers.write_datetime_i64
+        case ("datetime_i64", _, True):
+            return writers.write_nullable_datetime_i64
 
     raise NotImplementedError(
         f"Failed identifying writer for {kafka_type!r} field {flexible=} {optional=}"

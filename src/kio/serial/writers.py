@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 import io
 import struct
 from collections.abc import Callable
@@ -15,7 +16,9 @@ from kio.static.constants import uuid_zero
 from kio.static.primitive import i8
 from kio.static.primitive import i16
 from kio.static.primitive import i32
+from kio.static.primitive import i32Timedelta
 from kio.static.primitive import i64
+from kio.static.primitive import i64Timedelta
 from kio.static.primitive import u8
 from kio.static.primitive import u16
 from kio.static.primitive import u32
@@ -214,3 +217,25 @@ def write_tagged_field(
 
 def write_error_code(buffer: Writable, error_code: ErrorCode) -> None:
     write_int16(buffer, error_code.value)
+
+
+def write_timedelta_i32(buffer: Writable, value: i32Timedelta) -> None:
+    write_int32(buffer, round(value.total_seconds() * 1000))  # type: ignore[arg-type]
+
+
+def write_timedelta_i64(buffer: Writable, value: i64Timedelta) -> None:
+    write_int64(buffer, round(value.total_seconds() * 1000))  # type: ignore[arg-type]
+
+
+def write_datetime_i64(buffer: Writable, value: datetime.datetime) -> None:
+    write_int64(buffer, round(value.timestamp() * 1000))  # type: ignore[arg-type]
+
+
+def write_nullable_datetime_i64(
+    buffer: Writable,
+    value: datetime.datetime | None,
+) -> None:
+    if value is None:
+        write_int64(buffer, -1)  # type: ignore[arg-type]
+    else:
+        write_int64(buffer, round(value.timestamp() * 1000))  # type: ignore[arg-type]

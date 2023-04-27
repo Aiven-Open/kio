@@ -1,10 +1,12 @@
 import asyncio
+import datetime
 import io
 import secrets
 from asyncio import StreamReader
 from asyncio import StreamWriter
 from contextlib import closing
 from typing import Any
+from typing import Final
 from typing import TypeVar
 from unittest import mock
 
@@ -40,8 +42,11 @@ from kio.static.constants import ErrorCode
 from kio.static.constants import uuid_zero
 from kio.static.primitive import i16
 from kio.static.primitive import i32
+from kio.static.primitive import i32Timedelta
 from kio.static.protocol import Entity
 from kio.static.protocol import Payload
+
+timedelta_zero: Final = i32Timedelta.parse(datetime.timedelta())
 
 
 def write_request_header(
@@ -170,7 +175,7 @@ async def test_roundtrip_api_versions_v3() -> None:
     ApiVersion = api_versions_v3_response.ApiVersion
     assert response == api_versions_v3_response.ApiVersionsResponse(
         error_code=ErrorCode.none,
-        throttle_time_ms=i32(0),
+        throttle_time=timedelta_zero,
         supported_features=(
             api_versions_v3_response.SupportedFeatureKey(
                 name="metadata.version",
@@ -248,7 +253,7 @@ async def test_roundtrip_api_versions_v2() -> None:
     ApiVersion = api_versions_v2_response.ApiVersion
     assert response == api_versions_v2_response.ApiVersionsResponse(
         error_code=ErrorCode.none,
-        throttle_time_ms=i32(0),
+        throttle_time=timedelta_zero,
         api_keys=(
             ApiVersion(api_key=i16(0), min_version=i16(0), max_version=i16(9)),
             ApiVersion(api_key=i16(1), min_version=i16(0), max_version=i16(13)),
@@ -304,16 +309,18 @@ async def test_roundtrip_api_versions_v2() -> None:
 
 
 async def delete_topic(topic_name: TopicName) -> DeleteTopicsResponse:
+    timeout: i32Timedelta = datetime.timedelta(seconds=1)  # type: ignore[assignment]
     return await make_request(
         request=DeleteTopicsRequest(
             topics=(DeleteTopicState(name=topic_name, topic_id=uuid_zero),),
-            timeout_ms=i16(1000),
+            timeout=timeout,
         ),
         response_type=DeleteTopicsResponse,
     )
 
 
 async def create_topic(topic_name: TopicName) -> CreateTopicsResponse:
+    timeout: i32Timedelta = datetime.timedelta(seconds=1)  # type: ignore[assignment]
     return await make_request(
         request=CreateTopicsRequest(
             topics=(
@@ -325,7 +332,7 @@ async def create_topic(topic_name: TopicName) -> CreateTopicsResponse:
                     configs=(),
                 ),
             ),
-            timeout_ms=i16(1000),
+            timeout=timeout,
         ),
         response_type=CreateTopicsResponse,
     )
@@ -366,7 +373,7 @@ async def test_topic_and_metadata_operations() -> None:
     # Test delete topic which might or might not exist.
     delete_topics_response = await delete_topic(topic_name)
     assert delete_topics_response == DeleteTopicsResponse(
-        throttle_time_ms=i32(0),
+        throttle_time=timedelta_zero,
         responses=(
             DeletableTopicResult(
                 name=topic_name,
@@ -380,7 +387,7 @@ async def test_topic_and_metadata_operations() -> None:
     # The previous deletion call should guarantee this call succeeds.
     create_topics_response = await create_topic(topic_name)
     assert create_topics_response == CreateTopicsResponse(
-        throttle_time_ms=i32(0),
+        throttle_time=timedelta_zero,
         topics=(
             CreatableTopicResult(
                 name=topic_name,
@@ -398,7 +405,7 @@ async def test_topic_and_metadata_operations() -> None:
     # The previous creation call should guarantee this call contains the topic.
     response_v12 = await metadata_v12()
     assert response_v12 == metadata_v12_response.MetadataResponse(
-        throttle_time_ms=i32(0),
+        throttle_time=timedelta_zero,
         brokers=(
             metadata_v12_response.MetadataResponseBroker(
                 node_id=BrokerId(1),
@@ -421,7 +428,7 @@ async def test_topic_and_metadata_operations() -> None:
     # Test also with a legacy format API version, i.e. non-flexible.
     response_v5 = await metadata_v5()
     assert response_v5 == metadata_v5_response.MetadataResponse(
-        throttle_time_ms=i32(0),
+        throttle_time=timedelta_zero,
         brokers=(
             metadata_v5_response.MetadataResponseBroker(
                 node_id=BrokerId(1),

@@ -14,6 +14,7 @@ from kio.schema.types import TopicName
 from kio.static.primitive import i8
 from kio.static.primitive import i16
 from kio.static.primitive import i32
+from kio.static.primitive import i32Timedelta
 from kio.static.primitive import i64
 
 
@@ -73,7 +74,7 @@ class FetchRequest:
     """The clusterId if known. This is used to validate metadata fetches prior to broker registration."""
     replica_id: BrokerId = field(metadata={"kafka_type": "int32"})
     """The broker ID of the follower, of -1 if this request is from a consumer."""
-    max_wait_ms: i32 = field(metadata={"kafka_type": "int32"})
+    max_wait: i32Timedelta = field(metadata={"kafka_type": "timedelta_i32"})
     """The maximum time in milliseconds to wait for the response."""
     min_bytes: i32 = field(metadata={"kafka_type": "int32"})
     """The minimum bytes to accumulate in the response."""

@@ -11,6 +11,7 @@ from collections.abc import Callable
 from collections.abc import Iterator
 from collections.abc import Mapping
 from typing import Annotated
+from typing import Final
 from typing import Literal
 from typing import NamedTuple
 from typing import TypeAlias
@@ -69,6 +70,9 @@ class Primitive(enum.Enum):
     uuid = "uuid"
     records = "records"
     error_code = "error_code"
+    timedelta_i32 = "timedelta_i32"
+    timedelta_i64 = "timedelta_i64"
+    datetime_i64 = "datetime_i64"
 
     def get_type_hint(self, optional: bool = False) -> str:
         match self:
@@ -100,6 +104,12 @@ class Primitive(enum.Enum):
                 return "tuple[bytes | None, ...]"
             case Primitive.error_code:
                 hint = "ErrorCode"
+            case Primitive.timedelta_i32:
+                hint = "i32Timedelta"
+            case Primitive.timedelta_i64:
+                hint = "i64Timedelta"
+            case Primitive.datetime_i64:
+                hint = "TZAware"
             case no_match:
                 assert_never(no_match)
 
@@ -187,6 +197,32 @@ class _BaseField(BaseModel):
 # Defining this union before its members allows not having to call
 # EntityField.update_forward_refs().
 Field: TypeAlias = "PrimitiveField | PrimitiveArrayField | EntityArrayField | CommonStructArrayField | EntityField"
+timedelta_names: Final = frozenset(
+    {
+        "timeoutMs",
+        "TimeoutMs",
+        "ThrottleTimeMs",
+        "MaxWaitMs",
+        "SessionLifetimeMs",
+        "TransactionTimeoutMs",
+        "MaxLifetimeMs",
+        "SessionTimeoutMs",
+        "RebalanceTimeoutMs",
+        "ExpiryTimePeriodMs",
+        "RenewPeriodMs",
+        "RetentionTimeMs",
+    }
+)
+datetime_names: Final = frozenset(
+    {
+        "IssueTimestampMs",
+        "ExpiryTimestampMs",
+        "MaxTimestampMs",
+        "TransactionStartTimeMs",
+        "LogAppendTimeMs",
+    }
+)
+excluded_ms_names: Final = frozenset[str]()
 
 
 class PrimitiveField(_BaseField):
@@ -195,14 +231,23 @@ class PrimitiveField(_BaseField):
 
     def is_nullable(self, version: int) -> bool:
         return (
-            # Tagged fields that are ignorable and don't have a default are optional.
-            self.get_tag(version) is not None
-            and self.ignorable
-            and self.default is None
-        ) or (
-            False
-            if self.nullableVersions is None
-            else self.nullableVersions.matches(version)
+            (
+                # Tagged fields that are ignorable and don't have a default are optional.
+                self.get_tag(version) is not None
+                and self.ignorable
+                and self.default is None
+            )
+            or (
+                False
+                if self.nullableVersions is None
+                else self.nullableVersions.matches(version)
+            )
+            or (
+                # Datetime fields might not be optional in the underlying representation,
+                # but if they have a default of -1, we want to represent that as None.
+                self.type is Primitive.datetime_i64
+                and self.default == "-1"
+            )
         )
 
     @root_validator(pre=True)
@@ -213,6 +258,48 @@ class PrimitiveField(_BaseField):
     ) -> Mapping[str, object]:
         if values["name"] == "ErrorCode":
             return values | {"type": "error_code"}
+        return values
+
+    @staticmethod
+    def _drop_ms_suffix(name: str) -> str:
+        return name.removesuffix("Ms")
+
+    @root_validator(pre=True)
+    @classmethod
+    def special_case_time_fields(
+        cls,
+        values: Mapping[str, object],
+    ) -> Mapping[str, object]:
+        name = values["name"]
+        assert isinstance(name, str)
+        if name in timedelta_names:
+            match values["type"]:
+                case Primitive.int32.value:
+                    primitive = Primitive.timedelta_i32
+                case Primitive.int64.value:
+                    primitive = Primitive.timedelta_i64
+                case _:
+                    raise NotImplementedError(
+                        f"Unknown timedelta primitive type: {values['type']!r}"
+                    )
+            return values | {
+                "type": primitive.value,
+                "name": cls._drop_ms_suffix(name),
+            }
+        elif name in datetime_names:
+            if values["type"] != Primitive.int64.value:
+                raise NotImplementedError(
+                    f"Unknown datetime primitive type: {values['type']!r}"
+                )
+            return values | {
+                "type": Primitive.datetime_i64.value,
+                "name": cls._drop_ms_suffix(name),
+            }
+        elif name.endswith("Ms") and name not in excluded_ms_names:
+            raise NotImplementedError(
+                f"The field {name!r} looks like a time field, but is not "
+                f"explicitly included or excluded."
+            )
         return values
 
 

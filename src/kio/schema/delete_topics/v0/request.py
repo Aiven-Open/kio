@@ -11,7 +11,7 @@ from typing import ClassVar
 from kio.schema.request_header.v1.header import RequestHeader
 from kio.schema.types import TopicName
 from kio.static.primitive import i16
-from kio.static.primitive import i32
+from kio.static.primitive import i32Timedelta
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -24,5 +24,5 @@ class DeleteTopicsRequest:
         metadata={"kafka_type": "string"}, default=()
     )
     """The names of the topics to delete"""
-    timeout_ms: i32 = field(metadata={"kafka_type": "int32"})
+    timeout: i32Timedelta = field(metadata={"kafka_type": "timedelta_i32"})
     """The length of time in milliseconds to wait for the deletions to complete."""

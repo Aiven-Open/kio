@@ -4,6 +4,7 @@ Generated from ElectLeadersRequest.json.
 
 # ruff: noqa: A003
 
+import datetime
 from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
@@ -12,6 +13,7 @@ from kio.schema.request_header.v1.header import RequestHeader
 from kio.schema.types import TopicName
 from kio.static.primitive import i16
 from kio.static.primitive import i32
+from kio.static.primitive import i32Timedelta
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -34,5 +36,8 @@ class ElectLeadersRequest:
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     topic_partitions: tuple[TopicPartitions, ...]
     """The topic partitions to elect leaders."""
-    timeout_ms: i32 = field(metadata={"kafka_type": "int32"}, default=i32(60000))
+    timeout: i32Timedelta = field(
+        metadata={"kafka_type": "timedelta_i32"},
+        default=i32Timedelta.parse(datetime.timedelta(milliseconds=60000)),
+    )
     """The time in ms to wait for the election to complete."""

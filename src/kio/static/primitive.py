@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import datetime
 import math
 from typing import TYPE_CHECKING
+from typing import Final
 
 from phantom import Phantom
 from phantom.interval import Inclusive
@@ -48,3 +50,60 @@ class f64(float, Phantom, predicate=math.isfinite):
         from hypothesis.strategies import floats
 
         return floats(allow_nan=False, allow_infinity=False)
+
+
+def has_millisecond_precision(value: datetime.timedelta) -> bool:
+    milliseconds = value.total_seconds() * 1000
+    return int(milliseconds) == milliseconds
+
+
+i32_timedelta_min: Final = datetime.timedelta(milliseconds=-(2**31))
+i32_timedelta_max: Final = datetime.timedelta(milliseconds=2**31 - 1)
+
+
+def is_i32_timedelta(value: datetime.timedelta) -> bool:
+    return (
+        i32_timedelta_min <= value <= i32_timedelta_max
+        and has_millisecond_precision(value)
+    )
+
+
+class i32Timedelta(datetime.timedelta, Phantom, predicate=is_i32_timedelta):
+    @classmethod
+    def __register_strategy__(cls) -> SearchStrategy:
+        from hypothesis.strategies import composite
+
+        @composite
+        def timedeltas(  # type: ignore[no-untyped-def]
+            draw,
+            elements=i32.__register_strategy__(),
+        ) -> datetime.timedelta:
+            return datetime.timedelta(milliseconds=draw(elements))
+
+        return timedeltas()
+
+
+i64_timedelta_min: Final = datetime.timedelta.min
+i64_timedelta_max: Final = datetime.timedelta.max
+
+
+def is_i64_timedelta(value: datetime.timedelta) -> bool:
+    return (
+        i64_timedelta_min <= value <= i64_timedelta_max
+        and has_millisecond_precision(value)
+    )
+
+
+class i64Timedelta(datetime.timedelta, Phantom, predicate=is_i64_timedelta):
+    @classmethod
+    def __register_strategy__(cls) -> SearchStrategy:
+        from hypothesis.strategies import composite
+
+        @composite
+        def timedeltas(  # type: ignore[no-untyped-def]
+            draw,
+            elements=i64.__register_strategy__(),
+        ) -> datetime.timedelta:
+            return datetime.timedelta(milliseconds=draw(elements))
+
+        return timedeltas()
