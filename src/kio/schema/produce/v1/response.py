@@ -4,6 +4,7 @@ Generated from ProduceResponse.json.
 
 # ruff: noqa: A003
 
+import datetime
 from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
@@ -13,6 +14,7 @@ from kio.schema.types import TopicName
 from kio.static.constants import ErrorCode
 from kio.static.primitive import i16
 from kio.static.primitive import i32
+from kio.static.primitive import i32Timedelta
 from kio.static.primitive import i64
 
 
@@ -50,5 +52,8 @@ class ProduceResponse:
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     responses: tuple[TopicProduceResponse, ...]
     """Each produce response"""
-    throttle_time_ms: i32 = field(metadata={"kafka_type": "int32"}, default=i32(0))
+    throttle_time: i32Timedelta = field(
+        metadata={"kafka_type": "timedelta_i32"},
+        default=i32Timedelta.parse(datetime.timedelta(milliseconds=0)),
+    )
     """The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota."""

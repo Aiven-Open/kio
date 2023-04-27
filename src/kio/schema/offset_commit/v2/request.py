@@ -4,6 +4,7 @@ Generated from OffsetCommitRequest.json.
 
 # ruff: noqa: A003
 
+import datetime
 from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
@@ -14,6 +15,7 @@ from kio.schema.types import TopicName
 from kio.static.primitive import i16
 from kio.static.primitive import i32
 from kio.static.primitive import i64
+from kio.static.primitive import i64Timedelta
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -54,7 +56,10 @@ class OffsetCommitRequest:
     """The generation of the group."""
     member_id: str = field(metadata={"kafka_type": "string"})
     """The member ID assigned by the group coordinator."""
-    retention_time_ms: i64 = field(metadata={"kafka_type": "int64"}, default=i64(-1))
+    retention_time: i64Timedelta = field(
+        metadata={"kafka_type": "timedelta_i64"},
+        default=i64Timedelta.parse(datetime.timedelta(milliseconds=-1)),
+    )
     """The time period in ms to retain the offset."""
     topics: tuple[OffsetCommitRequestTopic, ...]
     """The topics to commit offsets for."""

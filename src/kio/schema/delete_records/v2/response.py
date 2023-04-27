@@ -13,6 +13,7 @@ from kio.schema.types import TopicName
 from kio.static.constants import ErrorCode
 from kio.static.primitive import i16
 from kio.static.primitive import i32
+from kio.static.primitive import i32Timedelta
 from kio.static.primitive import i64
 
 
@@ -48,7 +49,7 @@ class DeleteRecordsResponse:
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(21)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
-    throttle_time_ms: i32 = field(metadata={"kafka_type": "int32"})
+    throttle_time: i32Timedelta = field(metadata={"kafka_type": "timedelta_i32"})
     """The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota."""
     topics: tuple[DeleteRecordsTopicResult, ...]
     """Each topic that we wanted to delete records from."""

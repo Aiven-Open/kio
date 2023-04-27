@@ -11,7 +11,7 @@ from typing import ClassVar
 from kio.schema.response_header.v1.header import ResponseHeader
 from kio.static.constants import ErrorCode
 from kio.static.primitive import i16
-from kio.static.primitive import i32
+from kio.static.primitive import i32Timedelta
 from kio.static.primitive import i64
 
 
@@ -65,5 +65,5 @@ class DescribeDelegationTokenResponse:
     """The error code, or 0 if there was no error."""
     tokens: tuple[DescribedDelegationToken, ...]
     """The tokens."""
-    throttle_time_ms: i32 = field(metadata={"kafka_type": "int32"})
+    throttle_time: i32Timedelta = field(metadata={"kafka_type": "timedelta_i32"})
     """The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota."""

@@ -10,7 +10,7 @@ from typing import ClassVar
 
 from kio.schema.request_header.v2.header import RequestHeader
 from kio.static.primitive import i16
-from kio.static.primitive import i64
+from kio.static.primitive import i64Timedelta
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -33,5 +33,5 @@ class CreateDelegationTokenRequest:
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     renewers: tuple[CreatableRenewers, ...]
     """A list of those who are allowed to renew this token before it expires."""
-    max_lifetime_ms: i64 = field(metadata={"kafka_type": "int64"})
+    max_lifetime: i64Timedelta = field(metadata={"kafka_type": "timedelta_i64"})
     """The maximum lifetime of the token in milliseconds, or -1 to use the server side default."""

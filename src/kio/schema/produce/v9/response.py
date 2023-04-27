@@ -4,15 +4,19 @@ Generated from ProduceResponse.json.
 
 # ruff: noqa: A003
 
+import datetime
 from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
+
+from phantom.datetime import TZAware
 
 from kio.schema.response_header.v1.header import ResponseHeader
 from kio.schema.types import TopicName
 from kio.static.constants import ErrorCode
 from kio.static.primitive import i16
 from kio.static.primitive import i32
+from kio.static.primitive import i32Timedelta
 from kio.static.primitive import i64
 
 
@@ -42,7 +46,9 @@ class PartitionProduceResponse:
     """The error code, or 0 if there was no error."""
     base_offset: i64 = field(metadata={"kafka_type": "int64"})
     """The base offset."""
-    log_append_time_ms: i64 = field(metadata={"kafka_type": "int64"}, default=i64(-1))
+    log_append_time: TZAware | None = field(
+        metadata={"kafka_type": "datetime_i64"}, default=None
+    )
     """The timestamp returned by broker after appending the messages. If CreateTime is used for the topic, the timestamp will be -1.  If LogAppendTime is used for the topic, the timestamp will be the broker local time when the messages are appended."""
     log_start_offset: i64 = field(metadata={"kafka_type": "int64"}, default=i64(-1))
     """The log start offset."""
@@ -72,5 +78,8 @@ class ProduceResponse:
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     responses: tuple[TopicProduceResponse, ...]
     """Each produce response"""
-    throttle_time_ms: i32 = field(metadata={"kafka_type": "int32"}, default=i32(0))
+    throttle_time: i32Timedelta = field(
+        metadata={"kafka_type": "timedelta_i32"},
+        default=i32Timedelta.parse(datetime.timedelta(milliseconds=0)),
+    )
     """The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota."""

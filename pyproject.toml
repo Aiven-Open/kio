@@ -62,6 +62,8 @@ extend-ignore = [
   # Ignore line-length. This is enforced by black, but all cases cannot be handled.
   # Ideally we'd only suppress this in generated files.
   "E501",
+  # Allow function calls in argument defaults.
+  "B008",
 ]
 
 [tool.ruff.isort]

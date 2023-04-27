@@ -62,6 +62,14 @@ def get_reader(
             return readers.read_boolean
         case ("error_code", _, False):
             return readers.read_error_code
+        case ("timedelta_i32", _, False):
+            return readers.read_timedelta_i32
+        case ("timedelta_i64", _, False):
+            return readers.read_timedelta_i64
+        case ("datetime_i64", _, False):
+            return readers.read_datetime_i64
+        case ("datetime_i64", _, True):
+            return readers.read_nullable_datetime_i64
 
     raise NotImplementedError(
         f"Failed identifying reader for {kafka_type!r} field {flexible=} {optional=}"

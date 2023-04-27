@@ -11,7 +11,7 @@ from typing import ClassVar
 from kio.schema.request_header.v1.header import RequestHeader
 from kio.schema.types import GroupId
 from kio.static.primitive import i16
-from kio.static.primitive import i32
+from kio.static.primitive import i32Timedelta
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -34,7 +34,7 @@ class JoinGroupRequest:
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     group_id: GroupId = field(metadata={"kafka_type": "string"})
     """The group identifier."""
-    session_timeout_ms: i32 = field(metadata={"kafka_type": "int32"})
+    session_timeout: i32Timedelta = field(metadata={"kafka_type": "timedelta_i32"})
     """The coordinator considers the consumer dead if it receives no heartbeat after this timeout in milliseconds."""
     member_id: str = field(metadata={"kafka_type": "string"})
     """The member id assigned by the group coordinator."""

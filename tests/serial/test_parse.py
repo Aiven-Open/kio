@@ -1,3 +1,4 @@
+import datetime
 import io
 import uuid
 from dataclasses import dataclass
@@ -234,7 +235,7 @@ def test_can_parse_complex_entity(buffer: io.BytesIO) -> None:
     instance = entity_reader(MetadataResponse)(buffer)
     assert isinstance(instance, MetadataResponse)
 
-    assert instance.throttle_time_ms == 123
+    assert instance.throttle_time == datetime.timedelta(milliseconds=123)
     assert len(instance.brokers) == 2
     assert instance.cluster_id is None
     assert instance.controller_id == 321
