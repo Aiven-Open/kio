@@ -1,6 +1,5 @@
 
 
 def test_foo():
-    import kio
-    breakpoint()
-    assert kio.sum_as_string(1, 2) == "3"
+    import kio._kio_core
+    assert kio._kio_core.sum_as_string(1, 2) == "3"
