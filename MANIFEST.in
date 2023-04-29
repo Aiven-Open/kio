@@ -4,6 +4,7 @@ recursive-exclude docs *
 recursive-exclude tests *
 recursive-exclude codegen *
 recursive-exclude container *
+recursive-exclude benchmarks *
 recursive-include src py.typed
 recursive-include src *.py
 exclude *.yaml

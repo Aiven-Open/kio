@@ -112,7 +112,7 @@ class TestGetWriter:
             get_writer(kafka_type, flexible, optional)
 
 
-async def test_serialize_complex_entity(buffer: io.BytesIO) -> None:
+def test_serialize_complex_entity(buffer: io.BytesIO) -> None:
     write_metadata_response = entity_writer(MetadataResponse)
 
     topic_id = uuid.uuid4()
