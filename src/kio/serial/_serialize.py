@@ -1,8 +1,10 @@
+import io
 from dataclasses import Field
 from dataclasses import fields
 from typing import TypeVar
 from typing import assert_never
 
+from kio._utils import cache
 from kio.static.protocol import Entity
 
 from . import writers
@@ -88,6 +90,7 @@ def get_field_writer(
     field: Field[T],
     flexible: bool,
     is_request_header: bool,
+    is_tag: bool,
 ) -> Writer[T]:
     # RequestHeader.client_id is special-cased by Kafka to always use the legacy string
     # format.
@@ -101,19 +104,27 @@ def get_field_writer(
     field_kind, field_type = classify_field(field)
     array_writer = compact_array_writer if flexible else legacy_array_writer
 
+    # Optionality needs to be special cased for tagged fields, because they are optional
+    # by definition. This optionality is implemented in a different way from normal
+    # fields, it's implemented by the presence or absence by the tag itself. Hence, we
+    # can have optional fields with in-transit value types that cannot represent None.
+    # To be able to match an optional tagged field to a writer that cannot accept None,
+    # we hard-code all tagged fields as not optional here.
+    optional = False if is_tag else is_optional(field)
+
     match field_kind:
         case FieldKind.primitive:
             return get_writer(
                 kafka_type=get_schema_field_type(field),
                 flexible=flexible,
-                optional=is_optional(field),
+                optional=optional,
             )
         case FieldKind.primitive_tuple:
             return array_writer(  # type: ignore[return-value]
                 get_writer(
                     kafka_type=get_schema_field_type(field),
                     flexible=flexible,
-                    optional=is_optional(field),
+                    optional=optional,
                 )
             )
         case FieldKind.entity:
@@ -133,52 +144,66 @@ def _fqn(type_: type) -> str:
 E = TypeVar("E", bound=Entity)
 
 
+@cache
 def entity_writer(entity_type: type[E]) -> Writer[E]:
+    field_writers = {}
+    tagged_field_writers = {}
+    is_request_header = entity_type.__name__ == "RequestHeader"
+
+    for field in fields(entity_type):
+        tag = get_field_tag(field)
+        field_writer = get_field_writer(
+            field,
+            flexible=entity_type.__flexible__,
+            is_request_header=is_request_header,
+            is_tag=tag is not None,
+        )
+        if tag is not None:
+            tagged_field_writers[tag] = field, field_writer
+        else:
+            field_writers[field] = field_writer
+
+    # Sort tagged fields by key, maintaining this order when writing tagged fields is
+    # important to fulfill the spec.
+    tagged_field_writers = {
+        key: tagged_field_writers[key] for key in sorted(tagged_field_writers.keys())
+    }
+
     def write_entity(buffer: Writable, entity: E) -> None:
-        is_request_header = entity_type.__name__ == "RequestHeader"
-        tag_writers = {}
-
-        # Loop over all fields of the entity, serializing its values to the buffer and
-        # keeping track of tagged fields.
-
-        for field in fields(entity):
-            tag = get_field_tag(field)
+        # Loop over all fields of the entity, serializing its values to the buffer.
+        for field, field_writer in field_writers.items():
             field_value = getattr(entity, field.name)
-
-            if tag is not None and field_value == field.default:
-                continue
-
-            field_writer = get_field_writer(
-                field,
-                flexible=entity.__flexible__,
-                is_request_header=is_request_header,
-            )
-
-            # Record non-default valued tagged fields and defer serialization.
-            if (tag := get_field_tag(field)) is not None:
-                if field_value != field.default:
-                    tag_writers[tag] = (field_writer, field_value)
-                continue
-
             field_writer(buffer, field_value)
 
         # For non-flexible entities we're done here.
         if not entity_type.__flexible__:
             # Assert we don't find tags for non-flexible models.
-            assert not tag_writers
+            assert not tagged_field_writers
             return
 
-        # Write number of tagged fields.
-        write_unsigned_varint(buffer, len(tag_writers))
+        # Write tagged fields to a temporary buffer, in order to be able to count the
+        # number of tags that are being written.
+        num_tagged_fields = 0
+        with io.BytesIO() as tag_buffer:
+            # Serialize tagged fields. Note that order is important to fulfill spec.
+            for tag, (field, field_writer) in tagged_field_writers.items():
+                field_value = getattr(entity, field.name)
 
-        # Serialize tagged fields. Order is important to fulfill spec.
-        for field_tag in sorted(tag_writers.keys()):
-            field_writer, value = tag_writers[field_tag]
-            write_tagged_field(
-                buffer=buffer,
-                tag=field_tag,
-                writer=field_writer,
-                value=value,
-            )
+                # Skip default-valued fields.
+                if field_value == field.default:
+                    continue
+
+                # Write the tag to the buffer and increase counter.
+                write_tagged_field(
+                    buffer=tag_buffer,
+                    tag=tag,
+                    writer=field_writer,
+                    value=field_value,
+                )
+                num_tagged_fields += 1
+
+            # Write number of tagged fields followed by the serialized tags.
+            write_unsigned_varint(buffer, num_tagged_fields)
+            buffer.write(tag_buffer.getvalue())
 
     return write_entity

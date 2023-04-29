@@ -4,6 +4,7 @@ from typing import IO
 from typing import TypeVar
 from typing import assert_never
 
+from kio._utils import cache
 from kio.static.protocol import Entity
 
 from . import readers
@@ -125,37 +126,45 @@ def get_field_reader(
 E = TypeVar("E", bound=Entity)
 
 
+@cache
 def entity_reader(entity_type: type[E]) -> readers.Reader[E]:
+    field_readers = {}
+    tagged_field_readers = {}
+    is_request_header = entity_type.__name__ == "RequestHeader"
+
+    for field in fields(entity_type):
+        tag = get_field_tag(field)
+        field_reader = get_field_reader(
+            entity_type=entity_type,
+            field=field,
+            is_request_header=is_request_header,
+            is_tagged_field=tag is not None,
+        )
+        if tag is not None:
+            tagged_field_readers[tag] = field, field_reader
+        else:
+            field_readers[field] = field_reader
+
     def read_entity(buffer: IO[bytes]) -> E:
-        is_request_header = entity_type.__name__ == "RequestHeader"
-        kwargs = {}
-        tagged_fields = {}
+        # Read regular fields.
+        kwargs = {
+            field.name: field_reader(buffer)
+            for field, field_reader in field_readers.items()
+        }
 
-        for field in fields(entity_type):
-            tag = get_field_tag(field)
-            field_reader = get_field_reader(
-                entity_type=entity_type,
-                field=field,
-                is_request_header=is_request_header,
-                is_tagged_field=tag is not None,
-            )
-            if tag is not None:
-                tagged_fields[tag] = field, field_reader
-            else:
-                kwargs[field.name] = field_reader(buffer)
-
+        # For non-flexible entities we're done here.
         if not entity_type.__flexible__:
             # Assert we don't find tags for non-flexible models.
-            assert not tagged_fields
+            assert not tagged_field_readers
             return entity_type(**kwargs)
 
+        # Read tagged fields.
         num_tagged_fields = readers.read_unsigned_varint(buffer)
-
         for _ in range(num_tagged_fields):
             field_tag = readers.read_unsigned_varint(buffer)
             readers.read_unsigned_varint(buffer)  # field length
-            field, read_field = tagged_fields[field_tag]
-            kwargs[field.name] = read_field(buffer)
+            field, field_reader = tagged_field_readers[field_tag]
+            kwargs[field.name] = field_reader(buffer)
 
         return entity_type(**kwargs)
 
