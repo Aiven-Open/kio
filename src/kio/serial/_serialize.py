@@ -163,6 +163,10 @@ def entity_writer(entity_type: type[E]) -> Writer[E]:
         else:
             field_writers[field] = field_writer
 
+    # Assert we don't find tags for non-flexible models.
+    if tagged_field_writers and not entity_type.__flexible__:
+        raise ValueError("Found tagged fields on a non-flexible model")
+
     # Sort tagged fields by key, maintaining this order when writing tagged fields is
     # important to fulfill the spec.
     tagged_field_writers = {
@@ -177,8 +181,6 @@ def entity_writer(entity_type: type[E]) -> Writer[E]:
 
         # For non-flexible entities we're done here.
         if not entity_type.__flexible__:
-            # Assert we don't find tags for non-flexible models.
-            assert not tagged_field_writers
             return
 
         # Write tagged fields to a temporary buffer, in order to be able to count the

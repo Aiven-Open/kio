@@ -59,28 +59,39 @@ instance = MetadataResponse(
 
 
 def perform_roundtrip(
-    loops: int = 10,
+    loops: int,
     test_instance: MetadataResponse = instance,
 ) -> float:
     loop_range = range(loops)
 
-    with io.BytesIO() as buffer:
-        t0 = pyperf.perf_counter()
+    t0 = pyperf.perf_counter()
 
-        for _ in loop_range:
+    for _ in loop_range:
+        with io.BytesIO() as buffer:
             write_metadata_response(buffer, test_instance)
+            write_metadata_response(buffer, test_instance)
+            write_metadata_response(buffer, test_instance)
+            write_metadata_response(buffer, test_instance)
+            write_metadata_response(buffer, test_instance)
+            write_metadata_response(buffer, test_instance)
+            write_metadata_response(buffer, test_instance)
+            write_metadata_response(buffer, test_instance)
+            write_metadata_response(buffer, test_instance)
+            write_metadata_response(buffer, test_instance)
+            buffer.seek(0)
+            read_metadata_response(buffer)
+            read_metadata_response(buffer)
+            read_metadata_response(buffer)
+            read_metadata_response(buffer)
+            read_metadata_response(buffer)
+            read_metadata_response(buffer)
+            read_metadata_response(buffer)
+            read_metadata_response(buffer)
+            read_metadata_response(buffer)
+            read_metadata_response(buffer)
+            assert buffer.read(1) == b"", "buffer not exhausted after read"
 
-        buffer.seek(0)
-
-        for _ in loop_range:
-            result = read_metadata_response(buffer)
-            assert result == test_instance
-
-        tN = pyperf.perf_counter() - t0
-
-        assert buffer.read(1) == b"", "buffer not exhausted after read"
-
-    return tN
+    return pyperf.perf_counter() - t0
 
 
 if __name__ == "__main__":
@@ -91,4 +102,4 @@ if __name__ == "__main__":
     # scalene_profiler.stop()
 
     runner = pyperf.Runner()
-    runner.bench_time_func("roundtrip", perform_roundtrip, inner_loops=100)
+    runner.bench_time_func("roundtrip", perform_roundtrip, inner_loops=10)

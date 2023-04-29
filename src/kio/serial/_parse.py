@@ -145,6 +145,10 @@ def entity_reader(entity_type: type[E]) -> readers.Reader[E]:
         else:
             field_readers[field] = field_reader
 
+    # Assert we don't find tags for non-flexible models.
+    if tagged_field_readers and not entity_type.__flexible__:
+        raise ValueError("Found tagged fields on a non-flexible model")
+
     def read_entity(buffer: IO[bytes]) -> E:
         # Read regular fields.
         kwargs = {
@@ -154,8 +158,6 @@ def entity_reader(entity_type: type[E]) -> readers.Reader[E]:
 
         # For non-flexible entities we're done here.
         if not entity_type.__flexible__:
-            # Assert we don't find tags for non-flexible models.
-            assert not tagged_field_readers
             return entity_type(**kwargs)
 
         # Read tagged fields.
