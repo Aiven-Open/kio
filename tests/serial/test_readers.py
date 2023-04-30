@@ -2,37 +2,17 @@ import io
 import struct
 import sys
 import uuid
-from typing import IO
+from typing import Callable
 
 import pytest
 
-from kio.serial.errors import UnexpectedNull
-from kio.serial.readers import Reader
-from kio.serial.readers import read_compact_string
-from kio.serial.readers import read_compact_string_as_bytes
-from kio.serial.readers import read_compact_string_as_bytes_nullable
-from kio.serial.readers import read_compact_string_nullable
-from kio.serial.readers import read_float64
-from kio.serial.readers import read_int8
-from kio.serial.readers import read_int16
-from kio.serial.readers import read_int32
-from kio.serial.readers import read_int64
-from kio.serial.readers import read_legacy_bytes
-from kio.serial.readers import read_legacy_string
-from kio.serial.readers import read_nullable_legacy_bytes
-from kio.serial.readers import read_nullable_legacy_string
-from kio.serial.readers import read_raw_bytes
-from kio.serial.readers import read_uint8
-from kio.serial.readers import read_uint16
-from kio.serial.readers import read_uint32
-from kio.serial.readers import read_uint64
-from kio.serial.readers import read_unsigned_varint
-from kio.serial.readers import read_uuid
+import kio._kio_core
+from kio.serial.errors import UnexpectedNull, InvalidUnicode, NegativeByteLength
 from kio.static.constants import uuid_zero
 
 
 class IntReaderContract:
-    reader: Reader[int]
+    reader: Callable[[bytes, int], tuple[int, int]]
     lower_limit: int
     lower_limit_as_bytes: bytes
     upper_limit: int
@@ -40,27 +20,27 @@ class IntReaderContract:
     zero_as_bytes: bytes
 
     @classmethod
-    def read(cls, buffer: IO[bytes]) -> int:
-        return cls.reader(buffer)
+    def read(cls, buffer: bytes, offset: int = 0) -> tuple[int, int]:
+        return cls.reader(buffer, offset)
 
-    def test_can_read_lower_limit_sync(self, buffer: io.BytesIO) -> None:
-        buffer.write(self.lower_limit_as_bytes)
-        buffer.seek(0)
-        assert self.lower_limit == self.read(buffer)
+    def test_can_read_lower_limit(self) -> None:
+        value, offset = self.read(self.lower_limit_as_bytes)
+        assert value == self.lower_limit
+        assert offset == len(self.lower_limit_as_bytes)
 
-    def test_can_read_upper_limit_sync(self, buffer: io.BytesIO) -> None:
-        buffer.write(self.upper_limit_as_bytes)
-        buffer.seek(0)
-        assert self.upper_limit == self.read(buffer)
+    def test_can_read_upper_limit(self) -> None:
+        value, offset = self.read(self.upper_limit_as_bytes)
+        assert value == self.upper_limit
+        assert offset == len(self.upper_limit_as_bytes)
 
-    def test_can_read_zero_sync(self, buffer: io.BytesIO) -> None:
-        buffer.write(self.zero_as_bytes)
-        buffer.seek(0)
-        assert self.read(buffer) == 0
+    def test_can_read_zero(self) -> None:
+        value, offset = self.read(self.zero_as_bytes)
+        assert value == 0
+        assert offset == len(self.zero_as_bytes)
 
 
 class TestReadInt8(IntReaderContract):
-    reader = read_int8
+    reader = kio._kio_core.read_int8
     lower_limit = -128
     lower_limit_as_bytes = b"\x80"
     upper_limit = 127
@@ -69,7 +49,7 @@ class TestReadInt8(IntReaderContract):
 
 
 class TestReadInt16(IntReaderContract):
-    reader = read_int16
+    reader = kio._kio_core.read_int16
     lower_limit = -(2**15)
     lower_limit_as_bytes = b"\x80\x00"
     upper_limit = 2**15 - 1
@@ -78,7 +58,7 @@ class TestReadInt16(IntReaderContract):
 
 
 class TestReadInt32(IntReaderContract):
-    reader = read_int32
+    reader = kio._kio_core.read_int32
     lower_limit = -(2**31)
     lower_limit_as_bytes = b"\x80\x00\x00\x00"
     upper_limit = 2**31 - 1
@@ -87,7 +67,7 @@ class TestReadInt32(IntReaderContract):
 
 
 class TestReadInt64(IntReaderContract):
-    reader = read_int64
+    reader = kio._kio_core.read_int64
     lower_limit = -(2**63)
     lower_limit_as_bytes = b"\x80\x00\x00\x00\x00\x00\x00\x00"
     upper_limit = 2**63 - 1
@@ -96,7 +76,7 @@ class TestReadInt64(IntReaderContract):
 
 
 class TestReadUint8(IntReaderContract):
-    reader = read_uint8
+    reader = kio._kio_core.read_uint8
     lower_limit = 0
     lower_limit_as_bytes = zero_as_bytes = b"\x00"
     upper_limit = 2**8 - 1
@@ -104,7 +84,7 @@ class TestReadUint8(IntReaderContract):
 
 
 class TestReadUint16(IntReaderContract):
-    reader = read_uint16
+    reader = kio._kio_core.read_uint16
     lower_limit = 0
     lower_limit_as_bytes = zero_as_bytes = b"\x00\x00"
     upper_limit = 2**16 - 1
@@ -113,7 +93,7 @@ class TestReadUint16(IntReaderContract):
 
 
 class TestReadUint32(IntReaderContract):
-    reader = read_uint32
+    reader = kio._kio_core.read_uint32
     lower_limit = 0
     lower_limit_as_bytes = zero_as_bytes = b"\x00\x00\x00\x00"
     upper_limit = 2**32 - 1
@@ -122,7 +102,7 @@ class TestReadUint32(IntReaderContract):
 
 
 class TestReadUint64(IntReaderContract):
-    reader = read_uint64
+    reader = kio._kio_core.read_uint64
     lower_limit = 0
     lower_limit_as_bytes = zero_as_bytes = b"\x00\x00\x00\x00\x00\x00\x00\x00"
     upper_limit = 2**64 - 1
@@ -131,18 +111,19 @@ class TestReadUint64(IntReaderContract):
 
 
 class TestReadUnsignedVarint(IntReaderContract):
-    reader = read_unsigned_varint
+    reader = kio._kio_core.read_unsigned_varint
     lower_limit = 0
     lower_limit_as_bytes = zero_as_bytes = b"\x00"
     upper_limit = 2**31 - 1
     upper_limit_as_bytes = b"\xff\xff\xff\xff\x07"
 
     def test_raises_value_error_for_too_long_value(self, buffer: io.BytesIO) -> None:
-        for _ in range(5):
-            buffer.write(0b10000001.to_bytes(1, "little"))
-        buffer.seek(0)
+        value = b"".join(
+            0b10000001.to_bytes(1, "little")
+            for _ in range(5)
+        )
         with pytest.raises(ValueError, match=r"^Varint is too long"):
-            self.read(buffer)
+            self.read(value)
 
     @pytest.mark.parametrize(
         "byte_value, expected",
@@ -156,13 +137,12 @@ class TestReadUnsignedVarint(IntReaderContract):
     )
     def test_can_read_known_value(
         self,
-        buffer: io.BytesIO,
         byte_value: bytes,
         expected: int,
     ) -> None:
-        buffer.write(byte_value)
-        buffer.seek(0)
-        assert self.read(buffer) == expected
+        value, offset = self.read(byte_value)
+        assert value == expected
+        assert offset == len(byte_value)
 
 
 class TestReadFloat64:
@@ -178,218 +158,262 @@ class TestReadFloat64:
             sys.float_info.max,
         ),
     )
-    def test_can_read_value(self, buffer: io.BytesIO, value: float) -> None:
-        buffer.write(struct.pack(">d", value))
-        buffer.seek(0)
-        assert read_float64(buffer) == value
+    def test_can_read_value(self, value: float) -> None:
+        byte_value = struct.pack(">d", value)
+        result, offset = kio._kio_core.read_float64(byte_value, 0)
+        assert result == value
+        assert offset == 8
 
 
 class TestReadCompactStringAsBytes:
-    def test_raises_unexpected_null_for_negative_length_sync(
-        self,
-        buffer: io.BytesIO,
+    def test_raises_unexpected_null_for_negative_length(
+        self
     ) -> None:
-        buffer.write(0b00000000.to_bytes(1, "little"))
-        buffer.seek(0)
+        length_encoded = 0b00000000.to_bytes(1, "little")
         with pytest.raises(UnexpectedNull):
-            read_compact_string_as_bytes(buffer)
+            kio._kio_core.read_compact_string_as_bytes(length_encoded, 0)
 
-    def test_can_read_bytes_sync(
-        self,
-        buffer: io.BytesIO,
+    def test_can_read_bytes(
+        self
     ) -> None:
         value = b"k\x9bC\x94\xbe\x1fV\xd6"
         byte_length = len(value) + 1  # string length is offset by one
-        buffer.write(byte_length.to_bytes(1, "little"))
-        buffer.write(value)
-        buffer.seek(0)
-        assert value == read_compact_string_as_bytes(buffer)
+        length_encoded = (
+            # Note! This is a special case, length should be encoded as an
+            # unsigned varint.
+            byte_length.to_bytes(1, "little") + value
+        )
+
+        result, offset = kio._kio_core.read_compact_string_as_bytes(length_encoded, 0)
+
+        assert value == result
+        # Size of bytes + size of length value.
+        assert offset == len(value) + 1
 
 
 class TestReadCompactStringAsBytesNullable:
-    def test_returns_null_for_negative_length_sync(
-        self,
-        buffer: io.BytesIO,
+    def test_returns_null_for_negative_length(
+        self
     ) -> None:
-        buffer.write(0b00000000.to_bytes(1, "little"))
-        buffer.seek(0)
-        assert read_compact_string_as_bytes_nullable(buffer) is None
+        length_encoded = 0b00000000.to_bytes(1, "little")
+        value, offset = kio._kio_core.read_compact_string_as_bytes_nullable(length_encoded, 0)
+        assert value is None
+        assert offset is len(length_encoded)
+        assert offset == 1
 
-    def test_can_read_bytes_sync(
-        self,
-        buffer: io.BytesIO,
+    def test_can_read_bytes(
+        self
     ) -> None:
-        value = b"k\x9bC\x94\xbe\x1fV\xd6"
-        byte_length = len(value) + 1  # string length is offset by one
-        buffer.write(byte_length.to_bytes(1, "little"))
-        buffer.write(value)
-        buffer.seek(0)
-        assert value == read_compact_string_as_bytes_nullable(buffer)
+        byte_value = b"k\x9bC\x94\xbe\x1fV\xd6"
+        byte_length = len(byte_value) + 1  # string length is offset by one
+        length_encoded = (
+            # Note! This is a special case, length should be encoded as an
+            # unsigned varint.
+            byte_length.to_bytes(1, "little")
+            + byte_value
+        )
+        result, offset = kio._kio_core.read_compact_string_as_bytes_nullable(length_encoded, 0)
+        assert result == byte_value
+        # Size of bytes + size of length value.
+        assert offset == len(byte_value) + 1
 
 
 class TestReadCompactString:
-    def test_raises_unexpected_null_for_negative_length_sync(
-        self,
-        buffer: io.BytesIO,
+    def test_raises_unexpected_null_for_negative_length(
+        self
     ) -> None:
-        buffer.write((0).to_bytes(1, "little"))
-        buffer.seek(0)
+        length_encoded = (0).to_bytes(1, "little")
         with pytest.raises(UnexpectedNull):
-            read_compact_string(buffer)
+            kio._kio_core.read_compact_string(length_encoded, 0)
 
-    def test_can_read_string_sync(
-        self,
-        buffer: io.BytesIO,
+    def test_raises_invalid_unicode_for_invalid_bytes(self) -> None:
+        invalid_byte_value = b"\xc3\x28"
+        byte_length = len(invalid_byte_value) + 1  # string length is offset by one
+        length_encoded = (
+            byte_length.to_bytes(1, "little")
+            + invalid_byte_value
+        )
+        with pytest.raises(InvalidUnicode, match=r"^Failed interpreting bytes as UTF-8$",):
+            kio._kio_core.read_compact_string(length_encoded, 0)
+
+    def test_can_read_string(
+        self
     ) -> None:
         value = "The quick brown 🦊 jumps over the lazy dog 🧖"
         byte_value = value.encode()
         byte_length = len(byte_value) + 1  # string length is offset by one
-        buffer.write(byte_length.to_bytes(1, "little"))
-        buffer.write(byte_value)
-        buffer.seek(0)
-        assert value == read_compact_string(buffer)
+        length_encoded = (
+            byte_length.to_bytes(1, "little")
+            + byte_value
+        )
+        decoded, offset = kio._kio_core.read_compact_string(length_encoded, 0)
+        assert decoded == value
+        assert offset == len(byte_value) + 1  # length takes 1 byte
 
 
 class TestReadCompactStringNullable:
-    def test_returns_null_for_negative_length_sync(
-        self,
-        buffer: io.BytesIO,
+    def test_returns_none_for_negative_length(
+        self
     ) -> None:
-        buffer.write((0).to_bytes(1, "little"))
-        buffer.seek(0)
-        assert read_compact_string_nullable(buffer) is None
+        length_encoded = (0).to_bytes(1, "little")
+        decoded, offset = kio._kio_core.read_compact_string_nullable(length_encoded, 0)
+        assert decoded is None
+        assert offset == 1
 
-    def test_can_read_string_sync(
-        self,
-        buffer: io.BytesIO,
+    def test_raises_invalid_unicode_for_invalid_bytes(self) -> None:
+        invalid_byte_value = b"\xc3\x28"
+        byte_length = len(invalid_byte_value) + 1  # string length is offset by one
+        length_encoded = (
+            byte_length.to_bytes(1, "little")
+            + invalid_byte_value
+        )
+        with pytest.raises(InvalidUnicode, match=r"^Failed interpreting bytes as UTF-8$",):
+            kio._kio_core.read_compact_string_nullable(length_encoded, 0)
+
+    def test_can_read_string(
+        self
     ) -> None:
         value = "The quick brown 🦊 jumps over the lazy dog 🧖"
         byte_value = value.encode()
         byte_length = len(byte_value) + 1  # string length is offset by one
-        buffer.write(byte_length.to_bytes(1, "little"))
-        buffer.write(byte_value)
-        buffer.seek(0)
-        assert value == read_compact_string_nullable(buffer)
+        length_encoded = (byte_length.to_bytes(1, "little") + byte_value)
+        decoded, offset = kio._kio_core.read_compact_string_nullable(length_encoded, 0)
+        assert decoded == value
+        assert offset == len(byte_value) + 1  # length takes 1 byte
 
 
-class TestReadRawBytes:
-    def test_returns_null_for_negative_length_sync(
-        self,
-        buffer: io.BytesIO,
+class TestReadLegacyBytes:
+    def test_raises_unexpected_null_for_null_length(
+        self
     ) -> None:
-        buffer.write((0).to_bytes(4, "big"))
-        buffer.seek(0)
-        assert read_raw_bytes(buffer) is None
+        length_encoded = struct.pack(">h", -1)
+        with pytest.raises(UnexpectedNull):
+            kio._kio_core.read_legacy_bytes(length_encoded, 0)
 
-    def test_can_read_bytes_sync(
-        self,
-        buffer: io.BytesIO,
+    def test_raises_negative_byte_length_for_negative_length(
+        self
     ) -> None:
-        value = b"k\x9bC\x94\xbe\x1fV\xd6"
-        byte_length = len(value) + 1  # string length is offset by one
-        buffer.write(struct.pack(">i", byte_length))
-        buffer.write(value)
-        buffer.seek(0)
-        assert value == read_raw_bytes(buffer)
+        length_encoded = struct.pack(">h", -2)
+        with pytest.raises(NegativeByteLength):
+            kio._kio_core.read_legacy_bytes(length_encoded, 0)
+
+    def test_can_read_bytes(
+        self
+    ) -> None:
+        value = "The quick brown 🦊 jumps over the lazy dog 🧖"
+        byte_value = value.encode()
+        byte_length = len(byte_value)
+        length_encoded = (
+            struct.pack(">h", byte_length)
+            + byte_value
+        )
+        decoded, offset = kio._kio_core.read_legacy_bytes(length_encoded, 0)
+        assert decoded == byte_value
+        assert offset == len(length_encoded)
 
 
 class TestReadNullableLegacyBytes:
-    def test_returns_none_for_negative_length_sync(
-        self,
-        buffer: io.BytesIO,
+    def test_returns_none_for_negative_length(
+        self
     ) -> None:
-        buffer.write(struct.pack(">h", -1))
-        buffer.seek(0)
-        assert read_nullable_legacy_bytes(buffer) is None
+        length_encoded = struct.pack(">h", -1)
+        decoded, offset = kio._kio_core.read_nullable_legacy_bytes(length_encoded, 0)
+        assert decoded is None
+        assert offset == len(length_encoded)
+        assert offset == 2
 
-    def test_can_read_bytes_sync(
+    def test_raises_negative_byte_length_for_negative_length(
+        self
+    ) -> None:
+        length_encoded = struct.pack(">h", -2)
+        with pytest.raises(NegativeByteLength):
+            kio._kio_core.read_nullable_legacy_bytes(length_encoded, 0)
+
+    def test_can_read_bytes(
         self,
         buffer: io.BytesIO,
     ) -> None:
         value = b"k\x9bC\x94\xbe\x1fV\xd6"
         byte_length = len(value)
-        buffer.write(struct.pack(">h", byte_length))
-        buffer.write(value)
-        buffer.seek(0)
-        assert value == read_nullable_legacy_bytes(buffer)
+        length_encoded = (
+            struct.pack(">h", byte_length)
+            + value
+        )
+        decoded, offset = kio._kio_core.read_nullable_legacy_bytes(length_encoded, 0)
+        assert decoded == value
+        assert offset == len(length_encoded)
 
 
 class TestReadLegacyString:
-    def test_raises_unexpected_null_for_negative_length_sync(
-        self,
-        buffer: io.BytesIO,
+    def test_raises_unexpected_null_for_negative_length(
+        self
     ) -> None:
-        buffer.write(struct.pack(">h", -1))
-        buffer.seek(0)
+        length_encoded = struct.pack(">h", -1)
         with pytest.raises(UnexpectedNull):
-            read_legacy_string(buffer)
+            kio._kio_core.read_legacy_string(length_encoded, 0)
 
-    def test_can_read_string_sync(
-        self,
-        buffer: io.BytesIO,
+    def test_raises_negative_byte_length_for_negative_length(
+        self
+    ) -> None:
+        length_encoded = struct.pack(">h", -2)
+        with pytest.raises(NegativeByteLength):
+            kio._kio_core.read_legacy_string(length_encoded, 0)
+
+    def test_can_read_string(
+        self
     ) -> None:
         value = "The quick brown 🦊 jumps over the lazy dog 🧖"
         byte_value = value.encode()
         byte_length = len(byte_value)
-        buffer.write(struct.pack(">h", byte_length))
-        buffer.write(byte_value)
-        buffer.seek(0)
-        assert value == read_legacy_string(buffer)
+        length_encoded = (
+            struct.pack(">h", byte_length)
+            + byte_value
+        )
+        decoded, offset = kio._kio_core.read_legacy_string(length_encoded, 0)
+        assert decoded == value
+        assert offset == len(length_encoded)
 
 
 class TestReadNullableLegacyString:
-    def test_returns_null_for_negative_length_sync(
-        self,
-        buffer: io.BytesIO,
+    def test_returns_null_for_negative_length(
+        self
     ) -> None:
-        buffer.write(struct.pack(">h", -1))
-        buffer.seek(0)
-        assert read_nullable_legacy_string(buffer) is None
+        length_encoded = struct.pack(">h", -1)
+        decoded, offset = kio._kio_core.read_nullable_legacy_string(length_encoded, 0)
+        assert decoded is None
+        assert offset == len(length_encoded)
 
-    def test_can_read_string_sync(
-        self,
-        buffer: io.BytesIO,
+    def test_raises_negative_byte_length_for_negative_length(
+        self
     ) -> None:
-        value = "The quick brown 🦊 jumps over the lazy dog 🧖"
-        byte_value = value.encode()
-        byte_length = len(byte_value)
-        buffer.write(struct.pack(">h", byte_length))
-        buffer.write(byte_value)
-        buffer.seek(0)
-        assert value == read_nullable_legacy_string(buffer)
+        length_encoded = struct.pack(">h", -2)
+        with pytest.raises(NegativeByteLength):
+            kio._kio_core.read_nullable_legacy_string(length_encoded, 0)
 
-
-class TestReadLegacyBytes:
-    def test_raises_unexpected_null_for_negative_length_sync(
-        self,
-        buffer: io.BytesIO,
-    ) -> None:
-        buffer.write(struct.pack(">h", -1))
-        buffer.seek(0)
-        with pytest.raises(UnexpectedNull):
-            read_legacy_bytes(buffer)
-
-    def test_can_read_bytes_sync(
-        self,
-        buffer: io.BytesIO,
+    def test_can_read_string(
+        self
     ) -> None:
         value = "The quick brown 🦊 jumps over the lazy dog 🧖"
         byte_value = value.encode()
         byte_length = len(byte_value)
-        buffer.write(struct.pack(">h", byte_length))
-        buffer.write(byte_value)
-        buffer.seek(0)
-        assert byte_value == read_legacy_bytes(buffer)
+        length_encoded = (
+            struct.pack(">h", byte_length)
+            + byte_value
+        )
+        decoded, offset = kio._kio_core.read_nullable_legacy_string(length_encoded, 0)
+        assert decoded == value
+        assert offset == len(length_encoded)
 
 
 class TestReadUUID:
-    def test_reads_zero_as_none(self, buffer: io.BytesIO) -> None:
-        buffer.write(uuid_zero.bytes)
-        buffer.seek(0)
-        assert read_uuid(buffer) is None
+    def test_reads_zero_as_none(self) -> None:
+        decoded, offset = kio._kio_core.read_uuid(uuid_zero.bytes, 0)
+        assert decoded is None
+        assert offset == 16
 
-    def test_can_read_uuid4(self, buffer: io.BytesIO) -> None:
+    def test_can_read_uuid4(self) -> None:
         value = uuid.uuid4()
-        buffer.write(value.bytes)
-        buffer.seek(0)
-        assert read_uuid(buffer) == value
+        decoded, offset = kio._kio_core.read_uuid(value.bytes, 0)
+        assert decoded == value
+        assert offset == len(value.bytes)
+        assert offset == 16

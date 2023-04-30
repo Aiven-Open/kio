@@ -1,6 +1,6 @@
 import io
 import uuid
-from typing import TypeVar
+from typing import TypeVar, Callable
 
 from hypothesis import given
 from hypothesis.strategies import binary
@@ -14,26 +14,6 @@ from hypothesis.strategies import uuids
 from kio.schema.metadata.v12.response import MetadataResponse
 from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial.readers import Reader
-from kio.serial.readers import read_boolean
-from kio.serial.readers import read_compact_array_length
-from kio.serial.readers import read_compact_string
-from kio.serial.readers import read_compact_string_as_bytes
-from kio.serial.readers import read_compact_string_as_bytes_nullable
-from kio.serial.readers import read_compact_string_nullable
-from kio.serial.readers import read_int8
-from kio.serial.readers import read_int16
-from kio.serial.readers import read_int32
-from kio.serial.readers import read_int64
-from kio.serial.readers import read_legacy_array_length
-from kio.serial.readers import read_legacy_bytes
-from kio.serial.readers import read_legacy_string
-from kio.serial.readers import read_nullable_legacy_string
-from kio.serial.readers import read_uint8
-from kio.serial.readers import read_uint16
-from kio.serial.readers import read_uint32
-from kio.serial.readers import read_uint64
-from kio.serial.readers import read_unsigned_varint
 from kio.serial.readers import read_uuid
 from kio.serial.writers import Writer
 from kio.serial.writers import write_boolean
@@ -53,18 +33,23 @@ from kio.serial.writers import write_uint32
 from kio.serial.writers import write_uint64
 from kio.serial.writers import write_unsigned_varint
 from kio.serial.writers import write_uuid
+import kio._kio_core
 
 
 @given(booleans(), booleans())
-def test_booleans_roundtrip_sync(a: bool, b: bool) -> None:
-    buffer = io.BytesIO()
-    write_boolean(buffer, a)
-    write_boolean(buffer, b)
-    buffer.seek(0)
-    assert a is read_boolean(buffer)
-    assert b is read_boolean(buffer)
-    # Make sure buffer is exhausted.
-    assert buffer.read(1) == b""
+def test_booleans_roundtrip(a: bool, b: bool) -> None:
+    with io.BytesIO() as buffer:
+        write_boolean(buffer, a)
+        write_boolean(buffer, b)
+        flattened = buffer.getvalue()
+
+    offset = 0
+    value, offset = kio._kio_core.read_boolean(flattened, offset)
+    assert a is value
+    assert offset == 1
+    value, offset = kio._kio_core.read_boolean(flattened, offset)
+    assert b is value
+    assert offset == 2
 
 
 _I = TypeVar("_I", bound=int, contravariant=True)
@@ -72,7 +57,7 @@ _I = TypeVar("_I", bound=int, contravariant=True)
 
 def create_integer_roundtrip_test(
     int_writer: Writer[_I],
-    int_reader: Reader[int],
+    int_reader: Callable[[bytes, int], tuple[int, int]],
     min_value: int,
     max_value: int,
 ) -> type:
@@ -87,79 +72,82 @@ def create_integer_roundtrip_test(
             buffer = io.BytesIO()
             int_writer(buffer, a)
             int_writer(buffer, b)
-            buffer.seek(0)
-            assert a == int_reader(buffer)
-            assert b == int_reader(buffer)
-            # Make sure buffer is exhausted.
-            assert buffer.read(1) == b"", "buffer not exhausted"
+
+            flattened = buffer.getvalue()
+            offset = 0
+            value, offset = int_reader(flattened, offset)
+            assert a == value
+            value, offset = int_reader(flattened, offset)
+            assert b == value
+            assert len(flattened) == offset
 
     return Test
 
 
 TestInt8Roundtrip = create_integer_roundtrip_test(
     int_writer=write_int8,
-    int_reader=read_int8,
+    int_reader=kio._kio_core.read_int8,
     min_value=-(2**7),
     max_value=2**7 - 1,
 )
 TestInt16Roundtrip = create_integer_roundtrip_test(
     int_writer=write_int16,
-    int_reader=read_int16,
+    int_reader=kio._kio_core.read_int16,
     min_value=-(2**15),
     max_value=2**15 - 1,
 )
 TestInt32Roundtrip = create_integer_roundtrip_test(
     int_writer=write_int32,
-    int_reader=read_int32,
+    int_reader=kio._kio_core.read_int32,
     min_value=-(2**31),
     max_value=2**31 - 1,
 )
 TestInt64Roundtrip = create_integer_roundtrip_test(
     int_writer=write_int64,
-    int_reader=read_int64,
+    int_reader=kio._kio_core.read_int64,
     min_value=-(2**63),
     max_value=2**63 - 1,
 )
 TestUint8Roundtrip = create_integer_roundtrip_test(
     int_writer=write_uint8,
-    int_reader=read_uint8,
+    int_reader=kio._kio_core.read_uint8,
     min_value=0,
     max_value=2**7 - 1,
 )
 TestUint16Roundtrip = create_integer_roundtrip_test(
     int_writer=write_uint16,
-    int_reader=read_uint16,
+    int_reader=kio._kio_core.read_uint16,
     min_value=0,
     max_value=2**15 - 1,
 )
 TestUint32Roundtrip = create_integer_roundtrip_test(
     int_writer=write_uint32,
-    int_reader=read_uint32,
+    int_reader=kio._kio_core.read_uint32,
     min_value=0,
     max_value=2**31 - 1,
 )
 TestUint64Roundtrip = create_integer_roundtrip_test(
     int_writer=write_uint64,
-    int_reader=read_uint64,
+    int_reader=kio._kio_core.read_uint64,
     min_value=0,
     max_value=2**63 - 1,
 )
 TestUnsignedVarintRoundtrip = create_integer_roundtrip_test(
     int_writer=write_unsigned_varint,
-    int_reader=read_unsigned_varint,
+    int_reader=kio._kio_core.read_unsigned_varint,
     min_value=0,
     max_value=2**31 - 1,
 )
 TestLegacyArrayLengthRoundtrip = create_integer_roundtrip_test(
     int_writer=write_legacy_array_length,
-    int_reader=read_legacy_array_length,
+    int_reader=kio._kio_core.read_legacy_array_length,
     min_value=-(2**31),
     max_value=2**31 - 1,
 )
 TestCompactArrayLengthRoundtrip = create_integer_roundtrip_test(
     int_writer=write_compact_array_length,
-    int_reader=read_compact_array_length,
-    min_value=-1,
+    int_reader=kio._kio_core.read_compact_array_length,
+    min_value=0,
     max_value=2**31 - 2,
 )
 

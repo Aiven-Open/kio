@@ -10,6 +10,15 @@ class UnexpectedNull(DecodeError):
     ...
 
 
+# todo: Consider sub-classing UnicodeDecodeError.
+class InvalidUnicode(DecodeError):
+    ...
+
+
+class NegativeByteLength(DecodeError):
+    ...
+
+
 class SchemaError(SerialError):
     ...
 
