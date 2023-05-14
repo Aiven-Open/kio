@@ -12,6 +12,7 @@ testpaths = ["tests", "src"]
 addopts = """\
 --doctest-modules \
 --random-order-bucket=global \
+--durations=5 \
 """
 asyncio_mode = "auto"
 # Promote warnings to errors.
