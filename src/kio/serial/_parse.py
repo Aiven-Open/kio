@@ -1,6 +1,6 @@
 from dataclasses import Field
 from dataclasses import fields
-from typing import IO
+from typing import IO, TypeAlias, Callable, NewType
 from typing import TypeVar
 from typing import assert_never
 
@@ -13,64 +13,69 @@ from ._introspect import classify_field
 from ._introspect import get_field_tag
 from ._introspect import get_schema_field_type
 from ._introspect import is_optional
+import kio._kio_core
+
+
+T = TypeVar("T")
+Reader: TypeAlias = Callable[[bytes, int], tuple[T, int]]
 
 
 def get_reader(
     kafka_type: str,
     flexible: bool,
     optional: bool,
-) -> readers.Reader:
+) -> Reader:
     match (kafka_type, flexible, optional):
         case ("int8", _, False):
-            return readers.read_int8
+            return kio._kio_core.read_int8
         case ("int16", _, False):
-            return readers.read_int16
+            return kio._kio_core.read_int16
         case ("int32", _, False):
-            return readers.read_int32
+            return kio._kio_core.read_int32
         case ("int64", _, False):
-            return readers.read_int64
+            return kio._kio_core.read_int64
         case ("uint8", _, False):
-            return readers.read_uint8
+            return kio._kio_core.read_uint8
         case ("uint16", _, False):
-            return readers.read_uint16
+            return kio._kio_core.read_uint16
         case ("uint32", _, False):
-            return readers.read_uint32
+            return kio._kio_core.read_uint32
         case ("uint64", _, False):
-            return readers.read_uint64
+            return kio._kio_core.read_uint64
         case ("float64", _, False):
-            return readers.read_float64
+            return kio._kio_core.read_float64
         case ("string", True, False):
-            return readers.read_compact_string
+            return kio._kio_core.read_compact_string
         case ("string", True, True):
-            return readers.read_compact_string_nullable
+            return kio._kio_core.read_compact_string_nullable
         case ("string", False, False):
-            return readers.read_legacy_string
+            return kio._kio_core.read_legacy_string
         case ("string", False, True):
-            return readers.read_nullable_legacy_string
+            return kio._kio_core.read_nullable_legacy_string
         case ("bytes", True, False):
-            return readers.read_compact_string_as_bytes
+            return kio._kio_core.read_compact_string_as_bytes
         case ("bytes", True, True):
-            return readers.read_compact_string_as_bytes_nullable
+            return kio._kio_core.read_compact_string_as_bytes_nullable
         case ("bytes", False, False):
-            return readers.read_legacy_bytes
+            return kio._kio_core.read_legacy_bytes
         case ("bytes", False, True):
-            return readers.read_nullable_legacy_bytes
+            return kio._kio_core.read_nullable_legacy_bytes
         case ("records", _, True):
-            return readers.read_nullable_legacy_bytes
+            return kio._kio_core.read_nullable_legacy_bytes
         case ("uuid", _, True):
-            return readers.read_uuid
+            return kio._kio_core.read_uuid
         case ("bool", _, False):
-            return readers.read_boolean
+            return kio._kio_core.read_boolean
         case ("error_code", _, False):
-            return readers.read_error_code
+            return kio._kio_core.read_error_code
         case ("timedelta_i32", _, False):
-            return readers.read_timedelta_i32
+            return kio._kio_core.read_timedelta_i32
         case ("timedelta_i64", _, False):
-            return readers.read_timedelta_i64
+            return kio._kio_core.read_timedelta_i64
         case ("datetime_i64", _, False):
-            return readers.read_datetime_i64
+            return kio._kio_core.read_datetime_i64
         case ("datetime_i64", _, True):
-            return readers.read_nullable_datetime_i64
+            return kio._kio_core.read_nullable_datetime_i64
 
     raise NotImplementedError(
         f"Failed identifying reader for {kafka_type!r} field {flexible=} {optional=}"
@@ -85,7 +90,7 @@ def get_field_reader(
     field: Field[T],
     is_request_header: bool,
     is_tagged_field: bool,
-) -> readers.Reader[T]:
+) -> Reader[T]:
     # RequestHeader.client_id is special-cased by Kafka to always use the legacy string
     # format.
     # https://github.com/apache/kafka/blob/trunk/clients/src/main/resources/common/message/RequestHeader.json#L34-L38

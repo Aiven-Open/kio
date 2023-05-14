@@ -14,7 +14,6 @@ from hypothesis.strategies import uuids
 from kio.schema.metadata.v12.response import MetadataResponse
 from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial.readers import read_uuid
 from kio.serial.writers import Writer
 from kio.serial.writers import write_boolean
 from kio.serial.writers import write_compact_array_length
@@ -41,13 +40,13 @@ def test_booleans_roundtrip(a: bool, b: bool) -> None:
     with io.BytesIO() as buffer:
         write_boolean(buffer, a)
         write_boolean(buffer, b)
-        flattened = buffer.getvalue()
+        encoded = buffer.getvalue()
 
     offset = 0
-    value, offset = kio._kio_core.read_boolean(flattened, offset)
+    value, offset = kio._kio_core.read_boolean(encoded, offset)
     assert a is value
     assert offset == 1
-    value, offset = kio._kio_core.read_boolean(flattened, offset)
+    value, offset = kio._kio_core.read_boolean(encoded, offset)
     assert b is value
     assert offset == 2
 
@@ -73,13 +72,13 @@ def create_integer_roundtrip_test(
             int_writer(buffer, a)
             int_writer(buffer, b)
 
-            flattened = buffer.getvalue()
+            encoded = buffer.getvalue()
             offset = 0
-            value, offset = int_reader(flattened, offset)
+            value, offset = int_reader(encoded, offset)
             assert a == value
-            value, offset = int_reader(flattened, offset)
+            value, offset = int_reader(encoded, offset)
             assert b == value
-            assert len(flattened) == offset
+            assert len(encoded) == offset
 
     return Test
 
@@ -157,11 +156,12 @@ def test_compact_string_roundtrip_sync(a: str, b: str) -> None:
     buffer = io.BytesIO()
     write_compact_string(buffer, a)
     write_compact_string(buffer, b)
-    buffer.seek(0)
-    assert a == read_compact_string(buffer)
-    assert b == read_compact_string(buffer)
-    # Make sure buffer is exhausted.
-    assert buffer.read(1) == b""
+    encoded = buffer.getvalue()
+    decoded_a, offset = kio._kio_core.read_compact_string(encoded, 0)
+    decoded_b, offset = kio._kio_core.read_compact_string(encoded, offset)
+    assert decoded_a == a
+    assert decoded_b == b
+    assert offset == buffer.tell()
 
 
 @given(binary(), binary())
@@ -169,90 +169,97 @@ def test_compact_bytes_roundtrip(a: bytes, b: bytes) -> None:
     buffer = io.BytesIO()
     write_compact_string(buffer, a)
     write_compact_string(buffer, b)
-    buffer.seek(0)
-    assert a == read_compact_string_as_bytes(buffer)
-    assert b == read_compact_string_as_bytes(buffer)
-    # Make sure buffer is exhausted.
-    assert buffer.read(1) == b""
+    encoded = buffer.getvalue()
+    decoded_a, offset = kio._kio_core.read_compact_string_as_bytes(encoded, 0)
+    decoded_b, offset = kio._kio_core.read_compact_string_as_bytes(encoded, offset)
+    assert decoded_a == a
+    assert decoded_b == b
+    assert offset == buffer.tell()
 
 
 def test_compact_bytes_roundtrip_none() -> None:
-    buffer = io.BytesIO()
-    write_nullable_compact_string(buffer, None)
-    write_nullable_compact_string(buffer, None)
-    buffer.seek(0)
-    assert read_compact_string_as_bytes_nullable(buffer) is None
-    assert read_compact_string_as_bytes_nullable(buffer) is None
-    # Make sure buffer is exhausted.
-    assert buffer.read(1) == b""
+    with io.BytesIO() as buffer:
+        write_nullable_compact_string(buffer, None)
+        write_nullable_compact_string(buffer, None)
+        encoded = buffer.getvalue()
+    decoded_a, offset = kio._kio_core.read_compact_string_as_bytes_nullable(encoded, 0)
+    decoded_b, offset = kio._kio_core.read_compact_string_as_bytes_nullable(encoded, offset)
+    assert decoded_a is None
+    assert decoded_b is None
+    assert offset == buffer.tell()
 
 
 def test_compact_string_roundtrip_none() -> None:
-    buffer = io.BytesIO()
-    write_nullable_compact_string(buffer, None)
-    write_nullable_compact_string(buffer, None)
-    buffer.seek(0)
-    assert read_compact_string_nullable(buffer) is None
-    assert read_compact_string_nullable(buffer) is None
-    # Make sure buffer is exhausted.
-    assert buffer.read(1) == b""
+    with io.BytesIO() as buffer:
+        write_nullable_compact_string(buffer, None)
+        write_nullable_compact_string(buffer, None)
+        encoded = buffer.getvalue()
+    decoded_a, offset = kio._kio_core.read_compact_string_nullable(encoded, 0)
+    decoded_b, offset = kio._kio_core.read_compact_string_nullable(encoded, offset)
+    assert decoded_a is None
+    assert decoded_b is None
+    assert offset == buffer.tell()
 
 
 @given(text(), text())
 def test_legacy_string_roundtrip(a: str, b: str) -> None:
-    buffer = io.BytesIO()
-    write_legacy_string(buffer, a)
-    write_legacy_string(buffer, b)
-    buffer.seek(0)
-    assert a == read_legacy_string(buffer)
-    assert b == read_legacy_string(buffer)
-    # Make sure buffer is exhausted.
-    assert buffer.read(1) == b""
+    with io.BytesIO() as buffer:
+        write_legacy_string(buffer, a)
+        write_legacy_string(buffer, b)
+        encoded = buffer.getvalue()
+    decoded_a, offset = kio._kio_core.read_legacy_string(encoded, 0)
+    decoded_b, offset = kio._kio_core.read_legacy_string(encoded, offset)
+    assert decoded_a == a
+    assert decoded_b == b
+    assert offset == len(encoded)
 
 
 @given(text() | none(), text() | none())
 def test_nullable_legacy_string_roundtrip(a: str | None, b: str | None) -> None:
-    buffer = io.BytesIO()
-    write_nullable_legacy_string(buffer, a)
-    write_nullable_legacy_string(buffer, b)
-    buffer.seek(0)
-    assert a == read_nullable_legacy_string(buffer)
-    assert b == read_nullable_legacy_string(buffer)
-    # Make sure buffer is exhausted.
-    assert buffer.read(1) == b""
+    with io.BytesIO() as buffer:
+        write_nullable_legacy_string(buffer, a)
+        write_nullable_legacy_string(buffer, b)
+        encoded = buffer.getvalue()
+    decoded_a, offset = kio._kio_core.read_nullable_legacy_string(encoded, 0)
+    decoded_b, offset = kio._kio_core.read_nullable_legacy_string(encoded, offset)
+    assert decoded_a == a
+    assert decoded_b == b
+    assert offset == len(encoded)
 
 
 @given(binary(), binary())
 def test_legacy_bytes_roundtrip(a: bytes, b: bytes) -> None:
-    buffer = io.BytesIO()
-    write_legacy_string(buffer, a)
-    write_legacy_string(buffer, b)
-    buffer.seek(0)
-    assert a == read_legacy_bytes(buffer)
-    assert b == read_legacy_bytes(buffer)
-    # Make sure buffer is exhausted.
-    assert buffer.read(1) == b""
+    with io.BytesIO() as buffer:
+        write_legacy_string(buffer, a)
+        write_legacy_string(buffer, b)
+        encoded = buffer.getvalue()
+    decoded_a, offset = kio._kio_core.read_legacy_bytes(encoded, 0)
+    decoded_b, offset = kio._kio_core.read_legacy_bytes(encoded, offset)
+    assert decoded_a == a
+    assert decoded_b == b
+    assert offset == len(encoded)
 
 
 @given(uuids() | none(), uuids() | none())
 def test_uuid_roundtrip(a: uuid.UUID | None, b: uuid.UUID | None) -> None:
-    buffer = io.BytesIO()
-    write_uuid(buffer, a)
-    write_uuid(buffer, b)
-    buffer.seek(0)
-    assert a == read_uuid(buffer)
-    assert b == read_uuid(buffer)
-    # Make sure buffer is exhausted.
-    assert buffer.read(1) == b""
+    with io.BytesIO() as buffer:
+        write_uuid(buffer, a)
+        write_uuid(buffer, b)
+        encoded = buffer.getvalue()
+    decoded_a, offset = kio._kio_core.read_uuid(encoded, 0)
+    decoded_b, offset = kio._kio_core.read_uuid(encoded, offset)
+    assert decoded_a == a
+    assert decoded_b == b
+    assert offset == len(encoded)
 
 
 @given(from_type(MetadataResponse))
 async def test_flexible_entity_roundtrip(instance: MetadataResponse) -> None:
-    buffer = io.BytesIO()
-    write_metadata_response = entity_writer(MetadataResponse)
-    write_metadata_response(buffer, instance)
-    buffer.seek(0)
-    result = entity_reader(MetadataResponse)(buffer)
+    with io.BytesIO() as buffer:
+        write_metadata_response = entity_writer(MetadataResponse)
+        write_metadata_response(buffer, instance)
+        encoded = buffer.getvalue()
+
+    result, offset = entity_reader(MetadataResponse)(encoded, 0)
     assert instance == result
-    # Make sure buffer is exhausted.
-    assert buffer.read(1) == b""
+    assert offset == len(encoded)

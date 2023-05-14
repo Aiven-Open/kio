@@ -1,3 +1,4 @@
+import datetime
 import io
 import struct
 import sys
@@ -7,8 +8,9 @@ from typing import Callable
 import pytest
 
 import kio._kio_core
-from kio.serial.errors import UnexpectedNull, InvalidUnicode, NegativeByteLength
-from kio.static.constants import uuid_zero
+from kio.serial.errors import UnexpectedNull, InvalidUnicode, NegativeByteLength, \
+    OutOfBoundValue
+from kio.static.constants import uuid_zero, ErrorCode
 
 
 class IntReaderContract:
@@ -417,3 +419,69 @@ class TestReadUUID:
         assert decoded == value
         assert offset == len(value.bytes)
         assert offset == 16
+
+
+class TestReadErrorCode:
+    def test_can_read_valid_error_code(self) -> None:
+        value = ErrorCode.unknown_server_error
+        encoded = struct.pack(">h", value.value)
+        decoded, offset = kio._kio_core.read_error_code(encoded, 0)
+        assert decoded is value
+        assert offset == len(encoded)
+
+    def test_raises_value_error_for_invalid_code(self) -> None:
+        encoded = struct.pack(">h", -2)
+        with pytest.raises(ValueError, match=r"^-2 is not a valid ErrorCode$"):
+            kio._kio_core.read_error_code(encoded, 0)
+
+
+class TestReadTimedeltaI32:
+    def test_can_read_timedelta(self) -> None:
+        value = datetime.timedelta(milliseconds=12345)
+        encoded = struct.pack(">i", round(value.total_seconds() * 1000))
+        decoded, offset = kio._kio_core.read_timedelta_i32(encoded, 0)
+        assert decoded == value
+        assert offset == len(encoded)
+
+
+class TestReadTimedeltaI64:
+    def test_can_read_timedelta(self) -> None:
+        value = datetime.timedelta(milliseconds=12345)
+        encoded = struct.pack(">q", round(value.total_seconds() * 1000))
+        decoded, offset = kio._kio_core.read_timedelta_i64(encoded, 0)
+        assert decoded == value
+        assert offset == len(encoded)
+
+
+class TestReadDatetimeI64:
+    def test_can_read_datetime(self) -> None:
+        value = datetime.datetime.now(tz=datetime.UTC).replace(microsecond=0)
+        encoded = struct.pack(">q", round(value.timestamp() * 1000))
+        decoded, offset = kio._kio_core.read_datetime_i64(encoded, 0)
+        assert decoded == value
+        assert offset == len(encoded)
+
+    def test_raises_out_of_bound_value_for_negative_timestamp(self) -> None:
+        encoded = struct.pack(">q", -1)
+        with pytest.raises(OutOfBoundValue, match=r"^Cannot parse negative timestamp$"):
+            kio._kio_core.read_datetime_i64(encoded, 0)
+
+
+class TestReadNullableDatetimeI64:
+    def test_can_read_datetime(self) -> None:
+        value = datetime.datetime.now(tz=datetime.UTC).replace(microsecond=0)
+        encoded = struct.pack(">q", round(value.timestamp() * 1000))
+        decoded, offset = kio._kio_core.read_nullable_datetime_i64(encoded, 0)
+        assert decoded == value
+        assert offset == len(encoded)
+
+    def test_can_read_none(self) -> None:
+        encoded = struct.pack(">q", -1)
+        decoded, offset = kio._kio_core.read_nullable_datetime_i64(encoded, 0)
+        assert decoded is None
+        assert offset == len(encoded)
+
+    def test_raises_out_of_bound_value_for_negative_timestamp(self) -> None:
+        encoded = struct.pack(">q", -2)
+        with pytest.raises(OutOfBoundValue, match=r"^Cannot parse negative timestamp$"):
+            kio._kio_core.read_nullable_datetime_i64(encoded, 0)
