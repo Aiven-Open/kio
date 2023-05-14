@@ -136,7 +136,10 @@ class TestWriteUint16(IntWriterContract):
     lower_limit_as_bytes = zero_as_bytes = b"\x00\x00"
     upper_limit = 2**16 - 1
     upper_limit_as_bytes = b"\xff\xff"
-    lower_limit_error_message = "argument out of range"
+    lower_limit_error_message = (
+        fr"(argument out of range)"
+        fr"|(format requires {lower_limit} <= number <= {upper_limit})"
+    )
 
 
 class TestWriteUint32(IntWriterContract):
@@ -145,7 +148,10 @@ class TestWriteUint32(IntWriterContract):
     lower_limit_as_bytes = zero_as_bytes = b"\x00\x00\x00\x00"
     upper_limit = 2**32 - 1
     upper_limit_as_bytes = b"\xff\xff\xff\xff"
-    lower_limit_error_message = "argument out of range"
+    lower_limit_error_message = (
+        fr"(argument out of range)"
+        fr"|(format requires {lower_limit} <= number <= {upper_limit})"
+    )
 
 
 class TestWriteUint64(IntWriterContract):
@@ -154,7 +160,10 @@ class TestWriteUint64(IntWriterContract):
     lower_limit_as_bytes = zero_as_bytes = b"\x00\x00\x00\x00\x00\x00\x00\x00"
     upper_limit = 2**64 - 1
     upper_limit_as_bytes = b"\xff\xff\xff\xff\xff\xff\xff\xff"
-    match_error_message = r"int too large to convert"
+    upper_limit_error_message = (
+        fr"(int too large to convert)"
+        fr"|(format requires {lower_limit} <= number <= {upper_limit})"
+    )
 
 
 class TestWriteUnsignedVarint:
