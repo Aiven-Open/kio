@@ -123,7 +123,7 @@ class TestWriteInt64(IntWriterContract):
     @property
     def match_error_message(self) -> str:
         return (
-            fr"^'>q' format requires {self.lower_limit} <= number <= {self.upper_limit}$"
+            rf"^'>q' format requires {self.lower_limit} <= number <= {self.upper_limit}$"
             if sys.version_info >= (3, 12)
             else r"^int too large to convert$"
         )
@@ -147,10 +147,9 @@ class TestWriteUint16(IntWriterContract):
     @property
     def lower_limit_error_message(self) -> str:
         return (
-            fr"^'>H' format requires {self.lower_limit} <= number <= {self.upper_limit}$"
+            rf"^'>H' format requires {self.lower_limit} <= number <= {self.upper_limit}$"
             if sys.version_info >= (3, 12)
-            else
-            r"^argument out of range$"
+            else r"^argument out of range$"
         )
 
 
@@ -164,10 +163,9 @@ class TestWriteUint32(IntWriterContract):
     @property
     def lower_limit_error_message(self) -> str:
         return (
-            fr"^'>I' format requires {self.lower_limit} <= number <= {self.upper_limit}$"
+            rf"^'>I' format requires {self.lower_limit} <= number <= {self.upper_limit}$"
             if sys.version_info >= (3, 12)
-            else
-            r"^argument out of range$"
+            else r"^argument out of range$"
         )
 
 
@@ -181,7 +179,7 @@ class TestWriteUint64(IntWriterContract):
     @property
     def lower_limit_error_message(self) -> str:
         return (
-            fr"^'>Q' format requires {self.lower_limit} <= number <= {self.upper_limit}$"
+            rf"^'>Q' format requires {self.lower_limit} <= number <= {self.upper_limit}$"
             if sys.version_info >= (3, 12)
             else
             # Note: this error message is clearly incorrect prior to 3.12.
@@ -191,10 +189,9 @@ class TestWriteUint64(IntWriterContract):
     @property
     def upper_limit_error_message(self) -> str:
         return (
-            fr"^'>Q' format requires {self.lower_limit} <= number <= {self.upper_limit}$"
+            rf"^'>Q' format requires {self.lower_limit} <= number <= {self.upper_limit}$"
             if sys.version_info >= (3, 12)
-            else
-            r"^int too large to convert$"
+            else r"^int too large to convert$"
         )
 
 
