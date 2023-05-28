@@ -16,7 +16,10 @@ addopts = """\
 """
 asyncio_mode = "auto"
 # Promote warnings to errors.
-filterwarnings = ["error"]
+filterwarnings = [
+  "error",
+  'ignore:ast\.Str is deprecated:DeprecationWarning',
+]
 
 
 [tool.ruff]
