@@ -41,7 +41,7 @@ class IntWriterContract(Generic[_I]):
 
     @property
     def match_error_message(self) -> str:
-        return rf"format requires {self.lower_limit} <= number <= {self.upper_limit}"
+        return rf"format requires {self.lower_limit} <= number <= {self.upper_limit}$"
 
     @property
     def upper_limit_error_message(self) -> str:
@@ -119,7 +119,14 @@ class TestWriteInt64(IntWriterContract):
     upper_limit = 2**63 - 1
     upper_limit_as_bytes = b"\x7f\xff\xff\xff\xff\xff\xff\xff"
     zero_as_bytes = b"\x00\x00\x00\x00\x00\x00\x00\x00"
-    match_error_message = "int too large to convert"
+
+    @property
+    def match_error_message(self) -> str:
+        return (
+            rf"^'q' format requires {self.lower_limit} <= number <= {self.upper_limit}$"
+            if sys.version_info >= (3, 12)
+            else r"^int too large to convert$"
+        )
 
 
 class TestWriteUint8(IntWriterContract):
@@ -136,7 +143,14 @@ class TestWriteUint16(IntWriterContract):
     lower_limit_as_bytes = zero_as_bytes = b"\x00\x00"
     upper_limit = 2**16 - 1
     upper_limit_as_bytes = b"\xff\xff"
-    lower_limit_error_message = "argument out of range"
+
+    @property
+    def lower_limit_error_message(self) -> str:
+        return (
+            rf"^'H' format requires {self.lower_limit} <= number <= {self.upper_limit}$"
+            if sys.version_info >= (3, 12)
+            else r"^argument out of range$"
+        )
 
 
 class TestWriteUint32(IntWriterContract):
@@ -145,7 +159,14 @@ class TestWriteUint32(IntWriterContract):
     lower_limit_as_bytes = zero_as_bytes = b"\x00\x00\x00\x00"
     upper_limit = 2**32 - 1
     upper_limit_as_bytes = b"\xff\xff\xff\xff"
-    lower_limit_error_message = "argument out of range"
+
+    @property
+    def lower_limit_error_message(self) -> str:
+        return (
+            rf"^'I' format requires {self.lower_limit} <= number <= {self.upper_limit}$"
+            if sys.version_info >= (3, 12)
+            else r"^argument out of range$"
+        )
 
 
 class TestWriteUint64(IntWriterContract):
@@ -154,7 +175,24 @@ class TestWriteUint64(IntWriterContract):
     lower_limit_as_bytes = zero_as_bytes = b"\x00\x00\x00\x00\x00\x00\x00\x00"
     upper_limit = 2**64 - 1
     upper_limit_as_bytes = b"\xff\xff\xff\xff\xff\xff\xff\xff"
-    match_error_message = r"int too large to convert"
+
+    @property
+    def lower_limit_error_message(self) -> str:
+        return (
+            rf"^'Q' format requires {self.lower_limit} <= number <= {self.upper_limit}$"
+            if sys.version_info >= (3, 12)
+            else
+            # Note: this error message is clearly incorrect prior to 3.12.
+            "^int too large to convert$"
+        )
+
+    @property
+    def upper_limit_error_message(self) -> str:
+        return (
+            rf"^'Q' format requires {self.lower_limit} <= number <= {self.upper_limit}$"
+            if sys.version_info >= (3, 12)
+            else r"^int too large to convert$"
+        )
 
 
 class TestWriteUnsignedVarint:

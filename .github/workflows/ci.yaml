@@ -15,6 +15,7 @@ concurrency:
 env:
   COLUMNS: "120"
   FORCE_COLOR: "1"
+  PYTHONUNBUFFERED: "1"
 
 jobs:
   lint:
@@ -32,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.11"]
+        python-version: ["3.11", "3.12-dev"]
     steps:
       - uses: actions/checkout@v3
 

@@ -16,7 +16,11 @@ addopts = """\
 """
 asyncio_mode = "auto"
 # Promote warnings to errors.
-filterwarnings = ["error"]
+filterwarnings = [
+  "error",
+  'ignore: ast\.[A-z]+ is deprecated:DeprecationWarning',
+  'ignore: Attribute s is deprecated and will be removed:DeprecationWarning',
+]
 
 
 [tool.ruff]
