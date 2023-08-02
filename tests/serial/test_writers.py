@@ -197,7 +197,7 @@ class TestWriteUint64(IntWriterContract):
 
 class TestWriteUnsignedVarint:
     def test_raises_value_error_for_negative_value(self, buffer: io.BytesIO) -> None:
-        with (pytest.raises(ValueError, match=r"^Value must be positive$")):
+        with pytest.raises(ValueError, match=r"^Value must be positive$"):
             write_unsigned_varint(buffer, -1)
 
     def test_raises_value_error_when_upper_limit_exceeded(
