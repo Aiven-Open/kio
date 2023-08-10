@@ -51,7 +51,6 @@ repos:
           - pydantic==1.10.2
           - hypothesis==6.61.0
           - types-setuptools==67.6.0.0
-          - phantom-types==1.2.0
           - types-requests==2.28.11.14
 
   - repo: https://github.com/seddonym/import-linter

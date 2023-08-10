@@ -9,10 +9,9 @@ from typing import TypeAlias
 from typing import TypeVar
 from uuid import UUID
 
-from phantom.datetime import TZAware
-
 from kio.static.constants import ErrorCode
 from kio.static.constants import uuid_zero
+from kio.static.primitive import TZAware
 from kio.static.primitive import i8
 from kio.static.primitive import i16
 from kio.static.primitive import i32

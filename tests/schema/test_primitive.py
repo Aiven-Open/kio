@@ -1,5 +1,3 @@
-from typing import cast
-
 from hypothesis import given
 from hypothesis.strategies import from_type
 from hypothesis.strategies import integers
@@ -15,8 +13,8 @@ from kio.static.primitive import u64
 
 
 class TestU8:
-    low = cast(int, u8.__low__)
-    high = cast(int, u8.__high__)
+    low = u8.__low__
+    high = u8.__high__
 
     @given(from_type(u8))
     def test_is_subtype_of_u16(self, value: u8) -> None:
@@ -32,8 +30,8 @@ class TestU8:
 
 
 class TestU16:
-    low = cast(int, u16.__low__)
-    high = cast(int, u16.__high__)
+    low = u16.__low__
+    high = u16.__high__
 
     @given(from_type(u16))
     def test_is_subtype_of_u32(self, value: u16) -> None:
@@ -49,8 +47,8 @@ class TestU16:
 
 
 class TestU32:
-    low = cast(int, u32.__low__)
-    high = cast(int, u32.__high__)
+    low = u32.__low__
+    high = u32.__high__
 
     @given(from_type(u32))
     def test_is_subtype_of_u64(self, value: u32) -> None:
@@ -66,8 +64,8 @@ class TestU32:
 
 
 class TestU64:
-    low = cast(int, u64.__low__)
-    high = cast(int, u64.__high__)
+    low = u64.__low__
+    high = u64.__high__
 
     @given(from_type(u64))
     def test_valid_value_is_instance(self, value: int) -> None:
@@ -79,8 +77,8 @@ class TestU64:
 
 
 class TestI8:
-    low = cast(int, i8.__low__)
-    high = cast(int, i8.__high__)
+    low = i8.__low__
+    high = i8.__high__
 
     @given(from_type(i8))
     def test_is_subtype_of_i16(self, value: i8) -> None:
@@ -96,8 +94,8 @@ class TestI8:
 
 
 class TestI16:
-    low = cast(int, i16.__low__)
-    high = cast(int, i16.__high__)
+    low = i16.__low__
+    high = i16.__high__
 
     @given(from_type(i16))
     def test_is_subtype_of_i32(self, value: i16) -> None:
@@ -113,8 +111,8 @@ class TestI16:
 
 
 class TestI32:
-    low = cast(int, i32.__low__)
-    high = cast(int, i32.__high__)
+    low = i32.__low__
+    high = i32.__high__
 
     @given(from_type(i32))
     def test_is_subtype_of_i64(self, value: i32) -> None:
@@ -130,8 +128,8 @@ class TestI32:
 
 
 class TestI64:
-    low = cast(int, i64.__low__)
-    high = cast(int, i64.__high__)
+    low = i64.__low__
+    high = i64.__high__
 
     @given(from_type(i64))
     def test_valid_value_is_instance(self, value: int) -> None:

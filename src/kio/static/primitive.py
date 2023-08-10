@@ -2,54 +2,98 @@ from __future__ import annotations
 
 import datetime
 import math
-from typing import TYPE_CHECKING
+from collections.abc import Callable
 from typing import Final
 
-from phantom import Phantom
-from phantom.interval import Inclusive
-
-if TYPE_CHECKING:
-    from hypothesis.strategies import SearchStrategy
+from ._phantom import Phantom
+from ._phantom import Predicate
 
 
-class i64(int, Inclusive, low=-(2**63), high=2**63 - 1):
-    ...
+def inclusive_interval(low: int, high: int) -> Predicate[int]:
+    def check(value: int) -> bool:
+        return low <= value <= high
+
+    return check
 
 
-class i32(i64, Inclusive, low=-(2**31), high=2**31 - 1):
-    ...
+class Interval(int, Phantom, bound=int, predicate=lambda _: True):
+    __low__: int
+    __high__: int
 
+    def __init_subclass__(
+        cls,
+        low: int | None = None,
+        high: int | None = None,
+        **kwargs: object,
+    ) -> None:
+        if low is None:
+            if getattr(cls, "__low__", ...) is ...:
+                raise TypeError("Interval definition must set lower bound.")
+        else:
+            cls.__low__ = low
+        if high is None:
+            if getattr(cls, "__high__", ...) is ...:
+                raise TypeError("Interval definition must set upper bound.")
+        else:
+            cls.__high__ = high
+        super().__init_subclass__(
+            bound=int,
+            predicate=inclusive_interval(cls.__low__, cls.__high__),
+        )
 
-class i16(i32, Inclusive, low=-(2**15), high=2**15 - 1):
-    ...
-
-
-class i8(i16, Inclusive, low=-128, high=127):
-    ...
-
-
-class u64(int, Inclusive, low=0, high=2**64 - 1):
-    ...
-
-
-class u32(u64, Inclusive, low=0, high=2**32 - 1):
-    ...
-
-
-class u16(u32, Inclusive, low=0, high=2**16 - 1):
-    ...
-
-
-class u8(u16, Inclusive, low=0, high=2**8 - 1):
-    ...
-
-
-class f64(float, Phantom, predicate=math.isfinite):
     @classmethod
-    def __register_strategy__(cls) -> SearchStrategy:
-        from hypothesis.strategies import floats
+    def __hypothesis_hook__(cls) -> None:
+        from hypothesis.strategies import integers
+        from hypothesis.strategies import register_type_strategy
 
-        return floats(allow_nan=False, allow_infinity=False)
+        register_type_strategy(
+            cls,
+            integers(  # type: ignore[arg-type]
+                min_value=getattr(cls, "__low__", None),
+                max_value=getattr(cls, "__high__", None),
+            ),
+        )
+
+
+class i64(Interval, low=-(2**63), high=2**63 - 1):
+    ...
+
+
+class i32(i64, low=-(2**31), high=2**31 - 1):
+    ...
+
+
+class i16(i32, low=-(2**15), high=2**15 - 1):
+    ...
+
+
+class i8(i16, low=-128, high=127):
+    ...
+
+
+class u64(Interval, low=0, high=2**64 - 1):
+    ...
+
+
+class u32(u64, high=2**32 - 1):
+    ...
+
+
+class u16(u32, high=2**16 - 1):
+    ...
+
+
+class u8(u16, high=2**8 - 1):
+    ...
+
+
+class f64(float, Phantom, bound=float, predicate=math.isfinite):
+    @classmethod
+    def __hypothesis_hook__(cls) -> None:
+        from hypothesis.strategies import floats
+        from hypothesis.strategies import register_type_strategy
+
+        register_type_strategy(cls, floats(allow_nan=False, allow_infinity=False))  # type: ignore[arg-type]
 
 
 def has_millisecond_precision(value: datetime.timedelta) -> bool:
@@ -68,19 +112,29 @@ def is_i32_timedelta(value: datetime.timedelta) -> bool:
     )
 
 
-class i32Timedelta(datetime.timedelta, Phantom, predicate=is_i32_timedelta):
+class i32Timedelta(
+    datetime.timedelta,
+    Phantom,
+    bound=datetime.timedelta,
+    predicate=is_i32_timedelta,
+):
     @classmethod
-    def __register_strategy__(cls) -> SearchStrategy:
+    def __hypothesis_hook__(cls) -> None:
+        from hypothesis.strategies import SearchStrategy
         from hypothesis.strategies import composite
+        from hypothesis.strategies import integers
+        from hypothesis.strategies import register_type_strategy
 
         @composite
-        def timedeltas(  # type: ignore[no-untyped-def]
-            draw,
-            elements=i32.__register_strategy__(),
-        ) -> datetime.timedelta:
-            return datetime.timedelta(milliseconds=draw(elements))
+        def i32_timedeltas(
+            draw: Callable,
+            elements: SearchStrategy[int] = integers(-(2**31), 2**31 - 1),
+        ) -> i32Timedelta:
+            return datetime.timedelta(  # type: ignore[return-value]
+                milliseconds=draw(elements)
+            )
 
-        return timedeltas()
+        register_type_strategy(cls, i32_timedeltas())
 
 
 i64_timedelta_min: Final = datetime.timedelta.min
@@ -94,16 +148,50 @@ def is_i64_timedelta(value: datetime.timedelta) -> bool:
     )
 
 
-class i64Timedelta(datetime.timedelta, Phantom, predicate=is_i64_timedelta):
+class i64Timedelta(
+    datetime.timedelta,
+    Phantom,
+    bound=datetime.timedelta,
+    predicate=is_i64_timedelta,
+):
     @classmethod
-    def __register_strategy__(cls) -> SearchStrategy:
+    def __hypothesis_hook__(cls) -> None:
+        from hypothesis.strategies import SearchStrategy
         from hypothesis.strategies import composite
+        from hypothesis.strategies import integers
+        from hypothesis.strategies import register_type_strategy
 
         @composite
-        def timedeltas(  # type: ignore[no-untyped-def]
-            draw,
-            elements=i64.__register_strategy__(),
-        ) -> datetime.timedelta:
-            return datetime.timedelta(milliseconds=draw(elements))
+        def i64_timedeltas(
+            draw: Callable,
+            elements: SearchStrategy[int] = integers(-(2**63), 2**63 - 1),
+        ) -> i64Timedelta:
+            return datetime.timedelta(  # type: ignore[return-value]
+                milliseconds=draw(elements),
+            )
 
-        return timedeltas()
+        register_type_strategy(cls, i64_timedeltas())
+
+
+def is_tz_aware(dt: datetime.datetime) -> bool:
+    return dt.tzinfo is not None and dt.tzinfo.utcoffset(dt) is not None
+
+
+class TZAware(
+    datetime.datetime,
+    Phantom,
+    bound=datetime.datetime,
+    predicate=is_tz_aware,
+):
+    tzinfo: datetime.tzinfo
+
+    @classmethod
+    def __hypothesis_hook__(cls) -> None:
+        from hypothesis.strategies import datetimes
+        from hypothesis.strategies import register_type_strategy
+        from hypothesis.strategies import timezones
+
+        register_type_strategy(
+            cls,
+            datetimes(timezones=timezones()),  # type: ignore[arg-type]
+        )

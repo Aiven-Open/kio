@@ -1,0 +1,21 @@
+[project]
+name = "python-kafka-protocol-docs"
+version = "0"
+requires-python = ">3.11,<3.12"
+classifiers = ["Private :: Do Not Upload"]
+dependencies = [
+  "sphinx",
+  "sphinx-autodoc-typehints",
+  "recommonmark",
+  "m2r2",
+  "mistune<2",
+  "furo",
+
+  # Package dependencies.
+  "typing-extensions",
+]
+
+[tool.pip-tools]
+generate-hashes = true
+strip-extras = true
+upgrade = true
