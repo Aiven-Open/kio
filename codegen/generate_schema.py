@@ -48,9 +48,19 @@ import datetime
 from dataclasses import dataclass, field
 from typing import Annotated, ClassVar
 import uuid
-from kio.static.primitive import i8, i16, i32, i64, u8, u16, u32, u64, f64, i32Timedelta, i64Timedelta
+from kio.static.primitive import i8
+from kio.static.primitive import i16
+from kio.static.primitive import i32
+from kio.static.primitive import i64
+from kio.static.primitive import u8
+from kio.static.primitive import u16
+from kio.static.primitive import u32
+from kio.static.primitive import u64
+from kio.static.primitive import f64
+from kio.static.primitive import i32Timedelta
+from kio.static.primitive import i64Timedelta
+from kio.static.primitive import TZAware
 from kio.static.constants import ErrorCode
-from phantom.datetime import TZAware
 '''
 
 
@@ -487,7 +497,6 @@ seen_custom_types = set[str]()
 custom_type_imports = """\
 from typing import NewType
 from kio.static.primitive import i8, i16, i32, i64, u8, u16, u32, u64, f64
-from phantom import Phantom
 """
 
 

@@ -110,7 +110,7 @@ def test_serializing_raises_out_of_bound_error_for_too_large_array(
 ) -> None:
     class LargeCollection:
         def __len__(self) -> int:
-            return cast(int, i32.__high__) + 1
+            return i32.__high__ + 1
 
     instance = Flat(values=cast(tuple[u8, ...], LargeCollection()))
     writer = entity_writer(Flat)

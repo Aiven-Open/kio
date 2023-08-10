@@ -8,10 +8,9 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
 
-from phantom.datetime import TZAware
-
 from kio.schema.response_header.v0.header import ResponseHeader
 from kio.static.constants import ErrorCode
+from kio.static.primitive import TZAware
 from kio.static.primitive import i16
 from kio.static.primitive import i32Timedelta
 

@@ -145,7 +145,7 @@ async def make_request(
     request: Payload,
     response_type: type[R],
 ) -> R:
-    correlation_id = i32(secrets.randbelow(i32.__high__ + 1))  # type: ignore[operator]
+    correlation_id = i32(secrets.randbelow(i32.__high__ + 1))
     stream_reader, stream_writer = await asyncio.open_connection(
         host="127.0.0.1",
         port=9092,
