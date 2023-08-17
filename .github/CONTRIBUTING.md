@@ -20,3 +20,7 @@ allows for pushing many "fix" commits to feature branches without using force pu
 
 [squash merging]:
   https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/about-pull-request-merges#squash-and-merge-your-commits
+
+Releases of the project follow [Semantic Versioning v2.0.0][semver].
+
+[semver]: https://semver.org/spec/v2.0.0.html
