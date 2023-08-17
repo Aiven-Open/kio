@@ -1,14 +1,15 @@
-exclude .editorconfig
 recursive-exclude .github *
 recursive-exclude docs *
 recursive-exclude tests *
 recursive-exclude codegen *
 recursive-exclude container *
 recursive-exclude benchmarks *
-recursive-include src py.typed
-recursive-include src *.py
+exclude .editorconfig
 exclude *.yaml
 exclude *.yml
-include README.md
-include LICENSE
 exclude Makefile
+recursive-include src py.typed
+recursive-include src *.py
+include LICENSE
+include NOTICE
+include README.md

@@ -14,9 +14,9 @@ import kio  # noqa: E402
 current_dir = pathlib.Path(__file__).resolve().parent
 
 
-def get_copyright_from_license() -> str:
-    license = current_dir.parent / "LICENSE"
-    prefix = "Copyright (c) "
+def get_copyright_from_notice() -> str:
+    license = current_dir.parent / "NOTICE"
+    prefix = "Copyright "
     for line in license.read_text().split("\n"):
         if line.startswith(prefix):
             return line[len(prefix) :]
@@ -25,7 +25,7 @@ def get_copyright_from_license() -> str:
 
 # Project information
 project = "kafka-protocol"
-copyright = get_copyright_from_license()
+copyright = get_copyright_from_notice()
 author = "Anton Agestam"
 version = kio.__version__
 release = version
