@@ -5,13 +5,13 @@
 </p>
 
 <p align=center>
-    Kafka Protocol data types for Python.
+    Python data types for the Apache Kafka® Protocol.
 </p>
 
 ## Features
 
-- Exposes immutable dataclass entities for all Kafka Protocol messages, generated from
-  the [same source][schema-source] as used by Kafka's internals.
+- Exposes immutable dataclass entities for all protocol messages, generated from
+  the [same source][schema-source] as used by Apache Kafka®'s internals.
 - Message classes are simply light-weight data containers and does not inherit anything
   or expose any methods other than a vanilla dataclass. Encoding and decoding is enabled
   by making all the necessary details about Kafka encoding introspectable.
@@ -29,9 +29,9 @@ Install development requirements.
 $ python3 -m pip install -e .[all]
 ```
 
-The test suite contains integration tests that expects to be able to connect to a Kafka
+The test suite contains integration tests that expects to be able to connect to an Apache Kafka®
 instance running on `127.0.0.1:9092`. There is a Docker Compose file in
-`container/compose.yml` that you can use to conveniently start up a Kafka instance.
+`container/compose.yml` that you can use to conveniently start up an instance.
 
 ```shell
 $ docker compose --file=container/compose.yml up -d
