@@ -24,7 +24,7 @@ def get_copyright_from_notice() -> str:
 
 
 # Project information
-project = "kafka-protocol"
+project = "kio"
 copyright = get_copyright_from_notice()
 author = "Anton Agestam"
 version = kio.__version__

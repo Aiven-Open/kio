@@ -12,7 +12,7 @@ When contributing please keep this in mind:
 
 The [README][readme] contains instructions for getting started with development.
 
-[readme]: https://github.com/aiven/python-kafka-protocol/blob/main/README.md#development
+[readme]: https://github.com/aiven/kio/blob/main/README.md#development
 
 We use [squash merging] to achieve a linear git history. This means every PR needs to be
 a logic unit of changes to the code-base, that makes sense to be squashed. This also

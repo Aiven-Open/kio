@@ -1,5 +1,5 @@
 version: '2'
-name: python-kafka-protocol
+name: kio
 services:
   # Adopted from
   # https://github.com/confluentinc/cp-all-in-one/tree/6.2.0-post/cp-all-in-one-kraft

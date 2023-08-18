@@ -1,5 +1,5 @@
-kafka-protocol
-==============
+kio
+===
 
 Fundamentals for parsing and serializing Kafka protocol messages in Python.
 

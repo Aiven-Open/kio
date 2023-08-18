@@ -1,7 +1,7 @@
-<h1 align=center>kafka-protocol</h1>
+<h1 align=center>kio</h1>
 
 <p align=center>
-    <a href=https://github.com/aiven/python-kafka-protocol/actions?query=workflow%3ACI+branch%3Amain><img src=https://github.com/aiven/python-kafka-protocol/workflows/CI/badge.svg alt="CI Build Status"></a>
+    <a href=https://github.com/aiven/kio/actions?query=workflow%3ACI+branch%3Amain><img src=https://github.com/aiven/kio/workflows/CI/badge.svg alt="CI Build Status"></a>
 </p>
 
 <p align=center>

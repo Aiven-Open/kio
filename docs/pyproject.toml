@@ -1,5 +1,5 @@
 [project]
-name = "python-kafka-protocol-docs"
+name = "kio-docs"
 version = "0"
 requires-python = ">3.11,<3.12"
 classifiers = ["Private :: Do Not Upload"]
