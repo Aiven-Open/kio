@@ -5,7 +5,7 @@ Asynchronous writing and reading
 --------------------------------
 
 In this example we show how message entities can be used to serialize and send a request
-to Kafka, and receive and parse the response into a full entity.
+to Apache Kafka®, and receive and parse the response into a full entity.
 
 .. code-block:: python
 

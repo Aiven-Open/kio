@@ -4,8 +4,8 @@ Project goals
 Primary goals
 -------------
 
-- Provide correct and typing-friendly models for the entirety of the Kafka protocol, by
-  generating from Kafka's schema spec.
+- Provide correct and typing-friendly models for the entirety of the Apache Kafka® Protocol, by
+  generating from the upstream schema specification.
 - Expose user-friendly APIs for serializing and parsing protocol messages.
 
 Secondary goals

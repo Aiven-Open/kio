@@ -1,7 +1,7 @@
 Schema
 ======
 
-Schema entities are generated from `Kafka's schema specification
+Schema entities are generated from `the upstream schema specification
 <https://github.com/apache/kafka/tree/79b5f7f/clients/src/main/resources/common/message>`_.
 Every API version has separate schema entities, to allow best-in-class typing support
 for message models. Schema entities are exposed in sub-modules under the

@@ -86,8 +86,8 @@ def get_field_reader(
     is_request_header: bool,
     is_tagged_field: bool,
 ) -> readers.Reader[T]:
-    # RequestHeader.client_id is special-cased by Kafka to always use the legacy string
-    # format.
+    # RequestHeader.client_id is special-cased by Apache Kafka® to always use the legacy
+    # string format.
     # https://github.com/apache/kafka/blob/trunk/clients/src/main/resources/common/message/RequestHeader.json#L34-L38
     if is_request_header and field.name == "client_id":
         return readers.read_nullable_legacy_string  # type: ignore[return-value]

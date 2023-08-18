@@ -1,8 +1,7 @@
 kio
 ===
 
-Fundamentals for parsing and serializing Kafka protocol messages in Python.
-
+Python data types for the Apache Kafka® Protocol.
 
 Documentation sections
 ----------------------

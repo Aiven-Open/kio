@@ -65,7 +65,7 @@ def read_uint64(buffer: IO[bytes]) -> u64:
     return struct.unpack(">Q", buffer.read(8))[0]  # type: ignore[no-any-return]
 
 
-# See description and Kafka implementation.
+# See description and upstream implementation.
 # https://developers.google.com/protocol-buffers/docs/encoding?csw=1#varints
 # https://github.com/apache/kafka/blob/ef96ac07f565a73e35c5b0f4c56c8e87cfbaaf59/clients/src/main/java/org/apache/kafka/common/utils/ByteUtils.java#L262
 def read_unsigned_varint(buffer: IO[bytes]) -> int:
@@ -91,7 +91,7 @@ def read_float64(buffer: IO[bytes]) -> float:
 
 
 def read_compact_string_as_bytes(buffer: IO[bytes]) -> bytes:
-    # Kafka uses the string length plus 1.
+    # Apache Kafka® uses the string length plus 1.
     length = read_unsigned_varint(buffer) - 1
     if length == -1:
         raise UnexpectedNull(
@@ -101,7 +101,7 @@ def read_compact_string_as_bytes(buffer: IO[bytes]) -> bytes:
 
 
 def read_compact_string_as_bytes_nullable(buffer: IO[bytes]) -> bytes | None:
-    # Kafka uses the string length plus 1.
+    # Apache Kafka® uses the string length plus 1.
     length = read_unsigned_varint(buffer) - 1
     if length == -1:
         return None
@@ -158,7 +158,7 @@ read_legacy_array_length: Final = read_int32
 
 
 def read_compact_array_length(buffer: IO[bytes]) -> int:
-    # Kafka uses the array size plus 1.
+    # Apache Kafka® uses the array size plus 1.
     return read_unsigned_varint(buffer) - 1
 
 

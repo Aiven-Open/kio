@@ -19,15 +19,15 @@ class Entity(DataclassInstance, Protocol):
     """All schema entities adhere to this protocol."""
 
     __version__: ClassVar[i16]
-    """The version of the Kafka API that the entity is modeling."""
+    """The version of the protocol API that the entity is modeling."""
     __flexible__: ClassVar[bool]
     """
-    Whether the API version is "flexible" or not, see `Kafka protocol documentation
+    Whether the API version is "flexible" or not, see `upstream protocol documentation
     <https://github.com/apache/kafka/tree/79b5f7f/clients/src/main/resources/common/message#flexible-versions>`_.
     """
 
 
-# Kafka calls this "message", but it also calls the whole message (header +
+# Apache Kafka® calls this "message", but it also calls the whole message (header +
 # payload) "message", so to disambiguate, we call this part of the message
 # "payload" instead.
 class Payload(DataclassInstance, Protocol):
@@ -37,10 +37,10 @@ class Payload(DataclassInstance, Protocol):
     """
 
     __version__: ClassVar[i16]
-    """The version of the Kafka API that the entity is modeling."""
+    """The version of the protocol API that the entity is modeling."""
     __flexible__: ClassVar[bool]
     """
-    Whether the API version is "flexible" or not, see `Kafka protocol documentation
+    Whether the API version is "flexible" or not, see `upstream protocol documentation
     <https://github.com/apache/kafka/tree/79b5f7f/clients/src/main/resources/common/message#flexible-versions>`_.
     """
     __api_key__: ClassVar[i16]

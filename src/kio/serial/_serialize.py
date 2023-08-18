@@ -92,8 +92,8 @@ def get_field_writer(
     is_request_header: bool,
     is_tag: bool,
 ) -> Writer[T]:
-    # RequestHeader.client_id is special-cased by Kafka to always use the legacy string
-    # format.
+    # RequestHeader.client_id is special-cased by Apache Kafka® to always use the legacy
+    # string format.
     # https://github.com/apache/kafka/blob/trunk/clients/src/main/resources/common/message/RequestHeader.json#L34-L38
     # It's odd that this choice is made, instead of addressing this only for the
     # ApiVersions request, because it's response is already special-cased.

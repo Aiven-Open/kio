@@ -70,7 +70,7 @@ def write_uint64(buffer: Writable, value: u64) -> None:
 unsigned_varint_upper_limit: Final = 2**31 - 1
 
 
-# See description and Kafka implementation.
+# See description and upstream implementation.
 # https://developers.google.com/protocol-buffers/docs/encoding?csw=1#varints
 # https://github.com/apache/kafka/blob/ef96ac07f565a73e35c5b0f4c56c8e87cfbaaf59/clients/src/main/java/org/apache/kafka/common/utils/ByteUtils.java#L262
 def write_unsigned_varint(buffer: Writable, value: int) -> None:
@@ -159,7 +159,7 @@ def write_legacy_array_length(buffer: Writable, value: i32) -> None:
 
 
 def write_compact_array_length(buffer: Writable, value: int) -> None:
-    # Kafka uses the array size plus 1 to ensure that `None` can be
+    # Apache Kafka® uses the array size plus 1 to ensure that `None` can be
     # distinguished from empty.
     write_unsigned_varint(buffer, value + 1)
 
