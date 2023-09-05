@@ -1,6 +1,63 @@
+[project]
+name = "kio"
+authors = [
+  { name="Anton Agestam", email="anton.agestam@aiven.io" },
+]
+description = "Python data types for the Apache Kafka® Protocol."
+license = {text = "Apache-2.0 license"}
+requires-python = ">=3.11"
+classifiers = [
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.11",
+  "Typing :: Typed",
+  "Topic :: Database",
+]
+dynamic = ["version", "readme"]
+dependencies = [
+  "typing-extensions>=4.6.0",
+]
+
+[project.optional-dependencies]
+test = [
+  "pytest",
+  "pytest-asyncio",
+  "pytest-icdiff",
+  "pytest-random-order",
+  "hypothesis>=6.61.0",
+  "coverage",
+]
+codegen = [
+  "pydantic>=1.10.4,<2",
+  "requests",
+  "pre-commit",
+]
+all = [
+  "kio[test]",
+  "kio[codegen]",
+]
+
+[project.urls]
+"Source Repository" = "https://github.com/Aiven-Open/kio"
+"Bug Tracker" = "https://github.com/Aiven-Open/kio/issues"
+
 [build-system]
-requires = ["setuptools>=67.6.0", "wheel"]
+requires = ["setuptools>=68.1.2", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.dynamic]
+version = {attr = "kio.__version__"}
+readme = {file = "README.md", content-type = "text/markdown; charset=UTF-8"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+namespaces = false
 
 
 [tool.black]

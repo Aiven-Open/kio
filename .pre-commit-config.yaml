@@ -76,4 +76,4 @@ repos:
       - id: check-manifest
         args: ["--no-build-isolation"]
         additional_dependencies:
-          - setuptools==67.6.0
+          - setuptools==68.1.2
