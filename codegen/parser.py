@@ -136,8 +136,18 @@ class PrimitiveArrayType(NamedTuple):
         yield parse_primitive_array_type
 
 
+def parse_common_struct_reference(struct_name: object) -> CommonStruct:
+    if not isinstance(struct_name, str):
+        raise ValueError("Common struct reference must be str")
+
+    try:
+        return structs_registry[struct_name]
+    except KeyError:
+        raise ValueError(f"No registered common struct named {struct_name!r}") from None
+
+
 class CommonStructArrayType(NamedTuple):
-    item_type: CommonStruct
+    struct: CommonStruct
 
     @classmethod
     def __get_validators__(cls) -> Iterator[Callable[[object], CommonStructArrayType]]:
@@ -146,19 +156,23 @@ class CommonStructArrayType(NamedTuple):
                 raise ValueError("CommonStructArrayType must be str")
             if not value.startswith("[]"):
                 raise ValueError("CommonStructArrayType must start with '[]'")
-
             struct_name = value.removeprefix("[]")
-
-            try:
-                struct = structs_registry[struct_name]
-            except KeyError:
-                raise ValueError(
-                    f"No registered common struct named {struct_name!r}"
-                ) from None
-
+            struct = parse_common_struct_reference(struct_name)
             return CommonStructArrayType(struct)
 
         yield parse_common_struct_array_type
+
+
+class CommonStructType(NamedTuple):
+    struct: CommonStruct
+
+    @classmethod
+    def __get_validators__(cls) -> Iterator[Callable[[object], CommonStructType]]:
+        def parse_common_struct_type(struct_name: object) -> CommonStructType:
+            struct = parse_common_struct_reference(struct_name)
+            return CommonStructType(struct)
+
+        yield parse_common_struct_type
 
 
 class _BaseField(BaseModel):
@@ -222,7 +236,7 @@ class _BaseField(BaseModel):
 
 # Defining this union before its members allows not having to call
 # EntityField.update_forward_refs().
-Field: TypeAlias = "PrimitiveField | PrimitiveArrayField | EntityArrayField | CommonStructArrayField | EntityField"
+Field: TypeAlias = "PrimitiveField | PrimitiveArrayField | EntityArrayField | CommonStructArrayField | EntityField | CommonStructField"
 timedelta_names: Final = frozenset(
     {
         "timeoutMs",
@@ -341,6 +355,10 @@ class PrimitiveArrayField(_BaseField):
 
 class CommonStructArrayField(_BaseField):
     type: CommonStructArrayType
+
+
+class CommonStructField(_BaseField):
+    type: CommonStructType
 
 
 class EntityArrayField(_BaseField):
