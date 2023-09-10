@@ -27,7 +27,7 @@ class PartitionData:
     leader_epoch: i32 = field(metadata={"kafka_type": "int32"})
     """The leader epoch of this partition"""
     new_isr: tuple[BrokerId, ...] = field(metadata={"kafka_type": "int32"}, default=())
-    """The ISR for this partition"""
+    """The ISR for this partition. Deprecated since version 3."""
     partition_epoch: i32 = field(metadata={"kafka_type": "int32"})
     """The expected epoch of the partition which is being updated. For legacy cluster this is the ZkVersion in the LeaderAndIsr request."""
 

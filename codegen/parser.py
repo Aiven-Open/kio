@@ -10,6 +10,7 @@ import textwrap
 from collections.abc import Callable
 from collections.abc import Iterator
 from collections.abc import Mapping
+from collections.abc import Sequence
 from typing import Annotated
 from typing import Final
 from typing import Literal
@@ -19,6 +20,7 @@ from typing import assert_never
 
 import pydantic
 from pydantic import root_validator
+from pydantic import validator
 
 from .util import BaseModel
 from .versions import VersionRange
@@ -170,8 +172,32 @@ class _BaseField(BaseModel):
     tag: int | None = None
     taggedVersions: VersionRange | None = None
 
+    # This broke in upstream version 3.5, prior to that every message had the versions
+    # field set. It was subsequently fixed, however according to discussion on the PR,
+    # there is no intent to treat this strictly, so it needs to be treated as a
+    # "feature" of the schema format.
+    # https://github.com/apache/kafka/pull/13680
+    @root_validator(pre=True)
     @classmethod
+    def use_tagged_versions_as_fallback_for_versions(
+        cls,
+        values: Mapping[str, object],
+    ) -> Mapping[str, object]:
+        if "versions" in values:
+            return values
+
+        try:
+            tagged_versions = values["taggedVersions"]
+        except KeyError as e:
+            raise ValueError(
+                "Cannot derive a version range without one of `versions` or "
+                "`taggedVersions`, and could not find either"
+            ) from e
+
+        return {**values, "versions": tagged_versions}
+
     @root_validator
+    @classmethod
     def validate_tag_tagged_versions_composite(
         cls,
         values: Mapping[str, object],
@@ -211,6 +237,7 @@ timedelta_names: Final = frozenset(
         "ExpiryTimePeriodMs",
         "RenewPeriodMs",
         "RetentionTimeMs",
+        "HeartbeatIntervalMs",
     }
 )
 datetime_names: Final = frozenset(
@@ -223,6 +250,7 @@ datetime_names: Final = frozenset(
     }
 )
 excluded_ms_names: Final = frozenset[str]()
+error_code_names: Final = frozenset({"ErrorCode", "PartitionErrorCode"})
 
 
 class PrimitiveField(_BaseField):
@@ -256,7 +284,7 @@ class PrimitiveField(_BaseField):
         cls,
         values: Mapping[str, object],
     ) -> Mapping[str, object]:
-        if values["name"] == "ErrorCode":
+        if values["name"] in error_code_names:
             return values | {"type": "error_code"}
         return values
 
@@ -359,7 +387,56 @@ class CommonStruct(BaseModel):
 
 
 class CommonStructSchema(BaseModel):
-    commonStructs: tuple[CommonStruct, ...]
+    commonStructs: tuple[CommonStruct, ...] = ()
+
+    @validator("commonStructs", pre=True, always=False)
+    @classmethod
+    def solve_forward_references(cls, value: object) -> object:
+        """
+        Upstream version 3.5 introduced a schema construct in the common structs of
+        AddPartitionsToTxnResponse that is only solvable by keeping track of forward
+        references. This method does that in a somewhat crude but effective way: we
+        assume that any ValidationError raised when parsing a CommonStruct could be
+        solved by first resolving the other available common structs.
+
+        This is implemented with a recursive function, but guarding itself against a
+        situation where it's no longer making progress.
+        """
+        global structs_registry
+
+        if not isinstance(value, Sequence) or not value:
+            return value
+
+        def resolve_structs(raw_structs: Sequence[object]) -> Iterator[CommonStruct]:
+            unsolved = []
+            for struct_data in raw_structs:
+                try:
+                    struct = CommonStruct.parse_obj(struct_data)
+                except pydantic.ValidationError:
+                    unsolved.append(struct_data)
+                    continue
+                yield struct
+
+            if not unsolved:
+                # All structs are resolved, we're done.
+                return
+
+            # If unsolved contain as many values as we started out with, it means we
+            # made no progress at all in this pass, and there's no point in keeping
+            # trying.
+            if len(unsolved) == len(raw_structs):
+                raise RuntimeError(
+                    "Last pass made no progress, and there are still unsolved structs"
+                )
+
+            yield from resolve_structs(unsolved)
+
+        for resolved_struct in resolve_structs(value):
+            if resolved_struct.name in structs_registry:
+                raise RuntimeError("Struct with conflicting name is already registered")
+            structs_registry[resolved_struct.name] = resolved_struct
+
+        yield from resolve_structs(value)
 
 
 EntityArrayField.update_forward_refs()
@@ -371,6 +448,13 @@ def get_error_json(data: object, location: tuple[str | int, ...]) -> object:
         assert isinstance(extracted, dict)
         extracted = extracted[level]
     return extracted
+
+
+def parse_common_structs(json_structure: object) -> dict[str, CommonStruct]:
+    return {
+        struct.name: struct
+        for struct in CommonStructSchema.parse_obj(json_structure).commonStructs
+    }
 
 
 def parse_file(path: pathlib.Path) -> MessageSchema | HeaderSchema | DataSchema:
@@ -385,16 +469,7 @@ def parse_file(path: pathlib.Path) -> MessageSchema | HeaderSchema | DataSchema:
             contents += line
 
     parsed_json = json.loads(contents)
-
-    try:
-        parsed_structs = CommonStructSchema.parse_obj(parsed_json)
-    except pydantic.ValidationError:
-        if "commonStructs" in parsed_json:
-            raise
-    else:
-        structs_registry = {
-            struct.name: struct for struct in parsed_structs.commonStructs
-        }
+    structs_registry = parse_common_structs(parsed_json)
 
     try:
         parsed_schema = Schema.parse_obj(parsed_json)

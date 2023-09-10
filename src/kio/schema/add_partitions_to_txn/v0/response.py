@@ -24,7 +24,7 @@ class AddPartitionsToTxnPartitionResult:
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     partition_index: i32 = field(metadata={"kafka_type": "int32"})
     """The partition indexes."""
-    error_code: ErrorCode = field(metadata={"kafka_type": "error_code"})
+    partition_error_code: ErrorCode = field(metadata={"kafka_type": "error_code"})
     """The response error code."""
 
 
@@ -36,7 +36,7 @@ class AddPartitionsToTxnTopicResult:
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     name: TopicName = field(metadata={"kafka_type": "string"})
     """The topic name."""
-    results: tuple[AddPartitionsToTxnPartitionResult, ...]
+    results_by_partition: tuple[AddPartitionsToTxnPartitionResult, ...]
     """The results for each partition"""
 
 
@@ -48,5 +48,5 @@ class AddPartitionsToTxnResponse:
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     throttle_time: i32Timedelta = field(metadata={"kafka_type": "timedelta_i32"})
     """Duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota."""
-    results: tuple[AddPartitionsToTxnTopicResult, ...]
+    results_by_topic_v3_and_below: tuple[AddPartitionsToTxnTopicResult, ...]
     """The results for each topic."""
