@@ -1,5 +1,7 @@
 """
 Generated from SaslHandshakeRequest.json.
+
+https://github.com/apache/kafka/tree/3.5.1/clients/src/main/resources/common/message/SaslHandshakeRequest.json
 """
 
 # ruff: noqa: A003

@@ -1,5 +1,7 @@
 """
 Generated from LeaderChangeMessage.json.
+
+https://github.com/apache/kafka/tree/3.5.1/clients/src/main/resources/common/message/LeaderChangeMessage.json
 """
 
 # ruff: noqa: A003
