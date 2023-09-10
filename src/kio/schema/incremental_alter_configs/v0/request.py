@@ -1,5 +1,7 @@
 """
 Generated from IncrementalAlterConfigsRequest.json.
+
+https://github.com/apache/kafka/tree/3.5.1/clients/src/main/resources/common/message/IncrementalAlterConfigsRequest.json
 """
 
 # ruff: noqa: A003

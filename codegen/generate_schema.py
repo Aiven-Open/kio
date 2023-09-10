@@ -37,9 +37,15 @@ from .parser import PrimitiveArrayType
 from .parser import PrimitiveField
 from .parser import parse_file
 
+schema_repository_source: Final = (
+    f"https://github.com/apache/kafka"
+    f"/tree/{build_tag}/clients/src/main/resources/common/message/"
+)
 imports_and_docstring: Final = '''\
 """
 Generated from {schema_source}.
+
+{schema_repository_source}{schema_source}
 """
 
 # ruff: noqa: A003
@@ -535,7 +541,10 @@ def write_to_version_module(
     with module_path.open("a") as fd:
         if write_imports:
             print(
-                imports_and_docstring.format(schema_source=schema_path.name),
+                imports_and_docstring.format(
+                    schema_repository_source=schema_repository_source,
+                    schema_source=schema_path.name,
+                ),
                 file=fd,
             )
             print(get_header_schema_import(schema, version), file=fd)

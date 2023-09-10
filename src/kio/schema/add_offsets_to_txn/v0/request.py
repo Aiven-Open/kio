@@ -1,5 +1,7 @@
 """
 Generated from AddOffsetsToTxnRequest.json.
+
+https://github.com/apache/kafka/tree/3.5.1/clients/src/main/resources/common/message/AddOffsetsToTxnRequest.json
 """
 
 # ruff: noqa: A003

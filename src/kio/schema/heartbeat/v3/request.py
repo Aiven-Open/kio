@@ -1,5 +1,7 @@
 """
 Generated from HeartbeatRequest.json.
+
+https://github.com/apache/kafka/tree/3.5.1/clients/src/main/resources/common/message/HeartbeatRequest.json
 """
 
 # ruff: noqa: A003
