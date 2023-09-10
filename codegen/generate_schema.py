@@ -24,6 +24,8 @@ from .case import capitalize_first
 from .case import to_snake_case
 from .header_schema import get_header_schema_import
 from .parser import CommonStructArrayField
+from .parser import CommonStructField
+from .parser import CommonStructType
 from .parser import DataSchema
 from .parser import EntityArrayField
 from .parser import EntityField
@@ -137,7 +139,7 @@ def format_default(
 
 
 def format_dataclass_field(
-    field_type: Primitive | PrimitiveArrayType | EntityType,
+    field_type: Primitive | PrimitiveArrayType | EntityType | CommonStructType,
     default: str | int | float | bool | None,
     optional: bool,
     custom_type: CustomTypeDef | None,
@@ -166,6 +168,7 @@ def format_dataclass_field(
         field_kwargs["default"] = "()"
     elif default is not None:
         assert not isinstance(field_type, EntityType)
+        assert not isinstance(field_type, CommonStructType)
         field_kwargs["default"] = format_default(
             field_type, default, optional, custom_type
         )
@@ -310,7 +313,10 @@ def generate_entity_array_field(
     return f"    {to_snake_case(field.name)}: tuple[{field.type}, ...]{field_call}\n"
 
 
-def generate_entity_field(field: EntityField, version: int) -> str:
+def generate_entity_field(
+    field: EntityField | CommonStructField,
+    version: int,
+) -> str:
     field_call = format_dataclass_field(
         field_type=field.type,
         default=None,
@@ -330,9 +336,26 @@ def generate_common_struct_array_field(
 ) -> str:
     field_call = format_array_field_call(field, version)
     return (
-        f"    {to_snake_case(field.name)}: tuple[{field.type.item_type.name}, ...]"
+        f"    {to_snake_case(field.name)}: tuple[{field.type.struct.name}, ...]"
         f"{field_call}\n"
     )
+
+
+def generate_common_struct_field(
+    field: CommonStructField,
+    version: int,
+) -> str:
+    field_call = format_dataclass_field(
+        field_type=field.type,
+        default=None,
+        optional=(
+            field.nullableVersions.matches(version) if field.nullableVersions else False
+        ),
+        custom_type=None,
+        tag=field.get_tag(version),
+        ignorable=field.ignorable,
+    )
+    return f"    {to_snake_case(field.name)}: {field.type.struct.name}{field_call}\n"
 
 
 seen = set[tuple[str, int]]()
@@ -442,11 +465,19 @@ def generate_dataclass(  # noqa: C901
         elif isinstance(field, CommonStructArrayField):
             yield from generate_dataclass(
                 schema=schema,
-                name=field.type.item_type.name,
-                fields=field.type.item_type.fields,
+                name=field.type.struct.name,
+                fields=field.type.struct.fields,
                 version=version,
             )
             class_fields.append(generate_common_struct_array_field(field, version))
+        elif isinstance(field, CommonStructField):
+            yield from generate_dataclass(
+                schema=schema,
+                name=field.type.struct.name,
+                fields=field.type.struct.fields,
+                version=version,
+            )
+            class_fields.append(generate_common_struct_field(field, version))
         else:
             assert_never(field)
 
