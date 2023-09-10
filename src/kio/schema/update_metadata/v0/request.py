@@ -47,9 +47,9 @@ class UpdateMetadataBroker:
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     id: BrokerId = field(metadata={"kafka_type": "int32"})
     """The broker id."""
-    v0host: str = field(metadata={"kafka_type": "string"})
+    v0_host: str = field(metadata={"kafka_type": "string"})
     """The broker hostname."""
-    v0port: i32 = field(metadata={"kafka_type": "int32"})
+    v0_port: i32 = field(metadata={"kafka_type": "int32"})
     """The broker port."""
 
 

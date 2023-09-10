@@ -1,3 +1,3 @@
 from typing import Final
 
-build_tag: Final = "3.4.1"
+build_tag: Final = "3.5.1"

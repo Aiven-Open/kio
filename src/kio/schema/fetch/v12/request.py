@@ -72,7 +72,7 @@ class FetchRequest:
         metadata={"kafka_type": "string", "tag": 0}, default=None
     )
     """The clusterId if known. This is used to validate metadata fetches prior to broker registration."""
-    replica_id: BrokerId = field(metadata={"kafka_type": "int32"})
+    replica_id: BrokerId = field(metadata={"kafka_type": "int32"}, default=BrokerId(-1))
     """The broker ID of the follower, of -1 if this request is from a consumer."""
     max_wait: i32Timedelta = field(metadata={"kafka_type": "timedelta_i32"})
     """The maximum time in milliseconds to wait for the response."""

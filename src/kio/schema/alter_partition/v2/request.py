@@ -28,7 +28,7 @@ class PartitionData:
     leader_epoch: i32 = field(metadata={"kafka_type": "int32"})
     """The leader epoch of this partition"""
     new_isr: tuple[BrokerId, ...] = field(metadata={"kafka_type": "int32"}, default=())
-    """The ISR for this partition"""
+    """The ISR for this partition. Deprecated since version 3."""
     leader_recovery_state: i8 = field(metadata={"kafka_type": "int8"}, default=i8(0))
     """1 if the partition is recovering from an unclean leader election; 0 otherwise."""
     partition_epoch: i32 = field(metadata={"kafka_type": "int32"})

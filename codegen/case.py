@@ -1,3 +1,6 @@
+from itertools import count
+
+
 def to_snake_case(value: str) -> str:
     """
     >>> to_snake_case("ISRReplicas")
@@ -8,15 +11,14 @@ def to_snake_case(value: str) -> str:
     'in_sync_replicas'
     >>> to_snake_case("WhatIsQ")
     'what_is_q'
+    >>> to_snake_case("V3AndBelow")
+    'v3_and_below'
     """
 
     groups = []
     current_group = ""
-    offset = -1
 
-    while True:
-        offset += 1
-
+    for offset in count(0):
         current = value[offset]
 
         try:
@@ -35,8 +37,10 @@ def to_snake_case(value: str) -> str:
                 current_group += current
             break
 
-        if (previous.isupper() and current.isupper() and subsequent.islower()) or (
-            previous.islower() and current.isupper()
+        if (
+            (previous.isupper() and current.isupper() and subsequent.islower())
+            or (previous.islower() and current.isupper())
+            or (previous.isdigit() and current.isupper() and subsequent.islower())
         ):
             groups.append(current_group)
             current_group = current
