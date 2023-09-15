@@ -53,17 +53,17 @@ jobs:
       - name: Run test suite
         run: python -X dev -m coverage run -m pytest
 
-      # TODO: Enable coverage reporting.
-      # - name: Collect coverage
-      #   run: |
-      #     coverage report
-      #     coverage xml
-      # - name: Report coverage
-      #   uses: codecov/codecov-action@v3
-      #   with:
-      #     file: coverage.xml
-      #     fail_ci_if_error: true
-      #     name: codecov-py${{ matrix.python-version }}
+      - name: Collect coverage
+        run: |
+          coverage report
+          coverage xml
+
+      - name: Report coverage
+        uses: codecov/codecov-action@v3
+        with:
+          file: coverage.xml
+          fail_ci_if_error: true
+          name: codecov-py${{ matrix.python-version }}
 
   check-generate-schema:
     name: Check schema
