@@ -21,12 +21,18 @@
 [schema-source]:
   https://github.com/apache/kafka/tree/trunk/clients/src/main/resources/common/message
 
+## Installation
+
+```shell
+$ pip install --require-virtualenv kio
+```
+
 ## Development
 
 Install development requirements.
 
 ```shell
-$ python3 -m pip install -e .[all]
+$ pip install --require-virtualenv -e .[all]
 ```
 
 The test suite contains integration tests that expects to be able to connect to an
