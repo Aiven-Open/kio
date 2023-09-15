@@ -14,7 +14,9 @@ class ErrorCode(enum.IntEnum):
     retriable: bool
     value: i16
 
-    if not TYPE_CHECKING:
+    # Note: Pragma is needed to ignore the negative branch, the branch where the
+    # conditional check fails.
+    if not TYPE_CHECKING:  # pragma: no cover
 
         def __new__(cls, value: int, retriable: bool) -> ErrorCode:
             normalized_value = i16(value)
