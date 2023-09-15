@@ -18,7 +18,7 @@ hypothesis: ModuleType | None
 
 try:
     import hypothesis.strategies
-except ImportError:
+except ImportError:  # pragma: no cover
     hypothesis = None
 
 
@@ -70,7 +70,7 @@ class Phantom(Generic[T], metaclass=PhantomMeta):
         else:
             cls.__predicate__ = predicate
 
-        if hypothesis is not None:
+        if hypothesis is not None:  # pragma: no cover
             cls.__hypothesis_hook__()
 
     @classmethod
