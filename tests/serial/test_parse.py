@@ -332,3 +332,18 @@ def test_can_read_empty_flexible_entity(buffer: io.BytesIO) -> None:
 def test_can_read_empty_legacy_entity(buffer: io.BytesIO) -> None:
     instance = entity_reader(EmptyLegacy)(buffer)
     assert instance == EmptyLegacy()
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class LegacyWithTag:
+    __version__: ClassVar[i16] = i16(0)
+    __flexible__: ClassVar[bool] = False
+    value: str = field(metadata={"kafka_type": "string", "tag": 0})
+
+
+def test_raises_value_error_for_tagged_field_on_legacy_model() -> None:
+    with pytest.raises(
+        ValueError,
+        match=r"^Found tagged fields on a non-flexible model$",
+    ):
+        entity_reader(LegacyWithTag)
