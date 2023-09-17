@@ -137,10 +137,6 @@ def get_field_writer(
             assert_never(no_match)
 
 
-def _fqn(type_: type) -> str:
-    return f"{type_.__module__}.{type_.__qualname__}"
-
-
 E = TypeVar("E", bound=Entity)
 
 
