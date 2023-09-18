@@ -68,6 +68,16 @@ class TestGetWriter:
             ("uuid", True, True, writers.write_uuid),
             ("bool", False, False, writers.write_boolean),
             ("bool", True, False, writers.write_boolean),
+            ("error_code", True, False, writers.write_error_code),
+            ("error_code", False, False, writers.write_error_code),
+            ("timedelta_i32", True, False, writers.write_timedelta_i32),
+            ("timedelta_i32", False, False, writers.write_timedelta_i32),
+            ("timedelta_i64", True, False, writers.write_timedelta_i64),
+            ("timedelta_i64", False, False, writers.write_timedelta_i64),
+            ("datetime_i64", True, False, writers.write_datetime_i64),
+            ("datetime_i64", False, False, writers.write_datetime_i64),
+            ("datetime_i64", True, True, writers.write_nullable_datetime_i64),
+            ("datetime_i64", False, True, writers.write_nullable_datetime_i64),
         ),
     )
     def test_can_match_kafka_type_with_writer(
@@ -104,6 +114,12 @@ class TestGetWriter:
             ("bool", True, True),
             ("records", True, False),
             ("records", False, False),
+            ("error_code", True, True),
+            ("error_code", False, True),
+            ("timedelta_i32", True, True),
+            ("timedelta_i32", False, True),
+            ("timedelta_i64", True, True),
+            ("timedelta_i64", False, True),
         ),
     )
     def test_raises_not_implemented_error_for_invalid_combination(
