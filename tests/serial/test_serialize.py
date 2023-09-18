@@ -1,6 +1,9 @@
 import datetime
 import io
 import uuid
+from dataclasses import dataclass
+from dataclasses import field
+from typing import ClassVar
 
 import pytest
 
@@ -22,6 +25,7 @@ from kio.serial.readers import read_int32
 from kio.serial.readers import read_unsigned_varint
 from kio.serial.readers import read_uuid
 from kio.static.constants import ErrorCode
+from kio.static.primitive import i16
 from kio.static.primitive import i32
 from kio.static.primitive import i32Timedelta
 
@@ -64,6 +68,16 @@ class TestGetWriter:
             ("uuid", True, True, writers.write_uuid),
             ("bool", False, False, writers.write_boolean),
             ("bool", True, False, writers.write_boolean),
+            ("error_code", True, False, writers.write_error_code),
+            ("error_code", False, False, writers.write_error_code),
+            ("timedelta_i32", True, False, writers.write_timedelta_i32),
+            ("timedelta_i32", False, False, writers.write_timedelta_i32),
+            ("timedelta_i64", True, False, writers.write_timedelta_i64),
+            ("timedelta_i64", False, False, writers.write_timedelta_i64),
+            ("datetime_i64", True, False, writers.write_datetime_i64),
+            ("datetime_i64", False, False, writers.write_datetime_i64),
+            ("datetime_i64", True, True, writers.write_nullable_datetime_i64),
+            ("datetime_i64", False, True, writers.write_nullable_datetime_i64),
         ),
     )
     def test_can_match_kafka_type_with_writer(
@@ -100,6 +114,12 @@ class TestGetWriter:
             ("bool", True, True),
             ("records", True, False),
             ("records", False, False),
+            ("error_code", True, True),
+            ("error_code", False, True),
+            ("timedelta_i32", True, True),
+            ("timedelta_i32", False, True),
+            ("timedelta_i64", True, True),
+            ("timedelta_i64", False, True),
         ),
     )
     def test_raises_not_implemented_error_for_invalid_combination(
@@ -110,6 +130,22 @@ class TestGetWriter:
     ) -> None:
         with pytest.raises(NotImplementedError):
             get_writer(kafka_type, flexible, optional)
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class LegacyWithTag:
+    __version__: ClassVar[i16] = i16(0)
+    __flexible__: ClassVar[bool] = False
+    value: str = field(metadata={"kafka_type": "string", "tag": 0})
+
+
+class TestEntityWriter:
+    def test_raises_value_error_for_tagged_field_on_legacy_model(self) -> None:
+        with pytest.raises(
+            ValueError,
+            match=r"^Found tagged fields on a non-flexible model$",
+        ):
+            entity_writer(LegacyWithTag)
 
 
 def test_serialize_complex_entity(buffer: io.BytesIO) -> None:
