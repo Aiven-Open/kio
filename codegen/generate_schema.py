@@ -50,8 +50,6 @@ Generated from {schema_source}.
 {schema_repository_source}{schema_source}
 """
 
-# ruff: noqa: A003
-
 import datetime
 from dataclasses import dataclass, field
 from typing import Annotated, ClassVar

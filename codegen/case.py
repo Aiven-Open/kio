@@ -1,4 +1,8 @@
+import builtins
 from itertools import count
+from typing import Final
+
+_builtins: Final = frozenset(dir(builtins))
 
 
 def to_snake_case(value: str) -> str:
@@ -13,6 +17,8 @@ def to_snake_case(value: str) -> str:
     'what_is_q'
     >>> to_snake_case("V3AndBelow")
     'v3_and_below'
+    >>> to_snake_case("Type")
+    'type_'
     """
 
     groups = []
@@ -48,7 +54,10 @@ def to_snake_case(value: str) -> str:
             current_group += current
 
     groups.append(current_group)
-    return ("_".join(groups)).lower()
+
+    formatted = ("_".join(groups)).lower()
+
+    return formatted + "_" if formatted in _builtins else formatted
 
 
 def capitalize_first(value: str) -> str:

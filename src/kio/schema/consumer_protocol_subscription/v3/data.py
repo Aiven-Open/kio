@@ -4,8 +4,6 @@ Generated from ConsumerProtocolSubscription.json.
 https://github.com/apache/kafka/tree/3.5.1/clients/src/main/resources/common/message/ConsumerProtocolSubscription.json
 """
 
-# ruff: noqa: A003
-
 from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
