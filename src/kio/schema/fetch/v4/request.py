@@ -1,7 +1,7 @@
 """
 Generated from FetchRequest.json.
 
-https://github.com/apache/kafka/tree/3.5.1/clients/src/main/resources/common/message/FetchRequest.json
+https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/FetchRequest.json
 """
 
 from dataclasses import dataclass

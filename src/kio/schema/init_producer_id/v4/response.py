@@ -1,7 +1,7 @@
 """
 Generated from InitProducerIdResponse.json.
 
-https://github.com/apache/kafka/tree/3.5.1/clients/src/main/resources/common/message/InitProducerIdResponse.json
+https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/InitProducerIdResponse.json
 """
 
 from dataclasses import dataclass

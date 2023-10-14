@@ -1,7 +1,7 @@
 """
 Generated from TxnOffsetCommitRequest.json.
 
-https://github.com/apache/kafka/tree/3.5.1/clients/src/main/resources/common/message/TxnOffsetCommitRequest.json
+https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/TxnOffsetCommitRequest.json
 """
 
 from dataclasses import dataclass
@@ -45,7 +45,7 @@ class TxnOffsetCommitRequestTopic:
     name: TopicName = field(metadata={"kafka_type": "string"})
     """The topic name."""
     partitions: tuple[TxnOffsetCommitRequestPartition, ...]
-    """The partitions inside the topic that we want to committ offsets for."""
+    """The partitions inside the topic that we want to commit offsets for."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

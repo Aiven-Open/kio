@@ -1,7 +1,7 @@
 """
 Generated from SaslAuthenticateResponse.json.
 
-https://github.com/apache/kafka/tree/3.5.1/clients/src/main/resources/common/message/SaslAuthenticateResponse.json
+https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/SaslAuthenticateResponse.json
 """
 
 import datetime
@@ -31,4 +31,4 @@ class SaslAuthenticateResponse:
         metadata={"kafka_type": "timedelta_i64"},
         default=i64Timedelta.parse(datetime.timedelta(milliseconds=0)),
     )
-    """The SASL authentication bytes from the server, as defined by the SASL mechanism."""
+    """Number of milliseconds after which only re-authentication over the existing connection to create a new session can occur."""
