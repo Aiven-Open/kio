@@ -1,7 +1,7 @@
 """
 Generated from OffsetCommitRequest.json.
 
-https://github.com/apache/kafka/tree/3.5.1/clients/src/main/resources/common/message/OffsetCommitRequest.json
+https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/OffsetCommitRequest.json
 """
 
 # ruff: noqa: A003
@@ -56,8 +56,10 @@ class OffsetCommitRequest:
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     group_id: GroupId = field(metadata={"kafka_type": "string"})
     """The unique group identifier."""
-    generation_id: i32 = field(metadata={"kafka_type": "int32"}, default=i32(-1))
-    """The generation of the group."""
+    generation_id_or_member_epoch: i32 = field(
+        metadata={"kafka_type": "int32"}, default=i32(-1)
+    )
+    """The generation of the group if using the generic group protocol or the member epoch if using the consumer protocol."""
     member_id: str = field(metadata={"kafka_type": "string"})
     """The member ID assigned by the group coordinator."""
     group_instance_id: str | None = field(

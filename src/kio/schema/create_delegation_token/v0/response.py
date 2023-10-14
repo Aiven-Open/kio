@@ -1,7 +1,7 @@
 """
 Generated from CreateDelegationTokenResponse.json.
 
-https://github.com/apache/kafka/tree/3.5.1/clients/src/main/resources/common/message/CreateDelegationTokenResponse.json
+https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/CreateDelegationTokenResponse.json
 """
 
 # ruff: noqa: A003

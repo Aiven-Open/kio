@@ -1,7 +1,7 @@
 """
 Generated from ListOffsetsRequest.json.
 
-https://github.com/apache/kafka/tree/3.5.1/clients/src/main/resources/common/message/ListOffsetsRequest.json
+https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/ListOffsetsRequest.json
 """
 
 # ruff: noqa: A003
@@ -50,7 +50,7 @@ class ListOffsetsRequest:
     __api_key__: ClassVar[i16] = i16(2)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     replica_id: BrokerId = field(metadata={"kafka_type": "int32"})
-    """The broker ID of the requestor, or -1 if this request is being made by a normal consumer."""
+    """The broker ID of the requester, or -1 if this request is being made by a normal consumer."""
     isolation_level: i8 = field(metadata={"kafka_type": "int8"})
     """This setting controls the visibility of transactional records. Using READ_UNCOMMITTED (isolation_level = 0) makes all records visible. With READ_COMMITTED (isolation_level = 1), non-transactional and COMMITTED transactional records are visible. To be more concrete, READ_COMMITTED returns all data from offsets smaller than the current LSO (last stable offset), and enables the inclusion of the list of aborted transactions in the result, which allows consumers to discard ABORTED transactional records"""
     topics: tuple[ListOffsetsTopic, ...]

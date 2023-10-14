@@ -1,7 +1,7 @@
 """
 Generated from DeleteAclsRequest.json.
 
-https://github.com/apache/kafka/tree/3.5.1/clients/src/main/resources/common/message/DeleteAclsRequest.json
+https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/DeleteAclsRequest.json
 """
 
 # ruff: noqa: A003

@@ -1,7 +1,7 @@
 """
 Generated from ListOffsetsRequest.json.
 
-https://github.com/apache/kafka/tree/3.5.1/clients/src/main/resources/common/message/ListOffsetsRequest.json
+https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/ListOffsetsRequest.json
 """
 
 # ruff: noqa: A003
@@ -51,6 +51,6 @@ class ListOffsetsRequest:
     __api_key__: ClassVar[i16] = i16(2)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     replica_id: BrokerId = field(metadata={"kafka_type": "int32"})
-    """The broker ID of the requestor, or -1 if this request is being made by a normal consumer."""
+    """The broker ID of the requester, or -1 if this request is being made by a normal consumer."""
     topics: tuple[ListOffsetsTopic, ...]
     """Each topic in the request."""

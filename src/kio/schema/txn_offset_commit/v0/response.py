@@ -1,7 +1,7 @@
 """
 Generated from TxnOffsetCommitResponse.json.
 
-https://github.com/apache/kafka/tree/3.5.1/clients/src/main/resources/common/message/TxnOffsetCommitResponse.json
+https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/TxnOffsetCommitResponse.json
 """
 
 # ruff: noqa: A003
