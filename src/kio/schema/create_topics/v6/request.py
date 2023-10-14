@@ -4,8 +4,6 @@ Generated from CreateTopicsRequest.json.
 https://github.com/apache/kafka/tree/3.5.1/clients/src/main/resources/common/message/CreateTopicsRequest.json
 """
 
-# ruff: noqa: A003
-
 import datetime
 from dataclasses import dataclass
 from dataclasses import field

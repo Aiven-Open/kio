@@ -4,8 +4,6 @@ Generated from LeaderAndIsrRequest.json.
 https://github.com/apache/kafka/tree/3.5.1/clients/src/main/resources/common/message/LeaderAndIsrRequest.json
 """
 
-# ruff: noqa: A003
-
 import uuid
 from dataclasses import dataclass
 from dataclasses import field
@@ -92,7 +90,7 @@ class LeaderAndIsrRequest:
     """The current controller epoch."""
     broker_epoch: i64 = field(metadata={"kafka_type": "int64"}, default=i64(-1))
     """The current broker epoch."""
-    type: i8 = field(metadata={"kafka_type": "int8"})
+    type_: i8 = field(metadata={"kafka_type": "int8"})
     """The type that indicates whether all topics are included in the request"""
     topic_states: tuple[LeaderAndIsrTopicState, ...]
     """Each topic."""
