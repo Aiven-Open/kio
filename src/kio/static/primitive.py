@@ -164,7 +164,10 @@ class i64Timedelta(
         @composite
         def i64_timedeltas(
             draw: Callable,
-            elements: SearchStrategy[int] = integers(-(2**63), 2**63 - 1),
+            elements: SearchStrategy[int] = integers(
+                datetime.timedelta.min // datetime.timedelta(milliseconds=1),
+                datetime.timedelta.max // datetime.timedelta(milliseconds=1),
+            ),
         ) -> i64Timedelta:
             return datetime.timedelta(  # type: ignore[return-value]
                 milliseconds=draw(elements),
