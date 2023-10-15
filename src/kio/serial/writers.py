@@ -123,13 +123,13 @@ def write_compact_string(buffer: Writable, value: str | bytes) -> None:
     write_nullable_compact_string(buffer, value)
 
 
-def write_nullable_legacy_string(buffer: Writable, value: str | bytes | None) -> None:
+def write_nullable_legacy_string(buffer: Writable, value: str | None) -> None:
     """Write a nullable string with legacy int16 length encoding."""
     if value is None:
         write_int16(buffer, i16(-1))
         return
-    if isinstance(value, str):
-        value = value.encode()
+
+    value = value.encode()
 
     try:
         length = i16(len(value))
@@ -143,11 +143,36 @@ def write_nullable_legacy_string(buffer: Writable, value: str | bytes | None) ->
     buffer.write(value)
 
 
-def write_legacy_string(buffer: Writable, value: str | bytes) -> None:
+def write_nullable_legacy_bytes(buffer: Writable, value: bytes | None) -> None:
+    """Write a nullable bytes with legacy int32 length encoding."""
+    if value is None:
+        write_int32(buffer, i32(-1))
+        return
+
+    try:
+        length = i32(len(value))
+    except TypeError as exception:
+        raise OutOfBoundValue(
+            f"Bytes is too long for legacy string format ({len(value)} > "
+            f"{i32.__high__})"
+        ) from exception
+
+    write_int32(buffer, length)
+    buffer.write(value)
+
+
+def write_legacy_string(buffer: Writable, value: str) -> None:
     """Write a non-nullable string with legacy int16 length encoding."""
     if value is None:
         raise TypeError("Unexpectedly received None value")
     write_nullable_legacy_string(buffer, value)
+
+
+def write_legacy_bytes(buffer: Writable, value: bytes) -> None:
+    """Write a non-nullable bytes with legacy int32 length encoding."""
+    if value is None:
+        raise TypeError("Unexpectedly received None value")
+    write_nullable_legacy_bytes(buffer, value)
 
 
 def write_empty_tagged_fields(buffer: Writable) -> None:

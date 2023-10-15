@@ -298,7 +298,7 @@ class TestReadNullableLegacyBytes:
         self,
         buffer: io.BytesIO,
     ) -> None:
-        buffer.write(struct.pack(">h", -1))
+        buffer.write(struct.pack(">i", -1))
         buffer.seek(0)
         assert read_nullable_legacy_bytes(buffer) is None
 
@@ -308,7 +308,7 @@ class TestReadNullableLegacyBytes:
     ) -> None:
         value = b"k\x9bC\x94\xbe\x1fV\xd6"
         byte_length = len(value)
-        buffer.write(struct.pack(">h", byte_length))
+        buffer.write(struct.pack(">i", byte_length))
         buffer.write(value)
         buffer.seek(0)
         assert value == read_nullable_legacy_bytes(buffer)
@@ -364,7 +364,7 @@ class TestReadLegacyBytes:
         self,
         buffer: io.BytesIO,
     ) -> None:
-        buffer.write(struct.pack(">h", -1))
+        buffer.write(struct.pack(">i", -1))
         buffer.seek(0)
         with pytest.raises(UnexpectedNull):
             read_legacy_bytes(buffer)
@@ -376,7 +376,7 @@ class TestReadLegacyBytes:
         value = "The quick brown 🦊 jumps over the lazy dog 🧖"
         byte_value = value.encode()
         byte_length = len(byte_value)
-        buffer.write(struct.pack(">h", byte_length))
+        buffer.write(struct.pack(">i", byte_length))
         buffer.write(byte_value)
         buffer.seek(0)
         assert byte_value == read_legacy_bytes(buffer)
