@@ -66,6 +66,7 @@ from kio.static.primitive import f64
 from kio.static.primitive import i32Timedelta
 from kio.static.primitive import i64Timedelta
 from kio.static.primitive import TZAware
+from kio.static.protocol import ApiMessage
 from kio.static.constants import ErrorCode
 '''
 
@@ -394,15 +395,17 @@ def generate_dataclass(  # noqa: C901
     name: str,
     fields: Sequence[Field],
     version: int,
+    top_level: bool = False,
 ) -> Iterator[str | CustomTypeDef | ExportName]:
     if (name, version) in seen:
         return
     seen.add((name, version))
 
+    class_parent_str = "(ApiMessage)" if top_level else ""
     class_start = textwrap.dedent(
         f"""\
         @dataclass(frozen=True, slots=True, kw_only=True)
-        class {name}:
+        class {name}{class_parent_str}:
         """
     )
     class_fields = []
@@ -504,6 +507,7 @@ def generate_models(
             name=schema.name,
             fields=schema.fields,
             version=version,
+            top_level=True,
         ):
             match item:
                 case CustomTypeDef() as instruction:

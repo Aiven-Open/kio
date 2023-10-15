@@ -1,13 +1,33 @@
+# ruff: noqa: S603
 import asyncio
+import base64
 import contextlib
+import dataclasses
 import io
+import json
 import os
 from collections.abc import AsyncIterator
 from collections.abc import Iterator
 from contextlib import closing
+from datetime import datetime
+from datetime import timedelta
+from json import JSONEncoder
+from pathlib import Path
+from subprocess import PIPE
+from subprocess import Popen
+from subprocess import TimeoutExpired
+from typing import Any
+from uuid import UUID
 
 import pytest
 import pytest_asyncio
+from hypothesis import settings
+
+from kio.serial import entity_writer
+from kio.static.protocol import Entity
+
+settings.register_profile("test", deadline=timedelta(minutes=10))
+settings.load_profile("test")
 
 
 def buffer() -> Iterator[io.BytesIO]:
@@ -68,3 +88,98 @@ async def stream_writer(
     async_buffers: tuple[object, asyncio.StreamWriter],
 ) -> asyncio.StreamWriter:
     return async_buffers[1]
+
+
+class JavaTester:
+    class _Encoder(JSONEncoder):
+        def default(self, o: Any) -> Any:
+            if dataclasses.is_dataclass(o):
+                return self._replace_tzaware_nulls(dataclasses.asdict(o))
+            if isinstance(o, timedelta):
+                return round(o.total_seconds() * 1000)
+            if isinstance(o, datetime):
+                return round(o.timestamp() * 1000)
+            if isinstance(o, UUID):
+                return str(o)
+            if isinstance(o, bytes):
+                return base64.b64encode(o).decode("utf-8")
+            return super().default(o)
+
+        def _replace_tzaware_nulls(self, o: Any) -> Any:
+            if isinstance(o, dict):
+                result = {}
+                for k, v in o.items():
+                    if k == "log_append_time" and v is None:
+                        result[k] = -1
+                    else:
+                        result[k] = self._replace_tzaware_nulls(v)
+                return result
+            elif isinstance(o, list):
+                return [self._replace_tzaware_nulls(e) for e in o]
+            elif isinstance(o, tuple):
+                return tuple(self._replace_tzaware_nulls(e) for e in o)
+            else:
+                return o
+
+    def __init__(self) -> None:
+        cmd = [
+            "docker",
+            "compose",
+            "-f",
+            str(Path(__file__).parent / "docker-compose-java-tester.yaml"),
+            "run",
+            "--build",
+            "--rm",
+            "-i",
+            "java_tester",
+        ]
+        self._p = Popen(cmd, stdin=PIPE, stdout=PIPE, shell=False, text=True)
+        assert self._p.stdout is not None
+        while self._p.stdout.readline().strip() != "Java tester started":
+            pass
+
+    def test(self, instance: Entity) -> None:
+        instance_type = type(instance)
+        buffer = io.BytesIO()
+        writer = entity_writer(instance_type)
+        writer(buffer, instance)
+        buffer.seek(0)
+
+        case = {
+            "class": instance_type.__name__,
+            "version": instance_type.__version__,
+            "json": instance,
+            "serialized": buffer.getvalue(),
+        }
+        case_str = json.dumps(case, cls=self._Encoder) + "\n"
+
+        assert self._p.stdin is not None
+        assert self._p.stdout is not None
+
+        self._p.stdin.write(case_str)
+        self._p.stdin.flush()
+
+        line = self._p.stdout.readline()
+        response = json.loads(line)
+        assert response["success"], response.get("message") or response.get("exception")
+
+    def close(self) -> None:
+        if self._p.stdin is not None:
+            self._p.stdin.flush()
+            self._p.stdin.close()
+        if self._p.stdout is not None:
+            self._p.stdout.close()
+        try:
+            self._p.wait(timeout=10)
+        except TimeoutExpired:
+            self._p.kill()
+            self._p.wait(timeout=10)
+
+
+@pytest.fixture(name="java_tester", scope="session")
+def fixture_java_tester() -> Iterator[JavaTester]:
+    jt = JavaTester()
+    try:
+        yield jt
+    finally:
+        jt.close()

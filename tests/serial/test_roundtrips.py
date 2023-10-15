@@ -35,7 +35,7 @@ from kio.serial.readers import read_uint32
 from kio.serial.readers import read_uint64
 from kio.serial.readers import read_unsigned_varint
 from kio.serial.readers import read_uuid
-from kio.serial.writers import Writer, write_legacy_bytes
+from kio.serial.writers import Writer
 from kio.serial.writers import write_boolean
 from kio.serial.writers import write_compact_array_length
 from kio.serial.writers import write_compact_string
@@ -44,6 +44,7 @@ from kio.serial.writers import write_int16
 from kio.serial.writers import write_int32
 from kio.serial.writers import write_int64
 from kio.serial.writers import write_legacy_array_length
+from kio.serial.writers import write_legacy_bytes
 from kio.serial.writers import write_legacy_string
 from kio.serial.writers import write_nullable_compact_string
 from kio.serial.writers import write_nullable_legacy_string
