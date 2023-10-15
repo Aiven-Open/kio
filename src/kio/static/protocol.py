@@ -12,7 +12,11 @@ else:
         ...
 
 
-__all__ = ("Entity", "Payload")
+__all__ = ("ApiMessage", "Entity", "Payload")
+
+
+class ApiMessage:
+    pass
 
 
 class Entity(DataclassInstance, Protocol):
