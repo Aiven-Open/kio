@@ -127,14 +127,14 @@ def read_raw_bytes(buffer: IO[bytes]) -> bytes | None:
 
 
 def read_legacy_bytes(buffer: IO[bytes]) -> bytes:
-    length = read_int16(buffer)
+    length = read_int32(buffer)
     if length == -1:
         raise UnexpectedNull("Unexpectedly read null where bytes was expected")
     return buffer.read(length)
 
 
 def read_nullable_legacy_bytes(buffer: IO[bytes]) -> bytes | None:
-    length = read_int16(buffer)
+    length = read_int32(buffer)
     if length == -1:
         return None
     return buffer.read(length)

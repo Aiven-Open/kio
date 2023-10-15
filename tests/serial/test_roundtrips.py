@@ -35,7 +35,7 @@ from kio.serial.readers import read_uint32
 from kio.serial.readers import read_uint64
 from kio.serial.readers import read_unsigned_varint
 from kio.serial.readers import read_uuid
-from kio.serial.writers import Writer
+from kio.serial.writers import Writer, write_legacy_bytes
 from kio.serial.writers import write_boolean
 from kio.serial.writers import write_compact_array_length
 from kio.serial.writers import write_compact_string
@@ -237,8 +237,8 @@ def test_nullable_legacy_string_roundtrip(a: str | None, b: str | None) -> None:
 @given(binary(), binary())
 def test_legacy_bytes_roundtrip(a: bytes, b: bytes) -> None:
     buffer = io.BytesIO()
-    write_legacy_string(buffer, a)
-    write_legacy_string(buffer, b)
+    write_legacy_bytes(buffer, a)
+    write_legacy_bytes(buffer, b)
     buffer.seek(0)
     assert a == read_legacy_bytes(buffer)
     assert b == read_legacy_bytes(buffer)
