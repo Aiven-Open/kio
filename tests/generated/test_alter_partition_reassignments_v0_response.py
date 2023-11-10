@@ -17,6 +17,7 @@ from kio.schema.alter_partition_reassignments.v0.response import (
 )
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_reassignable_partition_response: Final = entity_reader(
@@ -69,3 +70,10 @@ def test_alter_partition_reassignments_response_roundtrip(
         buffer.seek(0)
         result = read_alter_partition_reassignments_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(AlterPartitionReassignmentsResponse))
+def test_alter_partition_reassignments_response_java(
+    instance: AlterPartitionReassignmentsResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

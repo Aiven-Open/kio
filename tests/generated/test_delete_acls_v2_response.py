@@ -11,6 +11,7 @@ from kio.schema.delete_acls.v2.response import DeleteAclsMatchingAcl
 from kio.schema.delete_acls.v2.response import DeleteAclsResponse
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_delete_acls_matching_acl: Final = entity_reader(DeleteAclsMatchingAcl)
@@ -53,3 +54,10 @@ def test_delete_acls_response_roundtrip(instance: DeleteAclsResponse) -> None:
         buffer.seek(0)
         result = read_delete_acls_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(DeleteAclsResponse))
+def test_delete_acls_response_java(
+    instance: DeleteAclsResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

@@ -12,6 +12,7 @@ from kio.schema.describe_user_scram_credentials.v0.request import (
 from kio.schema.describe_user_scram_credentials.v0.request import UserName
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_user_name: Final = entity_reader(UserName)
@@ -44,3 +45,10 @@ def test_describe_user_scram_credentials_request_roundtrip(
         buffer.seek(0)
         result = read_describe_user_scram_credentials_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(DescribeUserScramCredentialsRequest))
+def test_describe_user_scram_credentials_request_java(
+    instance: DescribeUserScramCredentialsRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

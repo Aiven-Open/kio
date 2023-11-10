@@ -10,6 +10,7 @@ from kio.schema.join_group.v5.response import JoinGroupResponse
 from kio.schema.join_group.v5.response import JoinGroupResponseMember
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_join_group_response_member: Final = entity_reader(JoinGroupResponseMember)
@@ -40,3 +41,10 @@ def test_join_group_response_roundtrip(instance: JoinGroupResponse) -> None:
         buffer.seek(0)
         result = read_join_group_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(JoinGroupResponse))
+def test_join_group_response_java(
+    instance: JoinGroupResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

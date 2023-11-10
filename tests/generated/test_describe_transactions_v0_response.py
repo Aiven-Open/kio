@@ -11,6 +11,7 @@ from kio.schema.describe_transactions.v0.response import TopicData
 from kio.schema.describe_transactions.v0.response import TransactionState
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_topic_data: Final = entity_reader(TopicData)
@@ -55,3 +56,10 @@ def test_describe_transactions_response_roundtrip(
         buffer.seek(0)
         result = read_describe_transactions_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(DescribeTransactionsResponse))
+def test_describe_transactions_response_java(
+    instance: DescribeTransactionsResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

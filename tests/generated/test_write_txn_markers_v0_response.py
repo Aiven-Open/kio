@@ -12,6 +12,7 @@ from kio.schema.write_txn_markers.v0.response import WritableTxnMarkerTopicResul
 from kio.schema.write_txn_markers.v0.response import WriteTxnMarkersResponse
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_writable_txn_marker_partition_result: Final = entity_reader(
@@ -80,3 +81,10 @@ def test_write_txn_markers_response_roundtrip(
         buffer.seek(0)
         result = read_write_txn_markers_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(WriteTxnMarkersResponse))
+def test_write_txn_markers_response_java(
+    instance: WriteTxnMarkersResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

@@ -12,6 +12,7 @@ from kio.schema.describe_client_quotas.v0.response import EntryData
 from kio.schema.describe_client_quotas.v0.response import ValueData
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_entity_data: Final = entity_reader(EntityData)
@@ -72,3 +73,10 @@ def test_describe_client_quotas_response_roundtrip(
         buffer.seek(0)
         result = read_describe_client_quotas_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(DescribeClientQuotasResponse))
+def test_describe_client_quotas_response_java(
+    instance: DescribeClientQuotasResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

@@ -13,10 +13,11 @@ from kio.static.constants import ErrorCode
 from kio.static.primitive import TZAware
 from kio.static.primitive import i16
 from kio.static.primitive import i32Timedelta
+from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class CreateDelegationTokenResponse:
+class CreateDelegationTokenResponse(ApiMessage):
     __version__: ClassVar[i16] = i16(2)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(38)

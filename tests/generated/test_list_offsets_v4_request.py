@@ -11,6 +11,7 @@ from kio.schema.list_offsets.v4.request import ListOffsetsRequest
 from kio.schema.list_offsets.v4.request import ListOffsetsTopic
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_list_offsets_partition: Final = entity_reader(ListOffsetsPartition)
@@ -53,3 +54,10 @@ def test_list_offsets_request_roundtrip(instance: ListOffsetsRequest) -> None:
         buffer.seek(0)
         result = read_list_offsets_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(ListOffsetsRequest))
+def test_list_offsets_request_java(
+    instance: ListOffsetsRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

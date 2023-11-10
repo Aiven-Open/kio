@@ -10,6 +10,7 @@ from kio.schema.list_groups.v1.response import ListedGroup
 from kio.schema.list_groups.v1.response import ListGroupsResponse
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_listed_group: Final = entity_reader(ListedGroup)
@@ -38,3 +39,10 @@ def test_list_groups_response_roundtrip(instance: ListGroupsResponse) -> None:
         buffer.seek(0)
         result = read_list_groups_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(ListGroupsResponse))
+def test_list_groups_response_java(
+    instance: ListGroupsResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

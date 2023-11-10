@@ -11,6 +11,7 @@ from kio.schema.offset_fetch.v6.response import OffsetFetchResponsePartition
 from kio.schema.offset_fetch.v6.response import OffsetFetchResponseTopic
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_offset_fetch_response_partition: Final = entity_reader(
@@ -59,3 +60,10 @@ def test_offset_fetch_response_roundtrip(instance: OffsetFetchResponse) -> None:
         buffer.seek(0)
         result = read_offset_fetch_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(OffsetFetchResponse))
+def test_offset_fetch_response_java(
+    instance: OffsetFetchResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

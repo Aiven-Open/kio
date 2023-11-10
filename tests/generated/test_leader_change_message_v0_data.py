@@ -10,6 +10,7 @@ from kio.schema.leader_change_message.v0.data import LeaderChangeMessage
 from kio.schema.leader_change_message.v0.data import Voter
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_voter: Final = entity_reader(Voter)
@@ -38,3 +39,10 @@ def test_leader_change_message_roundtrip(instance: LeaderChangeMessage) -> None:
         buffer.seek(0)
         result = read_leader_change_message(buffer)
     assert instance == result
+
+
+@given(instance=from_type(LeaderChangeMessage))
+def test_leader_change_message_java(
+    instance: LeaderChangeMessage, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

@@ -9,10 +9,11 @@ from dataclasses import field
 from typing import ClassVar
 
 from kio.static.primitive import i16
+from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class ConsumerProtocolSubscription:
+class ConsumerProtocolSubscription(ApiMessage):
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = False
     topics: tuple[str, ...] = field(metadata={"kafka_type": "string"}, default=())

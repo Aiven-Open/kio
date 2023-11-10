@@ -12,6 +12,7 @@ from kio.schema.produce.v8.response import ProduceResponse
 from kio.schema.produce.v8.response import TopicProduceResponse
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_batch_index_and_error_message: Final = entity_reader(BatchIndexAndErrorMessage)
@@ -72,3 +73,10 @@ def test_produce_response_roundtrip(instance: ProduceResponse) -> None:
         buffer.seek(0)
         result = read_produce_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(ProduceResponse))
+def test_produce_response_java(
+    instance: ProduceResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

@@ -13,6 +13,7 @@ from kio.schema.alter_user_scram_credentials.v0.request import ScramCredentialDe
 from kio.schema.alter_user_scram_credentials.v0.request import ScramCredentialUpsertion
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_scram_credential_deletion: Final = entity_reader(ScramCredentialDeletion)
@@ -61,3 +62,10 @@ def test_alter_user_scram_credentials_request_roundtrip(
         buffer.seek(0)
         result = read_alter_user_scram_credentials_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(AlterUserScramCredentialsRequest))
+def test_alter_user_scram_credentials_request_java(
+    instance: AlterUserScramCredentialsRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

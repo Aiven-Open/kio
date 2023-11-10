@@ -10,6 +10,7 @@ from kio.schema.update_features.v1.request import FeatureUpdateKey
 from kio.schema.update_features.v1.request import UpdateFeaturesRequest
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_feature_update_key: Final = entity_reader(FeatureUpdateKey)
@@ -38,3 +39,10 @@ def test_update_features_request_roundtrip(instance: UpdateFeaturesRequest) -> N
         buffer.seek(0)
         result = read_update_features_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(UpdateFeaturesRequest))
+def test_update_features_request_java(
+    instance: UpdateFeaturesRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

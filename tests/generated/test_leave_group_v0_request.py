@@ -9,6 +9,7 @@ from hypothesis.strategies import from_type
 from kio.schema.leave_group.v0.request import LeaveGroupRequest
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_leave_group_request: Final = entity_reader(LeaveGroupRequest)
@@ -23,3 +24,10 @@ def test_leave_group_request_roundtrip(instance: LeaveGroupRequest) -> None:
         buffer.seek(0)
         result = read_leave_group_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(LeaveGroupRequest))
+def test_leave_group_request_java(
+    instance: LeaveGroupRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

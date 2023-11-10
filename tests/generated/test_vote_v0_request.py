@@ -11,6 +11,7 @@ from kio.schema.vote.v0.request import TopicData
 from kio.schema.vote.v0.request import VoteRequest
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_partition_data: Final = entity_reader(PartitionData)
@@ -53,3 +54,8 @@ def test_vote_request_roundtrip(instance: VoteRequest) -> None:
         buffer.seek(0)
         result = read_vote_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(VoteRequest))
+def test_vote_request_java(instance: VoteRequest, java_tester: JavaTester) -> None:
+    java_tester.test(instance)

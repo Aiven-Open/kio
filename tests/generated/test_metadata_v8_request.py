@@ -10,6 +10,7 @@ from kio.schema.metadata.v8.request import MetadataRequest
 from kio.schema.metadata.v8.request import MetadataRequestTopic
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_metadata_request_topic: Final = entity_reader(MetadataRequestTopic)
@@ -38,3 +39,10 @@ def test_metadata_request_roundtrip(instance: MetadataRequest) -> None:
         buffer.seek(0)
         result = read_metadata_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(MetadataRequest))
+def test_metadata_request_java(
+    instance: MetadataRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

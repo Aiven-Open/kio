@@ -9,6 +9,7 @@ from hypothesis.strategies import from_type
 from kio.schema.sasl_handshake.v0.response import SaslHandshakeResponse
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_sasl_handshake_response: Final = entity_reader(SaslHandshakeResponse)
@@ -23,3 +24,10 @@ def test_sasl_handshake_response_roundtrip(instance: SaslHandshakeResponse) -> N
         buffer.seek(0)
         result = read_sasl_handshake_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(SaslHandshakeResponse))
+def test_sasl_handshake_response_java(
+    instance: SaslHandshakeResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

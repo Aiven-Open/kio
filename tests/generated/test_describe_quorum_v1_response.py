@@ -12,6 +12,7 @@ from kio.schema.describe_quorum.v1.response import ReplicaState
 from kio.schema.describe_quorum.v1.response import TopicData
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_replica_state: Final = entity_reader(ReplicaState)
@@ -68,3 +69,10 @@ def test_describe_quorum_response_roundtrip(instance: DescribeQuorumResponse) ->
         buffer.seek(0)
         result = read_describe_quorum_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(DescribeQuorumResponse))
+def test_describe_quorum_response_java(
+    instance: DescribeQuorumResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

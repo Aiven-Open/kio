@@ -11,6 +11,7 @@ from kio.schema.alter_replica_log_dirs.v0.request import AlterReplicaLogDirsRequ
 from kio.schema.alter_replica_log_dirs.v0.request import AlterReplicaLogDirTopic
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_alter_replica_log_dir_topic: Final = entity_reader(AlterReplicaLogDirTopic)
@@ -57,3 +58,10 @@ def test_alter_replica_log_dirs_request_roundtrip(
         buffer.seek(0)
         result = read_alter_replica_log_dirs_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(AlterReplicaLogDirsRequest))
+def test_alter_replica_log_dirs_request_java(
+    instance: AlterReplicaLogDirsRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

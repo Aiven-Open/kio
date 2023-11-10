@@ -11,6 +11,7 @@ from kio.schema.broker_registration.v1.request import Feature
 from kio.schema.broker_registration.v1.request import Listener
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_listener: Final = entity_reader(Listener)
@@ -55,3 +56,10 @@ def test_broker_registration_request_roundtrip(
         buffer.seek(0)
         result = read_broker_registration_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(BrokerRegistrationRequest))
+def test_broker_registration_request_java(
+    instance: BrokerRegistrationRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

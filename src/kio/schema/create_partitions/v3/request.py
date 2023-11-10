@@ -14,6 +14,7 @@ from kio.schema.types import TopicName
 from kio.static.primitive import i16
 from kio.static.primitive import i32
 from kio.static.primitive import i32Timedelta
+from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -43,7 +44,7 @@ class CreatePartitionsTopic:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class CreatePartitionsRequest:
+class CreatePartitionsRequest(ApiMessage):
     __version__: ClassVar[i16] = i16(3)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(37)

@@ -11,6 +11,7 @@ from kio.schema.txn_offset_commit.v0.response import TxnOffsetCommitResponsePart
 from kio.schema.txn_offset_commit.v0.response import TxnOffsetCommitResponseTopic
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_txn_offset_commit_response_partition: Final = entity_reader(
@@ -63,3 +64,10 @@ def test_txn_offset_commit_response_roundtrip(
         buffer.seek(0)
         result = read_txn_offset_commit_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(TxnOffsetCommitResponse))
+def test_txn_offset_commit_response_java(
+    instance: TxnOffsetCommitResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

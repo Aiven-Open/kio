@@ -13,6 +13,7 @@ from kio.schema.incremental_alter_configs.v0.request import (
 )
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_alterable_config: Final = entity_reader(AlterableConfig)
@@ -59,3 +60,10 @@ def test_incremental_alter_configs_request_roundtrip(
         buffer.seek(0)
         result = read_incremental_alter_configs_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(IncrementalAlterConfigsRequest))
+def test_incremental_alter_configs_request_java(
+    instance: IncrementalAlterConfigsRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

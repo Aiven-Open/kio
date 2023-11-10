@@ -9,6 +9,7 @@ from hypothesis.strategies import from_type
 from kio.schema.describe_cluster.v0.request import DescribeClusterRequest
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_describe_cluster_request: Final = entity_reader(DescribeClusterRequest)
@@ -23,3 +24,10 @@ def test_describe_cluster_request_roundtrip(instance: DescribeClusterRequest) ->
         buffer.seek(0)
         result = read_describe_cluster_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(DescribeClusterRequest))
+def test_describe_cluster_request_java(
+    instance: DescribeClusterRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

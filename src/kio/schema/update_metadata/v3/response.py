@@ -11,10 +11,11 @@ from typing import ClassVar
 from kio.schema.response_header.v0.header import ResponseHeader
 from kio.static.constants import ErrorCode
 from kio.static.primitive import i16
+from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class UpdateMetadataResponse:
+class UpdateMetadataResponse(ApiMessage):
     __version__: ClassVar[i16] = i16(3)
     __flexible__: ClassVar[bool] = False
     __api_key__: ClassVar[i16] = i16(6)

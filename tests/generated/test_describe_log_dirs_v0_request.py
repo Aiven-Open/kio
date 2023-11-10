@@ -10,6 +10,7 @@ from kio.schema.describe_log_dirs.v0.request import DescribableLogDirTopic
 from kio.schema.describe_log_dirs.v0.request import DescribeLogDirsRequest
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_describable_log_dir_topic: Final = entity_reader(DescribableLogDirTopic)
@@ -38,3 +39,10 @@ def test_describe_log_dirs_request_roundtrip(instance: DescribeLogDirsRequest) -
         buffer.seek(0)
         result = read_describe_log_dirs_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(DescribeLogDirsRequest))
+def test_describe_log_dirs_request_java(
+    instance: DescribeLogDirsRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

@@ -11,6 +11,7 @@ from kio.schema.alter_configs.v1.request import AlterConfigsRequest
 from kio.schema.alter_configs.v1.request import AlterConfigsResource
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_alterable_config: Final = entity_reader(AlterableConfig)
@@ -53,3 +54,10 @@ def test_alter_configs_request_roundtrip(instance: AlterConfigsRequest) -> None:
         buffer.seek(0)
         result = read_alter_configs_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(AlterConfigsRequest))
+def test_alter_configs_request_java(
+    instance: AlterConfigsRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

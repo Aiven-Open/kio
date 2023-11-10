@@ -10,6 +10,7 @@ from kio.schema.sync_group.v4.request import SyncGroupRequest
 from kio.schema.sync_group.v4.request import SyncGroupRequestAssignment
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_sync_group_request_assignment: Final = entity_reader(SyncGroupRequestAssignment)
@@ -40,3 +41,10 @@ def test_sync_group_request_roundtrip(instance: SyncGroupRequest) -> None:
         buffer.seek(0)
         result = read_sync_group_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(SyncGroupRequest))
+def test_sync_group_request_java(
+    instance: SyncGroupRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

@@ -11,6 +11,7 @@ from kio.schema.delete_records.v2.request import DeleteRecordsRequest
 from kio.schema.delete_records.v2.request import DeleteRecordsTopic
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_delete_records_partition: Final = entity_reader(DeleteRecordsPartition)
@@ -53,3 +54,10 @@ def test_delete_records_request_roundtrip(instance: DeleteRecordsRequest) -> Non
         buffer.seek(0)
         result = read_delete_records_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(DeleteRecordsRequest))
+def test_delete_records_request_java(
+    instance: DeleteRecordsRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

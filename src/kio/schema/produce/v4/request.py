@@ -14,6 +14,7 @@ from kio.schema.types import TransactionalId
 from kio.static.primitive import i16
 from kio.static.primitive import i32
 from kio.static.primitive import i32Timedelta
+from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -41,7 +42,7 @@ class TopicProduceData:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class ProduceRequest:
+class ProduceRequest(ApiMessage):
     __version__: ClassVar[i16] = i16(4)
     __flexible__: ClassVar[bool] = False
     __api_key__: ClassVar[i16] = i16(0)

@@ -11,6 +11,7 @@ from kio.schema.offset_commit.v4.response import OffsetCommitResponsePartition
 from kio.schema.offset_commit.v4.response import OffsetCommitResponseTopic
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_offset_commit_response_partition: Final = entity_reader(
@@ -59,3 +60,10 @@ def test_offset_commit_response_roundtrip(instance: OffsetCommitResponse) -> Non
         buffer.seek(0)
         result = read_offset_commit_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(OffsetCommitResponse))
+def test_offset_commit_response_java(
+    instance: OffsetCommitResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

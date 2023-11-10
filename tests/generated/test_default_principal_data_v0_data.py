@@ -9,6 +9,7 @@ from hypothesis.strategies import from_type
 from kio.schema.default_principal_data.v0.data import DefaultPrincipalData
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_default_principal_data: Final = entity_reader(DefaultPrincipalData)
@@ -23,3 +24,10 @@ def test_default_principal_data_roundtrip(instance: DefaultPrincipalData) -> Non
         buffer.seek(0)
         result = read_default_principal_data(buffer)
     assert instance == result
+
+
+@given(instance=from_type(DefaultPrincipalData))
+def test_default_principal_data_java(
+    instance: DefaultPrincipalData, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

@@ -12,6 +12,7 @@ from kio.schema.describe_log_dirs.v3.response import DescribeLogDirsResult
 from kio.schema.describe_log_dirs.v3.response import DescribeLogDirsTopic
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_describe_log_dirs_partition: Final = entity_reader(DescribeLogDirsPartition)
@@ -72,3 +73,10 @@ def test_describe_log_dirs_response_roundtrip(
         buffer.seek(0)
         result = read_describe_log_dirs_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(DescribeLogDirsResponse))
+def test_describe_log_dirs_response_java(
+    instance: DescribeLogDirsResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

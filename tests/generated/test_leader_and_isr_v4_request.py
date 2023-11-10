@@ -12,6 +12,7 @@ from kio.schema.leader_and_isr.v4.request import LeaderAndIsrRequest
 from kio.schema.leader_and_isr.v4.request import LeaderAndIsrTopicState
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_leader_and_isr_partition_state: Final = entity_reader(LeaderAndIsrPartitionState)
@@ -70,3 +71,10 @@ def test_leader_and_isr_request_roundtrip(instance: LeaderAndIsrRequest) -> None
         buffer.seek(0)
         result = read_leader_and_isr_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(LeaderAndIsrRequest))
+def test_leader_and_isr_request_java(
+    instance: LeaderAndIsrRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

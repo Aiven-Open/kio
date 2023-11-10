@@ -9,6 +9,7 @@ from hypothesis.strategies import from_type
 from kio.schema.snapshot_header_record.v0.data import SnapshotHeaderRecord
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_snapshot_header_record: Final = entity_reader(SnapshotHeaderRecord)
@@ -23,3 +24,10 @@ def test_snapshot_header_record_roundtrip(instance: SnapshotHeaderRecord) -> Non
         buffer.seek(0)
         result = read_snapshot_header_record(buffer)
     assert instance == result
+
+
+@given(instance=from_type(SnapshotHeaderRecord))
+def test_snapshot_header_record_java(
+    instance: SnapshotHeaderRecord, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

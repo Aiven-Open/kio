@@ -10,6 +10,7 @@ from kio.schema.delete_acls.v2.request import DeleteAclsFilter
 from kio.schema.delete_acls.v2.request import DeleteAclsRequest
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_delete_acls_filter: Final = entity_reader(DeleteAclsFilter)
@@ -38,3 +39,10 @@ def test_delete_acls_request_roundtrip(instance: DeleteAclsRequest) -> None:
         buffer.seek(0)
         result = read_delete_acls_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(DeleteAclsRequest))
+def test_delete_acls_request_java(
+    instance: DeleteAclsRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)
