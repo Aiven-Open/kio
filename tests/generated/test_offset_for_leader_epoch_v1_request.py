@@ -11,6 +11,7 @@ from kio.schema.offset_for_leader_epoch.v1.request import OffsetForLeaderPartiti
 from kio.schema.offset_for_leader_epoch.v1.request import OffsetForLeaderTopic
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_offset_for_leader_partition: Final = entity_reader(OffsetForLeaderPartition)
@@ -57,3 +58,10 @@ def test_offset_for_leader_epoch_request_roundtrip(
         buffer.seek(0)
         result = read_offset_for_leader_epoch_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(OffsetForLeaderEpochRequest))
+def test_offset_for_leader_epoch_request_java(
+    instance: OffsetForLeaderEpochRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

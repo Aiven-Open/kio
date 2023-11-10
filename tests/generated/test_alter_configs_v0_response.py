@@ -10,6 +10,7 @@ from kio.schema.alter_configs.v0.response import AlterConfigsResourceResponse
 from kio.schema.alter_configs.v0.response import AlterConfigsResponse
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_alter_configs_resource_response: Final = entity_reader(
@@ -42,3 +43,10 @@ def test_alter_configs_response_roundtrip(instance: AlterConfigsResponse) -> Non
         buffer.seek(0)
         result = read_alter_configs_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(AlterConfigsResponse))
+def test_alter_configs_response_java(
+    instance: AlterConfigsResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

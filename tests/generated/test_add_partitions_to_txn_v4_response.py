@@ -14,6 +14,7 @@ from kio.schema.add_partitions_to_txn.v4.response import AddPartitionsToTxnResul
 from kio.schema.add_partitions_to_txn.v4.response import AddPartitionsToTxnTopicResult
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_add_partitions_to_txn_partition_result: Final = entity_reader(
@@ -82,3 +83,10 @@ def test_add_partitions_to_txn_response_roundtrip(
         buffer.seek(0)
         result = read_add_partitions_to_txn_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(AddPartitionsToTxnResponse))
+def test_add_partitions_to_txn_response_java(
+    instance: AddPartitionsToTxnResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

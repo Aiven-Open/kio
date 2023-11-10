@@ -11,6 +11,7 @@ from typing import ClassVar
 from kio.schema.types import BrokerId
 from kio.static.primitive import i16
 from kio.static.primitive import i32
+from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -21,7 +22,7 @@ class Voter:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class LeaderChangeMessage:
+class LeaderChangeMessage(ApiMessage):
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     version: i16 = field(metadata={"kafka_type": "int16"})

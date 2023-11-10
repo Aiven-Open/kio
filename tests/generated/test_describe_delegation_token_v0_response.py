@@ -15,6 +15,7 @@ from kio.schema.describe_delegation_token.v0.response import (
 )
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_described_delegation_token_renewer: Final = entity_reader(
@@ -67,3 +68,10 @@ def test_describe_delegation_token_response_roundtrip(
         buffer.seek(0)
         result = read_describe_delegation_token_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(DescribeDelegationTokenResponse))
+def test_describe_delegation_token_response_java(
+    instance: DescribeDelegationTokenResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

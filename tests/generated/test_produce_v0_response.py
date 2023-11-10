@@ -11,6 +11,7 @@ from kio.schema.produce.v0.response import ProduceResponse
 from kio.schema.produce.v0.response import TopicProduceResponse
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_partition_produce_response: Final = entity_reader(PartitionProduceResponse)
@@ -55,3 +56,10 @@ def test_produce_response_roundtrip(instance: ProduceResponse) -> None:
         buffer.seek(0)
         result = read_produce_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(ProduceResponse))
+def test_produce_response_java(
+    instance: ProduceResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

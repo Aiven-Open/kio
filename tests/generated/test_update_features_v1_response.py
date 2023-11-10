@@ -10,6 +10,7 @@ from kio.schema.update_features.v1.response import UpdatableFeatureResult
 from kio.schema.update_features.v1.response import UpdateFeaturesResponse
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_updatable_feature_result: Final = entity_reader(UpdatableFeatureResult)
@@ -38,3 +39,10 @@ def test_update_features_response_roundtrip(instance: UpdateFeaturesResponse) ->
         buffer.seek(0)
         result = read_update_features_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(UpdateFeaturesResponse))
+def test_update_features_response_java(
+    instance: UpdateFeaturesResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

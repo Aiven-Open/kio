@@ -11,6 +11,7 @@ from kio.schema.offset_delete.v0.response import OffsetDeleteResponsePartition
 from kio.schema.offset_delete.v0.response import OffsetDeleteResponseTopic
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_offset_delete_response_partition: Final = entity_reader(
@@ -59,3 +60,10 @@ def test_offset_delete_response_roundtrip(instance: OffsetDeleteResponse) -> Non
         buffer.seek(0)
         result = read_offset_delete_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(OffsetDeleteResponse))
+def test_offset_delete_response_java(
+    instance: OffsetDeleteResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

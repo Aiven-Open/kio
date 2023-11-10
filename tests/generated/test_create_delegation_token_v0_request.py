@@ -10,6 +10,7 @@ from kio.schema.create_delegation_token.v0.request import CreatableRenewers
 from kio.schema.create_delegation_token.v0.request import CreateDelegationTokenRequest
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_creatable_renewers: Final = entity_reader(CreatableRenewers)
@@ -42,3 +43,10 @@ def test_create_delegation_token_request_roundtrip(
         buffer.seek(0)
         result = read_create_delegation_token_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(CreateDelegationTokenRequest))
+def test_create_delegation_token_request_java(
+    instance: CreateDelegationTokenRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

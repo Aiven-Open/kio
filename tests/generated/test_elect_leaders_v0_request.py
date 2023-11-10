@@ -10,6 +10,7 @@ from kio.schema.elect_leaders.v0.request import ElectLeadersRequest
 from kio.schema.elect_leaders.v0.request import TopicPartitions
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_topic_partitions: Final = entity_reader(TopicPartitions)
@@ -38,3 +39,10 @@ def test_elect_leaders_request_roundtrip(instance: ElectLeadersRequest) -> None:
         buffer.seek(0)
         result = read_elect_leaders_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(ElectLeadersRequest))
+def test_elect_leaders_request_java(
+    instance: ElectLeadersRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

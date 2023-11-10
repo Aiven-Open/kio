@@ -10,10 +10,11 @@ from typing import ClassVar
 
 from kio.static.primitive import i16
 from kio.static.primitive import i32
+from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class RequestHeader:
+class RequestHeader(ApiMessage):
     __version__: ClassVar[i16] = i16(2)
     __flexible__: ClassVar[bool] = True
     request_api_key: i16 = field(metadata={"kafka_type": "int16"})

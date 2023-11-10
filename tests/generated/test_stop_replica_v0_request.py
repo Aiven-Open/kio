@@ -10,6 +10,7 @@ from kio.schema.stop_replica.v0.request import StopReplicaPartitionV0
 from kio.schema.stop_replica.v0.request import StopReplicaRequest
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_stop_replica_partition_v0: Final = entity_reader(StopReplicaPartitionV0)
@@ -38,3 +39,10 @@ def test_stop_replica_request_roundtrip(instance: StopReplicaRequest) -> None:
         buffer.seek(0)
         result = read_stop_replica_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(StopReplicaRequest))
+def test_stop_replica_request_java(
+    instance: StopReplicaRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

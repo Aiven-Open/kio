@@ -10,6 +10,7 @@ from kio.schema.delete_topics.v6.request import DeleteTopicsRequest
 from kio.schema.delete_topics.v6.request import DeleteTopicState
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_delete_topic_state: Final = entity_reader(DeleteTopicState)
@@ -38,3 +39,10 @@ def test_delete_topics_request_roundtrip(instance: DeleteTopicsRequest) -> None:
         buffer.seek(0)
         result = read_delete_topics_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(DeleteTopicsRequest))
+def test_delete_topics_request_java(
+    instance: DeleteTopicsRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

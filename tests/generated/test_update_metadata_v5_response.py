@@ -9,6 +9,7 @@ from hypothesis.strategies import from_type
 from kio.schema.update_metadata.v5.response import UpdateMetadataResponse
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_update_metadata_response: Final = entity_reader(UpdateMetadataResponse)
@@ -23,3 +24,10 @@ def test_update_metadata_response_roundtrip(instance: UpdateMetadataResponse) ->
         buffer.seek(0)
         result = read_update_metadata_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(UpdateMetadataResponse))
+def test_update_metadata_response_java(
+    instance: UpdateMetadataResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

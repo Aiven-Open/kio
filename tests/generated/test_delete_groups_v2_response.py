@@ -10,6 +10,7 @@ from kio.schema.delete_groups.v2.response import DeletableGroupResult
 from kio.schema.delete_groups.v2.response import DeleteGroupsResponse
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_deletable_group_result: Final = entity_reader(DeletableGroupResult)
@@ -38,3 +39,10 @@ def test_delete_groups_response_roundtrip(instance: DeleteGroupsResponse) -> Non
         buffer.seek(0)
         result = read_delete_groups_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(DeleteGroupsResponse))
+def test_delete_groups_response_java(
+    instance: DeleteGroupsResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

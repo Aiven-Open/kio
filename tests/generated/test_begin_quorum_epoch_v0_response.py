@@ -11,6 +11,7 @@ from kio.schema.begin_quorum_epoch.v0.response import PartitionData
 from kio.schema.begin_quorum_epoch.v0.response import TopicData
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_partition_data: Final = entity_reader(PartitionData)
@@ -55,3 +56,10 @@ def test_begin_quorum_epoch_response_roundtrip(
         buffer.seek(0)
         result = read_begin_quorum_epoch_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(BeginQuorumEpochResponse))
+def test_begin_quorum_epoch_response_java(
+    instance: BeginQuorumEpochResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

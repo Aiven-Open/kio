@@ -10,6 +10,7 @@ from kio.schema.consumer_protocol_assignment.v0.data import ConsumerProtocolAssi
 from kio.schema.consumer_protocol_assignment.v0.data import TopicPartition
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_topic_partition: Final = entity_reader(TopicPartition)
@@ -40,3 +41,10 @@ def test_consumer_protocol_assignment_roundtrip(
         buffer.seek(0)
         result = read_consumer_protocol_assignment(buffer)
     assert instance == result
+
+
+@given(instance=from_type(ConsumerProtocolAssignment))
+def test_consumer_protocol_assignment_java(
+    instance: ConsumerProtocolAssignment, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

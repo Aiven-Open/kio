@@ -13,6 +13,7 @@ from kio.schema.update_metadata.v5.request import UpdateMetadataRequest
 from kio.schema.update_metadata.v5.request import UpdateMetadataTopicState
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_update_metadata_partition_state: Final = entity_reader(
@@ -89,3 +90,10 @@ def test_update_metadata_request_roundtrip(instance: UpdateMetadataRequest) -> N
         buffer.seek(0)
         result = read_update_metadata_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(UpdateMetadataRequest))
+def test_update_metadata_request_java(
+    instance: UpdateMetadataRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

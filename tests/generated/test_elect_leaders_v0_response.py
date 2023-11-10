@@ -11,6 +11,7 @@ from kio.schema.elect_leaders.v0.response import PartitionResult
 from kio.schema.elect_leaders.v0.response import ReplicaElectionResult
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_partition_result: Final = entity_reader(PartitionResult)
@@ -53,3 +54,10 @@ def test_elect_leaders_response_roundtrip(instance: ElectLeadersResponse) -> Non
         buffer.seek(0)
         result = read_elect_leaders_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(ElectLeadersResponse))
+def test_elect_leaders_response_java(
+    instance: ElectLeadersResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

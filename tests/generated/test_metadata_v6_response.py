@@ -12,6 +12,7 @@ from kio.schema.metadata.v6.response import MetadataResponsePartition
 from kio.schema.metadata.v6.response import MetadataResponseTopic
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_metadata_response_broker: Final = entity_reader(MetadataResponseBroker)
@@ -70,3 +71,10 @@ def test_metadata_response_roundtrip(instance: MetadataResponse) -> None:
         buffer.seek(0)
         result = read_metadata_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(MetadataResponse))
+def test_metadata_response_java(
+    instance: MetadataResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

@@ -12,6 +12,7 @@ from kio.schema.create_topics.v6.request import CreateableTopicConfig
 from kio.schema.create_topics.v6.request import CreateTopicsRequest
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_creatable_replica_assignment: Final = entity_reader(CreatableReplicaAssignment)
@@ -70,3 +71,10 @@ def test_create_topics_request_roundtrip(instance: CreateTopicsRequest) -> None:
         buffer.seek(0)
         result = read_create_topics_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(CreateTopicsRequest))
+def test_create_topics_request_java(
+    instance: CreateTopicsRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

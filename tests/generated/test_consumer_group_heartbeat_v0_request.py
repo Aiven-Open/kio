@@ -11,6 +11,7 @@ from kio.schema.consumer_group_heartbeat.v0.request import ConsumerGroupHeartbea
 from kio.schema.consumer_group_heartbeat.v0.request import TopicPartitions
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_assignor: Final = entity_reader(Assignor)
@@ -57,3 +58,10 @@ def test_consumer_group_heartbeat_request_roundtrip(
         buffer.seek(0)
         result = read_consumer_group_heartbeat_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(ConsumerGroupHeartbeatRequest))
+def test_consumer_group_heartbeat_request_java(
+    instance: ConsumerGroupHeartbeatRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

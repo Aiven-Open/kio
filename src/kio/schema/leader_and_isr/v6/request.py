@@ -16,6 +16,7 @@ from kio.static.primitive import i8
 from kio.static.primitive import i16
 from kio.static.primitive import i32
 from kio.static.primitive import i64
+from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -81,7 +82,7 @@ class LeaderAndIsrLiveLeader:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class LeaderAndIsrRequest:
+class LeaderAndIsrRequest(ApiMessage):
     __version__: ClassVar[i16] = i16(6)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(4)

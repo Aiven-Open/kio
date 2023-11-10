@@ -9,6 +9,7 @@ from hypothesis.strategies import from_type
 from kio.schema.add_offsets_to_txn.v0.request import AddOffsetsToTxnRequest
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_add_offsets_to_txn_request: Final = entity_reader(AddOffsetsToTxnRequest)
@@ -23,3 +24,10 @@ def test_add_offsets_to_txn_request_roundtrip(instance: AddOffsetsToTxnRequest) 
         buffer.seek(0)
         result = read_add_offsets_to_txn_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(AddOffsetsToTxnRequest))
+def test_add_offsets_to_txn_request_java(
+    instance: AddOffsetsToTxnRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

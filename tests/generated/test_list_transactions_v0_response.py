@@ -10,6 +10,7 @@ from kio.schema.list_transactions.v0.response import ListTransactionsResponse
 from kio.schema.list_transactions.v0.response import TransactionState
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_transaction_state: Final = entity_reader(TransactionState)
@@ -40,3 +41,10 @@ def test_list_transactions_response_roundtrip(
         buffer.seek(0)
         result = read_list_transactions_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(ListTransactionsResponse))
+def test_list_transactions_response_java(
+    instance: ListTransactionsResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

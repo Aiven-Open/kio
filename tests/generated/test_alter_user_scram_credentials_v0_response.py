@@ -14,6 +14,7 @@ from kio.schema.alter_user_scram_credentials.v0.response import (
 )
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_alter_user_scram_credentials_result: Final = entity_reader(
@@ -50,3 +51,10 @@ def test_alter_user_scram_credentials_response_roundtrip(
         buffer.seek(0)
         result = read_alter_user_scram_credentials_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(AlterUserScramCredentialsResponse))
+def test_alter_user_scram_credentials_response_java(
+    instance: AlterUserScramCredentialsResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

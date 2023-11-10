@@ -11,6 +11,7 @@ from kio.schema.describe_groups.v3.response import DescribedGroupMember
 from kio.schema.describe_groups.v3.response import DescribeGroupsResponse
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_described_group_member: Final = entity_reader(DescribedGroupMember)
@@ -53,3 +54,10 @@ def test_describe_groups_response_roundtrip(instance: DescribeGroupsResponse) ->
         buffer.seek(0)
         result = read_describe_groups_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(DescribeGroupsResponse))
+def test_describe_groups_response_java(
+    instance: DescribeGroupsResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

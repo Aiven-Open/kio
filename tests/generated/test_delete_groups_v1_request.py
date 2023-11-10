@@ -9,6 +9,7 @@ from hypothesis.strategies import from_type
 from kio.schema.delete_groups.v1.request import DeleteGroupsRequest
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_delete_groups_request: Final = entity_reader(DeleteGroupsRequest)
@@ -23,3 +24,10 @@ def test_delete_groups_request_roundtrip(instance: DeleteGroupsRequest) -> None:
         buffer.seek(0)
         result = read_delete_groups_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(DeleteGroupsRequest))
+def test_delete_groups_request_java(
+    instance: DeleteGroupsRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

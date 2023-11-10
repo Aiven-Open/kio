@@ -10,6 +10,7 @@ from kio.schema.create_acls.v0.request import AclCreation
 from kio.schema.create_acls.v0.request import CreateAclsRequest
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_acl_creation: Final = entity_reader(AclCreation)
@@ -38,3 +39,10 @@ def test_create_acls_request_roundtrip(instance: CreateAclsRequest) -> None:
         buffer.seek(0)
         result = read_create_acls_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(CreateAclsRequest))
+def test_create_acls_request_java(
+    instance: CreateAclsRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

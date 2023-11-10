@@ -9,6 +9,7 @@ from hypothesis.strategies import from_type
 from kio.schema.request_header.v0.header import RequestHeader
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_request_header: Final = entity_reader(RequestHeader)
@@ -23,3 +24,8 @@ def test_request_header_roundtrip(instance: RequestHeader) -> None:
         buffer.seek(0)
         result = read_request_header(buffer)
     assert instance == result
+
+
+@given(instance=from_type(RequestHeader))
+def test_request_header_java(instance: RequestHeader, java_tester: JavaTester) -> None:
+    java_tester.test(instance)

@@ -10,6 +10,7 @@ from kio.schema.find_coordinator.v4.response import Coordinator
 from kio.schema.find_coordinator.v4.response import FindCoordinatorResponse
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_coordinator: Final = entity_reader(Coordinator)
@@ -38,3 +39,10 @@ def test_find_coordinator_response_roundtrip(instance: FindCoordinatorResponse) 
         buffer.seek(0)
         result = read_find_coordinator_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(FindCoordinatorResponse))
+def test_find_coordinator_response_java(
+    instance: FindCoordinatorResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

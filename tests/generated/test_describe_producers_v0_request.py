@@ -10,6 +10,7 @@ from kio.schema.describe_producers.v0.request import DescribeProducersRequest
 from kio.schema.describe_producers.v0.request import TopicRequest
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_topic_request: Final = entity_reader(TopicRequest)
@@ -40,3 +41,10 @@ def test_describe_producers_request_roundtrip(
         buffer.seek(0)
         result = read_describe_producers_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(DescribeProducersRequest))
+def test_describe_producers_request_java(
+    instance: DescribeProducersRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

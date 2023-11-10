@@ -15,6 +15,7 @@ from kio.schema.list_partition_reassignments.v0.response import (
 from kio.schema.list_partition_reassignments.v0.response import OngoingTopicReassignment
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_ongoing_partition_reassignment: Final = entity_reader(OngoingPartitionReassignment)
@@ -65,3 +66,10 @@ def test_list_partition_reassignments_response_roundtrip(
         buffer.seek(0)
         result = read_list_partition_reassignments_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(ListPartitionReassignmentsResponse))
+def test_list_partition_reassignments_response_java(
+    instance: ListPartitionReassignmentsResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

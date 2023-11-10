@@ -12,6 +12,7 @@ from kio.schema.fetch_snapshot.v0.request import SnapshotId
 from kio.schema.fetch_snapshot.v0.request import TopicSnapshot
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_snapshot_id: Final = entity_reader(SnapshotId)
@@ -68,3 +69,10 @@ def test_fetch_snapshot_request_roundtrip(instance: FetchSnapshotRequest) -> Non
         buffer.seek(0)
         result = read_fetch_snapshot_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(FetchSnapshotRequest))
+def test_fetch_snapshot_request_java(
+    instance: FetchSnapshotRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

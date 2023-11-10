@@ -10,6 +10,7 @@ from kio.schema.describe_cluster.v0.response import DescribeClusterBroker
 from kio.schema.describe_cluster.v0.response import DescribeClusterResponse
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_describe_cluster_broker: Final = entity_reader(DescribeClusterBroker)
@@ -38,3 +39,10 @@ def test_describe_cluster_response_roundtrip(instance: DescribeClusterResponse) 
         buffer.seek(0)
         result = read_describe_cluster_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(DescribeClusterResponse))
+def test_describe_cluster_response_java(
+    instance: DescribeClusterResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

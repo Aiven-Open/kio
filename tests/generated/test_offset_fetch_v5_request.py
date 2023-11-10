@@ -10,6 +10,7 @@ from kio.schema.offset_fetch.v5.request import OffsetFetchRequest
 from kio.schema.offset_fetch.v5.request import OffsetFetchRequestTopic
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_offset_fetch_request_topic: Final = entity_reader(OffsetFetchRequestTopic)
@@ -40,3 +41,10 @@ def test_offset_fetch_request_roundtrip(instance: OffsetFetchRequest) -> None:
         buffer.seek(0)
         result = read_offset_fetch_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(OffsetFetchRequest))
+def test_offset_fetch_request_java(
+    instance: OffsetFetchRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

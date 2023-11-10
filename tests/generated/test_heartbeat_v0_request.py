@@ -9,6 +9,7 @@ from hypothesis.strategies import from_type
 from kio.schema.heartbeat.v0.request import HeartbeatRequest
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_heartbeat_request: Final = entity_reader(HeartbeatRequest)
@@ -23,3 +24,10 @@ def test_heartbeat_request_roundtrip(instance: HeartbeatRequest) -> None:
         buffer.seek(0)
         result = read_heartbeat_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(HeartbeatRequest))
+def test_heartbeat_request_java(
+    instance: HeartbeatRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

@@ -11,6 +11,7 @@ from kio.schema.describe_acls.v3.response import DescribeAclsResource
 from kio.schema.describe_acls.v3.response import DescribeAclsResponse
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_acl_description: Final = entity_reader(AclDescription)
@@ -53,3 +54,10 @@ def test_describe_acls_response_roundtrip(instance: DescribeAclsResponse) -> Non
         buffer.seek(0)
         result = read_describe_acls_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(DescribeAclsResponse))
+def test_describe_acls_response_java(
+    instance: DescribeAclsResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

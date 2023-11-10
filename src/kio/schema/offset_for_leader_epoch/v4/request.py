@@ -13,6 +13,7 @@ from kio.schema.types import BrokerId
 from kio.schema.types import TopicName
 from kio.static.primitive import i16
 from kio.static.primitive import i32
+from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -42,7 +43,7 @@ class OffsetForLeaderTopic:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class OffsetForLeaderEpochRequest:
+class OffsetForLeaderEpochRequest(ApiMessage):
     __version__: ClassVar[i16] = i16(4)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(23)

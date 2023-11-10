@@ -12,6 +12,7 @@ from kio.schema.describe_configs.v2.response import DescribeConfigsResult
 from kio.schema.describe_configs.v2.response import DescribeConfigsSynonym
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_describe_configs_synonym: Final = entity_reader(DescribeConfigsSynonym)
@@ -72,3 +73,10 @@ def test_describe_configs_response_roundtrip(instance: DescribeConfigsResponse) 
         buffer.seek(0)
         result = read_describe_configs_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(DescribeConfigsResponse))
+def test_describe_configs_response_java(
+    instance: DescribeConfigsResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

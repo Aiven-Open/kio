@@ -10,6 +10,7 @@ from kio.schema.create_partitions.v0.response import CreatePartitionsResponse
 from kio.schema.create_partitions.v0.response import CreatePartitionsTopicResult
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_create_partitions_topic_result: Final = entity_reader(CreatePartitionsTopicResult)
@@ -42,3 +43,10 @@ def test_create_partitions_response_roundtrip(
         buffer.seek(0)
         result = read_create_partitions_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(CreatePartitionsResponse))
+def test_create_partitions_response_java(
+    instance: CreatePartitionsResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

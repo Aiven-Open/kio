@@ -10,6 +10,7 @@ from kio.schema.api_versions.v0.response import ApiVersion
 from kio.schema.api_versions.v0.response import ApiVersionsResponse
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_api_version: Final = entity_reader(ApiVersion)
@@ -38,3 +39,10 @@ def test_api_versions_response_roundtrip(instance: ApiVersionsResponse) -> None:
         buffer.seek(0)
         result = read_api_versions_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(ApiVersionsResponse))
+def test_api_versions_response_java(
+    instance: ApiVersionsResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

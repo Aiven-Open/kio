@@ -12,6 +12,7 @@ from kio.schema.describe_producers.v0.response import ProducerState
 from kio.schema.describe_producers.v0.response import TopicResponse
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_producer_state: Final = entity_reader(ProducerState)
@@ -70,3 +71,10 @@ def test_describe_producers_response_roundtrip(
         buffer.seek(0)
         result = read_describe_producers_response(buffer)
     assert instance == result
+
+
+@given(instance=from_type(DescribeProducersResponse))
+def test_describe_producers_response_java(
+    instance: DescribeProducersResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

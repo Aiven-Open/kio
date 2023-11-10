@@ -11,6 +11,7 @@ from kio.schema.describe_quorum.v0.request import PartitionData
 from kio.schema.describe_quorum.v0.request import TopicData
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_partition_data: Final = entity_reader(PartitionData)
@@ -53,3 +54,10 @@ def test_describe_quorum_request_roundtrip(instance: DescribeQuorumRequest) -> N
         buffer.seek(0)
         result = read_describe_quorum_request(buffer)
     assert instance == result
+
+
+@given(instance=from_type(DescribeQuorumRequest))
+def test_describe_quorum_request_java(
+    instance: DescribeQuorumRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)
