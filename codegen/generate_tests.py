@@ -120,7 +120,6 @@ def main() -> None:
             "ProduceRequest",  # Records
             "FetchResponse",  # Records
             "FetchSnapshotResponse",  # Records
-            "CreateTopicsResponse",  # Should not output tagged field if its value equals to default
             "FetchRequest",  # Should not output tagged field if its value equals to default (presumably)
             "ConsumerGroupHeartbeatResponse",  # Nullable `assignment` field
         }:
