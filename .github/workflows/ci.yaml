@@ -28,8 +28,86 @@ jobs:
     name: Check packaging metadata
     uses: less-action/reusables/.github/workflows/python-test-build.yaml@0afb53ddb81137deb9d41e7d911eb1755bb451e3
 
-  test:
-    name: Test
+  unit-test:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: setup.cfg
+
+      - name: Install requirements
+        run: pip install --upgrade -e '.[test]'
+
+      - name: Run test suite
+        run: python -X dev -m coverage run -m pytest -m "not java and not roundtrip and not integration"
+
+      - name: Collect coverage
+        run: |
+          coverage report
+          coverage xml
+
+      - name: Report coverage
+        uses: codecov/codecov-action@v3
+        with:
+          file: coverage.xml
+          fail_ci_if_error: true
+          name: codecov-py${{ matrix.python-version }}
+
+  roundtrip-test:
+    name: Roundtrip tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: setup.cfg
+
+      - name: Install requirements
+        run: pip install --upgrade -e '.[test]'
+
+      - name: Run test suite
+        run: python -X dev -m pytest -m roundtrip
+
+  java-test:
+    name: Java tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: setup.cfg
+
+      - name: Install requirements
+        run: pip install --upgrade -e '.[test]'
+
+      - name: Run Java tests
+        run: python -X dev -m pytest -m java
+
+  integration-test:
+    name: Integration tests
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -50,20 +128,8 @@ jobs:
       - name: Install requirements
         run: pip install --upgrade -e '.[test]'
 
-      - name: Run test suite
-        run: python -X dev -m coverage run -m pytest
-
-      - name: Collect coverage
-        run: |
-          coverage report
-          coverage xml
-
-      - name: Report coverage
-        uses: codecov/codecov-action@v3
-        with:
-          file: coverage.xml
-          fail_ci_if_error: true
-          name: codecov-py${{ matrix.python-version }}
+      - name: Run integration tests
+        run: python -X dev -m pytest -m integration
 
   check-generate-schema:
     name: Check schema
