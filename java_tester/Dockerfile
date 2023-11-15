@@ -1,4 +1,4 @@
-FROM gradle:jdk17-alpine AS build
+FROM gradle:jdk17 AS build
 
 RUN mkdir /java_tester
 WORKDIR /java_tester
