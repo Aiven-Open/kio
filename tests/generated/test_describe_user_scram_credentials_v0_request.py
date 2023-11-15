@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -18,6 +19,7 @@ from tests.conftest import setup_buffer
 read_user_name: Final = entity_reader(UserName)
 
 
+@pytest.mark.roundtrip
 @given(from_type(UserName))
 @settings(max_examples=1)
 def test_user_name_roundtrip(instance: UserName) -> None:
@@ -34,6 +36,7 @@ read_describe_user_scram_credentials_request: Final = entity_reader(
 )
 
 
+@pytest.mark.roundtrip
 @given(from_type(DescribeUserScramCredentialsRequest))
 @settings(max_examples=1)
 def test_describe_user_scram_credentials_request_roundtrip(
@@ -47,6 +50,7 @@ def test_describe_user_scram_credentials_request_roundtrip(
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(DescribeUserScramCredentialsRequest))
 def test_describe_user_scram_credentials_request_java(
     instance: DescribeUserScramCredentialsRequest, java_tester: JavaTester

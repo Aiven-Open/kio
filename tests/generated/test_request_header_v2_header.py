@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -15,6 +16,7 @@ from tests.conftest import setup_buffer
 read_request_header: Final = entity_reader(RequestHeader)
 
 
+@pytest.mark.roundtrip
 @given(from_type(RequestHeader))
 @settings(max_examples=1)
 def test_request_header_roundtrip(instance: RequestHeader) -> None:
@@ -26,6 +28,7 @@ def test_request_header_roundtrip(instance: RequestHeader) -> None:
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(RequestHeader))
 def test_request_header_java(instance: RequestHeader, java_tester: JavaTester) -> None:
     java_tester.test(instance)

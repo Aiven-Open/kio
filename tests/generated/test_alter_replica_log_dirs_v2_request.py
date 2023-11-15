@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -17,6 +18,7 @@ from tests.conftest import setup_buffer
 read_alter_replica_log_dir_topic: Final = entity_reader(AlterReplicaLogDirTopic)
 
 
+@pytest.mark.roundtrip
 @given(from_type(AlterReplicaLogDirTopic))
 @settings(max_examples=1)
 def test_alter_replica_log_dir_topic_roundtrip(
@@ -33,6 +35,7 @@ def test_alter_replica_log_dir_topic_roundtrip(
 read_alter_replica_log_dir: Final = entity_reader(AlterReplicaLogDir)
 
 
+@pytest.mark.roundtrip
 @given(from_type(AlterReplicaLogDir))
 @settings(max_examples=1)
 def test_alter_replica_log_dir_roundtrip(instance: AlterReplicaLogDir) -> None:
@@ -47,6 +50,7 @@ def test_alter_replica_log_dir_roundtrip(instance: AlterReplicaLogDir) -> None:
 read_alter_replica_log_dirs_request: Final = entity_reader(AlterReplicaLogDirsRequest)
 
 
+@pytest.mark.roundtrip
 @given(from_type(AlterReplicaLogDirsRequest))
 @settings(max_examples=1)
 def test_alter_replica_log_dirs_request_roundtrip(
@@ -60,6 +64,7 @@ def test_alter_replica_log_dirs_request_roundtrip(
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(AlterReplicaLogDirsRequest))
 def test_alter_replica_log_dirs_request_java(
     instance: AlterReplicaLogDirsRequest, java_tester: JavaTester

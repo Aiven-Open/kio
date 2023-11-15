@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -16,6 +17,7 @@ from tests.conftest import setup_buffer
 read_metadata_request_topic: Final = entity_reader(MetadataRequestTopic)
 
 
+@pytest.mark.roundtrip
 @given(from_type(MetadataRequestTopic))
 @settings(max_examples=1)
 def test_metadata_request_topic_roundtrip(instance: MetadataRequestTopic) -> None:
@@ -30,6 +32,7 @@ def test_metadata_request_topic_roundtrip(instance: MetadataRequestTopic) -> Non
 read_metadata_request: Final = entity_reader(MetadataRequest)
 
 
+@pytest.mark.roundtrip
 @given(from_type(MetadataRequest))
 @settings(max_examples=1)
 def test_metadata_request_roundtrip(instance: MetadataRequest) -> None:
@@ -41,6 +44,7 @@ def test_metadata_request_roundtrip(instance: MetadataRequest) -> None:
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(MetadataRequest))
 def test_metadata_request_java(
     instance: MetadataRequest, java_tester: JavaTester

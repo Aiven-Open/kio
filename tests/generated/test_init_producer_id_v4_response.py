@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -15,6 +16,7 @@ from tests.conftest import setup_buffer
 read_init_producer_id_response: Final = entity_reader(InitProducerIdResponse)
 
 
+@pytest.mark.roundtrip
 @given(from_type(InitProducerIdResponse))
 @settings(max_examples=1)
 def test_init_producer_id_response_roundtrip(instance: InitProducerIdResponse) -> None:
@@ -26,6 +28,7 @@ def test_init_producer_id_response_roundtrip(instance: InitProducerIdResponse) -
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(InitProducerIdResponse))
 def test_init_producer_id_response_java(
     instance: InitProducerIdResponse, java_tester: JavaTester

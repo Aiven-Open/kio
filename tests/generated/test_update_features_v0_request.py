@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -16,6 +17,7 @@ from tests.conftest import setup_buffer
 read_feature_update_key: Final = entity_reader(FeatureUpdateKey)
 
 
+@pytest.mark.roundtrip
 @given(from_type(FeatureUpdateKey))
 @settings(max_examples=1)
 def test_feature_update_key_roundtrip(instance: FeatureUpdateKey) -> None:
@@ -30,6 +32,7 @@ def test_feature_update_key_roundtrip(instance: FeatureUpdateKey) -> None:
 read_update_features_request: Final = entity_reader(UpdateFeaturesRequest)
 
 
+@pytest.mark.roundtrip
 @given(from_type(UpdateFeaturesRequest))
 @settings(max_examples=1)
 def test_update_features_request_roundtrip(instance: UpdateFeaturesRequest) -> None:
@@ -41,6 +44,7 @@ def test_update_features_request_roundtrip(instance: UpdateFeaturesRequest) -> N
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(UpdateFeaturesRequest))
 def test_update_features_request_java(
     instance: UpdateFeaturesRequest, java_tester: JavaTester

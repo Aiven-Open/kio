@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -15,6 +16,7 @@ from tests.conftest import setup_buffer
 read_sync_group_response: Final = entity_reader(SyncGroupResponse)
 
 
+@pytest.mark.roundtrip
 @given(from_type(SyncGroupResponse))
 @settings(max_examples=1)
 def test_sync_group_response_roundtrip(instance: SyncGroupResponse) -> None:
@@ -26,6 +28,7 @@ def test_sync_group_response_roundtrip(instance: SyncGroupResponse) -> None:
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(SyncGroupResponse))
 def test_sync_group_response_java(
     instance: SyncGroupResponse, java_tester: JavaTester

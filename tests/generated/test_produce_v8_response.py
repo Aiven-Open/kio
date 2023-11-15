@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -18,6 +19,7 @@ from tests.conftest import setup_buffer
 read_batch_index_and_error_message: Final = entity_reader(BatchIndexAndErrorMessage)
 
 
+@pytest.mark.roundtrip
 @given(from_type(BatchIndexAndErrorMessage))
 @settings(max_examples=1)
 def test_batch_index_and_error_message_roundtrip(
@@ -34,6 +36,7 @@ def test_batch_index_and_error_message_roundtrip(
 read_partition_produce_response: Final = entity_reader(PartitionProduceResponse)
 
 
+@pytest.mark.roundtrip
 @given(from_type(PartitionProduceResponse))
 @settings(max_examples=1)
 def test_partition_produce_response_roundtrip(
@@ -50,6 +53,7 @@ def test_partition_produce_response_roundtrip(
 read_topic_produce_response: Final = entity_reader(TopicProduceResponse)
 
 
+@pytest.mark.roundtrip
 @given(from_type(TopicProduceResponse))
 @settings(max_examples=1)
 def test_topic_produce_response_roundtrip(instance: TopicProduceResponse) -> None:
@@ -64,6 +68,7 @@ def test_topic_produce_response_roundtrip(instance: TopicProduceResponse) -> Non
 read_produce_response: Final = entity_reader(ProduceResponse)
 
 
+@pytest.mark.roundtrip
 @given(from_type(ProduceResponse))
 @settings(max_examples=1)
 def test_produce_response_roundtrip(instance: ProduceResponse) -> None:
@@ -75,6 +80,7 @@ def test_produce_response_roundtrip(instance: ProduceResponse) -> None:
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(ProduceResponse))
 def test_produce_response_java(
     instance: ProduceResponse, java_tester: JavaTester

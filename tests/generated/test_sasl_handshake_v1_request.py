@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -15,6 +16,7 @@ from tests.conftest import setup_buffer
 read_sasl_handshake_request: Final = entity_reader(SaslHandshakeRequest)
 
 
+@pytest.mark.roundtrip
 @given(from_type(SaslHandshakeRequest))
 @settings(max_examples=1)
 def test_sasl_handshake_request_roundtrip(instance: SaslHandshakeRequest) -> None:
@@ -26,6 +28,7 @@ def test_sasl_handshake_request_roundtrip(instance: SaslHandshakeRequest) -> Non
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(SaslHandshakeRequest))
 def test_sasl_handshake_request_java(
     instance: SaslHandshakeRequest, java_tester: JavaTester

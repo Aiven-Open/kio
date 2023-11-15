@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -16,6 +17,7 @@ from tests.conftest import setup_buffer
 read_delete_topic_state: Final = entity_reader(DeleteTopicState)
 
 
+@pytest.mark.roundtrip
 @given(from_type(DeleteTopicState))
 @settings(max_examples=1)
 def test_delete_topic_state_roundtrip(instance: DeleteTopicState) -> None:
@@ -30,6 +32,7 @@ def test_delete_topic_state_roundtrip(instance: DeleteTopicState) -> None:
 read_delete_topics_request: Final = entity_reader(DeleteTopicsRequest)
 
 
+@pytest.mark.roundtrip
 @given(from_type(DeleteTopicsRequest))
 @settings(max_examples=1)
 def test_delete_topics_request_roundtrip(instance: DeleteTopicsRequest) -> None:
@@ -41,6 +44,7 @@ def test_delete_topics_request_roundtrip(instance: DeleteTopicsRequest) -> None:
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(DeleteTopicsRequest))
 def test_delete_topics_request_java(
     instance: DeleteTopicsRequest, java_tester: JavaTester

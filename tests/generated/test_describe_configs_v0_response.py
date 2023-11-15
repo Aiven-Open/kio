@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -19,6 +20,7 @@ read_describe_configs_resource_result: Final = entity_reader(
 )
 
 
+@pytest.mark.roundtrip
 @given(from_type(DescribeConfigsResourceResult))
 @settings(max_examples=1)
 def test_describe_configs_resource_result_roundtrip(
@@ -35,6 +37,7 @@ def test_describe_configs_resource_result_roundtrip(
 read_describe_configs_result: Final = entity_reader(DescribeConfigsResult)
 
 
+@pytest.mark.roundtrip
 @given(from_type(DescribeConfigsResult))
 @settings(max_examples=1)
 def test_describe_configs_result_roundtrip(instance: DescribeConfigsResult) -> None:
@@ -49,6 +52,7 @@ def test_describe_configs_result_roundtrip(instance: DescribeConfigsResult) -> N
 read_describe_configs_response: Final = entity_reader(DescribeConfigsResponse)
 
 
+@pytest.mark.roundtrip
 @given(from_type(DescribeConfigsResponse))
 @settings(max_examples=1)
 def test_describe_configs_response_roundtrip(instance: DescribeConfigsResponse) -> None:
@@ -60,6 +64,7 @@ def test_describe_configs_response_roundtrip(instance: DescribeConfigsResponse) 
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(DescribeConfigsResponse))
 def test_describe_configs_response_java(
     instance: DescribeConfigsResponse, java_tester: JavaTester

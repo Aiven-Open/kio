@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -18,6 +19,7 @@ from tests.conftest import setup_buffer
 read_metadata_response_broker: Final = entity_reader(MetadataResponseBroker)
 
 
+@pytest.mark.roundtrip
 @given(from_type(MetadataResponseBroker))
 @settings(max_examples=1)
 def test_metadata_response_broker_roundtrip(instance: MetadataResponseBroker) -> None:
@@ -32,6 +34,7 @@ def test_metadata_response_broker_roundtrip(instance: MetadataResponseBroker) ->
 read_metadata_response_partition: Final = entity_reader(MetadataResponsePartition)
 
 
+@pytest.mark.roundtrip
 @given(from_type(MetadataResponsePartition))
 @settings(max_examples=1)
 def test_metadata_response_partition_roundtrip(
@@ -48,6 +51,7 @@ def test_metadata_response_partition_roundtrip(
 read_metadata_response_topic: Final = entity_reader(MetadataResponseTopic)
 
 
+@pytest.mark.roundtrip
 @given(from_type(MetadataResponseTopic))
 @settings(max_examples=1)
 def test_metadata_response_topic_roundtrip(instance: MetadataResponseTopic) -> None:
@@ -62,6 +66,7 @@ def test_metadata_response_topic_roundtrip(instance: MetadataResponseTopic) -> N
 read_metadata_response: Final = entity_reader(MetadataResponse)
 
 
+@pytest.mark.roundtrip
 @given(from_type(MetadataResponse))
 @settings(max_examples=1)
 def test_metadata_response_roundtrip(instance: MetadataResponse) -> None:
@@ -73,6 +78,7 @@ def test_metadata_response_roundtrip(instance: MetadataResponse) -> None:
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(MetadataResponse))
 def test_metadata_response_java(
     instance: MetadataResponse, java_tester: JavaTester

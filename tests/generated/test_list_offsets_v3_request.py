@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -17,6 +18,7 @@ from tests.conftest import setup_buffer
 read_list_offsets_partition: Final = entity_reader(ListOffsetsPartition)
 
 
+@pytest.mark.roundtrip
 @given(from_type(ListOffsetsPartition))
 @settings(max_examples=1)
 def test_list_offsets_partition_roundtrip(instance: ListOffsetsPartition) -> None:
@@ -31,6 +33,7 @@ def test_list_offsets_partition_roundtrip(instance: ListOffsetsPartition) -> Non
 read_list_offsets_topic: Final = entity_reader(ListOffsetsTopic)
 
 
+@pytest.mark.roundtrip
 @given(from_type(ListOffsetsTopic))
 @settings(max_examples=1)
 def test_list_offsets_topic_roundtrip(instance: ListOffsetsTopic) -> None:
@@ -45,6 +48,7 @@ def test_list_offsets_topic_roundtrip(instance: ListOffsetsTopic) -> None:
 read_list_offsets_request: Final = entity_reader(ListOffsetsRequest)
 
 
+@pytest.mark.roundtrip
 @given(from_type(ListOffsetsRequest))
 @settings(max_examples=1)
 def test_list_offsets_request_roundtrip(instance: ListOffsetsRequest) -> None:
@@ -56,6 +60,7 @@ def test_list_offsets_request_roundtrip(instance: ListOffsetsRequest) -> None:
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(ListOffsetsRequest))
 def test_list_offsets_request_java(
     instance: ListOffsetsRequest, java_tester: JavaTester

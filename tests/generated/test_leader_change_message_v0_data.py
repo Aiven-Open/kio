@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -16,6 +17,7 @@ from tests.conftest import setup_buffer
 read_voter: Final = entity_reader(Voter)
 
 
+@pytest.mark.roundtrip
 @given(from_type(Voter))
 @settings(max_examples=1)
 def test_voter_roundtrip(instance: Voter) -> None:
@@ -30,6 +32,7 @@ def test_voter_roundtrip(instance: Voter) -> None:
 read_leader_change_message: Final = entity_reader(LeaderChangeMessage)
 
 
+@pytest.mark.roundtrip
 @given(from_type(LeaderChangeMessage))
 @settings(max_examples=1)
 def test_leader_change_message_roundtrip(instance: LeaderChangeMessage) -> None:
@@ -41,6 +44,7 @@ def test_leader_change_message_roundtrip(instance: LeaderChangeMessage) -> None:
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(LeaderChangeMessage))
 def test_leader_change_message_java(
     instance: LeaderChangeMessage, java_tester: JavaTester

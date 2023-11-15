@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -16,6 +17,7 @@ from tests.conftest import setup_buffer
 read_component_data: Final = entity_reader(ComponentData)
 
 
+@pytest.mark.roundtrip
 @given(from_type(ComponentData))
 @settings(max_examples=1)
 def test_component_data_roundtrip(instance: ComponentData) -> None:
@@ -30,6 +32,7 @@ def test_component_data_roundtrip(instance: ComponentData) -> None:
 read_describe_client_quotas_request: Final = entity_reader(DescribeClientQuotasRequest)
 
 
+@pytest.mark.roundtrip
 @given(from_type(DescribeClientQuotasRequest))
 @settings(max_examples=1)
 def test_describe_client_quotas_request_roundtrip(
@@ -43,6 +46,7 @@ def test_describe_client_quotas_request_roundtrip(
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(DescribeClientQuotasRequest))
 def test_describe_client_quotas_request_java(
     instance: DescribeClientQuotasRequest, java_tester: JavaTester

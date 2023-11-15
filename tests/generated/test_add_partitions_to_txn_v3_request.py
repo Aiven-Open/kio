@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -16,6 +17,7 @@ from tests.conftest import setup_buffer
 read_add_partitions_to_txn_topic: Final = entity_reader(AddPartitionsToTxnTopic)
 
 
+@pytest.mark.roundtrip
 @given(from_type(AddPartitionsToTxnTopic))
 @settings(max_examples=1)
 def test_add_partitions_to_txn_topic_roundtrip(
@@ -32,6 +34,7 @@ def test_add_partitions_to_txn_topic_roundtrip(
 read_add_partitions_to_txn_request: Final = entity_reader(AddPartitionsToTxnRequest)
 
 
+@pytest.mark.roundtrip
 @given(from_type(AddPartitionsToTxnRequest))
 @settings(max_examples=1)
 def test_add_partitions_to_txn_request_roundtrip(
@@ -45,6 +48,7 @@ def test_add_partitions_to_txn_request_roundtrip(
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(AddPartitionsToTxnRequest))
 def test_add_partitions_to_txn_request_java(
     instance: AddPartitionsToTxnRequest, java_tester: JavaTester

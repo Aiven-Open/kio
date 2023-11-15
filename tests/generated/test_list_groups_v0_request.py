@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -15,6 +16,7 @@ from tests.conftest import setup_buffer
 read_list_groups_request: Final = entity_reader(ListGroupsRequest)
 
 
+@pytest.mark.roundtrip
 @given(from_type(ListGroupsRequest))
 @settings(max_examples=1)
 def test_list_groups_request_roundtrip(instance: ListGroupsRequest) -> None:
@@ -26,6 +28,7 @@ def test_list_groups_request_roundtrip(instance: ListGroupsRequest) -> None:
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(ListGroupsRequest))
 def test_list_groups_request_java(
     instance: ListGroupsRequest, java_tester: JavaTester

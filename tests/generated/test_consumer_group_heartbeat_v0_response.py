@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -18,6 +19,7 @@ from tests.conftest import setup_buffer
 read_topic_partitions: Final = entity_reader(TopicPartitions)
 
 
+@pytest.mark.roundtrip
 @given(from_type(TopicPartitions))
 @settings(max_examples=1)
 def test_topic_partitions_roundtrip(instance: TopicPartitions) -> None:
@@ -32,6 +34,7 @@ def test_topic_partitions_roundtrip(instance: TopicPartitions) -> None:
 read_assignment: Final = entity_reader(Assignment)
 
 
+@pytest.mark.roundtrip
 @given(from_type(Assignment))
 @settings(max_examples=1)
 def test_assignment_roundtrip(instance: Assignment) -> None:
@@ -48,6 +51,7 @@ read_consumer_group_heartbeat_response: Final = entity_reader(
 )
 
 
+@pytest.mark.roundtrip
 @given(from_type(ConsumerGroupHeartbeatResponse))
 @settings(max_examples=1)
 def test_consumer_group_heartbeat_response_roundtrip(

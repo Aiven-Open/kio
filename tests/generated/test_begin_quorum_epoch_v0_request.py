@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -17,6 +18,7 @@ from tests.conftest import setup_buffer
 read_partition_data: Final = entity_reader(PartitionData)
 
 
+@pytest.mark.roundtrip
 @given(from_type(PartitionData))
 @settings(max_examples=1)
 def test_partition_data_roundtrip(instance: PartitionData) -> None:
@@ -31,6 +33,7 @@ def test_partition_data_roundtrip(instance: PartitionData) -> None:
 read_topic_data: Final = entity_reader(TopicData)
 
 
+@pytest.mark.roundtrip
 @given(from_type(TopicData))
 @settings(max_examples=1)
 def test_topic_data_roundtrip(instance: TopicData) -> None:
@@ -45,6 +48,7 @@ def test_topic_data_roundtrip(instance: TopicData) -> None:
 read_begin_quorum_epoch_request: Final = entity_reader(BeginQuorumEpochRequest)
 
 
+@pytest.mark.roundtrip
 @given(from_type(BeginQuorumEpochRequest))
 @settings(max_examples=1)
 def test_begin_quorum_epoch_request_roundtrip(
@@ -58,6 +62,7 @@ def test_begin_quorum_epoch_request_roundtrip(
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(BeginQuorumEpochRequest))
 def test_begin_quorum_epoch_request_java(
     instance: BeginQuorumEpochRequest, java_tester: JavaTester

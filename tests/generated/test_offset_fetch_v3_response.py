@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -19,6 +20,7 @@ read_offset_fetch_response_partition: Final = entity_reader(
 )
 
 
+@pytest.mark.roundtrip
 @given(from_type(OffsetFetchResponsePartition))
 @settings(max_examples=1)
 def test_offset_fetch_response_partition_roundtrip(
@@ -35,6 +37,7 @@ def test_offset_fetch_response_partition_roundtrip(
 read_offset_fetch_response_topic: Final = entity_reader(OffsetFetchResponseTopic)
 
 
+@pytest.mark.roundtrip
 @given(from_type(OffsetFetchResponseTopic))
 @settings(max_examples=1)
 def test_offset_fetch_response_topic_roundtrip(
@@ -51,6 +54,7 @@ def test_offset_fetch_response_topic_roundtrip(
 read_offset_fetch_response: Final = entity_reader(OffsetFetchResponse)
 
 
+@pytest.mark.roundtrip
 @given(from_type(OffsetFetchResponse))
 @settings(max_examples=1)
 def test_offset_fetch_response_roundtrip(instance: OffsetFetchResponse) -> None:
@@ -62,6 +66,7 @@ def test_offset_fetch_response_roundtrip(instance: OffsetFetchResponse) -> None:
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(OffsetFetchResponse))
 def test_offset_fetch_response_java(
     instance: OffsetFetchResponse, java_tester: JavaTester

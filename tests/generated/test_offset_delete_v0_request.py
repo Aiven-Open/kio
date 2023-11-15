@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -19,6 +20,7 @@ read_offset_delete_request_partition: Final = entity_reader(
 )
 
 
+@pytest.mark.roundtrip
 @given(from_type(OffsetDeleteRequestPartition))
 @settings(max_examples=1)
 def test_offset_delete_request_partition_roundtrip(
@@ -35,6 +37,7 @@ def test_offset_delete_request_partition_roundtrip(
 read_offset_delete_request_topic: Final = entity_reader(OffsetDeleteRequestTopic)
 
 
+@pytest.mark.roundtrip
 @given(from_type(OffsetDeleteRequestTopic))
 @settings(max_examples=1)
 def test_offset_delete_request_topic_roundtrip(
@@ -51,6 +54,7 @@ def test_offset_delete_request_topic_roundtrip(
 read_offset_delete_request: Final = entity_reader(OffsetDeleteRequest)
 
 
+@pytest.mark.roundtrip
 @given(from_type(OffsetDeleteRequest))
 @settings(max_examples=1)
 def test_offset_delete_request_roundtrip(instance: OffsetDeleteRequest) -> None:
@@ -62,6 +66,7 @@ def test_offset_delete_request_roundtrip(instance: OffsetDeleteRequest) -> None:
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(OffsetDeleteRequest))
 def test_offset_delete_request_java(
     instance: OffsetDeleteRequest, java_tester: JavaTester

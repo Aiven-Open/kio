@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -16,6 +17,7 @@ from tests.conftest import setup_buffer
 read_creatable_topic_configs: Final = entity_reader(CreatableTopicConfigs)
 
 
+@pytest.mark.roundtrip
 @given(from_type(CreatableTopicConfigs))
 @settings(max_examples=1)
 def test_creatable_topic_configs_roundtrip(instance: CreatableTopicConfigs) -> None:
@@ -30,6 +32,7 @@ def test_creatable_topic_configs_roundtrip(instance: CreatableTopicConfigs) -> N
 read_creatable_topic_result: Final = entity_reader(CreatableTopicResult)
 
 
+@pytest.mark.roundtrip
 @given(from_type(CreatableTopicResult))
 @settings(max_examples=1)
 def test_creatable_topic_result_roundtrip(instance: CreatableTopicResult) -> None:
@@ -44,6 +47,7 @@ def test_creatable_topic_result_roundtrip(instance: CreatableTopicResult) -> Non
 read_create_topics_response: Final = entity_reader(CreateTopicsResponse)
 
 
+@pytest.mark.roundtrip
 @given(from_type(CreateTopicsResponse))
 @settings(max_examples=1)
 def test_create_topics_response_roundtrip(instance: CreateTopicsResponse) -> None:

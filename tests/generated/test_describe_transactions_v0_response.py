@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -17,6 +18,7 @@ from tests.conftest import setup_buffer
 read_topic_data: Final = entity_reader(TopicData)
 
 
+@pytest.mark.roundtrip
 @given(from_type(TopicData))
 @settings(max_examples=1)
 def test_topic_data_roundtrip(instance: TopicData) -> None:
@@ -31,6 +33,7 @@ def test_topic_data_roundtrip(instance: TopicData) -> None:
 read_transaction_state: Final = entity_reader(TransactionState)
 
 
+@pytest.mark.roundtrip
 @given(from_type(TransactionState))
 @settings(max_examples=1)
 def test_transaction_state_roundtrip(instance: TransactionState) -> None:
@@ -45,6 +48,7 @@ def test_transaction_state_roundtrip(instance: TransactionState) -> None:
 read_describe_transactions_response: Final = entity_reader(DescribeTransactionsResponse)
 
 
+@pytest.mark.roundtrip
 @given(from_type(DescribeTransactionsResponse))
 @settings(max_examples=1)
 def test_describe_transactions_response_roundtrip(
@@ -58,6 +62,7 @@ def test_describe_transactions_response_roundtrip(
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(DescribeTransactionsResponse))
 def test_describe_transactions_response_java(
     instance: DescribeTransactionsResponse, java_tester: JavaTester

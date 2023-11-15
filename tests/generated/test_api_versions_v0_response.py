@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -16,6 +17,7 @@ from tests.conftest import setup_buffer
 read_api_version: Final = entity_reader(ApiVersion)
 
 
+@pytest.mark.roundtrip
 @given(from_type(ApiVersion))
 @settings(max_examples=1)
 def test_api_version_roundtrip(instance: ApiVersion) -> None:
@@ -30,6 +32,7 @@ def test_api_version_roundtrip(instance: ApiVersion) -> None:
 read_api_versions_response: Final = entity_reader(ApiVersionsResponse)
 
 
+@pytest.mark.roundtrip
 @given(from_type(ApiVersionsResponse))
 @settings(max_examples=1)
 def test_api_versions_response_roundtrip(instance: ApiVersionsResponse) -> None:
@@ -41,6 +44,7 @@ def test_api_versions_response_roundtrip(instance: ApiVersionsResponse) -> None:
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(ApiVersionsResponse))
 def test_api_versions_response_java(
     instance: ApiVersionsResponse, java_tester: JavaTester

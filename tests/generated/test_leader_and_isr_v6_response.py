@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -17,6 +18,7 @@ from tests.conftest import setup_buffer
 read_leader_and_isr_partition_error: Final = entity_reader(LeaderAndIsrPartitionError)
 
 
+@pytest.mark.roundtrip
 @given(from_type(LeaderAndIsrPartitionError))
 @settings(max_examples=1)
 def test_leader_and_isr_partition_error_roundtrip(
@@ -33,6 +35,7 @@ def test_leader_and_isr_partition_error_roundtrip(
 read_leader_and_isr_topic_error: Final = entity_reader(LeaderAndIsrTopicError)
 
 
+@pytest.mark.roundtrip
 @given(from_type(LeaderAndIsrTopicError))
 @settings(max_examples=1)
 def test_leader_and_isr_topic_error_roundtrip(instance: LeaderAndIsrTopicError) -> None:
@@ -47,6 +50,7 @@ def test_leader_and_isr_topic_error_roundtrip(instance: LeaderAndIsrTopicError) 
 read_leader_and_isr_response: Final = entity_reader(LeaderAndIsrResponse)
 
 
+@pytest.mark.roundtrip
 @given(from_type(LeaderAndIsrResponse))
 @settings(max_examples=1)
 def test_leader_and_isr_response_roundtrip(instance: LeaderAndIsrResponse) -> None:
@@ -58,6 +62,7 @@ def test_leader_and_isr_response_roundtrip(instance: LeaderAndIsrResponse) -> No
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(LeaderAndIsrResponse))
 def test_leader_and_isr_response_java(
     instance: LeaderAndIsrResponse, java_tester: JavaTester

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -16,6 +17,7 @@ from tests.conftest import setup_buffer
 read_create_partitions_topic_result: Final = entity_reader(CreatePartitionsTopicResult)
 
 
+@pytest.mark.roundtrip
 @given(from_type(CreatePartitionsTopicResult))
 @settings(max_examples=1)
 def test_create_partitions_topic_result_roundtrip(
@@ -32,6 +34,7 @@ def test_create_partitions_topic_result_roundtrip(
 read_create_partitions_response: Final = entity_reader(CreatePartitionsResponse)
 
 
+@pytest.mark.roundtrip
 @given(from_type(CreatePartitionsResponse))
 @settings(max_examples=1)
 def test_create_partitions_response_roundtrip(
@@ -45,6 +48,7 @@ def test_create_partitions_response_roundtrip(
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(CreatePartitionsResponse))
 def test_create_partitions_response_java(
     instance: CreatePartitionsResponse, java_tester: JavaTester
