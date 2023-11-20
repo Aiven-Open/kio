@@ -12,6 +12,7 @@ from typing import ClassVar
 from kio.schema.request_header.v2.header import RequestHeader
 from kio.static.primitive import i16
 from kio.static.primitive import i32Timedelta
+from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -29,7 +30,7 @@ class FeatureUpdateKey:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class UpdateFeaturesRequest:
+class UpdateFeaturesRequest(ApiMessage):
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(57)

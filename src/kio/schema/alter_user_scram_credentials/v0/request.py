@@ -12,6 +12,7 @@ from kio.schema.request_header.v2.header import RequestHeader
 from kio.static.primitive import i8
 from kio.static.primitive import i16
 from kio.static.primitive import i32
+from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -45,7 +46,7 @@ class ScramCredentialUpsertion:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class AlterUserScramCredentialsRequest:
+class AlterUserScramCredentialsRequest(ApiMessage):
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(51)

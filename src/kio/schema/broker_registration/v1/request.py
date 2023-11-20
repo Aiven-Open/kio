@@ -13,6 +13,7 @@ from kio.schema.request_header.v2.header import RequestHeader
 from kio.schema.types import BrokerId
 from kio.static.primitive import i16
 from kio.static.primitive import u16
+from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -46,7 +47,7 @@ class Feature:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class BrokerRegistrationRequest:
+class BrokerRegistrationRequest(ApiMessage):
     __version__: ClassVar[i16] = i16(1)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(62)

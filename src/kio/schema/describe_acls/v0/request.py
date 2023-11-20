@@ -11,10 +11,11 @@ from typing import ClassVar
 from kio.schema.request_header.v1.header import RequestHeader
 from kio.static.primitive import i8
 from kio.static.primitive import i16
+from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class DescribeAclsRequest:
+class DescribeAclsRequest(ApiMessage):
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = False
     __api_key__: ClassVar[i16] = i16(29)

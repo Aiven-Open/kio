@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -10,11 +11,13 @@ from kio.schema.create_topics.v3.response import CreatableTopicResult
 from kio.schema.create_topics.v3.response import CreateTopicsResponse
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_creatable_topic_result: Final = entity_reader(CreatableTopicResult)
 
 
+@pytest.mark.roundtrip
 @given(from_type(CreatableTopicResult))
 @settings(max_examples=1)
 def test_creatable_topic_result_roundtrip(instance: CreatableTopicResult) -> None:
@@ -29,6 +32,7 @@ def test_creatable_topic_result_roundtrip(instance: CreatableTopicResult) -> Non
 read_create_topics_response: Final = entity_reader(CreateTopicsResponse)
 
 
+@pytest.mark.roundtrip
 @given(from_type(CreateTopicsResponse))
 @settings(max_examples=1)
 def test_create_topics_response_roundtrip(instance: CreateTopicsResponse) -> None:
@@ -38,3 +42,11 @@ def test_create_topics_response_roundtrip(instance: CreateTopicsResponse) -> Non
         buffer.seek(0)
         result = read_create_topics_response(buffer)
     assert instance == result
+
+
+@pytest.mark.java
+@given(instance=from_type(CreateTopicsResponse))
+def test_create_topics_response_java(
+    instance: CreateTopicsResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

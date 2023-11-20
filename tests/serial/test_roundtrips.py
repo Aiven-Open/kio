@@ -2,6 +2,7 @@ import io
 import uuid
 from typing import TypeVar
 
+import pytest
 from hypothesis import given
 from hypothesis.strategies import binary
 from hypothesis.strategies import booleans
@@ -44,6 +45,7 @@ from kio.serial.writers import write_int16
 from kio.serial.writers import write_int32
 from kio.serial.writers import write_int64
 from kio.serial.writers import write_legacy_array_length
+from kio.serial.writers import write_legacy_bytes
 from kio.serial.writers import write_legacy_string
 from kio.serial.writers import write_nullable_compact_string
 from kio.serial.writers import write_nullable_legacy_string
@@ -53,6 +55,8 @@ from kio.serial.writers import write_uint32
 from kio.serial.writers import write_uint64
 from kio.serial.writers import write_unsigned_varint
 from kio.serial.writers import write_uuid
+
+pytestmark = pytest.mark.roundtrip
 
 
 @given(booleans(), booleans())
@@ -237,8 +241,8 @@ def test_nullable_legacy_string_roundtrip(a: str | None, b: str | None) -> None:
 @given(binary(), binary())
 def test_legacy_bytes_roundtrip(a: bytes, b: bytes) -> None:
     buffer = io.BytesIO()
-    write_legacy_string(buffer, a)
-    write_legacy_string(buffer, b)
+    write_legacy_bytes(buffer, a)
+    write_legacy_bytes(buffer, b)
     buffer.seek(0)
     assert a == read_legacy_bytes(buffer)
     assert b == read_legacy_bytes(buffer)

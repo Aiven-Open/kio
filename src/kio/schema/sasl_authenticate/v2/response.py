@@ -13,10 +13,11 @@ from kio.schema.response_header.v1.header import ResponseHeader
 from kio.static.constants import ErrorCode
 from kio.static.primitive import i16
 from kio.static.primitive import i64Timedelta
+from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class SaslAuthenticateResponse:
+class SaslAuthenticateResponse(ApiMessage):
     __version__: ClassVar[i16] = i16(2)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(36)

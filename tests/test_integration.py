@@ -10,6 +10,8 @@ from typing import Final
 from typing import TypeVar
 from unittest import mock
 
+import pytest
+
 import kio.schema.request_header.v0.header
 import kio.schema.request_header.v1.header
 import kio.schema.request_header.v2.header
@@ -45,6 +47,8 @@ from kio.static.primitive import i32
 from kio.static.primitive import i32Timedelta
 from kio.static.protocol import Entity
 from kio.static.protocol import Payload
+
+pytestmark = pytest.mark.integration
 
 timedelta_zero: Final = i32Timedelta.parse(datetime.timedelta())
 

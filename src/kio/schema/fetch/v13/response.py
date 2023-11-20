@@ -17,6 +17,7 @@ from kio.static.primitive import i16
 from kio.static.primitive import i32
 from kio.static.primitive import i32Timedelta
 from kio.static.primitive import i64
+from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -107,7 +108,7 @@ class FetchableTopicResponse:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class FetchResponse:
+class FetchResponse(ApiMessage):
     __version__: ClassVar[i16] = i16(13)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(1)

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -11,11 +12,13 @@ from kio.schema.leader_and_isr.v0.request import LeaderAndIsrPartitionState
 from kio.schema.leader_and_isr.v0.request import LeaderAndIsrRequest
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_leader_and_isr_partition_state: Final = entity_reader(LeaderAndIsrPartitionState)
 
 
+@pytest.mark.roundtrip
 @given(from_type(LeaderAndIsrPartitionState))
 @settings(max_examples=1)
 def test_leader_and_isr_partition_state_roundtrip(
@@ -32,6 +35,7 @@ def test_leader_and_isr_partition_state_roundtrip(
 read_leader_and_isr_live_leader: Final = entity_reader(LeaderAndIsrLiveLeader)
 
 
+@pytest.mark.roundtrip
 @given(from_type(LeaderAndIsrLiveLeader))
 @settings(max_examples=1)
 def test_leader_and_isr_live_leader_roundtrip(instance: LeaderAndIsrLiveLeader) -> None:
@@ -46,6 +50,7 @@ def test_leader_and_isr_live_leader_roundtrip(instance: LeaderAndIsrLiveLeader) 
 read_leader_and_isr_request: Final = entity_reader(LeaderAndIsrRequest)
 
 
+@pytest.mark.roundtrip
 @given(from_type(LeaderAndIsrRequest))
 @settings(max_examples=1)
 def test_leader_and_isr_request_roundtrip(instance: LeaderAndIsrRequest) -> None:
@@ -55,3 +60,11 @@ def test_leader_and_isr_request_roundtrip(instance: LeaderAndIsrRequest) -> None
         buffer.seek(0)
         result = read_leader_and_isr_request(buffer)
     assert instance == result
+
+
+@pytest.mark.java
+@given(instance=from_type(LeaderAndIsrRequest))
+def test_leader_and_isr_request_java(
+    instance: LeaderAndIsrRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

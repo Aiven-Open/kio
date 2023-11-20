@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -11,11 +12,13 @@ from kio.schema.vote.v0.request import TopicData
 from kio.schema.vote.v0.request import VoteRequest
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_partition_data: Final = entity_reader(PartitionData)
 
 
+@pytest.mark.roundtrip
 @given(from_type(PartitionData))
 @settings(max_examples=1)
 def test_partition_data_roundtrip(instance: PartitionData) -> None:
@@ -30,6 +33,7 @@ def test_partition_data_roundtrip(instance: PartitionData) -> None:
 read_topic_data: Final = entity_reader(TopicData)
 
 
+@pytest.mark.roundtrip
 @given(from_type(TopicData))
 @settings(max_examples=1)
 def test_topic_data_roundtrip(instance: TopicData) -> None:
@@ -44,6 +48,7 @@ def test_topic_data_roundtrip(instance: TopicData) -> None:
 read_vote_request: Final = entity_reader(VoteRequest)
 
 
+@pytest.mark.roundtrip
 @given(from_type(VoteRequest))
 @settings(max_examples=1)
 def test_vote_request_roundtrip(instance: VoteRequest) -> None:
@@ -53,3 +58,9 @@ def test_vote_request_roundtrip(instance: VoteRequest) -> None:
         buffer.seek(0)
         result = read_vote_request(buffer)
     assert instance == result
+
+
+@pytest.mark.java
+@given(instance=from_type(VoteRequest))
+def test_vote_request_java(instance: VoteRequest, java_tester: JavaTester) -> None:
+    java_tester.test(instance)

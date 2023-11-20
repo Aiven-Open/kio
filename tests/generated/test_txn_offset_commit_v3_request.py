@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -11,6 +12,7 @@ from kio.schema.txn_offset_commit.v3.request import TxnOffsetCommitRequestPartit
 from kio.schema.txn_offset_commit.v3.request import TxnOffsetCommitRequestTopic
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_txn_offset_commit_request_partition: Final = entity_reader(
@@ -18,6 +20,7 @@ read_txn_offset_commit_request_partition: Final = entity_reader(
 )
 
 
+@pytest.mark.roundtrip
 @given(from_type(TxnOffsetCommitRequestPartition))
 @settings(max_examples=1)
 def test_txn_offset_commit_request_partition_roundtrip(
@@ -34,6 +37,7 @@ def test_txn_offset_commit_request_partition_roundtrip(
 read_txn_offset_commit_request_topic: Final = entity_reader(TxnOffsetCommitRequestTopic)
 
 
+@pytest.mark.roundtrip
 @given(from_type(TxnOffsetCommitRequestTopic))
 @settings(max_examples=1)
 def test_txn_offset_commit_request_topic_roundtrip(
@@ -50,6 +54,7 @@ def test_txn_offset_commit_request_topic_roundtrip(
 read_txn_offset_commit_request: Final = entity_reader(TxnOffsetCommitRequest)
 
 
+@pytest.mark.roundtrip
 @given(from_type(TxnOffsetCommitRequest))
 @settings(max_examples=1)
 def test_txn_offset_commit_request_roundtrip(instance: TxnOffsetCommitRequest) -> None:
@@ -59,3 +64,11 @@ def test_txn_offset_commit_request_roundtrip(instance: TxnOffsetCommitRequest) -
         buffer.seek(0)
         result = read_txn_offset_commit_request(buffer)
     assert instance == result
+
+
+@pytest.mark.java
+@given(instance=from_type(TxnOffsetCommitRequest))
+def test_txn_offset_commit_request_java(
+    instance: TxnOffsetCommitRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

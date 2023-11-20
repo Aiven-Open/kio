@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -9,11 +10,13 @@ from hypothesis.strategies import from_type
 from kio.schema.delete_topics.v0.request import DeleteTopicsRequest
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_delete_topics_request: Final = entity_reader(DeleteTopicsRequest)
 
 
+@pytest.mark.roundtrip
 @given(from_type(DeleteTopicsRequest))
 @settings(max_examples=1)
 def test_delete_topics_request_roundtrip(instance: DeleteTopicsRequest) -> None:
@@ -23,3 +26,11 @@ def test_delete_topics_request_roundtrip(instance: DeleteTopicsRequest) -> None:
         buffer.seek(0)
         result = read_delete_topics_request(buffer)
     assert instance == result
+
+
+@pytest.mark.java
+@given(instance=from_type(DeleteTopicsRequest))
+def test_delete_topics_request_java(
+    instance: DeleteTopicsRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -10,11 +11,13 @@ from kio.schema.describe_producers.v0.request import DescribeProducersRequest
 from kio.schema.describe_producers.v0.request import TopicRequest
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_topic_request: Final = entity_reader(TopicRequest)
 
 
+@pytest.mark.roundtrip
 @given(from_type(TopicRequest))
 @settings(max_examples=1)
 def test_topic_request_roundtrip(instance: TopicRequest) -> None:
@@ -29,6 +32,7 @@ def test_topic_request_roundtrip(instance: TopicRequest) -> None:
 read_describe_producers_request: Final = entity_reader(DescribeProducersRequest)
 
 
+@pytest.mark.roundtrip
 @given(from_type(DescribeProducersRequest))
 @settings(max_examples=1)
 def test_describe_producers_request_roundtrip(
@@ -40,3 +44,11 @@ def test_describe_producers_request_roundtrip(
         buffer.seek(0)
         result = read_describe_producers_request(buffer)
     assert instance == result
+
+
+@pytest.mark.java
+@given(instance=from_type(DescribeProducersRequest))
+def test_describe_producers_request_java(
+    instance: DescribeProducersRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

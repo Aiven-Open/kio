@@ -15,3 +15,4 @@ include LICENSE
 include NOTICE
 include README.md
 include pyproject.toml
+recursive-exclude java_tester *

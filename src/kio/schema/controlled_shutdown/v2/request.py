@@ -12,10 +12,11 @@ from kio.schema.request_header.v1.header import RequestHeader
 from kio.schema.types import BrokerId
 from kio.static.primitive import i16
 from kio.static.primitive import i64
+from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class ControlledShutdownRequest:
+class ControlledShutdownRequest(ApiMessage):
     __version__: ClassVar[i16] = i16(2)
     __flexible__: ClassVar[bool] = False
     __api_key__: ClassVar[i16] = i16(7)

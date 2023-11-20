@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -10,11 +11,13 @@ from kio.schema.consumer_protocol_assignment.v2.data import ConsumerProtocolAssi
 from kio.schema.consumer_protocol_assignment.v2.data import TopicPartition
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_topic_partition: Final = entity_reader(TopicPartition)
 
 
+@pytest.mark.roundtrip
 @given(from_type(TopicPartition))
 @settings(max_examples=1)
 def test_topic_partition_roundtrip(instance: TopicPartition) -> None:
@@ -29,6 +32,7 @@ def test_topic_partition_roundtrip(instance: TopicPartition) -> None:
 read_consumer_protocol_assignment: Final = entity_reader(ConsumerProtocolAssignment)
 
 
+@pytest.mark.roundtrip
 @given(from_type(ConsumerProtocolAssignment))
 @settings(max_examples=1)
 def test_consumer_protocol_assignment_roundtrip(
@@ -40,3 +44,11 @@ def test_consumer_protocol_assignment_roundtrip(
         buffer.seek(0)
         result = read_consumer_protocol_assignment(buffer)
     assert instance == result
+
+
+@pytest.mark.java
+@given(instance=from_type(ConsumerProtocolAssignment))
+def test_consumer_protocol_assignment_java(
+    instance: ConsumerProtocolAssignment, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

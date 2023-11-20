@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -13,11 +14,13 @@ from kio.schema.alter_partition_reassignments.v0.request import ReassignablePart
 from kio.schema.alter_partition_reassignments.v0.request import ReassignableTopic
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_reassignable_partition: Final = entity_reader(ReassignablePartition)
 
 
+@pytest.mark.roundtrip
 @given(from_type(ReassignablePartition))
 @settings(max_examples=1)
 def test_reassignable_partition_roundtrip(instance: ReassignablePartition) -> None:
@@ -32,6 +35,7 @@ def test_reassignable_partition_roundtrip(instance: ReassignablePartition) -> No
 read_reassignable_topic: Final = entity_reader(ReassignableTopic)
 
 
+@pytest.mark.roundtrip
 @given(from_type(ReassignableTopic))
 @settings(max_examples=1)
 def test_reassignable_topic_roundtrip(instance: ReassignableTopic) -> None:
@@ -48,6 +52,7 @@ read_alter_partition_reassignments_request: Final = entity_reader(
 )
 
 
+@pytest.mark.roundtrip
 @given(from_type(AlterPartitionReassignmentsRequest))
 @settings(max_examples=1)
 def test_alter_partition_reassignments_request_roundtrip(
@@ -59,3 +64,11 @@ def test_alter_partition_reassignments_request_roundtrip(
         buffer.seek(0)
         result = read_alter_partition_reassignments_request(buffer)
     assert instance == result
+
+
+@pytest.mark.java
+@given(instance=from_type(AlterPartitionReassignmentsRequest))
+def test_alter_partition_reassignments_request_java(
+    instance: AlterPartitionReassignmentsRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

@@ -9,6 +9,7 @@ from pkgutil import walk_packages
 from types import ModuleType
 
 import kio.schema
+from kio.static.protocol import ApiMessage
 
 from .case import to_snake_case
 
@@ -48,9 +49,10 @@ import io
 from hypothesis import given, settings
 from hypothesis.strategies import from_type
 from kio.serial import entity_writer
-from tests.conftest import setup_buffer
+from tests.conftest import setup_buffer, JavaTester
 from kio.serial import entity_reader
 from typing import Final
+import pytest
 """
 import_code = """\
 from {entity_module} import {entity_type}
@@ -61,6 +63,7 @@ test_code = """\
 read_{entity_snake_case}: Final = entity_reader({entity_type})
 
 
+@pytest.mark.roundtrip
 @given(from_type({entity_type}))
 @settings(max_examples=1)
 def test_{entity_snake_case}_roundtrip(instance: {entity_type}) -> None:
@@ -70,6 +73,13 @@ def test_{entity_snake_case}_roundtrip(instance: {entity_type}) -> None:
         buffer.seek(0)
         result = read_{entity_snake_case}(buffer)
     assert instance == result
+"""
+
+test_code_java = """\
+@pytest.mark.java
+@given(instance=from_type({entity_type}))
+def test_{entity_snake_case}_java(instance: {entity_type}, java_tester: JavaTester) -> None:
+    java_tester.test(instance)
 """
 
 
@@ -106,6 +116,19 @@ def main() -> None:
                 entity_snake_case=to_snake_case(entity_type.__name__),
             )
         )
+        if issubclass(entity_type, ApiMessage) and entity_type.__name__ not in {
+            "ProduceRequest",  # Records
+            "FetchResponse",  # Records
+            "FetchSnapshotResponse",  # Records
+            "FetchRequest",  # Should not output tagged field if its value equals to default (presumably)
+            "ConsumerGroupHeartbeatResponse",  # Nullable `assignment` field
+        }:
+            module_code[module_path].append(
+                test_code_java.format(
+                    entity_type=entity_type.__name__,
+                    entity_snake_case=to_snake_case(entity_type.__name__),
+                )
+            )
 
     for module_path, entity_imports in module_imports.items():
         with module_path.open("w") as fd:

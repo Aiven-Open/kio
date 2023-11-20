@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -11,6 +12,7 @@ from kio.schema.offset_commit.v5.response import OffsetCommitResponsePartition
 from kio.schema.offset_commit.v5.response import OffsetCommitResponseTopic
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_offset_commit_response_partition: Final = entity_reader(
@@ -18,6 +20,7 @@ read_offset_commit_response_partition: Final = entity_reader(
 )
 
 
+@pytest.mark.roundtrip
 @given(from_type(OffsetCommitResponsePartition))
 @settings(max_examples=1)
 def test_offset_commit_response_partition_roundtrip(
@@ -34,6 +37,7 @@ def test_offset_commit_response_partition_roundtrip(
 read_offset_commit_response_topic: Final = entity_reader(OffsetCommitResponseTopic)
 
 
+@pytest.mark.roundtrip
 @given(from_type(OffsetCommitResponseTopic))
 @settings(max_examples=1)
 def test_offset_commit_response_topic_roundtrip(
@@ -50,6 +54,7 @@ def test_offset_commit_response_topic_roundtrip(
 read_offset_commit_response: Final = entity_reader(OffsetCommitResponse)
 
 
+@pytest.mark.roundtrip
 @given(from_type(OffsetCommitResponse))
 @settings(max_examples=1)
 def test_offset_commit_response_roundtrip(instance: OffsetCommitResponse) -> None:
@@ -59,3 +64,11 @@ def test_offset_commit_response_roundtrip(instance: OffsetCommitResponse) -> Non
         buffer.seek(0)
         result = read_offset_commit_response(buffer)
     assert instance == result
+
+
+@pytest.mark.java
+@given(instance=from_type(OffsetCommitResponse))
+def test_offset_commit_response_java(
+    instance: OffsetCommitResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

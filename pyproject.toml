@@ -78,6 +78,11 @@ filterwarnings = [
   'ignore: ast\.[A-z]+ is deprecated:DeprecationWarning',
   'ignore: Attribute s is deprecated and will be removed:DeprecationWarning',
 ]
+markers = [
+  "integration: marks tests interacting with a running Apache Kafka® instance",
+  "roundtrip: marks roundtrip Hypothesis serialization tests",
+  "java: marks tests validating serialization against a Java process",
+]
 
 
 [tool.ruff]

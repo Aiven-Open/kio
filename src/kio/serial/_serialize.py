@@ -58,9 +58,9 @@ def get_writer(
         case ("bytes", True, True):
             return writers.write_nullable_compact_string
         case ("bytes", False, False):
-            return writers.write_legacy_string
+            return writers.write_legacy_bytes
         case ("bytes", False, True):
-            return writers.write_nullable_legacy_string
+            return writers.write_nullable_legacy_bytes
         case ("records", _, True):
             return writers.write_nullable_legacy_string
         case ("uuid", _, _):

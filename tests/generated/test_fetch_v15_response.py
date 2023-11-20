@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -20,6 +21,7 @@ from tests.conftest import setup_buffer
 read_epoch_end_offset: Final = entity_reader(EpochEndOffset)
 
 
+@pytest.mark.roundtrip
 @given(from_type(EpochEndOffset))
 @settings(max_examples=1)
 def test_epoch_end_offset_roundtrip(instance: EpochEndOffset) -> None:
@@ -34,6 +36,7 @@ def test_epoch_end_offset_roundtrip(instance: EpochEndOffset) -> None:
 read_leader_id_and_epoch: Final = entity_reader(LeaderIdAndEpoch)
 
 
+@pytest.mark.roundtrip
 @given(from_type(LeaderIdAndEpoch))
 @settings(max_examples=1)
 def test_leader_id_and_epoch_roundtrip(instance: LeaderIdAndEpoch) -> None:
@@ -48,6 +51,7 @@ def test_leader_id_and_epoch_roundtrip(instance: LeaderIdAndEpoch) -> None:
 read_snapshot_id: Final = entity_reader(SnapshotId)
 
 
+@pytest.mark.roundtrip
 @given(from_type(SnapshotId))
 @settings(max_examples=1)
 def test_snapshot_id_roundtrip(instance: SnapshotId) -> None:
@@ -62,6 +66,7 @@ def test_snapshot_id_roundtrip(instance: SnapshotId) -> None:
 read_aborted_transaction: Final = entity_reader(AbortedTransaction)
 
 
+@pytest.mark.roundtrip
 @given(from_type(AbortedTransaction))
 @settings(max_examples=1)
 def test_aborted_transaction_roundtrip(instance: AbortedTransaction) -> None:
@@ -76,6 +81,7 @@ def test_aborted_transaction_roundtrip(instance: AbortedTransaction) -> None:
 read_partition_data: Final = entity_reader(PartitionData)
 
 
+@pytest.mark.roundtrip
 @given(from_type(PartitionData))
 @settings(max_examples=1)
 def test_partition_data_roundtrip(instance: PartitionData) -> None:
@@ -90,6 +96,7 @@ def test_partition_data_roundtrip(instance: PartitionData) -> None:
 read_fetchable_topic_response: Final = entity_reader(FetchableTopicResponse)
 
 
+@pytest.mark.roundtrip
 @given(from_type(FetchableTopicResponse))
 @settings(max_examples=1)
 def test_fetchable_topic_response_roundtrip(instance: FetchableTopicResponse) -> None:
@@ -104,6 +111,7 @@ def test_fetchable_topic_response_roundtrip(instance: FetchableTopicResponse) ->
 read_fetch_response: Final = entity_reader(FetchResponse)
 
 
+@pytest.mark.roundtrip
 @given(from_type(FetchResponse))
 @settings(max_examples=1)
 def test_fetch_response_roundtrip(instance: FetchResponse) -> None:

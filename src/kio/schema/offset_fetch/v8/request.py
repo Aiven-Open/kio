@@ -13,6 +13,7 @@ from kio.schema.types import GroupId
 from kio.schema.types import TopicName
 from kio.static.primitive import i16
 from kio.static.primitive import i32
+from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -42,7 +43,7 @@ class OffsetFetchRequestGroup:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class OffsetFetchRequest:
+class OffsetFetchRequest(ApiMessage):
     __version__: ClassVar[i16] = i16(8)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(9)

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -10,11 +11,13 @@ from kio.schema.describe_client_quotas.v1.request import ComponentData
 from kio.schema.describe_client_quotas.v1.request import DescribeClientQuotasRequest
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_component_data: Final = entity_reader(ComponentData)
 
 
+@pytest.mark.roundtrip
 @given(from_type(ComponentData))
 @settings(max_examples=1)
 def test_component_data_roundtrip(instance: ComponentData) -> None:
@@ -29,6 +32,7 @@ def test_component_data_roundtrip(instance: ComponentData) -> None:
 read_describe_client_quotas_request: Final = entity_reader(DescribeClientQuotasRequest)
 
 
+@pytest.mark.roundtrip
 @given(from_type(DescribeClientQuotasRequest))
 @settings(max_examples=1)
 def test_describe_client_quotas_request_roundtrip(
@@ -40,3 +44,11 @@ def test_describe_client_quotas_request_roundtrip(
         buffer.seek(0)
         result = read_describe_client_quotas_request(buffer)
     assert instance == result
+
+
+@pytest.mark.java
+@given(instance=from_type(DescribeClientQuotasRequest))
+def test_describe_client_quotas_request_java(
+    instance: DescribeClientQuotasRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

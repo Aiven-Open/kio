@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -12,6 +13,7 @@ from kio.schema.write_txn_markers.v0.response import WritableTxnMarkerTopicResul
 from kio.schema.write_txn_markers.v0.response import WriteTxnMarkersResponse
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_writable_txn_marker_partition_result: Final = entity_reader(
@@ -19,6 +21,7 @@ read_writable_txn_marker_partition_result: Final = entity_reader(
 )
 
 
+@pytest.mark.roundtrip
 @given(from_type(WritableTxnMarkerPartitionResult))
 @settings(max_examples=1)
 def test_writable_txn_marker_partition_result_roundtrip(
@@ -37,6 +40,7 @@ read_writable_txn_marker_topic_result: Final = entity_reader(
 )
 
 
+@pytest.mark.roundtrip
 @given(from_type(WritableTxnMarkerTopicResult))
 @settings(max_examples=1)
 def test_writable_txn_marker_topic_result_roundtrip(
@@ -53,6 +57,7 @@ def test_writable_txn_marker_topic_result_roundtrip(
 read_writable_txn_marker_result: Final = entity_reader(WritableTxnMarkerResult)
 
 
+@pytest.mark.roundtrip
 @given(from_type(WritableTxnMarkerResult))
 @settings(max_examples=1)
 def test_writable_txn_marker_result_roundtrip(
@@ -69,6 +74,7 @@ def test_writable_txn_marker_result_roundtrip(
 read_write_txn_markers_response: Final = entity_reader(WriteTxnMarkersResponse)
 
 
+@pytest.mark.roundtrip
 @given(from_type(WriteTxnMarkersResponse))
 @settings(max_examples=1)
 def test_write_txn_markers_response_roundtrip(
@@ -80,3 +86,11 @@ def test_write_txn_markers_response_roundtrip(
         buffer.seek(0)
         result = read_write_txn_markers_response(buffer)
     assert instance == result
+
+
+@pytest.mark.java
+@given(instance=from_type(WriteTxnMarkersResponse))
+def test_write_txn_markers_response_java(
+    instance: WriteTxnMarkersResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

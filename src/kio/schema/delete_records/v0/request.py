@@ -14,6 +14,7 @@ from kio.static.primitive import i16
 from kio.static.primitive import i32
 from kio.static.primitive import i32Timedelta
 from kio.static.primitive import i64
+from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -41,7 +42,7 @@ class DeleteRecordsTopic:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class DeleteRecordsRequest:
+class DeleteRecordsRequest(ApiMessage):
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = False
     __api_key__: ClassVar[i16] = i16(21)

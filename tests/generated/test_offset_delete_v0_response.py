@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -11,6 +12,7 @@ from kio.schema.offset_delete.v0.response import OffsetDeleteResponsePartition
 from kio.schema.offset_delete.v0.response import OffsetDeleteResponseTopic
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_offset_delete_response_partition: Final = entity_reader(
@@ -18,6 +20,7 @@ read_offset_delete_response_partition: Final = entity_reader(
 )
 
 
+@pytest.mark.roundtrip
 @given(from_type(OffsetDeleteResponsePartition))
 @settings(max_examples=1)
 def test_offset_delete_response_partition_roundtrip(
@@ -34,6 +37,7 @@ def test_offset_delete_response_partition_roundtrip(
 read_offset_delete_response_topic: Final = entity_reader(OffsetDeleteResponseTopic)
 
 
+@pytest.mark.roundtrip
 @given(from_type(OffsetDeleteResponseTopic))
 @settings(max_examples=1)
 def test_offset_delete_response_topic_roundtrip(
@@ -50,6 +54,7 @@ def test_offset_delete_response_topic_roundtrip(
 read_offset_delete_response: Final = entity_reader(OffsetDeleteResponse)
 
 
+@pytest.mark.roundtrip
 @given(from_type(OffsetDeleteResponse))
 @settings(max_examples=1)
 def test_offset_delete_response_roundtrip(instance: OffsetDeleteResponse) -> None:
@@ -59,3 +64,11 @@ def test_offset_delete_response_roundtrip(instance: OffsetDeleteResponse) -> Non
         buffer.seek(0)
         result = read_offset_delete_response(buffer)
     assert instance == result
+
+
+@pytest.mark.java
+@given(instance=from_type(OffsetDeleteResponse))
+def test_offset_delete_response_java(
+    instance: OffsetDeleteResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

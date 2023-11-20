@@ -16,6 +16,7 @@ from kio.static.primitive import i8
 from kio.static.primitive import i16
 from kio.static.primitive import i32
 from kio.static.primitive import i32Timedelta
+from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -50,8 +51,8 @@ class CreatableTopicResult:
     """The error code, or 0 if there was no error."""
     error_message: str | None = field(metadata={"kafka_type": "string"})
     """The error message, or null if there was no error."""
-    topic_config_error_code: i16 | None = field(
-        metadata={"kafka_type": "int16", "tag": 0}, default=None
+    topic_config_error_code: i16 = field(
+        metadata={"kafka_type": "int16", "tag": 0}, default=i16(0)
     )
     """Optional topic config error returned if configs are not returned in the response."""
     num_partitions: i32 = field(metadata={"kafka_type": "int32"}, default=i32(-1))
@@ -63,7 +64,7 @@ class CreatableTopicResult:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class CreateTopicsResponse:
+class CreateTopicsResponse(ApiMessage):
     __version__: ClassVar[i16] = i16(7)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(19)

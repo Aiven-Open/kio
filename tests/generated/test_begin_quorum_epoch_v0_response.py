@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -11,11 +12,13 @@ from kio.schema.begin_quorum_epoch.v0.response import PartitionData
 from kio.schema.begin_quorum_epoch.v0.response import TopicData
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_partition_data: Final = entity_reader(PartitionData)
 
 
+@pytest.mark.roundtrip
 @given(from_type(PartitionData))
 @settings(max_examples=1)
 def test_partition_data_roundtrip(instance: PartitionData) -> None:
@@ -30,6 +33,7 @@ def test_partition_data_roundtrip(instance: PartitionData) -> None:
 read_topic_data: Final = entity_reader(TopicData)
 
 
+@pytest.mark.roundtrip
 @given(from_type(TopicData))
 @settings(max_examples=1)
 def test_topic_data_roundtrip(instance: TopicData) -> None:
@@ -44,6 +48,7 @@ def test_topic_data_roundtrip(instance: TopicData) -> None:
 read_begin_quorum_epoch_response: Final = entity_reader(BeginQuorumEpochResponse)
 
 
+@pytest.mark.roundtrip
 @given(from_type(BeginQuorumEpochResponse))
 @settings(max_examples=1)
 def test_begin_quorum_epoch_response_roundtrip(
@@ -55,3 +60,11 @@ def test_begin_quorum_epoch_response_roundtrip(
         buffer.seek(0)
         result = read_begin_quorum_epoch_response(buffer)
     assert instance == result
+
+
+@pytest.mark.java
+@given(instance=from_type(BeginQuorumEpochResponse))
+def test_begin_quorum_epoch_response_java(
+    instance: BeginQuorumEpochResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

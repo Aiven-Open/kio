@@ -59,6 +59,11 @@ Setup pre-commit to run on push.
 $ pre-commit install -t pre-push
 ```
 
+> [!WARNING]\
+> Building the schema will delete the `src/kio/schema` directory and recreate it again, hence
+> all of the files under this directory will be deleted. Make sure to not put unrelated files
+> there and accidentally wipe out your own work.
+
 Fetch, generate, and format schema.
 
 ```shell

@@ -66,6 +66,7 @@ from kio.static.primitive import f64
 from kio.static.primitive import i32Timedelta
 from kio.static.primitive import i64Timedelta
 from kio.static.primitive import TZAware
+from kio.static.protocol import ApiMessage
 from kio.static.constants import ErrorCode
 '''
 
@@ -171,7 +172,7 @@ def format_dataclass_field(
             field_type, default, optional, custom_type
         )
     elif tag is not None and ignorable:
-        field_kwargs["default"] = "None"
+        field_kwargs["default"] = _format_default_for_tagged(field_type)
 
     if not field_kwargs:
         return ""
@@ -180,6 +181,49 @@ def format_dataclass_field(
         f"{key}={value}" for key, value in field_kwargs.items()
     )
     return f" = field({formatted_kwargs})"
+
+
+def _format_default_for_tagged(
+    field_type: Primitive | PrimitiveArrayType | EntityType | CommonStructType,
+) -> str:
+    match field_type:
+        case Primitive.int8:
+            result = "i8(0)"
+        case Primitive.int16:
+            result = "i16(0)"
+        case Primitive.int32:
+            result = "i32(0)"
+        case Primitive.int64:
+            result = "i64(0)"
+        case Primitive.uint16:
+            result = "u16(0)"
+        case Primitive.uint32:
+            result = "u32(0)"
+        case Primitive.uint64:
+            result = "u64(0)"
+        case Primitive.float64:
+            result = "f64(0.0)"
+        case Primitive.bool_:
+            result = "false"
+        case Primitive.error_code:
+            result = "ErrorCode.none"
+        case (
+            Primitive.string
+            | Primitive.bytes_
+            | Primitive.records
+            | Primitive.uuid
+            | Primitive.datetime_i64
+            | Primitive.timedelta_i32
+            | Primitive.timedelta_i64
+        ):
+            result = "None"
+        case _ if isinstance(
+            field_type, PrimitiveArrayType | EntityType | CommonStructType
+        ):
+            result = "None"
+        case no_match:
+            assert_never(no_match)
+    return result
 
 
 @dataclass(frozen=True, slots=True, kw_only=True, order=True)
@@ -394,15 +438,17 @@ def generate_dataclass(  # noqa: C901
     name: str,
     fields: Sequence[Field],
     version: int,
+    top_level: bool = False,
 ) -> Iterator[str | CustomTypeDef | ExportName]:
     if (name, version) in seen:
         return
     seen.add((name, version))
 
+    class_parent_str = "(ApiMessage)" if top_level else ""
     class_start = textwrap.dedent(
         f"""\
         @dataclass(frozen=True, slots=True, kw_only=True)
-        class {name}:
+        class {name}{class_parent_str}:
         """
     )
     class_fields = []
@@ -504,6 +550,7 @@ def generate_models(
             name=schema.name,
             fields=schema.fields,
             version=version,
+            top_level=True,
         ):
             match item:
                 case CustomTypeDef() as instruction:

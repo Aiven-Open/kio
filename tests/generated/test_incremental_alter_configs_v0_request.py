@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -13,11 +14,13 @@ from kio.schema.incremental_alter_configs.v0.request import (
 )
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_alterable_config: Final = entity_reader(AlterableConfig)
 
 
+@pytest.mark.roundtrip
 @given(from_type(AlterableConfig))
 @settings(max_examples=1)
 def test_alterable_config_roundtrip(instance: AlterableConfig) -> None:
@@ -32,6 +35,7 @@ def test_alterable_config_roundtrip(instance: AlterableConfig) -> None:
 read_alter_configs_resource: Final = entity_reader(AlterConfigsResource)
 
 
+@pytest.mark.roundtrip
 @given(from_type(AlterConfigsResource))
 @settings(max_examples=1)
 def test_alter_configs_resource_roundtrip(instance: AlterConfigsResource) -> None:
@@ -48,6 +52,7 @@ read_incremental_alter_configs_request: Final = entity_reader(
 )
 
 
+@pytest.mark.roundtrip
 @given(from_type(IncrementalAlterConfigsRequest))
 @settings(max_examples=1)
 def test_incremental_alter_configs_request_roundtrip(
@@ -59,3 +64,11 @@ def test_incremental_alter_configs_request_roundtrip(
         buffer.seek(0)
         result = read_incremental_alter_configs_request(buffer)
     assert instance == result
+
+
+@pytest.mark.java
+@given(instance=from_type(IncrementalAlterConfigsRequest))
+def test_incremental_alter_configs_request_java(
+    instance: IncrementalAlterConfigsRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

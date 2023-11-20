@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -11,11 +12,13 @@ from kio.schema.produce.v4.response import ProduceResponse
 from kio.schema.produce.v4.response import TopicProduceResponse
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_partition_produce_response: Final = entity_reader(PartitionProduceResponse)
 
 
+@pytest.mark.roundtrip
 @given(from_type(PartitionProduceResponse))
 @settings(max_examples=1)
 def test_partition_produce_response_roundtrip(
@@ -32,6 +35,7 @@ def test_partition_produce_response_roundtrip(
 read_topic_produce_response: Final = entity_reader(TopicProduceResponse)
 
 
+@pytest.mark.roundtrip
 @given(from_type(TopicProduceResponse))
 @settings(max_examples=1)
 def test_topic_produce_response_roundtrip(instance: TopicProduceResponse) -> None:
@@ -46,6 +50,7 @@ def test_topic_produce_response_roundtrip(instance: TopicProduceResponse) -> Non
 read_produce_response: Final = entity_reader(ProduceResponse)
 
 
+@pytest.mark.roundtrip
 @given(from_type(ProduceResponse))
 @settings(max_examples=1)
 def test_produce_response_roundtrip(instance: ProduceResponse) -> None:
@@ -55,3 +60,11 @@ def test_produce_response_roundtrip(instance: ProduceResponse) -> None:
         buffer.seek(0)
         result = read_produce_response(buffer)
     assert instance == result
+
+
+@pytest.mark.java
+@given(instance=from_type(ProduceResponse))
+def test_produce_response_java(
+    instance: ProduceResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)
