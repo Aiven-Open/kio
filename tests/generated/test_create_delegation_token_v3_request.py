@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -16,6 +17,7 @@ from tests.conftest import setup_buffer
 read_creatable_renewers: Final = entity_reader(CreatableRenewers)
 
 
+@pytest.mark.roundtrip
 @given(from_type(CreatableRenewers))
 @settings(max_examples=1)
 def test_creatable_renewers_roundtrip(instance: CreatableRenewers) -> None:
@@ -32,6 +34,7 @@ read_create_delegation_token_request: Final = entity_reader(
 )
 
 
+@pytest.mark.roundtrip
 @given(from_type(CreateDelegationTokenRequest))
 @settings(max_examples=1)
 def test_create_delegation_token_request_roundtrip(
@@ -45,6 +48,7 @@ def test_create_delegation_token_request_roundtrip(
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(CreateDelegationTokenRequest))
 def test_create_delegation_token_request_java(
     instance: CreateDelegationTokenRequest, java_tester: JavaTester

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -15,6 +16,7 @@ from tests.conftest import setup_buffer
 read_end_txn_request: Final = entity_reader(EndTxnRequest)
 
 
+@pytest.mark.roundtrip
 @given(from_type(EndTxnRequest))
 @settings(max_examples=1)
 def test_end_txn_request_roundtrip(instance: EndTxnRequest) -> None:
@@ -26,6 +28,7 @@ def test_end_txn_request_roundtrip(instance: EndTxnRequest) -> None:
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(EndTxnRequest))
 def test_end_txn_request_java(instance: EndTxnRequest, java_tester: JavaTester) -> None:
     java_tester.test(instance)

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -19,6 +20,7 @@ from tests.conftest import setup_buffer
 read_reassignable_partition: Final = entity_reader(ReassignablePartition)
 
 
+@pytest.mark.roundtrip
 @given(from_type(ReassignablePartition))
 @settings(max_examples=1)
 def test_reassignable_partition_roundtrip(instance: ReassignablePartition) -> None:
@@ -33,6 +35,7 @@ def test_reassignable_partition_roundtrip(instance: ReassignablePartition) -> No
 read_reassignable_topic: Final = entity_reader(ReassignableTopic)
 
 
+@pytest.mark.roundtrip
 @given(from_type(ReassignableTopic))
 @settings(max_examples=1)
 def test_reassignable_topic_roundtrip(instance: ReassignableTopic) -> None:
@@ -49,6 +52,7 @@ read_alter_partition_reassignments_request: Final = entity_reader(
 )
 
 
+@pytest.mark.roundtrip
 @given(from_type(AlterPartitionReassignmentsRequest))
 @settings(max_examples=1)
 def test_alter_partition_reassignments_request_roundtrip(
@@ -62,6 +66,7 @@ def test_alter_partition_reassignments_request_roundtrip(
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(AlterPartitionReassignmentsRequest))
 def test_alter_partition_reassignments_request_java(
     instance: AlterPartitionReassignmentsRequest, java_tester: JavaTester

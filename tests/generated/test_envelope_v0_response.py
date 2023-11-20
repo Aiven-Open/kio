@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -15,6 +16,7 @@ from tests.conftest import setup_buffer
 read_envelope_response: Final = entity_reader(EnvelopeResponse)
 
 
+@pytest.mark.roundtrip
 @given(from_type(EnvelopeResponse))
 @settings(max_examples=1)
 def test_envelope_response_roundtrip(instance: EnvelopeResponse) -> None:
@@ -26,6 +28,7 @@ def test_envelope_response_roundtrip(instance: EnvelopeResponse) -> None:
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(EnvelopeResponse))
 def test_envelope_response_java(
     instance: EnvelopeResponse, java_tester: JavaTester

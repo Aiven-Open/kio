@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -15,6 +16,7 @@ from tests.conftest import setup_buffer
 read_snapshot_header_record: Final = entity_reader(SnapshotHeaderRecord)
 
 
+@pytest.mark.roundtrip
 @given(from_type(SnapshotHeaderRecord))
 @settings(max_examples=1)
 def test_snapshot_header_record_roundtrip(instance: SnapshotHeaderRecord) -> None:
@@ -26,6 +28,7 @@ def test_snapshot_header_record_roundtrip(instance: SnapshotHeaderRecord) -> Non
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(SnapshotHeaderRecord))
 def test_snapshot_header_record_java(
     instance: SnapshotHeaderRecord, java_tester: JavaTester

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -17,6 +18,7 @@ from tests.conftest import setup_buffer
 read_aborted_transaction: Final = entity_reader(AbortedTransaction)
 
 
+@pytest.mark.roundtrip
 @given(from_type(AbortedTransaction))
 @settings(max_examples=1)
 def test_aborted_transaction_roundtrip(instance: AbortedTransaction) -> None:
@@ -31,6 +33,7 @@ def test_aborted_transaction_roundtrip(instance: AbortedTransaction) -> None:
 read_partition_data: Final = entity_reader(PartitionData)
 
 
+@pytest.mark.roundtrip
 @given(from_type(PartitionData))
 @settings(max_examples=1)
 def test_partition_data_roundtrip(instance: PartitionData) -> None:
@@ -45,6 +48,7 @@ def test_partition_data_roundtrip(instance: PartitionData) -> None:
 read_fetchable_topic_response: Final = entity_reader(FetchableTopicResponse)
 
 
+@pytest.mark.roundtrip
 @given(from_type(FetchableTopicResponse))
 @settings(max_examples=1)
 def test_fetchable_topic_response_roundtrip(instance: FetchableTopicResponse) -> None:
@@ -59,6 +63,7 @@ def test_fetchable_topic_response_roundtrip(instance: FetchableTopicResponse) ->
 read_fetch_response: Final = entity_reader(FetchResponse)
 
 
+@pytest.mark.roundtrip
 @given(from_type(FetchResponse))
 @settings(max_examples=1)
 def test_fetch_response_roundtrip(instance: FetchResponse) -> None:

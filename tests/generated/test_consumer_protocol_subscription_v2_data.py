@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -18,6 +19,7 @@ from tests.conftest import setup_buffer
 read_topic_partition: Final = entity_reader(TopicPartition)
 
 
+@pytest.mark.roundtrip
 @given(from_type(TopicPartition))
 @settings(max_examples=1)
 def test_topic_partition_roundtrip(instance: TopicPartition) -> None:
@@ -32,6 +34,7 @@ def test_topic_partition_roundtrip(instance: TopicPartition) -> None:
 read_consumer_protocol_subscription: Final = entity_reader(ConsumerProtocolSubscription)
 
 
+@pytest.mark.roundtrip
 @given(from_type(ConsumerProtocolSubscription))
 @settings(max_examples=1)
 def test_consumer_protocol_subscription_roundtrip(
@@ -45,6 +48,7 @@ def test_consumer_protocol_subscription_roundtrip(
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(ConsumerProtocolSubscription))
 def test_consumer_protocol_subscription_java(
     instance: ConsumerProtocolSubscription, java_tester: JavaTester

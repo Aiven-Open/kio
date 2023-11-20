@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -20,6 +21,7 @@ read_describe_delegation_token_owner: Final = entity_reader(
 )
 
 
+@pytest.mark.roundtrip
 @given(from_type(DescribeDelegationTokenOwner))
 @settings(max_examples=1)
 def test_describe_delegation_token_owner_roundtrip(
@@ -38,6 +40,7 @@ read_describe_delegation_token_request: Final = entity_reader(
 )
 
 
+@pytest.mark.roundtrip
 @given(from_type(DescribeDelegationTokenRequest))
 @settings(max_examples=1)
 def test_describe_delegation_token_request_roundtrip(
@@ -51,6 +54,7 @@ def test_describe_delegation_token_request_roundtrip(
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(DescribeDelegationTokenRequest))
 def test_describe_delegation_token_request_java(
     instance: DescribeDelegationTokenRequest, java_tester: JavaTester

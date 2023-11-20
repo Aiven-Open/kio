@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -18,6 +19,7 @@ from tests.conftest import setup_buffer
 read_creatable_replica_assignment: Final = entity_reader(CreatableReplicaAssignment)
 
 
+@pytest.mark.roundtrip
 @given(from_type(CreatableReplicaAssignment))
 @settings(max_examples=1)
 def test_creatable_replica_assignment_roundtrip(
@@ -34,6 +36,7 @@ def test_creatable_replica_assignment_roundtrip(
 read_createable_topic_config: Final = entity_reader(CreateableTopicConfig)
 
 
+@pytest.mark.roundtrip
 @given(from_type(CreateableTopicConfig))
 @settings(max_examples=1)
 def test_createable_topic_config_roundtrip(instance: CreateableTopicConfig) -> None:
@@ -48,6 +51,7 @@ def test_createable_topic_config_roundtrip(instance: CreateableTopicConfig) -> N
 read_creatable_topic: Final = entity_reader(CreatableTopic)
 
 
+@pytest.mark.roundtrip
 @given(from_type(CreatableTopic))
 @settings(max_examples=1)
 def test_creatable_topic_roundtrip(instance: CreatableTopic) -> None:
@@ -62,6 +66,7 @@ def test_creatable_topic_roundtrip(instance: CreatableTopic) -> None:
 read_create_topics_request: Final = entity_reader(CreateTopicsRequest)
 
 
+@pytest.mark.roundtrip
 @given(from_type(CreateTopicsRequest))
 @settings(max_examples=1)
 def test_create_topics_request_roundtrip(instance: CreateTopicsRequest) -> None:
@@ -73,6 +78,7 @@ def test_create_topics_request_roundtrip(instance: CreateTopicsRequest) -> None:
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(CreateTopicsRequest))
 def test_create_topics_request_java(
     instance: CreateTopicsRequest, java_tester: JavaTester

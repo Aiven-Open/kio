@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -19,6 +20,7 @@ read_update_metadata_partition_state: Final = entity_reader(
 )
 
 
+@pytest.mark.roundtrip
 @given(from_type(UpdateMetadataPartitionState))
 @settings(max_examples=1)
 def test_update_metadata_partition_state_roundtrip(
@@ -35,6 +37,7 @@ def test_update_metadata_partition_state_roundtrip(
 read_update_metadata_broker: Final = entity_reader(UpdateMetadataBroker)
 
 
+@pytest.mark.roundtrip
 @given(from_type(UpdateMetadataBroker))
 @settings(max_examples=1)
 def test_update_metadata_broker_roundtrip(instance: UpdateMetadataBroker) -> None:
@@ -49,6 +52,7 @@ def test_update_metadata_broker_roundtrip(instance: UpdateMetadataBroker) -> Non
 read_update_metadata_request: Final = entity_reader(UpdateMetadataRequest)
 
 
+@pytest.mark.roundtrip
 @given(from_type(UpdateMetadataRequest))
 @settings(max_examples=1)
 def test_update_metadata_request_roundtrip(instance: UpdateMetadataRequest) -> None:
@@ -60,6 +64,7 @@ def test_update_metadata_request_roundtrip(instance: UpdateMetadataRequest) -> N
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(UpdateMetadataRequest))
 def test_update_metadata_request_java(
     instance: UpdateMetadataRequest, java_tester: JavaTester

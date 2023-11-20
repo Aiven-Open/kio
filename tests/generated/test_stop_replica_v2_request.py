@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -16,6 +17,7 @@ from tests.conftest import setup_buffer
 read_stop_replica_topic_v1: Final = entity_reader(StopReplicaTopicV1)
 
 
+@pytest.mark.roundtrip
 @given(from_type(StopReplicaTopicV1))
 @settings(max_examples=1)
 def test_stop_replica_topic_v1_roundtrip(instance: StopReplicaTopicV1) -> None:
@@ -30,6 +32,7 @@ def test_stop_replica_topic_v1_roundtrip(instance: StopReplicaTopicV1) -> None:
 read_stop_replica_request: Final = entity_reader(StopReplicaRequest)
 
 
+@pytest.mark.roundtrip
 @given(from_type(StopReplicaRequest))
 @settings(max_examples=1)
 def test_stop_replica_request_roundtrip(instance: StopReplicaRequest) -> None:
@@ -41,6 +44,7 @@ def test_stop_replica_request_roundtrip(instance: StopReplicaRequest) -> None:
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(StopReplicaRequest))
 def test_stop_replica_request_java(
     instance: StopReplicaRequest, java_tester: JavaTester

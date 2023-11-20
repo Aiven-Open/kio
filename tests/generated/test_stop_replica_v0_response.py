@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -16,6 +17,7 @@ from tests.conftest import setup_buffer
 read_stop_replica_partition_error: Final = entity_reader(StopReplicaPartitionError)
 
 
+@pytest.mark.roundtrip
 @given(from_type(StopReplicaPartitionError))
 @settings(max_examples=1)
 def test_stop_replica_partition_error_roundtrip(
@@ -32,6 +34,7 @@ def test_stop_replica_partition_error_roundtrip(
 read_stop_replica_response: Final = entity_reader(StopReplicaResponse)
 
 
+@pytest.mark.roundtrip
 @given(from_type(StopReplicaResponse))
 @settings(max_examples=1)
 def test_stop_replica_response_roundtrip(instance: StopReplicaResponse) -> None:
@@ -43,6 +46,7 @@ def test_stop_replica_response_roundtrip(instance: StopReplicaResponse) -> None:
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(StopReplicaResponse))
 def test_stop_replica_response_java(
     instance: StopReplicaResponse, java_tester: JavaTester

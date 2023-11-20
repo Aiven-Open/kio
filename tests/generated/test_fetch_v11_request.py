@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -17,6 +18,7 @@ from tests.conftest import setup_buffer
 read_fetch_partition: Final = entity_reader(FetchPartition)
 
 
+@pytest.mark.roundtrip
 @given(from_type(FetchPartition))
 @settings(max_examples=1)
 def test_fetch_partition_roundtrip(instance: FetchPartition) -> None:
@@ -31,6 +33,7 @@ def test_fetch_partition_roundtrip(instance: FetchPartition) -> None:
 read_fetch_topic: Final = entity_reader(FetchTopic)
 
 
+@pytest.mark.roundtrip
 @given(from_type(FetchTopic))
 @settings(max_examples=1)
 def test_fetch_topic_roundtrip(instance: FetchTopic) -> None:
@@ -45,6 +48,7 @@ def test_fetch_topic_roundtrip(instance: FetchTopic) -> None:
 read_forgotten_topic: Final = entity_reader(ForgottenTopic)
 
 
+@pytest.mark.roundtrip
 @given(from_type(ForgottenTopic))
 @settings(max_examples=1)
 def test_forgotten_topic_roundtrip(instance: ForgottenTopic) -> None:
@@ -59,6 +63,7 @@ def test_forgotten_topic_roundtrip(instance: ForgottenTopic) -> None:
 read_fetch_request: Final = entity_reader(FetchRequest)
 
 
+@pytest.mark.roundtrip
 @given(from_type(FetchRequest))
 @settings(max_examples=1)
 def test_fetch_request_roundtrip(instance: FetchRequest) -> None:

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -16,6 +17,7 @@ from tests.conftest import setup_buffer
 read_join_group_response_member: Final = entity_reader(JoinGroupResponseMember)
 
 
+@pytest.mark.roundtrip
 @given(from_type(JoinGroupResponseMember))
 @settings(max_examples=1)
 def test_join_group_response_member_roundtrip(
@@ -32,6 +34,7 @@ def test_join_group_response_member_roundtrip(
 read_join_group_response: Final = entity_reader(JoinGroupResponse)
 
 
+@pytest.mark.roundtrip
 @given(from_type(JoinGroupResponse))
 @settings(max_examples=1)
 def test_join_group_response_roundtrip(instance: JoinGroupResponse) -> None:
@@ -43,6 +46,7 @@ def test_join_group_response_roundtrip(instance: JoinGroupResponse) -> None:
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(JoinGroupResponse))
 def test_join_group_response_java(
     instance: JoinGroupResponse, java_tester: JavaTester

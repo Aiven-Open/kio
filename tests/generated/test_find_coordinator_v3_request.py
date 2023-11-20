@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -15,6 +16,7 @@ from tests.conftest import setup_buffer
 read_find_coordinator_request: Final = entity_reader(FindCoordinatorRequest)
 
 
+@pytest.mark.roundtrip
 @given(from_type(FindCoordinatorRequest))
 @settings(max_examples=1)
 def test_find_coordinator_request_roundtrip(instance: FindCoordinatorRequest) -> None:
@@ -26,6 +28,7 @@ def test_find_coordinator_request_roundtrip(instance: FindCoordinatorRequest) ->
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(FindCoordinatorRequest))
 def test_find_coordinator_request_java(
     instance: FindCoordinatorRequest, java_tester: JavaTester

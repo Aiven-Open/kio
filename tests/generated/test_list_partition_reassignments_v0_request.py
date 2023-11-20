@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -22,6 +23,7 @@ read_list_partition_reassignments_topics: Final = entity_reader(
 )
 
 
+@pytest.mark.roundtrip
 @given(from_type(ListPartitionReassignmentsTopics))
 @settings(max_examples=1)
 def test_list_partition_reassignments_topics_roundtrip(
@@ -40,6 +42,7 @@ read_list_partition_reassignments_request: Final = entity_reader(
 )
 
 
+@pytest.mark.roundtrip
 @given(from_type(ListPartitionReassignmentsRequest))
 @settings(max_examples=1)
 def test_list_partition_reassignments_request_roundtrip(
@@ -53,6 +56,7 @@ def test_list_partition_reassignments_request_roundtrip(
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(ListPartitionReassignmentsRequest))
 def test_list_partition_reassignments_request_java(
     instance: ListPartitionReassignmentsRequest, java_tester: JavaTester

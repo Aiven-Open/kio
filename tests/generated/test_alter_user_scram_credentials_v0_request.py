@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -19,6 +20,7 @@ from tests.conftest import setup_buffer
 read_scram_credential_deletion: Final = entity_reader(ScramCredentialDeletion)
 
 
+@pytest.mark.roundtrip
 @given(from_type(ScramCredentialDeletion))
 @settings(max_examples=1)
 def test_scram_credential_deletion_roundtrip(instance: ScramCredentialDeletion) -> None:
@@ -33,6 +35,7 @@ def test_scram_credential_deletion_roundtrip(instance: ScramCredentialDeletion) 
 read_scram_credential_upsertion: Final = entity_reader(ScramCredentialUpsertion)
 
 
+@pytest.mark.roundtrip
 @given(from_type(ScramCredentialUpsertion))
 @settings(max_examples=1)
 def test_scram_credential_upsertion_roundtrip(
@@ -51,6 +54,7 @@ read_alter_user_scram_credentials_request: Final = entity_reader(
 )
 
 
+@pytest.mark.roundtrip
 @given(from_type(AlterUserScramCredentialsRequest))
 @settings(max_examples=1)
 def test_alter_user_scram_credentials_request_roundtrip(
@@ -64,6 +68,7 @@ def test_alter_user_scram_credentials_request_roundtrip(
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(AlterUserScramCredentialsRequest))
 def test_alter_user_scram_credentials_request_java(
     instance: AlterUserScramCredentialsRequest, java_tester: JavaTester

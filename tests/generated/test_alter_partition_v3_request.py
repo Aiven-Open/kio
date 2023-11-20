@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -18,6 +19,7 @@ from tests.conftest import setup_buffer
 read_broker_state: Final = entity_reader(BrokerState)
 
 
+@pytest.mark.roundtrip
 @given(from_type(BrokerState))
 @settings(max_examples=1)
 def test_broker_state_roundtrip(instance: BrokerState) -> None:
@@ -32,6 +34,7 @@ def test_broker_state_roundtrip(instance: BrokerState) -> None:
 read_partition_data: Final = entity_reader(PartitionData)
 
 
+@pytest.mark.roundtrip
 @given(from_type(PartitionData))
 @settings(max_examples=1)
 def test_partition_data_roundtrip(instance: PartitionData) -> None:
@@ -46,6 +49,7 @@ def test_partition_data_roundtrip(instance: PartitionData) -> None:
 read_topic_data: Final = entity_reader(TopicData)
 
 
+@pytest.mark.roundtrip
 @given(from_type(TopicData))
 @settings(max_examples=1)
 def test_topic_data_roundtrip(instance: TopicData) -> None:
@@ -60,6 +64,7 @@ def test_topic_data_roundtrip(instance: TopicData) -> None:
 read_alter_partition_request: Final = entity_reader(AlterPartitionRequest)
 
 
+@pytest.mark.roundtrip
 @given(from_type(AlterPartitionRequest))
 @settings(max_examples=1)
 def test_alter_partition_request_roundtrip(instance: AlterPartitionRequest) -> None:
@@ -71,6 +76,7 @@ def test_alter_partition_request_roundtrip(instance: AlterPartitionRequest) -> N
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(AlterPartitionRequest))
 def test_alter_partition_request_java(
     instance: AlterPartitionRequest, java_tester: JavaTester

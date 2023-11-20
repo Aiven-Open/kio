@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -17,6 +18,7 @@ read_renew_delegation_token_response: Final = entity_reader(
 )
 
 
+@pytest.mark.roundtrip
 @given(from_type(RenewDelegationTokenResponse))
 @settings(max_examples=1)
 def test_renew_delegation_token_response_roundtrip(
@@ -30,6 +32,7 @@ def test_renew_delegation_token_response_roundtrip(
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(RenewDelegationTokenResponse))
 def test_renew_delegation_token_response_java(
     instance: RenewDelegationTokenResponse, java_tester: JavaTester

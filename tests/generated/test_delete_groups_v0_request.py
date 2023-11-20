@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -15,6 +16,7 @@ from tests.conftest import setup_buffer
 read_delete_groups_request: Final = entity_reader(DeleteGroupsRequest)
 
 
+@pytest.mark.roundtrip
 @given(from_type(DeleteGroupsRequest))
 @settings(max_examples=1)
 def test_delete_groups_request_roundtrip(instance: DeleteGroupsRequest) -> None:
@@ -26,6 +28,7 @@ def test_delete_groups_request_roundtrip(instance: DeleteGroupsRequest) -> None:
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(DeleteGroupsRequest))
 def test_delete_groups_request_java(
     instance: DeleteGroupsRequest, java_tester: JavaTester

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -18,6 +19,7 @@ from tests.conftest import setup_buffer
 read_snapshot_id: Final = entity_reader(SnapshotId)
 
 
+@pytest.mark.roundtrip
 @given(from_type(SnapshotId))
 @settings(max_examples=1)
 def test_snapshot_id_roundtrip(instance: SnapshotId) -> None:
@@ -32,6 +34,7 @@ def test_snapshot_id_roundtrip(instance: SnapshotId) -> None:
 read_leader_id_and_epoch: Final = entity_reader(LeaderIdAndEpoch)
 
 
+@pytest.mark.roundtrip
 @given(from_type(LeaderIdAndEpoch))
 @settings(max_examples=1)
 def test_leader_id_and_epoch_roundtrip(instance: LeaderIdAndEpoch) -> None:
@@ -46,6 +49,7 @@ def test_leader_id_and_epoch_roundtrip(instance: LeaderIdAndEpoch) -> None:
 read_partition_snapshot: Final = entity_reader(PartitionSnapshot)
 
 
+@pytest.mark.roundtrip
 @given(from_type(PartitionSnapshot))
 @settings(max_examples=1)
 def test_partition_snapshot_roundtrip(instance: PartitionSnapshot) -> None:
@@ -60,6 +64,7 @@ def test_partition_snapshot_roundtrip(instance: PartitionSnapshot) -> None:
 read_topic_snapshot: Final = entity_reader(TopicSnapshot)
 
 
+@pytest.mark.roundtrip
 @given(from_type(TopicSnapshot))
 @settings(max_examples=1)
 def test_topic_snapshot_roundtrip(instance: TopicSnapshot) -> None:
@@ -74,6 +79,7 @@ def test_topic_snapshot_roundtrip(instance: TopicSnapshot) -> None:
 read_fetch_snapshot_response: Final = entity_reader(FetchSnapshotResponse)
 
 
+@pytest.mark.roundtrip
 @given(from_type(FetchSnapshotResponse))
 @settings(max_examples=1)
 def test_fetch_snapshot_response_roundtrip(instance: FetchSnapshotResponse) -> None:

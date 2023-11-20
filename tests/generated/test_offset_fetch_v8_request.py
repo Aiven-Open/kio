@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -17,6 +18,7 @@ from tests.conftest import setup_buffer
 read_offset_fetch_request_topics: Final = entity_reader(OffsetFetchRequestTopics)
 
 
+@pytest.mark.roundtrip
 @given(from_type(OffsetFetchRequestTopics))
 @settings(max_examples=1)
 def test_offset_fetch_request_topics_roundtrip(
@@ -33,6 +35,7 @@ def test_offset_fetch_request_topics_roundtrip(
 read_offset_fetch_request_group: Final = entity_reader(OffsetFetchRequestGroup)
 
 
+@pytest.mark.roundtrip
 @given(from_type(OffsetFetchRequestGroup))
 @settings(max_examples=1)
 def test_offset_fetch_request_group_roundtrip(
@@ -49,6 +52,7 @@ def test_offset_fetch_request_group_roundtrip(
 read_offset_fetch_request: Final = entity_reader(OffsetFetchRequest)
 
 
+@pytest.mark.roundtrip
 @given(from_type(OffsetFetchRequest))
 @settings(max_examples=1)
 def test_offset_fetch_request_roundtrip(instance: OffsetFetchRequest) -> None:
@@ -60,6 +64,7 @@ def test_offset_fetch_request_roundtrip(instance: OffsetFetchRequest) -> None:
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(OffsetFetchRequest))
 def test_offset_fetch_request_java(
     instance: OffsetFetchRequest, java_tester: JavaTester

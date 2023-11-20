@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -17,6 +18,7 @@ from tests.conftest import setup_buffer
 read_offset_for_leader_partition: Final = entity_reader(OffsetForLeaderPartition)
 
 
+@pytest.mark.roundtrip
 @given(from_type(OffsetForLeaderPartition))
 @settings(max_examples=1)
 def test_offset_for_leader_partition_roundtrip(
@@ -33,6 +35,7 @@ def test_offset_for_leader_partition_roundtrip(
 read_offset_for_leader_topic: Final = entity_reader(OffsetForLeaderTopic)
 
 
+@pytest.mark.roundtrip
 @given(from_type(OffsetForLeaderTopic))
 @settings(max_examples=1)
 def test_offset_for_leader_topic_roundtrip(instance: OffsetForLeaderTopic) -> None:
@@ -47,6 +50,7 @@ def test_offset_for_leader_topic_roundtrip(instance: OffsetForLeaderTopic) -> No
 read_offset_for_leader_epoch_request: Final = entity_reader(OffsetForLeaderEpochRequest)
 
 
+@pytest.mark.roundtrip
 @given(from_type(OffsetForLeaderEpochRequest))
 @settings(max_examples=1)
 def test_offset_for_leader_epoch_request_roundtrip(
@@ -60,6 +64,7 @@ def test_offset_for_leader_epoch_request_roundtrip(
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(OffsetForLeaderEpochRequest))
 def test_offset_for_leader_epoch_request_java(
     instance: OffsetForLeaderEpochRequest, java_tester: JavaTester

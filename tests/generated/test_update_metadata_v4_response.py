@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -15,6 +16,7 @@ from tests.conftest import setup_buffer
 read_update_metadata_response: Final = entity_reader(UpdateMetadataResponse)
 
 
+@pytest.mark.roundtrip
 @given(from_type(UpdateMetadataResponse))
 @settings(max_examples=1)
 def test_update_metadata_response_roundtrip(instance: UpdateMetadataResponse) -> None:
@@ -26,6 +28,7 @@ def test_update_metadata_response_roundtrip(instance: UpdateMetadataResponse) ->
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(UpdateMetadataResponse))
 def test_update_metadata_response_java(
     instance: UpdateMetadataResponse, java_tester: JavaTester

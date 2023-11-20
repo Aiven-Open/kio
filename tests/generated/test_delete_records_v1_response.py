@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -19,6 +20,7 @@ read_delete_records_partition_result: Final = entity_reader(
 )
 
 
+@pytest.mark.roundtrip
 @given(from_type(DeleteRecordsPartitionResult))
 @settings(max_examples=1)
 def test_delete_records_partition_result_roundtrip(
@@ -35,6 +37,7 @@ def test_delete_records_partition_result_roundtrip(
 read_delete_records_topic_result: Final = entity_reader(DeleteRecordsTopicResult)
 
 
+@pytest.mark.roundtrip
 @given(from_type(DeleteRecordsTopicResult))
 @settings(max_examples=1)
 def test_delete_records_topic_result_roundtrip(
@@ -51,6 +54,7 @@ def test_delete_records_topic_result_roundtrip(
 read_delete_records_response: Final = entity_reader(DeleteRecordsResponse)
 
 
+@pytest.mark.roundtrip
 @given(from_type(DeleteRecordsResponse))
 @settings(max_examples=1)
 def test_delete_records_response_roundtrip(instance: DeleteRecordsResponse) -> None:
@@ -62,6 +66,7 @@ def test_delete_records_response_roundtrip(instance: DeleteRecordsResponse) -> N
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(DeleteRecordsResponse))
 def test_delete_records_response_java(
     instance: DeleteRecordsResponse, java_tester: JavaTester

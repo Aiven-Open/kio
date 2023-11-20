@@ -52,6 +52,7 @@ from kio.serial import entity_writer
 from tests.conftest import setup_buffer, JavaTester
 from kio.serial import entity_reader
 from typing import Final
+import pytest
 """
 import_code = """\
 from {entity_module} import {entity_type}
@@ -62,6 +63,7 @@ test_code = """\
 read_{entity_snake_case}: Final = entity_reader({entity_type})
 
 
+@pytest.mark.roundtrip
 @given(from_type({entity_type}))
 @settings(max_examples=1)
 def test_{entity_snake_case}_roundtrip(instance: {entity_type}) -> None:
@@ -74,6 +76,7 @@ def test_{entity_snake_case}_roundtrip(instance: {entity_type}) -> None:
 """
 
 test_code_java = """\
+@pytest.mark.java
 @given(instance=from_type({entity_type}))
 def test_{entity_snake_case}_java(instance: {entity_type}, java_tester: JavaTester) -> None:
     java_tester.test(instance)

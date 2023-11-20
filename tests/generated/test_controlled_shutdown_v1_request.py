@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -15,6 +16,7 @@ from tests.conftest import setup_buffer
 read_controlled_shutdown_request: Final = entity_reader(ControlledShutdownRequest)
 
 
+@pytest.mark.roundtrip
 @given(from_type(ControlledShutdownRequest))
 @settings(max_examples=1)
 def test_controlled_shutdown_request_roundtrip(
@@ -28,6 +30,7 @@ def test_controlled_shutdown_request_roundtrip(
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(ControlledShutdownRequest))
 def test_controlled_shutdown_request_java(
     instance: ControlledShutdownRequest, java_tester: JavaTester

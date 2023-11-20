@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -15,6 +16,7 @@ from tests.conftest import setup_buffer
 read_broker_heartbeat_request: Final = entity_reader(BrokerHeartbeatRequest)
 
 
+@pytest.mark.roundtrip
 @given(from_type(BrokerHeartbeatRequest))
 @settings(max_examples=1)
 def test_broker_heartbeat_request_roundtrip(instance: BrokerHeartbeatRequest) -> None:
@@ -26,6 +28,7 @@ def test_broker_heartbeat_request_roundtrip(instance: BrokerHeartbeatRequest) ->
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(BrokerHeartbeatRequest))
 def test_broker_heartbeat_request_java(
     instance: BrokerHeartbeatRequest, java_tester: JavaTester

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type
@@ -16,6 +17,7 @@ from tests.conftest import setup_buffer
 read_describable_log_dir_topic: Final = entity_reader(DescribableLogDirTopic)
 
 
+@pytest.mark.roundtrip
 @given(from_type(DescribableLogDirTopic))
 @settings(max_examples=1)
 def test_describable_log_dir_topic_roundtrip(instance: DescribableLogDirTopic) -> None:
@@ -30,6 +32,7 @@ def test_describable_log_dir_topic_roundtrip(instance: DescribableLogDirTopic) -
 read_describe_log_dirs_request: Final = entity_reader(DescribeLogDirsRequest)
 
 
+@pytest.mark.roundtrip
 @given(from_type(DescribeLogDirsRequest))
 @settings(max_examples=1)
 def test_describe_log_dirs_request_roundtrip(instance: DescribeLogDirsRequest) -> None:
@@ -41,6 +44,7 @@ def test_describe_log_dirs_request_roundtrip(instance: DescribeLogDirsRequest) -
     assert instance == result
 
 
+@pytest.mark.java
 @given(instance=from_type(DescribeLogDirsRequest))
 def test_describe_log_dirs_request_java(
     instance: DescribeLogDirsRequest, java_tester: JavaTester
