@@ -12,6 +12,7 @@ from kio.schema.create_topics.v6.response import CreatableTopicResult
 from kio.schema.create_topics.v6.response import CreateTopicsResponse
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_creatable_topic_configs: Final = entity_reader(CreatableTopicConfigs)
@@ -57,3 +58,11 @@ def test_create_topics_response_roundtrip(instance: CreateTopicsResponse) -> Non
         buffer.seek(0)
         result = read_create_topics_response(buffer)
     assert instance == result
+
+
+@pytest.mark.java
+@given(instance=from_type(CreateTopicsResponse))
+def test_create_topics_response_java(
+    instance: CreateTopicsResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

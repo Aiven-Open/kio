@@ -272,6 +272,19 @@ class PrimitiveField(_BaseField):
     default: str | int | float | bool | None
 
     def is_nullable(self, version: int) -> bool:
+        # Primitive types are never optional
+        if self.type in {
+            Primitive.int8,
+            Primitive.int16,
+            Primitive.int32,
+            Primitive.int64,
+            Primitive.uint16,
+            Primitive.uint32,
+            Primitive.uint64,
+            Primitive.float64,
+        }:
+            return False
+
         return (
             (
                 # Tagged fields that are ignorable and don't have a default are optional.
