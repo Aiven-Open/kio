@@ -1,8 +1,10 @@
 from dataclasses import Field
 from dataclasses import fields
 from typing import IO
+from typing import Literal
 from typing import TypeVar
 from typing import assert_never
+from typing import overload
 
 from kio._utils import cache
 from kio.static.protocol import Entity
@@ -13,6 +15,8 @@ from ._introspect import classify_field
 from ._introspect import get_field_tag
 from ._introspect import get_schema_field_type
 from ._introspect import is_optional
+from ._shared import NullableEntityMarker
+from .readers import read_int8
 
 
 def get_reader(
@@ -114,7 +118,11 @@ def get_field_reader(
                 )
             )
         case FieldKind.entity:
-            return entity_reader(field_type)  # type: ignore[type-var]
+            return (  # type: ignore[no-any-return]
+                entity_reader(field_type, nullable=True)  # type: ignore[call-overload]
+                if is_optional(field)
+                else entity_reader(field_type)  # type: ignore[type-var]
+            )
         case FieldKind.entity_tuple:
             return array_reader(  # type: ignore[return-value]
                 entity_reader(field_type)  # type: ignore[type-var]
@@ -126,8 +134,24 @@ def get_field_reader(
 E = TypeVar("E", bound=Entity)
 
 
-@cache
+@overload
 def entity_reader(entity_type: type[E]) -> readers.Reader[E]:
+    ...
+
+
+@overload
+def entity_reader(
+    entity_type: type[E],
+    nullable: Literal[True],
+) -> readers.Reader[E | None]:
+    ...
+
+
+@cache
+def entity_reader(
+    entity_type: type[E],
+    nullable: bool = False,
+) -> readers.Reader[E | None]:
     field_readers = {}
     tagged_field_readers = {}
     is_request_header = entity_type.__name__ == "RequestHeader"
@@ -170,4 +194,13 @@ def entity_reader(entity_type: type[E]) -> readers.Reader[E]:
 
         return entity_type(**kwargs)
 
-    return read_entity
+    if not nullable:
+        return read_entity
+
+    # This is undocumented behavior, formalized in KIP-893.
+    # https://cwiki.apache.org/confluence/display/KAFKA/KIP-893%3A+The+Kafka+protocol+should+support+nullable+structs
+    def read_nullable_entity(buffer: IO[bytes]) -> E | None:
+        marker = NullableEntityMarker(read_int8(buffer))
+        return None if marker is NullableEntityMarker.null else read_entity(buffer)
+
+    return read_nullable_entity

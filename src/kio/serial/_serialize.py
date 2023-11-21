@@ -1,8 +1,10 @@
 import io
 from dataclasses import Field
 from dataclasses import fields
+from typing import Literal
 from typing import TypeVar
 from typing import assert_never
+from typing import overload
 
 from kio._utils import cache
 from kio.static.protocol import Entity
@@ -13,10 +15,12 @@ from ._introspect import classify_field
 from ._introspect import get_field_tag
 from ._introspect import get_schema_field_type
 from ._introspect import is_optional
+from ._shared import NullableEntityMarker
 from .writers import Writable
 from .writers import Writer
 from .writers import compact_array_writer
 from .writers import legacy_array_writer
+from .writers import write_int8
 from .writers import write_tagged_field
 from .writers import write_unsigned_varint
 
@@ -128,7 +132,11 @@ def get_field_writer(
                 )
             )
         case FieldKind.entity:
-            return entity_writer(field_type)  # type: ignore[type-var]
+            return (  # type: ignore[no-any-return]
+                entity_writer(field_type, nullable=True)  # type: ignore[call-overload]
+                if optional
+                else entity_writer(field_type)  # type: ignore[type-var]
+            )
         case FieldKind.entity_tuple:
             return array_writer(  # type: ignore[return-value]
                 entity_writer(field_type)  # type: ignore[type-var]
@@ -140,8 +148,31 @@ def get_field_writer(
 E = TypeVar("E", bound=Entity)
 
 
-@cache
+def _wrap_nullable(write_entity: Writer[E]) -> Writer[E | None]:
+    # This is undocumented behavior, formalized in KIP-893.
+    # https://cwiki.apache.org/confluence/display/KAFKA/KIP-893%3A+The+Kafka+protocol+should+support+nullable+structs
+    def write_nullable(buffer: Writable, entity: E | None) -> None:
+        if entity is None:
+            write_int8(buffer, NullableEntityMarker.null.value)
+            return
+        write_int8(buffer, NullableEntityMarker.not_null.value)
+        write_entity(buffer, entity)
+
+    return write_nullable
+
+
+@overload
 def entity_writer(entity_type: type[E]) -> Writer[E]:
+    ...
+
+
+@overload
+def entity_writer(entity_type: type[E], nullable: Literal[True]) -> Writer[E | None]:
+    ...
+
+
+@cache
+def entity_writer(entity_type: type[E], nullable: bool = False) -> Writer[E | None]:
     field_writers = {}
     tagged_field_writers = {}
     is_request_header = entity_type.__name__ == "RequestHeader"
@@ -204,4 +235,4 @@ def entity_writer(entity_type: type[E]) -> Writer[E]:
             write_unsigned_varint(buffer, num_tagged_fields)
             buffer.write(tag_buffer.getvalue())
 
-    return write_entity
+    return _wrap_nullable(write_entity) if nullable else write_entity  # type: ignore[return-value]

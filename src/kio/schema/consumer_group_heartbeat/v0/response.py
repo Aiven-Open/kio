@@ -68,5 +68,5 @@ class ConsumerGroupHeartbeatResponse(ApiMessage):
     """True if the member should compute the assignment for the group."""
     heartbeat_interval: i32Timedelta = field(metadata={"kafka_type": "timedelta_i32"})
     """The heartbeat interval in milliseconds."""
-    assignment: Assignment
+    assignment: Assignment | None = field(default=None)
     """null if not provided; the assignment otherwise."""

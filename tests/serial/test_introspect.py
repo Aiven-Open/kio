@@ -2,6 +2,7 @@ from dataclasses import Field
 from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import fields
+from uuid import UUID
 
 import pytest
 
@@ -29,13 +30,17 @@ class A:
     pep_604_union_with_none: int | None
     pep_604_union_without_none: int | str
 
-    simple_primitive: int
-    complex_primitive: int | str
+    primitive: int
     primitive_tuple: tuple[int, ...]
     primitive_tuple_optional: tuple[int | None, ...]
     entity: Nested
     entity_tuple: tuple[Nested, ...]
+    nullable_entity: Nested | None
+    backwards_nullable_entity: None | Nested
     unsupported_tuple: tuple[int, str]
+    unsupported_union: int | str | bool
+
+    uuid_or_none: UUID | None
 
 
 model_fields = {field.name: field for field in fields(A)}
@@ -73,6 +78,15 @@ class TestIsOptional:
     def test_returns_false_for_pep_604_union_without_none(self) -> None:
         assert is_optional(model_fields["pep_604_union_without_none"]) is False
 
+    def test_returns_false_for_non_nullable_entity(self) -> None:
+        assert is_optional(model_fields["entity"]) is False
+
+    def test_returns_true_for_nullable_entity(self) -> None:
+        assert is_optional(model_fields["nullable_entity"]) is True
+
+    def test_returns_true_for_nullable_uuid(self) -> None:
+        assert is_optional(model_fields["uuid_or_none"]) is True
+
     def test_raises_schema_error_for_invalid_tuple_type(self) -> None:
         with pytest.raises(SchemaError, match=r"has invalid tuple type"):
             is_optional(model_fields["unsupported_tuple"])
@@ -83,15 +97,16 @@ class TestClassifyField:
         with pytest.raises(SchemaError, match=r"has invalid tuple type"):
             classify_field(model_fields["unsupported_tuple"])
 
-    @pytest.mark.parametrize(
-        "field",
-        (
-            model_fields["simple_primitive"],
-            model_fields["complex_primitive"],
-        ),
-    )
-    def test_can_classify_primitive_field(self, field: Field) -> None:
-        assert classify_field(field) == (FieldKind.primitive, field.type)
+    def test_raises_schema_error_for_invalid_union_type(self) -> None:
+        with pytest.raises(SchemaError, match=r"has unsupported union type"):
+            classify_field(model_fields["unsupported_union"])
+
+    def test_raises_schema_error_for_non_none_union(self) -> None:
+        with pytest.raises(SchemaError, match=r"Only union with None is supported"):
+            classify_field(model_fields["verbose_union_without_none"])
+
+    def test_can_classify_primitive_field(self) -> None:
+        assert classify_field(model_fields["primitive"]) == (FieldKind.primitive, int)
 
     def test_can_classify_primitive_tuple_field(self) -> None:
         assert classify_field(model_fields["primitive_tuple"]) == (
@@ -107,3 +122,20 @@ class TestClassifyField:
 
     def test_can_classify_simple_nested_entity(self) -> None:
         assert classify_field(model_fields["entity"]) == (FieldKind.entity, Nested)
+
+    # See KIP-893.
+    @pytest.mark.parametrize(
+        "field",
+        (
+            model_fields["nullable_entity"],
+            model_fields["backwards_nullable_entity"],
+        ),
+    )
+    def test_can_classify_nullable_nested_entity(self, field: Field) -> None:
+        assert classify_field(field) == (FieldKind.entity, Nested)
+
+    def test_can_classify_uuid_or_none(self) -> None:
+        assert classify_field(model_fields["uuid_or_none"]) == (
+            FieldKind.primitive,
+            UUID,
+        )

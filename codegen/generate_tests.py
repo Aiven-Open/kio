@@ -121,7 +121,6 @@ def main() -> None:
             "FetchResponse",  # Records
             "FetchSnapshotResponse",  # Records
             "FetchRequest",  # Should not output tagged field if its value equals to default (presumably)
-            "ConsumerGroupHeartbeatResponse",  # Nullable `assignment` field
         }:
             module_code[module_path].append(
                 test_code_java.format(

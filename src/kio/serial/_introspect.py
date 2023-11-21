@@ -55,6 +55,27 @@ T = TypeVar("T")
 def classify_field(field: Field[T]) -> tuple[FieldKind, type[T]]:
     type_origin = get_origin(field.type)
 
+    if type_origin is UnionType:
+        try:
+            a, b = get_args(field.type)
+        except ValueError:
+            raise SchemaError(
+                f"Field {field.name} has unsupported union type: {field.type}"
+            ) from None
+
+        if a is NoneType:
+            inner_type = b
+        elif b is NoneType:
+            inner_type = a
+        else:
+            raise SchemaError("Only union with None is supported")
+
+        return (
+            (FieldKind.entity, inner_type)
+            if is_dataclass(inner_type)
+            else (FieldKind.primitive, inner_type)
+        )
+
     if type_origin is not tuple:
         return (
             (FieldKind.entity, field.type)  # type: ignore[return-value]
