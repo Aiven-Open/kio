@@ -12,6 +12,7 @@ from kio.schema.fetch.v3.request import FetchRequest
 from kio.schema.fetch.v3.request import FetchTopic
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_fetch_partition: Final = entity_reader(FetchPartition)
@@ -57,3 +58,9 @@ def test_fetch_request_roundtrip(instance: FetchRequest) -> None:
         buffer.seek(0)
         result = read_fetch_request(buffer)
     assert instance == result
+
+
+@pytest.mark.java
+@given(instance=from_type(FetchRequest))
+def test_fetch_request_java(instance: FetchRequest, java_tester: JavaTester) -> None:
+    java_tester.test(instance)
