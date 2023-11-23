@@ -119,13 +119,6 @@ def read_compact_string_nullable(buffer: IO[bytes]) -> str | None:
     return bytes_value.decode()
 
 
-def read_raw_bytes(buffer: IO[bytes]) -> bytes | None:
-    length = read_int32(buffer)
-    if length == 0:
-        return None
-    return buffer.read(length - 1)
-
-
 def read_legacy_bytes(buffer: IO[bytes]) -> bytes:
     length = read_int32(buffer)
     if length == -1:
