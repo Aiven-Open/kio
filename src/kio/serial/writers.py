@@ -13,7 +13,7 @@ from uuid import UUID
 
 from kio.static.constants import ErrorCode
 from kio.static.constants import uuid_zero
-from kio.static.primitive import i8, uvarint
+from kio.static.primitive import i8
 from kio.static.primitive import i16
 from kio.static.primitive import i32
 from kio.static.primitive import i32Timedelta
@@ -23,6 +23,7 @@ from kio.static.primitive import u8
 from kio.static.primitive import u16
 from kio.static.primitive import u32
 from kio.static.primitive import u64
+from kio.static.primitive import uvarint
 
 from .errors import OutOfBoundValue
 
@@ -108,7 +109,7 @@ def write_signed_varint(buffer: Writable, value: int) -> None:
 def write_signed_varlong(buffer: Writable, value: int) -> None:
     _write_varint(
         buffer=buffer,
-        value = (value << 1) ^ (value >> 63),
+        value=(value << 1) ^ (value >> 63),
     )
 
 

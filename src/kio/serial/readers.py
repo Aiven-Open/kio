@@ -89,7 +89,8 @@ def read_unsigned_varint(buffer: IO[bytes], _max_bytes: Literal[10]) -> uvarlong
 # https://developers.google.com/protocol-buffers/docs/encoding?csw=1#varints
 # https://github.com/apache/kafka/blob/ef96ac07f565a73e35c5b0f4c56c8e87cfbaaf59/clients/src/main/java/org/apache/kafka/common/utils/ByteUtils.java#L262
 def read_unsigned_varint(
-    buffer: IO[bytes], _max_bytes: int = _varint_max_bytes,
+    buffer: IO[bytes],
+    _max_bytes: int = _varint_max_bytes,
 ) -> uvarint:
     """Deserialize an integer stored into variable number of bytes (1-5)."""
     result = 0

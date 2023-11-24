@@ -29,7 +29,7 @@ class PartitionData:
     """The error code, or 0 if there was no fetch error."""
     high_watermark: i64 = field(metadata={"kafka_type": "int64"})
     """The current high water mark."""
-    records: tuple[bytes | None, ...] = field(metadata={"kafka_type": "records"})
+    records: bytes | None = field(metadata={"kafka_type": "records"})
     """The record data."""
 
 

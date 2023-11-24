@@ -24,7 +24,7 @@ class PartitionProduceData:
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     index: i32 = field(metadata={"kafka_type": "int32"})
     """The partition index."""
-    records: tuple[bytes | None, ...] = field(metadata={"kafka_type": "records"})
+    records: bytes | None = field(metadata={"kafka_type": "records"})
     """The record data to be produced."""
 
 

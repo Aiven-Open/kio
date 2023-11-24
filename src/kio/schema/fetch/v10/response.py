@@ -49,7 +49,7 @@ class PartitionData:
     """The current log start offset."""
     aborted_transactions: tuple[AbortedTransaction, ...]
     """The aborted transactions."""
-    records: tuple[bytes | None, ...] = field(metadata={"kafka_type": "records"})
+    records: bytes | None = field(metadata={"kafka_type": "records"})
     """The record data."""
 
 

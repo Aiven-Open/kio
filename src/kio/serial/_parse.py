@@ -1,16 +1,18 @@
-from dataclasses import fields, Field
-from typing import IO, TypeVar
+from dataclasses import Field
+from dataclasses import fields
+from typing import IO
+from typing import TypeVar
 from typing import assert_never
 
 from kio._utils import cache
 from kio.static.protocol import Entity
+
 from . import readers
 from ._introspect import FieldKind
 from ._introspect import classify_field
 from ._introspect import get_field_tag
 from ._introspect import get_schema_field_type
 from ._introspect import is_optional
-from ..static.protocol import Entity
 
 
 def get_reader(
@@ -45,6 +47,7 @@ def get_reader(
             return readers.read_legacy_string
         case ("string", False, True):
             return readers.read_nullable_legacy_string
+
         case ("bytes" | "records", True, False):
             return readers.read_compact_string_as_bytes
         case ("bytes" | "records", True, True):
@@ -53,8 +56,10 @@ def get_reader(
             return readers.read_legacy_bytes
         case ("bytes" | "records", False, True):
             return readers.read_nullable_legacy_bytes
+
         case ("records", _, True):
             return readers.read_nullable_legacy_bytes
+
         case ("uuid", _, True):
             return readers.read_uuid
         case ("bool", _, False):

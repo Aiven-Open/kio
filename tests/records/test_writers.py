@@ -126,7 +126,7 @@ def test_write_record_batch(buffer: IO[bytes]) -> None:
                     ),
                 ),
             ),
-        )
+        ),
     ]
 
     for batch in batches:

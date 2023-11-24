@@ -58,13 +58,15 @@ def get_writer(
             return writers.write_compact_string
         case ("bytes", True, True):
             return writers.write_nullable_compact_string
-        case ("bytes" | "records", False, False):
+        case ("bytes", False, False):
             return writers.write_legacy_bytes
-        case ("bytes" | "records", False, True):
+        case ("bytes", False, True):
             return writers.write_nullable_legacy_bytes
 
-        # case ("records", _, True):
-        #     return writers.write_nullable_legacy_string
+        case ("records", _, True):
+            # fixme: conflicts with above ...
+            return writers.write_nullable_legacy_bytes
+
         case ("uuid", _, _):
             return writers.write_uuid
         case ("bool", _, False):
@@ -175,6 +177,8 @@ def entity_writer(entity_type: type[E]) -> Writer[E]:
         # Loop over all fields of the entity, serializing its values to the buffer.
         for field, field_writer in field_writers.items():
             field_value = getattr(entity, field.name)
+            print(f"{field.name=} {field_value=}")
+            print(f"{field_writer.__name__=}")
             field_writer(buffer, field_value)
 
         # For non-flexible entities we're done here.

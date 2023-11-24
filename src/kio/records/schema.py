@@ -3,8 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import ClassVar
 
-from phantom.datetime import TZAware
-
+from kio.static.primitive import TZAware
 from kio.static.primitive import i8
 from kio.static.primitive import i16
 from kio.static.primitive import i32
@@ -39,7 +38,7 @@ class RecordBatch:
     base_offset: i64
     batch_length: i32
     partition_leader_epoch: i32
-    crc: u32 | None = None
+    crc: u32
     attributes: i16
     last_offset_delta: i32
     base_timestamp: i64
@@ -48,3 +47,16 @@ class RecordBatch:
     producer_epoch: i16
     base_sequence: i32
     records: tuple[Record, ...]
+
+    def __post_init__(self) -> None:
+        assert self.batch_length == len(self.records)
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class NewRecordBatch:
+    producer_id: i16
+    producer_epoch: i16
+    partition_leader_epoch: i32
+    base_sequence: i32
+    records: tuple[Record, ...]
+    attributes: i16

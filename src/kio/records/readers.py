@@ -5,7 +5,6 @@ import io
 from typing import IO
 
 from crc32c import crc32c
-from phantom.datetime import TZAware
 
 from kio.serial.readers import read_int8
 from kio.serial.readers import read_int16
@@ -14,6 +13,7 @@ from kio.serial.readers import read_int64
 from kio.serial.readers import read_signed_varint
 from kio.serial.readers import read_signed_varlong
 from kio.serial.readers import read_uint32
+from kio.static.primitive import TZAware
 from kio.static.primitive import i64
 
 from .schema import Record

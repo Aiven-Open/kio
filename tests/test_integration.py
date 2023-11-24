@@ -17,6 +17,9 @@ import kio.schema.request_header.v1.header
 import kio.schema.request_header.v2.header
 import kio.schema.response_header.v0.header
 import kio.schema.response_header.v1.header
+from kio.records.schema import NewRecordBatch
+from kio.records.schema import Record
+from kio.records.writers import write_batch
 from kio.schema.api_versions.v2 import request as api_versions_v2_request
 from kio.schema.api_versions.v2 import response as api_versions_v2_response
 from kio.schema.api_versions.v3 import request as api_versions_v3_request
@@ -49,13 +52,14 @@ from kio.serial.writers import Writable
 from kio.serial.writers import write_int32
 from kio.static.constants import ErrorCode
 from kio.static.constants import uuid_zero
+from kio.static.primitive import TZAware
+from kio.static.primitive import i8
 from kio.static.primitive import i16
 from kio.static.primitive import i32
 from kio.static.primitive import i32Timedelta
+from kio.static.primitive import i64
 from kio.static.protocol import Entity
 from kio.static.protocol import Payload
-from tests.message import Record
-from tests.message import RecordBatch
 
 pytestmark = pytest.mark.integration
 
@@ -416,7 +420,7 @@ async def test_topic_and_metadata_operations() -> None:
     (created_topic,) = create_topics_response.topics
 
     # The previous creation call should guarantee this call contains the topic.
-    response_v12 = await metadata_v12()
+    response_v12 = await metadata_v12(created_topic.name)
     assert response_v12 == metadata_v12_response.MetadataResponse(
         throttle_time=timedelta_zero,
         brokers=(
@@ -461,13 +465,16 @@ async def test_topic_and_metadata_operations() -> None:
     )
 
 
+zero_delta: Final = i32Timedelta(datetime.timedelta())
+
+
 async def test_produce_consume() -> None:
     topic_name = TopicName("le-topic-2")
 
     # Test delete topic which might or might not exist.
     delete_topics_response = await delete_topic(topic_name)
     assert delete_topics_response == DeleteTopicsResponse(
-        throttle_time_ms=i32(0),
+        throttle_time=zero_delta,
         responses=(
             DeletableTopicResult(
                 name=topic_name,
@@ -481,7 +488,7 @@ async def test_produce_consume() -> None:
     # The previous deletion call should guarantee this call succeeds.
     create_topics_response = await create_topic(topic_name)
     assert create_topics_response == CreateTopicsResponse(
-        throttle_time_ms=i32(0),
+        throttle_time=zero_delta,
         topics=(
             CreatableTopicResult(
                 name=topic_name,
@@ -500,22 +507,17 @@ async def test_produce_consume() -> None:
     (topic,) = metadata.topics
     partition, _, _ = topic.partitions
 
-    batch = RecordBatch(
-        base_offset=14,
-        batch_length=1,
+    batch = NewRecordBatch(
         partition_leader_epoch=partition.leader_epoch,
-        attributes=0,
-        last_offset_delta=0,
-        base_timestamp=0,
-        max_timestamp=0,
-        producer_id=0,
-        producer_epoch=0,
-        base_sequence=0,
+        attributes=i16(0),
+        producer_id=i16(0),
+        producer_epoch=i16(0),
+        base_sequence=i32(0),
         records=(
             Record(
-                attributes=0,
-                timestamp_delta=0,
-                offset_delta=1,
+                attributes=i8(0),
+                timestamp=TZAware(datetime.datetime.now(tz=datetime.UTC)),
+                offset=i64(14),
                 key=b"foo",
                 value=b"bar",
                 headers=(),
@@ -523,12 +525,12 @@ async def test_produce_consume() -> None:
         ),
     )
     batch_buffer = io.BytesIO()
-    batch.write(batch_buffer)
+    write_batch(batch_buffer, batch)
 
     produce_request = ProduceRequest(
         transactional_id=TransactionalId("foo"),
         acks=i16(0),
-        timeout_ms=i32(1000),
+        timeout=i32Timedelta(datetime.timedelta(seconds=1)),
         topic_data=(
             TopicProduceData(
                 name=topic_name,
@@ -541,7 +543,6 @@ async def test_produce_consume() -> None:
             ),
         ),
     )
-    breakpoint()
     produce_response = await make_request(produce_request, ProduceResponse)
 
     print(produce_response)
