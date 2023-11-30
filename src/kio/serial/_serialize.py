@@ -135,7 +135,7 @@ def get_field_writer(
             return (  # type: ignore[no-any-return]
                 entity_writer(field_type, nullable=True)  # type: ignore[call-overload]
                 if optional
-                else entity_writer(field_type)  # type: ignore[type-var]
+                else entity_writer(field_type, nullable=False)  # type: ignore[call-overload]
             )
         case FieldKind.entity_tuple:
             return array_writer(  # type: ignore[return-value]
@@ -162,7 +162,7 @@ def _wrap_nullable(write_entity: Writer[E]) -> Writer[E | None]:
 
 
 @overload
-def entity_writer(entity_type: type[E]) -> Writer[E]:
+def entity_writer(entity_type: type[E], nullable: Literal[False] = ...) -> Writer[E]:
     ...
 
 

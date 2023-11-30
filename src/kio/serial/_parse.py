@@ -121,7 +121,7 @@ def get_field_reader(
             return (  # type: ignore[no-any-return]
                 entity_reader(field_type, nullable=True)  # type: ignore[call-overload]
                 if is_optional(field)
-                else entity_reader(field_type)  # type: ignore[type-var]
+                else entity_reader(field_type, nullable=False)  # type: ignore[call-overload]
             )
         case FieldKind.entity_tuple:
             return array_reader(  # type: ignore[return-value]
@@ -135,7 +135,10 @@ E = TypeVar("E", bound=Entity)
 
 
 @overload
-def entity_reader(entity_type: type[E]) -> readers.Reader[E]:
+def entity_reader(
+    entity_type: type[E],
+    nullable: Literal[False] = ...,
+) -> readers.Reader[E]:
     ...
 
 
