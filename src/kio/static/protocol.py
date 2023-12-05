@@ -1,16 +1,9 @@
-from typing import TYPE_CHECKING
 from typing import ClassVar
 from typing import Protocol
 
+from kio._utils import DataclassInstance
+
 from .primitive import i16
-
-if TYPE_CHECKING:
-    from _typeshed import DataclassInstance
-else:
-
-    class DataclassInstance(Protocol):
-        ...
-
 
 __all__ = ("ApiMessage", "Entity", "Payload")
 

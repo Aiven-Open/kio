@@ -372,6 +372,7 @@ class CommonStructArrayField(_BaseField):
 
 class CommonStructField(_BaseField):
     type: CommonStructType
+    default: Literal["null"] | None = None
 
 
 class EntityArrayField(_BaseField):
@@ -382,6 +383,7 @@ class EntityArrayField(_BaseField):
 class EntityField(_BaseField):
     type: EntityType
     fields: tuple[Field, ...]
+    default: Literal["null"] | None = None
 
 
 class _BaseSchema(BaseModel):

@@ -14,6 +14,7 @@ from kio.schema.consumer_group_heartbeat.v0.response import (
 from kio.schema.consumer_group_heartbeat.v0.response import TopicPartitions
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_topic_partitions: Final = entity_reader(TopicPartitions)
@@ -63,3 +64,11 @@ def test_consumer_group_heartbeat_response_roundtrip(
         buffer.seek(0)
         result = read_consumer_group_heartbeat_response(buffer)
     assert instance == result
+
+
+@pytest.mark.java
+@given(instance=from_type(ConsumerGroupHeartbeatResponse))
+def test_consumer_group_heartbeat_response_java(
+    instance: ConsumerGroupHeartbeatResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

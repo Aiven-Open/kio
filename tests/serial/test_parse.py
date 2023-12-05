@@ -17,10 +17,12 @@ from kio.schema.metadata.v12.response import (
 from kio.serial import entity_reader
 from kio.serial import readers
 from kio.serial._parse import get_reader
+from kio.serial._shared import NullableEntityMarker
 from kio.serial.writers import write_boolean
 from kio.serial.writers import write_compact_array_length
 from kio.serial.writers import write_compact_string
 from kio.serial.writers import write_empty_tagged_fields
+from kio.serial.writers import write_int8
 from kio.serial.writers import write_int16
 from kio.serial.writers import write_int32
 from kio.serial.writers import write_legacy_string
@@ -363,3 +365,42 @@ def test_raises_value_error_for_tagged_field_on_legacy_model() -> None:
         match=r"^Found tagged fields on a non-flexible model$",
     ):
         entity_reader(LegacyWithTag)
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class NestedNullable:
+    __version__: ClassVar[i16] = i16(0)
+    __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(-1)
+    child: Child | None = field(default=None)
+    name: str = field(metadata={"kafka_type": "string"})
+
+
+def test_can_read_populated_nested_nullable_entity(buffer: io.BytesIO) -> None:
+    write_int8(buffer, NullableEntityMarker.not_null.value)
+    write_compact_string(buffer, "child name")
+    write_empty_tagged_fields(buffer)  # child fields
+    write_compact_string(buffer, "parent name")
+    write_empty_tagged_fields(buffer)  # parent fields
+    buffer.seek(0)
+
+    instance = entity_reader(NestedNullable)(buffer)
+
+    assert instance == NestedNullable(
+        child=Child(name="child name"),
+        name="parent name",
+    )
+
+
+def test_can_read_empty_nested_nullable_entity(buffer: io.BytesIO) -> None:
+    write_int8(buffer, NullableEntityMarker.null.value)
+    write_compact_string(buffer, "parent name")
+    write_empty_tagged_fields(buffer)  # parent fields
+    buffer.seek(0)
+
+    instance = entity_reader(NestedNullable)(buffer)
+
+    assert instance == NestedNullable(
+        child=None,
+        name="parent name",
+    )

@@ -16,10 +16,12 @@ from kio.schema.types import TopicName
 from kio.serial import entity_writer
 from kio.serial import writers
 from kio.serial._serialize import get_writer
+from kio.serial._shared import NullableEntityMarker
 from kio.serial.readers import read_boolean
 from kio.serial.readers import read_compact_array_length
 from kio.serial.readers import read_compact_string
 from kio.serial.readers import read_compact_string_nullable
+from kio.serial.readers import read_int8
 from kio.serial.readers import read_int16
 from kio.serial.readers import read_int32
 from kio.serial.readers import read_unsigned_varint
@@ -256,3 +258,50 @@ def test_serialize_complex_entity(buffer: io.BytesIO) -> None:
 
     # main entity tagged fields
     assert read_unsigned_varint(buffer) == 0
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class Child:
+    __version__: ClassVar[i16] = i16(0)
+    __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(-1)
+    name: str = field(metadata={"kafka_type": "string"})
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class NestedNullable:
+    __version__: ClassVar[i16] = i16(0)
+    __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(-1)
+    child: Child | None = field(default=None)
+    name: str = field(metadata={"kafka_type": "string"})
+
+
+def test_can_write_populated_nested_nullable_entity(buffer: io.BytesIO) -> None:
+    write_nested_nullable = entity_writer(NestedNullable)
+    instance = NestedNullable(
+        child=Child(name="child name"),
+        name="parent name",
+    )
+    write_nested_nullable(buffer, instance)
+    buffer.seek(0)
+
+    assert read_int8(buffer) == NullableEntityMarker.not_null.value
+    assert read_compact_string(buffer) == "child name"
+    assert read_unsigned_varint(buffer) == 0  # tagged fields
+    assert read_compact_string(buffer) == "parent name"
+    assert read_unsigned_varint(buffer) == 0  # tagged fields
+
+
+def test_can_write_empty_nested_nullable_entity(buffer: io.BytesIO) -> None:
+    write_nested_nullable = entity_writer(NestedNullable)
+    instance = NestedNullable(
+        child=None,
+        name="parent name",
+    )
+    write_nested_nullable(buffer, instance)
+    buffer.seek(0)
+
+    assert read_int8(buffer) == NullableEntityMarker.null.value
+    assert read_compact_string(buffer) == "parent name"
+    assert read_unsigned_varint(buffer) == 0  # tagged fields

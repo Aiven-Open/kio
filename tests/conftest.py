@@ -16,13 +16,18 @@ from pathlib import Path
 from subprocess import PIPE
 from subprocess import Popen
 from subprocess import TimeoutExpired
+from types import NoneType
+from types import UnionType
 from typing import Any
+from typing import get_args
+from typing import get_origin
 from uuid import UUID
 
 import pytest
 import pytest_asyncio
 from hypothesis import settings
 
+from kio._utils import DataclassInstance
 from kio.serial import entity_writer
 from kio.static.protocol import Entity
 
@@ -90,11 +95,36 @@ async def stream_writer(
     return async_buffers[1]
 
 
+def is_nullable_entity_field(field: dataclasses.Field) -> bool:
+    if get_origin(field.type) is not UnionType:
+        return False
+    try:
+        a, b = get_args(field.type)
+    except ValueError:
+        return False
+    return (a is NoneType and dataclasses.is_dataclass(b)) or (
+        b is NoneType and dataclasses.is_dataclass(a)
+    )
+
+
+def map_nullable_entity_fields(obj: DataclassInstance) -> dict[str, bool]:
+    """Return map of KIP-893 nullable entity fields."""
+    return {
+        field.name: is_nullable_entity_field(field) for field in dataclasses.fields(obj)
+    }
+
+
 class JavaTester:
     class _Encoder(JSONEncoder):
         def default(self, o: Any) -> Any:
             if dataclasses.is_dataclass(o):
-                return self._replace_tzaware_nulls(dataclasses.asdict(o))
+                return self._replace_tzaware_nulls(
+                    {
+                        k: v
+                        for k, v in dataclasses.asdict(o).items()
+                        if (v is not None or not map_nullable_entity_fields(o)[k])
+                    }
+                )
             if isinstance(o, timedelta):
                 return round(o.total_seconds() * 1000)
             if isinstance(o, datetime):

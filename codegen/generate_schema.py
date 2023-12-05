@@ -72,7 +72,7 @@ from kio.static.constants import ErrorCode
 
 
 def format_default(
-    type_: Primitive,
+    type_: Primitive | EntityType | CommonStructType,
     default: str | int | float | bool,
     optional: bool,
     custom_type: CustomTypeDef | None,
@@ -99,6 +99,7 @@ def format_default(
             | Primitive.uint32
             | Primitive.uint64
         ), str(default):
+            assert not isinstance(type_, EntityType | CommonStructType)
             if custom_type_open:
                 return "".join(
                     (
@@ -133,7 +134,7 @@ def format_default(
             return "None"
 
     raise NotImplementedError(
-        f"Failed parsing default for {type_.value=} field: {default=!r}"
+        f"Failed parsing default for {type_=} field: {default=!r}"
     )
 
 
@@ -166,8 +167,6 @@ def format_dataclass_field(
     if isinstance(field_type, PrimitiveArrayType):
         field_kwargs["default"] = "()"
     elif default is not None:
-        assert not isinstance(field_type, EntityType)
-        assert not isinstance(field_type, CommonStructType)
         field_kwargs["default"] = format_default(
             field_type, default, optional, custom_type
         )
@@ -355,21 +354,27 @@ def generate_entity_array_field(
     return f"    {to_snake_case(field.name)}: tuple[{field.type}, ...]{field_call}\n"
 
 
+def entity_annotation(field: EntityField | CommonStructField, optional: bool) -> str:
+    return f"{field.type} | None" if optional else str(field.type)
+
+
 def generate_entity_field(
     field: EntityField | CommonStructField,
     version: int,
 ) -> str:
+    optional = (
+        field.nullableVersions.matches(version) if field.nullableVersions else False
+    )
     field_call = format_dataclass_field(
         field_type=field.type,
-        default=None,
-        optional=(
-            field.nullableVersions.matches(version) if field.nullableVersions else False
-        ),
+        default=field.default,
+        optional=optional,
         custom_type=None,
         tag=field.get_tag(version),
         ignorable=field.ignorable,
     )
-    return f"    {to_snake_case(field.name)}: {field.type}{field_call}\n"
+    annotation = entity_annotation(field, optional)
+    return f"    {to_snake_case(field.name)}: {annotation}{field_call}\n"
 
 
 def generate_common_struct_array_field(

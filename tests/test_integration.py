@@ -84,7 +84,7 @@ def write_request_header(
     else:
         raise NotImplementedError(f"Unknown request header schema: {header_schema}")
 
-    entity_writer(header_schema)(buffer, header)  # type: ignore[type-var]
+    entity_writer(header_schema)(buffer, header)  # type: ignore[arg-type]
 
 
 async def send(
