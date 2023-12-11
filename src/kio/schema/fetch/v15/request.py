@@ -85,7 +85,7 @@ class FetchRequest(ApiMessage):
         metadata={"kafka_type": "string", "tag": 0}, default=None
     )
     """The clusterId if known. This is used to validate metadata fetches prior to broker registration."""
-    replica_state: ReplicaState = field(metadata={"tag": 1})
+    replica_state: ReplicaState = field(metadata={"tag": 1}, default=ReplicaState())
     max_wait: i32Timedelta = field(metadata={"kafka_type": "timedelta_i32"})
     """The maximum time in milliseconds to wait for the response."""
     min_bytes: i32 = field(metadata={"kafka_type": "int32"})

@@ -120,7 +120,6 @@ def main() -> None:
             "ProduceRequest",  # Records
             "FetchResponse",  # Records
             "FetchSnapshotResponse",  # Records
-            "FetchRequest",  # Should not output tagged field if its value equals to default (presumably)
         }:
             module_code[module_path].append(
                 test_code_java.format(

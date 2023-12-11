@@ -145,6 +145,7 @@ def format_dataclass_field(
     custom_type: CustomTypeDef | None,
     tag: int | None,
     ignorable: bool,
+    nested_entity_defaults_only: bool = False,
 ) -> str:
     metadata: dict[str, object] = {}
     inner_type = (
@@ -170,6 +171,18 @@ def format_dataclass_field(
         field_kwargs["default"] = format_default(
             field_type, default, optional, custom_type
         )
+    elif (
+        tag is not None
+        and isinstance(field_type, EntityType | CommonStructType)
+        and nested_entity_defaults_only
+    ):
+        # As of writing, this caters to a single field in the schema, the v15
+        # FetchRequest.ReplicaState. When values of the nested entity are all defaults,
+        # the tagged field is expected to be omitted. By making the default value of the
+        # parent field equal to instantiating the child with only defaults, this doesn't
+        # need any special treatment in parsers/serializers and functions as other
+        # tagged fields in this respect.
+        field_kwargs["default"] = f"{field_type}()"
     elif tag is not None and ignorable:
         field_kwargs["default"] = _format_default_for_tagged(field_type)
 
@@ -358,6 +371,23 @@ def entity_annotation(field: EntityField | CommonStructField, optional: bool) ->
     return f"{field.type} | None" if optional else str(field.type)
 
 
+def nested_entity_has_only_defaults(field: EntityField | CommonStructField) -> bool:
+    # TODO: This behavior should likely apply to a tagged to a CommonStructField as
+    #  well. For now we don't have the required introspection capabilities of its
+    #  fields, so that's left for when it becomes required.
+    return isinstance(field, EntityField) and all(
+        not isinstance(
+            field,
+            PrimitiveArrayField
+            | EntityArrayField
+            | CommonStructArrayField
+            | CommonStructField,
+        )
+        and field.default is not None
+        for field in field.fields
+    )
+
+
 def generate_entity_field(
     field: EntityField | CommonStructField,
     version: int,
@@ -372,6 +402,7 @@ def generate_entity_field(
         custom_type=None,
         tag=field.get_tag(version),
         ignorable=field.ignorable,
+        nested_entity_defaults_only=nested_entity_has_only_defaults(field),
     )
     annotation = entity_annotation(field, optional)
     return f"    {to_snake_case(field.name)}: {annotation}{field_call}\n"
