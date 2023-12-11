@@ -21,7 +21,6 @@ from kio.serial.readers import read_legacy_bytes
 from kio.serial.readers import read_legacy_string
 from kio.serial.readers import read_nullable_legacy_bytes
 from kio.serial.readers import read_nullable_legacy_string
-from kio.serial.readers import read_raw_bytes
 from kio.serial.readers import read_uint8
 from kio.serial.readers import read_uint16
 from kio.serial.readers import read_uint32
@@ -270,27 +269,6 @@ class TestReadCompactStringNullable:
         buffer.write(byte_value)
         buffer.seek(0)
         assert value == read_compact_string_nullable(buffer)
-
-
-class TestReadRawBytes:
-    def test_returns_null_for_negative_length_sync(
-        self,
-        buffer: io.BytesIO,
-    ) -> None:
-        buffer.write((0).to_bytes(4, "big"))
-        buffer.seek(0)
-        assert read_raw_bytes(buffer) is None
-
-    def test_can_read_bytes_sync(
-        self,
-        buffer: io.BytesIO,
-    ) -> None:
-        value = b"k\x9bC\x94\xbe\x1fV\xd6"
-        byte_length = len(value) + 1  # string length is offset by one
-        buffer.write(struct.pack(">i", byte_length))
-        buffer.write(value)
-        buffer.seek(0)
-        assert value == read_raw_bytes(buffer)
 
 
 class TestReadNullableLegacyBytes:
