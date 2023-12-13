@@ -7,7 +7,7 @@ def truthy(value: bool) -> bool:
     return value is True
 
 
-class Truthy(Phantom[bool], predicate=truthy, bound=bool):
+class Truthy(Phantom, predicate=truthy, bound=object):
     ...
 
 
@@ -41,7 +41,9 @@ class TestPhantom:
         assert B.__predicate__ is truthy  # type: ignore[misc]
 
     def test_passing_predicate_is_instance(self) -> None:
-        assert isinstance(True, Truthy)
+        v: bool | int = True
+        assert isinstance(v, Truthy)
 
     def test_rejecting_predicate_is_not_instance(self) -> None:
-        assert not isinstance(False, Truthy)
+        v: bool | int = False
+        assert not isinstance(v, Truthy)
