@@ -10,6 +10,14 @@ from .primitive import i16
 uuid_zero: Final = uuid.UUID(int=0)
 
 
+class EntityType(enum.Enum):
+    request = enum.auto()
+    response = enum.auto()
+    header = enum.auto()
+    data = enum.auto()
+    nested = enum.auto()
+
+
 class ErrorCode(enum.IntEnum):
     retriable: bool
     value: i16

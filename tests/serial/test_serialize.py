@@ -26,6 +26,7 @@ from kio.serial.readers import read_int16
 from kio.serial.readers import read_int32
 from kio.serial.readers import read_unsigned_varint
 from kio.serial.readers import read_uuid
+from kio.static.constants import EntityType
 from kio.static.constants import ErrorCode
 from kio.static.primitive import i16
 from kio.static.primitive import i32
@@ -136,6 +137,7 @@ class TestGetWriter:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class LegacyWithTag:
+    __type__: ClassVar = EntityType.header
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = False
     value: str = field(metadata={"kafka_type": "string", "tag": 0})
@@ -270,6 +272,7 @@ class Child:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class NestedNullable:
+    __type__: ClassVar = EntityType.request
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(-1)
