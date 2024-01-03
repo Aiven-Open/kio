@@ -11,13 +11,14 @@ from typing import ClassVar
 from kio.schema.request_header.v1.header import RequestHeader
 from kio.schema.types import GroupId
 from kio.schema.types import TopicName
+from kio.static.constants import EntityType
 from kio.static.primitive import i16
 from kio.static.primitive import i32
-from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class OffsetFetchRequestTopic:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = False
     __api_key__: ClassVar[i16] = i16(9)
@@ -31,7 +32,8 @@ class OffsetFetchRequestTopic:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class OffsetFetchRequest(ApiMessage):
+class OffsetFetchRequest:
+    __type__: ClassVar = EntityType.request
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = False
     __api_key__: ClassVar[i16] = i16(9)

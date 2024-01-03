@@ -11,14 +11,15 @@ from typing import ClassVar
 from kio.schema.request_header.v2.header import RequestHeader
 from kio.schema.types import BrokerId
 from kio.schema.types import TopicName
+from kio.static.constants import EntityType
 from kio.static.primitive import i16
 from kio.static.primitive import i32
 from kio.static.primitive import i64
-from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class PartitionData:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(56)
@@ -35,6 +36,7 @@ class PartitionData:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class TopicData:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(56)
@@ -45,7 +47,8 @@ class TopicData:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class AlterPartitionRequest(ApiMessage):
+class AlterPartitionRequest:
+    __type__: ClassVar = EntityType.request
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(56)

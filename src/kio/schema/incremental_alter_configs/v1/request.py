@@ -9,13 +9,14 @@ from dataclasses import field
 from typing import ClassVar
 
 from kio.schema.request_header.v2.header import RequestHeader
+from kio.static.constants import EntityType
 from kio.static.primitive import i8
 from kio.static.primitive import i16
-from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class AlterableConfig:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(1)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(44)
@@ -30,6 +31,7 @@ class AlterableConfig:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class AlterConfigsResource:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(1)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(44)
@@ -43,7 +45,8 @@ class AlterConfigsResource:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class IncrementalAlterConfigsRequest(ApiMessage):
+class IncrementalAlterConfigsRequest:
+    __type__: ClassVar = EntityType.request
     __version__: ClassVar[i16] = i16(1)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(44)

@@ -10,15 +10,16 @@ from typing import ClassVar
 
 from kio.schema.response_header.v1.header import ResponseHeader
 from kio.schema.types import TopicName
+from kio.static.constants import EntityType
 from kio.static.constants import ErrorCode
 from kio.static.primitive import i16
 from kio.static.primitive import i32
 from kio.static.primitive import i32Timedelta
-from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class TxnOffsetCommitResponsePartition:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(3)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(28)
@@ -31,6 +32,7 @@ class TxnOffsetCommitResponsePartition:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class TxnOffsetCommitResponseTopic:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(3)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(28)
@@ -42,7 +44,8 @@ class TxnOffsetCommitResponseTopic:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class TxnOffsetCommitResponse(ApiMessage):
+class TxnOffsetCommitResponse:
+    __type__: ClassVar = EntityType.response
     __version__: ClassVar[i16] = i16(3)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(28)
