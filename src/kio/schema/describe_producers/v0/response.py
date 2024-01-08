@@ -11,16 +11,17 @@ from typing import ClassVar
 from kio.schema.response_header.v1.header import ResponseHeader
 from kio.schema.types import ProducerId
 from kio.schema.types import TopicName
+from kio.static.constants import EntityType
 from kio.static.constants import ErrorCode
 from kio.static.primitive import i16
 from kio.static.primitive import i32
 from kio.static.primitive import i32Timedelta
 from kio.static.primitive import i64
-from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class ProducerState:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(61)
@@ -37,6 +38,7 @@ class ProducerState:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class PartitionResponse:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(61)
@@ -52,6 +54,7 @@ class PartitionResponse:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class TopicResponse:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(61)
@@ -63,7 +66,8 @@ class TopicResponse:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class DescribeProducersResponse(ApiMessage):
+class DescribeProducersResponse:
+    __type__: ClassVar = EntityType.response
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(61)

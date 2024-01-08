@@ -10,15 +10,16 @@ from typing import ClassVar
 
 from kio.schema.response_header.v0.header import ResponseHeader
 from kio.schema.types import TopicName
+from kio.static.constants import EntityType
 from kio.static.constants import ErrorCode
 from kio.static.primitive import i16
 from kio.static.primitive import i32
 from kio.static.primitive import i64
-from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class EpochEndOffset:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(1)
     __flexible__: ClassVar[bool] = False
     __api_key__: ClassVar[i16] = i16(23)
@@ -35,6 +36,7 @@ class EpochEndOffset:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class OffsetForLeaderTopicResult:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(1)
     __flexible__: ClassVar[bool] = False
     __api_key__: ClassVar[i16] = i16(23)
@@ -46,7 +48,8 @@ class OffsetForLeaderTopicResult:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class OffsetForLeaderEpochResponse(ApiMessage):
+class OffsetForLeaderEpochResponse:
+    __type__: ClassVar = EntityType.response
     __version__: ClassVar[i16] = i16(1)
     __flexible__: ClassVar[bool] = False
     __api_key__: ClassVar[i16] = i16(23)

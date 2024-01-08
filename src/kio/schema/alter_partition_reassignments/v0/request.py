@@ -12,14 +12,15 @@ from typing import ClassVar
 from kio.schema.request_header.v2.header import RequestHeader
 from kio.schema.types import BrokerId
 from kio.schema.types import TopicName
+from kio.static.constants import EntityType
 from kio.static.primitive import i16
 from kio.static.primitive import i32
 from kio.static.primitive import i32Timedelta
-from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class ReassignablePartition:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(45)
@@ -32,6 +33,7 @@ class ReassignablePartition:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class ReassignableTopic:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(45)
@@ -43,7 +45,8 @@ class ReassignableTopic:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class AlterPartitionReassignmentsRequest(ApiMessage):
+class AlterPartitionReassignmentsRequest:
+    __type__: ClassVar = EntityType.request
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(45)

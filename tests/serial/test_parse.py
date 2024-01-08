@@ -28,6 +28,7 @@ from kio.serial.writers import write_int32
 from kio.serial.writers import write_legacy_string
 from kio.serial.writers import write_nullable_compact_string
 from kio.serial.writers import write_uuid
+from kio.static.constants import EntityType
 from kio.static.primitive import i16
 from kio.static.primitive import i32
 
@@ -268,6 +269,7 @@ def test_can_parse_complex_entity(buffer: io.BytesIO) -> None:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class Child:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(-1)
@@ -276,6 +278,7 @@ class Child:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class UniParent:
+    __type__: ClassVar = EntityType.response
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(-1)
@@ -300,6 +303,7 @@ def test_can_parse_nested_non_array_entity(buffer: io.BytesIO) -> None:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class MultiParent:
+    __type__: ClassVar = EntityType.request
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(-2)
@@ -330,12 +334,14 @@ def test_can_parse_nested_entity_array(buffer: io.BytesIO) -> None:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class EmptyFlexible:
+    __type__: ClassVar = EntityType.request
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class EmptyLegacy:
+    __type__: ClassVar = EntityType.request
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = False
 
@@ -354,6 +360,7 @@ def test_can_read_empty_legacy_entity(buffer: io.BytesIO) -> None:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class LegacyWithTag:
+    __type__: ClassVar = EntityType.data
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = False
     value: str = field(metadata={"kafka_type": "string", "tag": 0})
@@ -369,6 +376,7 @@ def test_raises_value_error_for_tagged_field_on_legacy_model() -> None:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class NestedNullable:
+    __type__: ClassVar = EntityType.header
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(-1)

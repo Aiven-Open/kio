@@ -3,18 +3,16 @@ from typing import Protocol
 
 from kio._utils import DataclassInstance
 
+from .constants import EntityType
 from .primitive import i16
 
-__all__ = ("ApiMessage", "Entity", "Payload")
-
-
-class ApiMessage:
-    pass
+__all__ = ("Entity", "Payload")
 
 
 class Entity(DataclassInstance, Protocol):
     """All schema entities adhere to this protocol."""
 
+    __type__: ClassVar[EntityType]
     __version__: ClassVar[i16]
     """The version of the protocol API that the entity is modeling."""
     __flexible__: ClassVar[bool]
@@ -33,6 +31,7 @@ class Payload(DataclassInstance, Protocol):
     <https://kafka.apache.org/protocol#protocol_api_keys>`_, adhere to this protocol.
     """
 
+    __type__: ClassVar[EntityType]
     __version__: ClassVar[i16]
     """The version of the protocol API that the entity is modeling."""
     __flexible__: ClassVar[bool]

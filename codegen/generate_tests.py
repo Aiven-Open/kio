@@ -9,7 +9,8 @@ from pkgutil import walk_packages
 from types import ModuleType
 
 import kio.schema
-from kio.static.protocol import ApiMessage
+from kio.static.constants import EntityType
+from kio.static.protocol import Entity
 
 from .case import to_snake_case
 
@@ -23,7 +24,7 @@ def generate_modules(parent: ModuleType) -> Iterator[ModuleType]:
             yield module
 
 
-def get_entities() -> Iterator[tuple[type, str]]:
+def get_entities() -> Iterator[tuple[type[Entity], str]]:
     modules = list(generate_modules(import_module("kio.schema")))
     for module in modules:
         items = module.__dict__.copy()
@@ -116,11 +117,15 @@ def main() -> None:
                 entity_snake_case=to_snake_case(entity_type.__name__),
             )
         )
-        if issubclass(entity_type, ApiMessage) and entity_type.__name__ not in {
-            "ProduceRequest",  # Records
-            "FetchResponse",  # Records
-            "FetchSnapshotResponse",  # Records
-        }:
+        if (
+            entity_type.__type__ is not EntityType.nested
+            and entity_type.__name__
+            not in {
+                "ProduceRequest",  # Records
+                "FetchResponse",  # Records
+                "FetchSnapshotResponse",  # Records
+            }
+        ):
             module_code[module_path].append(
                 test_code_java.format(
                     entity_type=entity_type.__name__,

@@ -13,12 +13,14 @@ from kio.serial.writers import write_compact_array_length
 from kio.serial.writers import write_compact_string
 from kio.serial.writers import write_empty_tagged_fields
 from kio.serial.writers import write_uint8
+from kio.static.constants import EntityType
 from kio.static.primitive import i16
 from kio.static.primitive import u8
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class Child:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     name: str = field(metadata={"kafka_type": "string"})
@@ -26,6 +28,7 @@ class Child:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class Parent:
+    __type__: ClassVar = EntityType.request
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     name: str = field(metadata={"kafka_type": "string"})
@@ -80,6 +83,7 @@ def test_can_serialize_flexible_entity_array(buffer: io.BytesIO) -> None:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class Flat:
+    __type__: ClassVar = EntityType.response
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     values: tuple[u8, ...] = field(metadata={"kafka_type": "uint8"})
