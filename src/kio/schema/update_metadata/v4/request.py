@@ -11,13 +11,14 @@ from typing import ClassVar
 from kio.schema.request_header.v1.header import RequestHeader
 from kio.schema.types import BrokerId
 from kio.schema.types import TopicName
+from kio.static.constants import EntityType
 from kio.static.primitive import i16
 from kio.static.primitive import i32
-from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class UpdateMetadataPartitionState:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(4)
     __flexible__: ClassVar[bool] = False
     __api_key__: ClassVar[i16] = i16(6)
@@ -46,6 +47,7 @@ class UpdateMetadataPartitionState:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class UpdateMetadataEndpoint:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(4)
     __flexible__: ClassVar[bool] = False
     __api_key__: ClassVar[i16] = i16(6)
@@ -62,6 +64,7 @@ class UpdateMetadataEndpoint:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class UpdateMetadataBroker:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(4)
     __flexible__: ClassVar[bool] = False
     __api_key__: ClassVar[i16] = i16(6)
@@ -75,7 +78,8 @@ class UpdateMetadataBroker:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class UpdateMetadataRequest(ApiMessage):
+class UpdateMetadataRequest:
+    __type__: ClassVar = EntityType.request
     __version__: ClassVar[i16] = i16(4)
     __flexible__: ClassVar[bool] = False
     __api_key__: ClassVar[i16] = i16(6)

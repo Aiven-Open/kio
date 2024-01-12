@@ -66,8 +66,8 @@ from kio.static.primitive import f64
 from kio.static.primitive import i32Timedelta
 from kio.static.primitive import i64Timedelta
 from kio.static.primitive import TZAware
-from kio.static.protocol import ApiMessage
 from kio.static.constants import ErrorCode
+from kio.static.constants import EntityType
 '''
 
 
@@ -459,6 +459,17 @@ def message_class_vars(
         raise NotImplementedError("Unknown message schema type")
 
 
+def _entity_type_line(
+    schema: MessageSchema | HeaderSchema | DataSchema,
+    top_level: bool,
+) -> str:
+    return (
+        f"    __type__: ClassVar = EntityType.{schema.type}\n"
+        if top_level
+        else "    __type__: ClassVar = EntityType.nested\n"
+    )
+
+
 @dataclass(frozen=True, slots=True, kw_only=True)
 class ExportName:
     name: str
@@ -480,11 +491,10 @@ def generate_dataclass(  # noqa: C901
         return
     seen.add((name, version))
 
-    class_parent_str = "(ApiMessage)" if top_level else ""
     class_start = textwrap.dedent(
         f"""\
         @dataclass(frozen=True, slots=True, kw_only=True)
-        class {name}{class_parent_str}:
+        class {name}:
         """
     )
     class_fields = []
@@ -565,13 +575,14 @@ def generate_dataclass(  # noqa: C901
             class_fields.append(f'    """{field.about}"""\n')
 
     yield class_start
+    yield _entity_type_line(schema, top_level)
     yield f"    __version__: ClassVar[i16] = i16({version})\n"
     is_flexible = str(schema.flexibleVersions.matches(version))
     yield f"    __flexible__: ClassVar[bool] = {is_flexible}\n"
     yield from message_class_vars(schema)
     yield from class_fields
 
-    if name.endswith(capitalize_first(schema.type)):
+    if top_level:
         yield ExportName(name=name, type=schema.type)
 
 

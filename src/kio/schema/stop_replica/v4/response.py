@@ -10,14 +10,15 @@ from typing import ClassVar
 
 from kio.schema.response_header.v1.header import ResponseHeader
 from kio.schema.types import TopicName
+from kio.static.constants import EntityType
 from kio.static.constants import ErrorCode
 from kio.static.primitive import i16
 from kio.static.primitive import i32
-from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class StopReplicaPartitionError:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(4)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(5)
@@ -31,7 +32,8 @@ class StopReplicaPartitionError:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class StopReplicaResponse(ApiMessage):
+class StopReplicaResponse:
+    __type__: ClassVar = EntityType.response
     __version__: ClassVar[i16] = i16(4)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(5)

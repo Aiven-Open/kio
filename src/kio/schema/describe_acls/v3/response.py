@@ -9,15 +9,16 @@ from dataclasses import field
 from typing import ClassVar
 
 from kio.schema.response_header.v1.header import ResponseHeader
+from kio.static.constants import EntityType
 from kio.static.constants import ErrorCode
 from kio.static.primitive import i8
 from kio.static.primitive import i16
 from kio.static.primitive import i32Timedelta
-from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class AclDescription:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(3)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(29)
@@ -34,6 +35,7 @@ class AclDescription:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class DescribeAclsResource:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(3)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(29)
@@ -49,7 +51,8 @@ class DescribeAclsResource:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class DescribeAclsResponse(ApiMessage):
+class DescribeAclsResponse:
+    __type__: ClassVar = EntityType.response
     __version__: ClassVar[i16] = i16(3)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(29)
