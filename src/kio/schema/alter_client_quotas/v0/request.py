@@ -9,13 +9,14 @@ from dataclasses import field
 from typing import ClassVar
 
 from kio.schema.request_header.v1.header import RequestHeader
+from kio.static.constants import EntityType
 from kio.static.primitive import f64
 from kio.static.primitive import i16
-from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class EntityData:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = False
     __api_key__: ClassVar[i16] = i16(49)
@@ -28,6 +29,7 @@ class EntityData:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class OpData:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = False
     __api_key__: ClassVar[i16] = i16(49)
@@ -42,6 +44,7 @@ class OpData:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class EntryData:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = False
     __api_key__: ClassVar[i16] = i16(49)
@@ -53,7 +56,8 @@ class EntryData:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class AlterClientQuotasRequest(ApiMessage):
+class AlterClientQuotasRequest:
+    __type__: ClassVar = EntityType.request
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = False
     __api_key__: ClassVar[i16] = i16(49)

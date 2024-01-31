@@ -11,16 +11,17 @@ from typing import ClassVar
 from kio.schema.request_header.v1.header import RequestHeader
 from kio.schema.types import BrokerId
 from kio.schema.types import TopicName
+from kio.static.constants import EntityType
 from kio.static.primitive import i8
 from kio.static.primitive import i16
 from kio.static.primitive import i32
 from kio.static.primitive import i32Timedelta
 from kio.static.primitive import i64
-from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class FetchPartition:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(4)
     __flexible__: ClassVar[bool] = False
     __api_key__: ClassVar[i16] = i16(1)
@@ -35,6 +36,7 @@ class FetchPartition:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class FetchTopic:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(4)
     __flexible__: ClassVar[bool] = False
     __api_key__: ClassVar[i16] = i16(1)
@@ -46,7 +48,8 @@ class FetchTopic:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class FetchRequest(ApiMessage):
+class FetchRequest:
+    __type__: ClassVar = EntityType.request
     __version__: ClassVar[i16] = i16(4)
     __flexible__: ClassVar[bool] = False
     __api_key__: ClassVar[i16] = i16(1)

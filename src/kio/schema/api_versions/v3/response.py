@@ -9,15 +9,16 @@ from dataclasses import field
 from typing import ClassVar
 
 from kio.schema.response_header.v0.header import ResponseHeader
+from kio.static.constants import EntityType
 from kio.static.constants import ErrorCode
 from kio.static.primitive import i16
 from kio.static.primitive import i32Timedelta
 from kio.static.primitive import i64
-from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class ApiVersion:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(3)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(18)
@@ -32,6 +33,7 @@ class ApiVersion:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class SupportedFeatureKey:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(3)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(18)
@@ -46,6 +48,7 @@ class SupportedFeatureKey:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class FinalizedFeatureKey:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(3)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(18)
@@ -59,7 +62,8 @@ class FinalizedFeatureKey:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class ApiVersionsResponse(ApiMessage):
+class ApiVersionsResponse:
+    __type__: ClassVar = EntityType.response
     __version__: ClassVar[i16] = i16(3)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(18)

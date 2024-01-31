@@ -9,15 +9,16 @@ from dataclasses import field
 from typing import ClassVar
 
 from kio.schema.response_header.v1.header import ResponseHeader
+from kio.static.constants import EntityType
 from kio.static.constants import ErrorCode
 from kio.static.primitive import i8
 from kio.static.primitive import i16
 from kio.static.primitive import i32Timedelta
-from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class DescribeConfigsSynonym:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(4)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(32)
@@ -32,6 +33,7 @@ class DescribeConfigsSynonym:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class DescribeConfigsResourceResult:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(4)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(32)
@@ -56,6 +58,7 @@ class DescribeConfigsResourceResult:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class DescribeConfigsResult:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(4)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(32)
@@ -73,7 +76,8 @@ class DescribeConfigsResult:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class DescribeConfigsResponse(ApiMessage):
+class DescribeConfigsResponse:
+    __type__: ClassVar = EntityType.response
     __version__: ClassVar[i16] = i16(4)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(32)

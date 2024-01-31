@@ -19,12 +19,14 @@ from kio.serial.writers import write_compact_string
 from kio.serial.writers import write_tagged_field
 from kio.serial.writers import write_uint8
 from kio.serial.writers import write_unsigned_varint
+from kio.static.constants import EntityType
 from kio.static.primitive import i16
 from kio.static.primitive import u8
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class Person:
+    __type__: ClassVar = EntityType.data
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(-1)

@@ -9,20 +9,22 @@ from dataclasses import field
 from typing import ClassVar
 
 from kio.schema.types import BrokerId
+from kio.static.constants import EntityType
 from kio.static.primitive import i16
 from kio.static.primitive import i32
-from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class Voter:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     voter_id: i32 = field(metadata={"kafka_type": "int32"})
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class LeaderChangeMessage(ApiMessage):
+class LeaderChangeMessage:
+    __type__: ClassVar = EntityType.data
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     version: i16 = field(metadata={"kafka_type": "int16"})

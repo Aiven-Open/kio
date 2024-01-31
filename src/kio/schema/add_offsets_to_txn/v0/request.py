@@ -12,12 +12,13 @@ from kio.schema.request_header.v1.header import RequestHeader
 from kio.schema.types import GroupId
 from kio.schema.types import ProducerId
 from kio.schema.types import TransactionalId
+from kio.static.constants import EntityType
 from kio.static.primitive import i16
-from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class AddOffsetsToTxnRequest(ApiMessage):
+class AddOffsetsToTxnRequest:
+    __type__: ClassVar = EntityType.request
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = False
     __api_key__: ClassVar[i16] = i16(25)

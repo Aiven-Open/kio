@@ -10,13 +10,14 @@ from typing import ClassVar
 
 from kio.schema.response_header.v0.header import ResponseHeader
 from kio.schema.types import TopicName
+from kio.static.constants import EntityType
 from kio.static.constants import ErrorCode
 from kio.static.primitive import i16
-from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class DeletableTopicResult:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = False
     __api_key__: ClassVar[i16] = i16(20)
@@ -28,7 +29,8 @@ class DeletableTopicResult:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class DeleteTopicsResponse(ApiMessage):
+class DeleteTopicsResponse:
+    __type__: ClassVar = EntityType.response
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = False
     __api_key__: ClassVar[i16] = i16(20)

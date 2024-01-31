@@ -10,13 +10,14 @@ from typing import ClassVar
 
 from kio.schema.request_header.v1.header import RequestHeader
 from kio.schema.types import GroupId
+from kio.static.constants import EntityType
 from kio.static.primitive import i16
 from kio.static.primitive import i32
-from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class HeartbeatRequest(ApiMessage):
+class HeartbeatRequest:
+    __type__: ClassVar = EntityType.request
     __version__: ClassVar[i16] = i16(3)
     __flexible__: ClassVar[bool] = False
     __api_key__: ClassVar[i16] = i16(12)

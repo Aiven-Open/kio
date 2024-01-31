@@ -11,14 +11,15 @@ from typing import ClassVar
 from kio.schema.request_header.v2.header import RequestHeader
 from kio.schema.types import BrokerId
 from kio.schema.types import TopicName
+from kio.static.constants import EntityType
 from kio.static.primitive import i16
 from kio.static.primitive import i32
 from kio.static.primitive import i64
-from kio.static.protocol import ApiMessage
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class SnapshotId:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(59)
@@ -29,6 +30,7 @@ class SnapshotId:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class PartitionSnapshot:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(59)
@@ -45,6 +47,7 @@ class PartitionSnapshot:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class TopicSnapshot:
+    __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(59)
@@ -56,7 +59,8 @@ class TopicSnapshot:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class FetchSnapshotRequest(ApiMessage):
+class FetchSnapshotRequest:
+    __type__: ClassVar = EntityType.request
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(59)
