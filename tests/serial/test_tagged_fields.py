@@ -1,4 +1,5 @@
 import io
+
 from collections.abc import Sequence
 from dataclasses import dataclass
 from dataclasses import field

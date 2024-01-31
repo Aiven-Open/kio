@@ -2,6 +2,7 @@ import io
 import struct
 import sys
 import uuid
+
 from contextlib import closing
 from typing import Generic
 from typing import TypeVar

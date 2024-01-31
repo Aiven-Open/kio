@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import enum
 import uuid
+
 from typing import TYPE_CHECKING
 from typing import Final
 
