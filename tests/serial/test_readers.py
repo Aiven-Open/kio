@@ -2,6 +2,7 @@ import io
 import struct
 import sys
 import uuid
+
 from typing import IO
 
 import pytest

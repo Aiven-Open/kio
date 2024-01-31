@@ -1,5 +1,6 @@
 import os
 import shutil
+
 from collections import defaultdict
 from collections.abc import Iterator
 from importlib import import_module
@@ -9,6 +10,7 @@ from pkgutil import walk_packages
 from types import ModuleType
 
 import kio.schema
+
 from kio.static.constants import EntityType
 from kio.static.protocol import Entity
 

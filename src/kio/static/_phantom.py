@@ -5,6 +5,7 @@ lacking some bells and whistles like Pydantic support and bounds checks.
 from __future__ import annotations
 
 import abc
+
 from collections.abc import Callable
 from types import ModuleType
 from typing import Generic

@@ -135,6 +135,7 @@ extend-ignore = [
 ]
 
 [tool.ruff.isort]
+lines-between-types = 1
 force-single-line = true
 known-first-party = ["kio", "tests", "codegen"]
 
@@ -143,7 +144,6 @@ max-complexity = 10
 
 [tool.ruff.flake8-tidy-imports]
 ban-relative-imports = "parents"
-
 
 [tool.importlinter]
 root_packages = ["kio", "codegen", "tests"]

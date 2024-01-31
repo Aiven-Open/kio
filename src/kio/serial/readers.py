@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import struct
+
 from collections.abc import Callable
 from typing import IO
 from typing import Final

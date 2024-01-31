@@ -6,6 +6,7 @@ https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/mes
 
 import datetime
 import uuid
+
 from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
