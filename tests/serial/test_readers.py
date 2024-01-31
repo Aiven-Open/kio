@@ -1,3 +1,4 @@
+import datetime
 import io
 import struct
 import sys
@@ -6,12 +7,14 @@ from typing import IO
 
 import pytest
 
+from kio.serial.errors import OutOfBoundValue
 from kio.serial.errors import UnexpectedNull
 from kio.serial.readers import Reader
 from kio.serial.readers import read_compact_string
 from kio.serial.readers import read_compact_string_as_bytes
 from kio.serial.readers import read_compact_string_as_bytes_nullable
 from kio.serial.readers import read_compact_string_nullable
+from kio.serial.readers import read_datetime_i64
 from kio.serial.readers import read_float64
 from kio.serial.readers import read_int8
 from kio.serial.readers import read_int16
@@ -19,6 +22,7 @@ from kio.serial.readers import read_int32
 from kio.serial.readers import read_int64
 from kio.serial.readers import read_legacy_bytes
 from kio.serial.readers import read_legacy_string
+from kio.serial.readers import read_nullable_datetime_i64
 from kio.serial.readers import read_nullable_legacy_bytes
 from kio.serial.readers import read_nullable_legacy_string
 from kio.serial.readers import read_uint8
@@ -28,6 +32,7 @@ from kio.serial.readers import read_uint64
 from kio.serial.readers import read_unsigned_varint
 from kio.serial.readers import read_uuid
 from kio.static.constants import uuid_zero
+from kio.static.primitive import TZAware
 
 
 class IntReaderContract:
@@ -371,3 +376,74 @@ class TestReadUUID:
         buffer.write(value.bytes)
         buffer.seek(0)
         assert read_uuid(buffer) == value
+
+
+class TestReadDatetimeI64:
+    reader = read_datetime_i64
+    lower_limit = datetime.datetime.fromtimestamp(0, tz=datetime.UTC)
+    lower_limit_as_bytes = struct.pack(">q", 0)
+    upper_limit = datetime.datetime.fromtimestamp(253402300799, datetime.UTC)
+    upper_limit_as_bytes = struct.pack(">q", int(upper_limit.timestamp() * 1000))
+
+    @classmethod
+    def read(cls, buffer: IO[bytes]) -> TZAware:
+        return cls.reader(buffer)
+
+    def test_can_read_lower_limit(self, buffer: io.BytesIO) -> None:
+        buffer.write(self.lower_limit_as_bytes)
+        buffer.seek(0)
+        assert self.lower_limit == self.read(buffer)
+
+    def test_can_read_upper_limit(self, buffer: io.BytesIO) -> None:
+        buffer.write(self.upper_limit_as_bytes)
+        buffer.seek(0)
+        assert self.upper_limit == self.read(buffer)
+
+    # As -1 is special null marker, also test with -2.
+    @pytest.mark.parametrize("value", (-1, -2))
+    def test_raises_out_of_bound_value_for_negative_values(
+        self,
+        value: int,
+        buffer: io.BytesIO,
+    ) -> None:
+        buffer.write(struct.pack(">q", value))
+        buffer.seek(0)
+        with pytest.raises(OutOfBoundValue):
+            self.read(buffer)
+
+
+class TestReadNullableDatetimeI64:
+    reader = read_nullable_datetime_i64
+    null_as_bytes = struct.pack(">q", -1)
+    lower_limit = datetime.datetime.fromtimestamp(0, tz=datetime.UTC)
+    lower_limit_as_bytes = struct.pack(">q", 0)
+    upper_limit = datetime.datetime.fromtimestamp(253402300799, datetime.UTC)
+    upper_limit_as_bytes = struct.pack(">q", int(upper_limit.timestamp() * 1000))
+
+    @classmethod
+    def read(cls, buffer: IO[bytes]) -> TZAware | None:
+        return cls.reader(buffer)
+
+    def test_can_read_null(self, buffer: io.BytesIO) -> None:
+        buffer.write(self.null_as_bytes)
+        buffer.seek(0)
+        assert self.read(buffer) is None
+
+    def test_can_read_lower_limit(self, buffer: io.BytesIO) -> None:
+        buffer.write(self.lower_limit_as_bytes)
+        buffer.seek(0)
+        assert self.lower_limit == self.read(buffer)
+
+    def test_can_read_upper_limit(self, buffer: io.BytesIO) -> None:
+        buffer.write(self.upper_limit_as_bytes)
+        buffer.seek(0)
+        assert self.upper_limit == self.read(buffer)
+
+    def test_raises_out_of_bound_value_for_negative_values(
+        self,
+        buffer: io.BytesIO,
+    ) -> None:
+        buffer.write(struct.pack(">q", -2))
+        buffer.seek(0)
+        with pytest.raises(OutOfBoundValue):
+            self.read(buffer)
