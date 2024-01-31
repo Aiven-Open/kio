@@ -63,7 +63,9 @@ class TestGetReader:
             ("bytes", True, True, readers.read_compact_string_as_bytes_nullable),
             ("bytes", False, False, readers.read_legacy_bytes),
             ("bytes", False, True, readers.read_nullable_legacy_bytes),
-            ("records", True, True, readers.read_nullable_legacy_bytes),
+            ("records", True, False, readers.read_compact_string_as_bytes),
+            ("records", True, True, readers.read_compact_string_as_bytes_nullable),
+            ("records", False, False, readers.read_legacy_bytes),
             ("records", False, True, readers.read_nullable_legacy_bytes),
             ("uuid", False, True, readers.read_uuid),
             ("uuid", True, True, readers.read_uuid),
@@ -121,8 +123,6 @@ class TestGetReader:
             ("timedelta_i32", False, True),
             ("timedelta_i64", True, True),
             ("timedelta_i64", False, True),
-            ("records", True, False),
-            ("records", False, False),
         ),
     )
     def test_raises_not_implemented_error_for_invalid_combination(
