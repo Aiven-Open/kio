@@ -14,7 +14,7 @@ class BufferUnderflow(DecodeError):
     ...
 
 
-class SchemaError(SerialError):
+class EncodeError(SerialError):
     ...
 
 
@@ -22,5 +22,5 @@ class OutOfBoundValue(SerialError):
     ...
 
 
-class EncodeError(SerialError):
+class SchemaError(SerialError):
     ...
