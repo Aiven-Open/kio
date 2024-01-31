@@ -45,5 +45,5 @@ class ListPartitionReassignmentsRequest:
         default=i32Timedelta.parse(datetime.timedelta(milliseconds=60000)),
     )
     """The time in ms to wait for the request to complete."""
-    topics: tuple[ListPartitionReassignmentsTopics, ...]
+    topics: tuple[ListPartitionReassignmentsTopics, ...] | None
     """The topics to list partition reassignments for, or null to list everything."""

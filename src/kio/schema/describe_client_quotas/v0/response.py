@@ -68,5 +68,5 @@ class DescribeClientQuotasResponse:
     """The error code, or `0` if the quota description succeeded."""
     error_message: str | None = field(metadata={"kafka_type": "string"})
     """The error message, or `null` if the quota description succeeded."""
-    entries: tuple[EntryData, ...]
+    entries: tuple[EntryData, ...] | None
     """A result entry."""

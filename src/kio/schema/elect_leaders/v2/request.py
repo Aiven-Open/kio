@@ -41,7 +41,7 @@ class ElectLeadersRequest:
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     election_type: i8 = field(metadata={"kafka_type": "int8"})
     """Type of elections to conduct for the partition. A value of '0' elects the preferred replica. A value of '1' elects the first live replica if there are no in-sync replica."""
-    topic_partitions: tuple[TopicPartitions, ...]
+    topic_partitions: tuple[TopicPartitions, ...] | None
     """The topic partitions to elect leaders."""
     timeout: i32Timedelta = field(
         metadata={"kafka_type": "timedelta_i32"},

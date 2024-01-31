@@ -36,6 +36,7 @@ class A:
     entity: Nested
     entity_tuple: tuple[Nested, ...]
     nullable_entity: Nested | None
+    nullable_entity_tuple: tuple[Nested, ...] | None
     backwards_nullable_entity: None | Nested
     unsupported_tuple: tuple[int, str]
     unsupported_union: int | str | bool
@@ -84,6 +85,9 @@ class TestIsOptional:
     def test_returns_true_for_nullable_entity(self) -> None:
         assert is_optional(model_fields["nullable_entity"]) is True
 
+    def test_returns_true_for_nullable_entity_tuple(self) -> None:
+        assert is_optional(model_fields["nullable_entity_tuple"]) is True
+
     def test_returns_true_for_nullable_uuid(self) -> None:
         assert is_optional(model_fields["uuid_or_none"]) is True
 
@@ -116,6 +120,12 @@ class TestClassifyField:
 
     def test_can_classify_entity_tuple_field(self) -> None:
         assert classify_field(model_fields["entity_tuple"]) == (
+            FieldKind.entity_tuple,
+            Nested,
+        )
+
+    def test_can_classify_nullable_nested_entity_tuple(self) -> None:
+        assert classify_field(model_fields["nullable_entity_tuple"]) == (
             FieldKind.entity_tuple,
             Nested,
         )

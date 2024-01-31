@@ -87,7 +87,7 @@ class ConsumerGroupHeartbeatRequest:
     """null if it didn't change since the last heartbeat; the subscribed topic regex otherwise"""
     server_assignor: str | None = field(metadata={"kafka_type": "string"}, default=None)
     """null if not used or if it didn't change since the last heartbeat; the server side assignor to use otherwise."""
-    client_assignors: tuple[Assignor, ...]
+    client_assignors: tuple[Assignor, ...] | None
     """null if not used or if it didn't change since the last heartbeat; the list of client-side assignors otherwise."""
-    topic_partitions: tuple[TopicPartitions, ...]
+    topic_partitions: tuple[TopicPartitions, ...] | None
     """null if it didn't change since the last heartbeat; the partitions owned by the member."""

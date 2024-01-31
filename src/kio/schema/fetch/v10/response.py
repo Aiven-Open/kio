@@ -49,7 +49,7 @@ class PartitionData:
     """The last stable offset (or LSO) of the partition. This is the last offset such that the state of all transactional records prior to this offset have been decided (ABORTED or COMMITTED)"""
     log_start_offset: i64 = field(metadata={"kafka_type": "int64"}, default=i64(-1))
     """The current log start offset."""
-    aborted_transactions: tuple[AbortedTransaction, ...]
+    aborted_transactions: tuple[AbortedTransaction, ...] | None
     """The aborted transactions."""
     records: bytes | None = field(metadata={"kafka_type": "records"})
     """The record data."""

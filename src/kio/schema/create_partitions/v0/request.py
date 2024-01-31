@@ -41,7 +41,7 @@ class CreatePartitionsTopic:
     """The topic name."""
     count: i32 = field(metadata={"kafka_type": "int32"})
     """The new partition count."""
-    assignments: tuple[CreatePartitionsAssignment, ...]
+    assignments: tuple[CreatePartitionsAssignment, ...] | None
     """The new partition assignments."""
 
 

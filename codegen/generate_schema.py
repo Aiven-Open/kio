@@ -364,8 +364,14 @@ def generate_entity_array_field(
     field: EntityArrayField,
     version: int,
 ) -> str:
+    optional = (
+        field.nullableVersions.matches(version) if field.nullableVersions else False
+    )
     field_call = format_array_field_call(field, version)
-    return f"    {to_snake_case(field.name)}: tuple[{field.type}, ...]{field_call}\n"
+    opt = " | None" if optional else ""
+    return (
+        f"    {to_snake_case(field.name)}: tuple[{field.type}, ...]{opt}{field_call}\n"
+    )
 
 
 def entity_annotation(field: EntityField | CommonStructField, optional: bool) -> str:
@@ -413,9 +419,13 @@ def generate_common_struct_array_field(
     field: CommonStructArrayField,
     version: int,
 ) -> str:
+    optional = (
+        field.nullableVersions.matches(version) if field.nullableVersions else False
+    )
     field_call = format_array_field_call(field, version)
+    opt = " | None" if optional else ""
     return (
-        f"    {to_snake_case(field.name)}: tuple[{field.type.struct.name}, ...]"
+        f"    {to_snake_case(field.name)}: tuple[{field.type.struct.name}, ...]{opt}"
         f"{field_call}\n"
     )
 
