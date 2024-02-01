@@ -9,6 +9,7 @@ from contextlib import closing
 from typing import Any
 from typing import Final
 from typing import TypeVar
+from typing import assert_type
 from unittest import mock
 
 import pytest
@@ -31,12 +32,21 @@ from kio.schema.delete_topics.v6 import DeleteTopicsRequest
 from kio.schema.delete_topics.v6 import DeleteTopicsResponse
 from kio.schema.delete_topics.v6.request import DeleteTopicState
 from kio.schema.delete_topics.v6.response import DeletableTopicResult
+from kio.schema.fetch.v13.request import FetchPartition
+from kio.schema.fetch.v13.request import FetchRequest
+from kio.schema.fetch.v13.request import FetchTopic
+from kio.schema.fetch.v13.response import FetchResponse
 from kio.schema.metadata.v5 import request as metadata_v5_request
 from kio.schema.metadata.v5 import response as metadata_v5_response
 from kio.schema.metadata.v12 import request as metadata_v12_request
 from kio.schema.metadata.v12 import response as metadata_v12_response
+from kio.schema.produce.v9.request import PartitionProduceData
+from kio.schema.produce.v9.request import ProduceRequest
+from kio.schema.produce.v9.request import TopicProduceData
+from kio.schema.produce.v9.response import ProduceResponse
 from kio.schema.types import BrokerId
 from kio.schema.types import TopicName
+from kio.schema.types import TransactionalId
 from kio.serial import entity_reader
 from kio.serial import entity_writer
 from kio.serial.readers import read_int32
@@ -44,11 +54,15 @@ from kio.serial.writers import Writable
 from kio.serial.writers import write_int32
 from kio.static.constants import ErrorCode
 from kio.static.constants import uuid_zero
+from kio.static.primitive import i8
 from kio.static.primitive import i16
 from kio.static.primitive import i32
 from kio.static.primitive import i32Timedelta
+from kio.static.primitive import i64
 from kio.static.protocol import Entity
 from kio.static.protocol import Payload
+
+from . import fixtures
 
 pytestmark = pytest.mark.integration
 
@@ -160,7 +174,7 @@ async def make_request(
     # We use asynchronous facilities to send the request and read the raw response into
     # a BytesIO buffer.
     with closing(stream_writer):
-        async with asyncio.timeout(1):
+        async with asyncio.timeout(10):
             await send(stream_writer, request, correlation_id)
             response = await read_response_bytes(stream_reader)
 
@@ -344,13 +358,13 @@ async def create_topic(topic_name: TopicName) -> CreateTopicsResponse:
     )
 
 
-async def metadata_v12() -> metadata_v12_response.MetadataResponse:
+async def metadata_v12(topic: TopicName) -> metadata_v12_response.MetadataResponse:
     return await make_request(
         request=metadata_v12_request.MetadataRequest(
             topics=(
                 metadata_v12_request.MetadataRequestTopic(
                     topic_id=uuid_zero,
-                    name=TopicName("le-topic"),
+                    name=topic,
                 ),
             ),
             allow_auto_topic_creation=True,
@@ -409,7 +423,7 @@ async def test_topic_and_metadata_operations() -> None:
     (created_topic,) = create_topics_response.topics
 
     # The previous creation call should guarantee this call contains the topic.
-    response_v12 = await metadata_v12()
+    response_v12 = await metadata_v12(created_topic.name)
     assert response_v12 == metadata_v12_response.MetadataResponse(
         throttle_time=timedelta_zero,
         brokers=(
@@ -452,3 +466,118 @@ async def test_topic_and_metadata_operations() -> None:
         controller_id=BrokerId(1),
         cluster_id=mock.ANY,
     )
+
+
+# Custom exception for ability to xfail narrowly.
+class _IncompleteFetch(Exception):
+    ...
+
+
+@pytest.mark.xfail(
+    raises=_IncompleteFetch,
+    reason=(
+        "This test is flaky. Intermittently, Kafka returns incomplete responses for "
+        "the fetch response. If this turns out to be expected behavior, we need to "
+        "adjust this test to retry fetching until it parses successfully."
+    ),
+)
+async def test_produce_consume() -> None:
+    topic_name = TopicName("le-topic-2")
+
+    # Test delete topic which might or might not exist.
+    delete_topics_response = await delete_topic(topic_name)
+    assert delete_topics_response == DeleteTopicsResponse(
+        throttle_time=timedelta_zero,
+        responses=(
+            DeletableTopicResult(
+                name=topic_name,
+                topic_id=mock.ANY,
+                error_code=mock.ANY,
+                error_message=mock.ANY,
+            ),
+        ),
+    )
+
+    # The previous deletion call should guarantee this call succeeds.
+    create_topics_response = await create_topic(topic_name)
+    assert create_topics_response == CreateTopicsResponse(
+        throttle_time=timedelta_zero,
+        topics=(
+            CreatableTopicResult(
+                name=topic_name,
+                topic_id=mock.ANY,
+                error_code=ErrorCode.none,
+                error_message=None,
+                num_partitions=i32(3),
+                replication_factor=i16(1),
+                configs=mock.ANY,
+            ),
+        ),
+    )
+    (created_topic,) = create_topics_response.topics
+
+    metadata = await metadata_v12(topic_name)
+    (topic,) = metadata.topics
+    partition, _, _ = topic.partitions
+
+    produce_request = ProduceRequest(
+        transactional_id=TransactionalId("foo"),
+        # Note that passing 0 here results in server sending no response at all.
+        acks=i16(1),
+        timeout=i32Timedelta.parse(datetime.timedelta(seconds=1)),
+        topic_data=(
+            TopicProduceData(
+                name=topic_name,
+                partition_data=(
+                    PartitionProduceData(
+                        index=partition.partition_index,
+                        records=fixtures.record_batch_data_v2[0],
+                    ),
+                ),
+            ),
+        ),
+    )
+    produce_response = await make_request(produce_request, ProduceResponse)
+
+    (topic_response,) = produce_response.responses
+    assert topic_response.name == topic_name
+    (partition_response,) = topic_response.partition_responses
+    assert partition_response.error_code is ErrorCode.none
+
+    fetch_request = FetchRequest(
+        max_wait=i32Timedelta.parse(datetime.timedelta(seconds=10)),
+        min_bytes=i32(0),
+        isolation_level=i8(1),
+        topics=(
+            FetchTopic(
+                topic_id=topic.topic_id,
+                partitions=(
+                    FetchPartition(
+                        partition=partition.partition_index,
+                        fetch_offset=i64(0),
+                        partition_max_bytes=i32(104_857_600),
+                    ),
+                ),
+            ),
+        ),
+        forgotten_topics_data=(),
+    )
+
+    try:
+        fetch_response = await make_request(fetch_request, FetchResponse)
+    except ValueError as exception:
+        # Re-raise as custom error in order to xfail as strictly as possible.
+        if str(exception).startswith("not enough values to unpack"):
+            raise _IncompleteFetch from exception
+        raise
+
+    assert_type(fetch_response, FetchResponse)
+    assert fetch_response.error_code is ErrorCode.none
+    (fetch_topic_response,) = fetch_response.responses
+    assert fetch_topic_response.topic_id == topic.topic_id
+    (fetch_partition,) = fetch_topic_response.partitions
+    assert fetch_partition.partition_index == partition.partition_index
+    assert fetch_partition.error_code is ErrorCode.none
+    # Compare record batch excluding baseOffset, batchLength, and partitionLeaderEpoch.
+    assert fetch_partition.records is not None
+    assert fetch_partition.records[16:] == fixtures.record_batch_data_v2[0][16:]

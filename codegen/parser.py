@@ -98,14 +98,12 @@ class Primitive(enum.Enum):
                 hint = "f64"
             case Primitive.string:
                 hint = "str"
-            case Primitive.bytes_:
+            case Primitive.bytes_ | Primitive.records:
                 hint = "bytes"
             case Primitive.bool_:
                 hint = "bool"
             case Primitive.uuid:
                 hint = "uuid.UUID | None"
-            case Primitive.records:
-                return "tuple[bytes | None, ...]"
             case Primitive.error_code:
                 hint = "ErrorCode"
             case Primitive.timedelta_i32:
