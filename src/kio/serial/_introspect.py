@@ -1,4 +1,5 @@
 import enum
+
 from dataclasses import Field
 from dataclasses import is_dataclass
 from types import EllipsisType
