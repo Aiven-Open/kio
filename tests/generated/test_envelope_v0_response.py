@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.envelope.v0.response import EnvelopeResponse
@@ -19,7 +18,6 @@ read_envelope_response: Final = entity_reader(EnvelopeResponse)
 
 @pytest.mark.roundtrip
 @given(from_type(EnvelopeResponse))
-@settings(max_examples=1)
 def test_envelope_response_roundtrip(instance: EnvelopeResponse) -> None:
     writer = entity_writer(EnvelopeResponse)
     with setup_buffer() as buffer:

@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.stop_replica.v4.response import StopReplicaPartitionError
@@ -20,7 +19,6 @@ read_stop_replica_partition_error: Final = entity_reader(StopReplicaPartitionErr
 
 @pytest.mark.roundtrip
 @given(from_type(StopReplicaPartitionError))
-@settings(max_examples=1)
 def test_stop_replica_partition_error_roundtrip(
     instance: StopReplicaPartitionError,
 ) -> None:
@@ -37,7 +35,6 @@ read_stop_replica_response: Final = entity_reader(StopReplicaResponse)
 
 @pytest.mark.roundtrip
 @given(from_type(StopReplicaResponse))
-@settings(max_examples=1)
 def test_stop_replica_response_roundtrip(instance: StopReplicaResponse) -> None:
     writer = entity_writer(StopReplicaResponse)
     with setup_buffer() as buffer:

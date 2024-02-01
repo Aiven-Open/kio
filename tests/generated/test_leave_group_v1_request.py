@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.leave_group.v1.request import LeaveGroupRequest
@@ -19,7 +18,6 @@ read_leave_group_request: Final = entity_reader(LeaveGroupRequest)
 
 @pytest.mark.roundtrip
 @given(from_type(LeaveGroupRequest))
-@settings(max_examples=1)
 def test_leave_group_request_roundtrip(instance: LeaveGroupRequest) -> None:
     writer = entity_writer(LeaveGroupRequest)
     with setup_buffer() as buffer:

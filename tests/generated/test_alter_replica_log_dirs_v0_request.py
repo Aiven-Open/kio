@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.alter_replica_log_dirs.v0.request import AlterReplicaLogDir
@@ -21,7 +20,6 @@ read_alter_replica_log_dir_topic: Final = entity_reader(AlterReplicaLogDirTopic)
 
 @pytest.mark.roundtrip
 @given(from_type(AlterReplicaLogDirTopic))
-@settings(max_examples=1)
 def test_alter_replica_log_dir_topic_roundtrip(
     instance: AlterReplicaLogDirTopic,
 ) -> None:
@@ -38,7 +36,6 @@ read_alter_replica_log_dir: Final = entity_reader(AlterReplicaLogDir)
 
 @pytest.mark.roundtrip
 @given(from_type(AlterReplicaLogDir))
-@settings(max_examples=1)
 def test_alter_replica_log_dir_roundtrip(instance: AlterReplicaLogDir) -> None:
     writer = entity_writer(AlterReplicaLogDir)
     with setup_buffer() as buffer:
@@ -53,7 +50,6 @@ read_alter_replica_log_dirs_request: Final = entity_reader(AlterReplicaLogDirsRe
 
 @pytest.mark.roundtrip
 @given(from_type(AlterReplicaLogDirsRequest))
-@settings(max_examples=1)
 def test_alter_replica_log_dirs_request_roundtrip(
     instance: AlterReplicaLogDirsRequest,
 ) -> None:

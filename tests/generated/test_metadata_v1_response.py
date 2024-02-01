@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.metadata.v1.response import MetadataResponse
@@ -22,7 +21,6 @@ read_metadata_response_broker: Final = entity_reader(MetadataResponseBroker)
 
 @pytest.mark.roundtrip
 @given(from_type(MetadataResponseBroker))
-@settings(max_examples=1)
 def test_metadata_response_broker_roundtrip(instance: MetadataResponseBroker) -> None:
     writer = entity_writer(MetadataResponseBroker)
     with setup_buffer() as buffer:
@@ -37,7 +35,6 @@ read_metadata_response_partition: Final = entity_reader(MetadataResponsePartitio
 
 @pytest.mark.roundtrip
 @given(from_type(MetadataResponsePartition))
-@settings(max_examples=1)
 def test_metadata_response_partition_roundtrip(
     instance: MetadataResponsePartition,
 ) -> None:
@@ -54,7 +51,6 @@ read_metadata_response_topic: Final = entity_reader(MetadataResponseTopic)
 
 @pytest.mark.roundtrip
 @given(from_type(MetadataResponseTopic))
-@settings(max_examples=1)
 def test_metadata_response_topic_roundtrip(instance: MetadataResponseTopic) -> None:
     writer = entity_writer(MetadataResponseTopic)
     with setup_buffer() as buffer:
@@ -69,7 +65,6 @@ read_metadata_response: Final = entity_reader(MetadataResponse)
 
 @pytest.mark.roundtrip
 @given(from_type(MetadataResponse))
-@settings(max_examples=1)
 def test_metadata_response_roundtrip(instance: MetadataResponse) -> None:
     writer = entity_writer(MetadataResponse)
     with setup_buffer() as buffer:

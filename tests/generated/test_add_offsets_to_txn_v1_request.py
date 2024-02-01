@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.add_offsets_to_txn.v1.request import AddOffsetsToTxnRequest
@@ -19,7 +18,6 @@ read_add_offsets_to_txn_request: Final = entity_reader(AddOffsetsToTxnRequest)
 
 @pytest.mark.roundtrip
 @given(from_type(AddOffsetsToTxnRequest))
-@settings(max_examples=1)
 def test_add_offsets_to_txn_request_roundtrip(instance: AddOffsetsToTxnRequest) -> None:
     writer = entity_writer(AddOffsetsToTxnRequest)
     with setup_buffer() as buffer:

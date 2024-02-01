@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.renew_delegation_token.v2.request import RenewDelegationTokenRequest
@@ -19,7 +18,6 @@ read_renew_delegation_token_request: Final = entity_reader(RenewDelegationTokenR
 
 @pytest.mark.roundtrip
 @given(from_type(RenewDelegationTokenRequest))
-@settings(max_examples=1)
 def test_renew_delegation_token_request_roundtrip(
     instance: RenewDelegationTokenRequest,
 ) -> None:

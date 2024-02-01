@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.init_producer_id.v2.request import InitProducerIdRequest
@@ -19,7 +18,6 @@ read_init_producer_id_request: Final = entity_reader(InitProducerIdRequest)
 
 @pytest.mark.roundtrip
 @given(from_type(InitProducerIdRequest))
-@settings(max_examples=1)
 def test_init_producer_id_request_roundtrip(instance: InitProducerIdRequest) -> None:
     writer = entity_writer(InitProducerIdRequest)
     with setup_buffer() as buffer:

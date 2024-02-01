@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.offset_fetch.v8.request import OffsetFetchRequest
@@ -21,7 +20,6 @@ read_offset_fetch_request_topics: Final = entity_reader(OffsetFetchRequestTopics
 
 @pytest.mark.roundtrip
 @given(from_type(OffsetFetchRequestTopics))
-@settings(max_examples=1)
 def test_offset_fetch_request_topics_roundtrip(
     instance: OffsetFetchRequestTopics,
 ) -> None:
@@ -38,7 +36,6 @@ read_offset_fetch_request_group: Final = entity_reader(OffsetFetchRequestGroup)
 
 @pytest.mark.roundtrip
 @given(from_type(OffsetFetchRequestGroup))
-@settings(max_examples=1)
 def test_offset_fetch_request_group_roundtrip(
     instance: OffsetFetchRequestGroup,
 ) -> None:
@@ -55,7 +52,6 @@ read_offset_fetch_request: Final = entity_reader(OffsetFetchRequest)
 
 @pytest.mark.roundtrip
 @given(from_type(OffsetFetchRequest))
-@settings(max_examples=1)
 def test_offset_fetch_request_roundtrip(instance: OffsetFetchRequest) -> None:
     writer = entity_writer(OffsetFetchRequest)
     with setup_buffer() as buffer:

@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.describe_producers.v0.request import DescribeProducersRequest
@@ -20,7 +19,6 @@ read_topic_request: Final = entity_reader(TopicRequest)
 
 @pytest.mark.roundtrip
 @given(from_type(TopicRequest))
-@settings(max_examples=1)
 def test_topic_request_roundtrip(instance: TopicRequest) -> None:
     writer = entity_writer(TopicRequest)
     with setup_buffer() as buffer:
@@ -35,7 +33,6 @@ read_describe_producers_request: Final = entity_reader(DescribeProducersRequest)
 
 @pytest.mark.roundtrip
 @given(from_type(DescribeProducersRequest))
-@settings(max_examples=1)
 def test_describe_producers_request_roundtrip(
     instance: DescribeProducersRequest,
 ) -> None:

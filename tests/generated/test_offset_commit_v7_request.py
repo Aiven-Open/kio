@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.offset_commit.v7.request import OffsetCommitRequest
@@ -23,7 +22,6 @@ read_offset_commit_request_partition: Final = entity_reader(
 
 @pytest.mark.roundtrip
 @given(from_type(OffsetCommitRequestPartition))
-@settings(max_examples=1)
 def test_offset_commit_request_partition_roundtrip(
     instance: OffsetCommitRequestPartition,
 ) -> None:
@@ -40,7 +38,6 @@ read_offset_commit_request_topic: Final = entity_reader(OffsetCommitRequestTopic
 
 @pytest.mark.roundtrip
 @given(from_type(OffsetCommitRequestTopic))
-@settings(max_examples=1)
 def test_offset_commit_request_topic_roundtrip(
     instance: OffsetCommitRequestTopic,
 ) -> None:
@@ -57,7 +54,6 @@ read_offset_commit_request: Final = entity_reader(OffsetCommitRequest)
 
 @pytest.mark.roundtrip
 @given(from_type(OffsetCommitRequest))
-@settings(max_examples=1)
 def test_offset_commit_request_roundtrip(instance: OffsetCommitRequest) -> None:
     writer = entity_writer(OffsetCommitRequest)
     with setup_buffer() as buffer:

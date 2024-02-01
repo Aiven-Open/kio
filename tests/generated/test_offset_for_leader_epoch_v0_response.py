@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.offset_for_leader_epoch.v0.response import EpochEndOffset
@@ -21,7 +20,6 @@ read_epoch_end_offset: Final = entity_reader(EpochEndOffset)
 
 @pytest.mark.roundtrip
 @given(from_type(EpochEndOffset))
-@settings(max_examples=1)
 def test_epoch_end_offset_roundtrip(instance: EpochEndOffset) -> None:
     writer = entity_writer(EpochEndOffset)
     with setup_buffer() as buffer:
@@ -36,7 +34,6 @@ read_offset_for_leader_topic_result: Final = entity_reader(OffsetForLeaderTopicR
 
 @pytest.mark.roundtrip
 @given(from_type(OffsetForLeaderTopicResult))
-@settings(max_examples=1)
 def test_offset_for_leader_topic_result_roundtrip(
     instance: OffsetForLeaderTopicResult,
 ) -> None:
@@ -55,7 +52,6 @@ read_offset_for_leader_epoch_response: Final = entity_reader(
 
 @pytest.mark.roundtrip
 @given(from_type(OffsetForLeaderEpochResponse))
-@settings(max_examples=1)
 def test_offset_for_leader_epoch_response_roundtrip(
     instance: OffsetForLeaderEpochResponse,
 ) -> None:

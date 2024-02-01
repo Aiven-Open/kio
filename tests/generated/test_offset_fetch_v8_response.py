@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.offset_fetch.v8.response import OffsetFetchResponse
@@ -24,7 +23,6 @@ read_offset_fetch_response_partitions: Final = entity_reader(
 
 @pytest.mark.roundtrip
 @given(from_type(OffsetFetchResponsePartitions))
-@settings(max_examples=1)
 def test_offset_fetch_response_partitions_roundtrip(
     instance: OffsetFetchResponsePartitions,
 ) -> None:
@@ -41,7 +39,6 @@ read_offset_fetch_response_topics: Final = entity_reader(OffsetFetchResponseTopi
 
 @pytest.mark.roundtrip
 @given(from_type(OffsetFetchResponseTopics))
-@settings(max_examples=1)
 def test_offset_fetch_response_topics_roundtrip(
     instance: OffsetFetchResponseTopics,
 ) -> None:
@@ -58,7 +55,6 @@ read_offset_fetch_response_group: Final = entity_reader(OffsetFetchResponseGroup
 
 @pytest.mark.roundtrip
 @given(from_type(OffsetFetchResponseGroup))
-@settings(max_examples=1)
 def test_offset_fetch_response_group_roundtrip(
     instance: OffsetFetchResponseGroup,
 ) -> None:
@@ -75,7 +71,6 @@ read_offset_fetch_response: Final = entity_reader(OffsetFetchResponse)
 
 @pytest.mark.roundtrip
 @given(from_type(OffsetFetchResponse))
-@settings(max_examples=1)
 def test_offset_fetch_response_roundtrip(instance: OffsetFetchResponse) -> None:
     writer = entity_writer(OffsetFetchResponse)
     with setup_buffer() as buffer:

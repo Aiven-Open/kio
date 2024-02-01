@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.find_coordinator.v3.request import FindCoordinatorRequest
@@ -19,7 +18,6 @@ read_find_coordinator_request: Final = entity_reader(FindCoordinatorRequest)
 
 @pytest.mark.roundtrip
 @given(from_type(FindCoordinatorRequest))
-@settings(max_examples=1)
 def test_find_coordinator_request_roundtrip(instance: FindCoordinatorRequest) -> None:
     writer = entity_writer(FindCoordinatorRequest)
     with setup_buffer() as buffer:

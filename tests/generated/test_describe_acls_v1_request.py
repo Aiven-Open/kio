@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.describe_acls.v1.request import DescribeAclsRequest
@@ -19,7 +18,6 @@ read_describe_acls_request: Final = entity_reader(DescribeAclsRequest)
 
 @pytest.mark.roundtrip
 @given(from_type(DescribeAclsRequest))
-@settings(max_examples=1)
 def test_describe_acls_request_roundtrip(instance: DescribeAclsRequest) -> None:
     writer = entity_writer(DescribeAclsRequest)
     with setup_buffer() as buffer:

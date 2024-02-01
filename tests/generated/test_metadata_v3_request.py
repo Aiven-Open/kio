@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.metadata.v3.request import MetadataRequest
@@ -20,7 +19,6 @@ read_metadata_request_topic: Final = entity_reader(MetadataRequestTopic)
 
 @pytest.mark.roundtrip
 @given(from_type(MetadataRequestTopic))
-@settings(max_examples=1)
 def test_metadata_request_topic_roundtrip(instance: MetadataRequestTopic) -> None:
     writer = entity_writer(MetadataRequestTopic)
     with setup_buffer() as buffer:
@@ -35,7 +33,6 @@ read_metadata_request: Final = entity_reader(MetadataRequest)
 
 @pytest.mark.roundtrip
 @given(from_type(MetadataRequest))
-@settings(max_examples=1)
 def test_metadata_request_roundtrip(instance: MetadataRequest) -> None:
     writer = entity_writer(MetadataRequest)
     with setup_buffer() as buffer:

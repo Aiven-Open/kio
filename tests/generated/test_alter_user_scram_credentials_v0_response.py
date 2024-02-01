@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.alter_user_scram_credentials.v0.response import (
@@ -26,7 +25,6 @@ read_alter_user_scram_credentials_result: Final = entity_reader(
 
 @pytest.mark.roundtrip
 @given(from_type(AlterUserScramCredentialsResult))
-@settings(max_examples=1)
 def test_alter_user_scram_credentials_result_roundtrip(
     instance: AlterUserScramCredentialsResult,
 ) -> None:
@@ -45,7 +43,6 @@ read_alter_user_scram_credentials_response: Final = entity_reader(
 
 @pytest.mark.roundtrip
 @given(from_type(AlterUserScramCredentialsResponse))
-@settings(max_examples=1)
 def test_alter_user_scram_credentials_response_roundtrip(
     instance: AlterUserScramCredentialsResponse,
 ) -> None:

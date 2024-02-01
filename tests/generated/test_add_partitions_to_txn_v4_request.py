@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.add_partitions_to_txn.v4.request import AddPartitionsToTxnRequest
@@ -21,7 +20,6 @@ read_add_partitions_to_txn_topic: Final = entity_reader(AddPartitionsToTxnTopic)
 
 @pytest.mark.roundtrip
 @given(from_type(AddPartitionsToTxnTopic))
-@settings(max_examples=1)
 def test_add_partitions_to_txn_topic_roundtrip(
     instance: AddPartitionsToTxnTopic,
 ) -> None:
@@ -40,7 +38,6 @@ read_add_partitions_to_txn_transaction: Final = entity_reader(
 
 @pytest.mark.roundtrip
 @given(from_type(AddPartitionsToTxnTransaction))
-@settings(max_examples=1)
 def test_add_partitions_to_txn_transaction_roundtrip(
     instance: AddPartitionsToTxnTransaction,
 ) -> None:
@@ -57,7 +54,6 @@ read_add_partitions_to_txn_request: Final = entity_reader(AddPartitionsToTxnRequ
 
 @pytest.mark.roundtrip
 @given(from_type(AddPartitionsToTxnRequest))
-@settings(max_examples=1)
 def test_add_partitions_to_txn_request_roundtrip(
     instance: AddPartitionsToTxnRequest,
 ) -> None:

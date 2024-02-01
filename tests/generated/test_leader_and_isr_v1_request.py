@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.leader_and_isr.v1.request import LeaderAndIsrLiveLeader
@@ -21,7 +20,6 @@ read_leader_and_isr_partition_state: Final = entity_reader(LeaderAndIsrPartition
 
 @pytest.mark.roundtrip
 @given(from_type(LeaderAndIsrPartitionState))
-@settings(max_examples=1)
 def test_leader_and_isr_partition_state_roundtrip(
     instance: LeaderAndIsrPartitionState,
 ) -> None:
@@ -38,7 +36,6 @@ read_leader_and_isr_live_leader: Final = entity_reader(LeaderAndIsrLiveLeader)
 
 @pytest.mark.roundtrip
 @given(from_type(LeaderAndIsrLiveLeader))
-@settings(max_examples=1)
 def test_leader_and_isr_live_leader_roundtrip(instance: LeaderAndIsrLiveLeader) -> None:
     writer = entity_writer(LeaderAndIsrLiveLeader)
     with setup_buffer() as buffer:
@@ -53,7 +50,6 @@ read_leader_and_isr_request: Final = entity_reader(LeaderAndIsrRequest)
 
 @pytest.mark.roundtrip
 @given(from_type(LeaderAndIsrRequest))
-@settings(max_examples=1)
 def test_leader_and_isr_request_roundtrip(instance: LeaderAndIsrRequest) -> None:
     writer = entity_writer(LeaderAndIsrRequest)
     with setup_buffer() as buffer:

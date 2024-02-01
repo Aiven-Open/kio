@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.describe_cluster.v0.response import DescribeClusterBroker
@@ -20,7 +19,6 @@ read_describe_cluster_broker: Final = entity_reader(DescribeClusterBroker)
 
 @pytest.mark.roundtrip
 @given(from_type(DescribeClusterBroker))
-@settings(max_examples=1)
 def test_describe_cluster_broker_roundtrip(instance: DescribeClusterBroker) -> None:
     writer = entity_writer(DescribeClusterBroker)
     with setup_buffer() as buffer:
@@ -35,7 +33,6 @@ read_describe_cluster_response: Final = entity_reader(DescribeClusterResponse)
 
 @pytest.mark.roundtrip
 @given(from_type(DescribeClusterResponse))
-@settings(max_examples=1)
 def test_describe_cluster_response_roundtrip(instance: DescribeClusterResponse) -> None:
     writer = entity_writer(DescribeClusterResponse)
     with setup_buffer() as buffer:

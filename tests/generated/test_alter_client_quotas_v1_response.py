@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.alter_client_quotas.v1.response import AlterClientQuotasResponse
@@ -21,7 +20,6 @@ read_entity_data: Final = entity_reader(EntityData)
 
 @pytest.mark.roundtrip
 @given(from_type(EntityData))
-@settings(max_examples=1)
 def test_entity_data_roundtrip(instance: EntityData) -> None:
     writer = entity_writer(EntityData)
     with setup_buffer() as buffer:
@@ -36,7 +34,6 @@ read_entry_data: Final = entity_reader(EntryData)
 
 @pytest.mark.roundtrip
 @given(from_type(EntryData))
-@settings(max_examples=1)
 def test_entry_data_roundtrip(instance: EntryData) -> None:
     writer = entity_writer(EntryData)
     with setup_buffer() as buffer:
@@ -51,7 +48,6 @@ read_alter_client_quotas_response: Final = entity_reader(AlterClientQuotasRespon
 
 @pytest.mark.roundtrip
 @given(from_type(AlterClientQuotasResponse))
-@settings(max_examples=1)
 def test_alter_client_quotas_response_roundtrip(
     instance: AlterClientQuotasResponse,
 ) -> None:

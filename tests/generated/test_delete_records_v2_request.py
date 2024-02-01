@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.delete_records.v2.request import DeleteRecordsPartition
@@ -21,7 +20,6 @@ read_delete_records_partition: Final = entity_reader(DeleteRecordsPartition)
 
 @pytest.mark.roundtrip
 @given(from_type(DeleteRecordsPartition))
-@settings(max_examples=1)
 def test_delete_records_partition_roundtrip(instance: DeleteRecordsPartition) -> None:
     writer = entity_writer(DeleteRecordsPartition)
     with setup_buffer() as buffer:
@@ -36,7 +34,6 @@ read_delete_records_topic: Final = entity_reader(DeleteRecordsTopic)
 
 @pytest.mark.roundtrip
 @given(from_type(DeleteRecordsTopic))
-@settings(max_examples=1)
 def test_delete_records_topic_roundtrip(instance: DeleteRecordsTopic) -> None:
     writer = entity_writer(DeleteRecordsTopic)
     with setup_buffer() as buffer:
@@ -51,7 +48,6 @@ read_delete_records_request: Final = entity_reader(DeleteRecordsRequest)
 
 @pytest.mark.roundtrip
 @given(from_type(DeleteRecordsRequest))
-@settings(max_examples=1)
 def test_delete_records_request_roundtrip(instance: DeleteRecordsRequest) -> None:
     writer = entity_writer(DeleteRecordsRequest)
     with setup_buffer() as buffer:

@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.sasl_authenticate.v0.request import SaslAuthenticateRequest
@@ -19,7 +18,6 @@ read_sasl_authenticate_request: Final = entity_reader(SaslAuthenticateRequest)
 
 @pytest.mark.roundtrip
 @given(from_type(SaslAuthenticateRequest))
-@settings(max_examples=1)
 def test_sasl_authenticate_request_roundtrip(instance: SaslAuthenticateRequest) -> None:
     writer = entity_writer(SaslAuthenticateRequest)
     with setup_buffer() as buffer:

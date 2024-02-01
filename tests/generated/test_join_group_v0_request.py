@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.join_group.v0.request import JoinGroupRequest
@@ -20,7 +19,6 @@ read_join_group_request_protocol: Final = entity_reader(JoinGroupRequestProtocol
 
 @pytest.mark.roundtrip
 @given(from_type(JoinGroupRequestProtocol))
-@settings(max_examples=1)
 def test_join_group_request_protocol_roundtrip(
     instance: JoinGroupRequestProtocol,
 ) -> None:
@@ -37,7 +35,6 @@ read_join_group_request: Final = entity_reader(JoinGroupRequest)
 
 @pytest.mark.roundtrip
 @given(from_type(JoinGroupRequest))
-@settings(max_examples=1)
 def test_join_group_request_roundtrip(instance: JoinGroupRequest) -> None:
     writer = entity_writer(JoinGroupRequest)
     with setup_buffer() as buffer:

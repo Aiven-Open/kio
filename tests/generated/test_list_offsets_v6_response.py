@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.list_offsets.v6.response import ListOffsetsPartitionResponse
@@ -23,7 +22,6 @@ read_list_offsets_partition_response: Final = entity_reader(
 
 @pytest.mark.roundtrip
 @given(from_type(ListOffsetsPartitionResponse))
-@settings(max_examples=1)
 def test_list_offsets_partition_response_roundtrip(
     instance: ListOffsetsPartitionResponse,
 ) -> None:
@@ -40,7 +38,6 @@ read_list_offsets_topic_response: Final = entity_reader(ListOffsetsTopicResponse
 
 @pytest.mark.roundtrip
 @given(from_type(ListOffsetsTopicResponse))
-@settings(max_examples=1)
 def test_list_offsets_topic_response_roundtrip(
     instance: ListOffsetsTopicResponse,
 ) -> None:
@@ -57,7 +54,6 @@ read_list_offsets_response: Final = entity_reader(ListOffsetsResponse)
 
 @pytest.mark.roundtrip
 @given(from_type(ListOffsetsResponse))
-@settings(max_examples=1)
 def test_list_offsets_response_roundtrip(instance: ListOffsetsResponse) -> None:
     writer = entity_writer(ListOffsetsResponse)
     with setup_buffer() as buffer:

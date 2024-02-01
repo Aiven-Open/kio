@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.list_partition_reassignments.v0.request import (
@@ -26,7 +25,6 @@ read_list_partition_reassignments_topics: Final = entity_reader(
 
 @pytest.mark.roundtrip
 @given(from_type(ListPartitionReassignmentsTopics))
-@settings(max_examples=1)
 def test_list_partition_reassignments_topics_roundtrip(
     instance: ListPartitionReassignmentsTopics,
 ) -> None:
@@ -45,7 +43,6 @@ read_list_partition_reassignments_request: Final = entity_reader(
 
 @pytest.mark.roundtrip
 @given(from_type(ListPartitionReassignmentsRequest))
-@settings(max_examples=1)
 def test_list_partition_reassignments_request_roundtrip(
     instance: ListPartitionReassignmentsRequest,
 ) -> None:

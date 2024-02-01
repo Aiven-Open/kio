@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.alter_configs.v0.request import AlterableConfig
@@ -21,7 +20,6 @@ read_alterable_config: Final = entity_reader(AlterableConfig)
 
 @pytest.mark.roundtrip
 @given(from_type(AlterableConfig))
-@settings(max_examples=1)
 def test_alterable_config_roundtrip(instance: AlterableConfig) -> None:
     writer = entity_writer(AlterableConfig)
     with setup_buffer() as buffer:
@@ -36,7 +34,6 @@ read_alter_configs_resource: Final = entity_reader(AlterConfigsResource)
 
 @pytest.mark.roundtrip
 @given(from_type(AlterConfigsResource))
-@settings(max_examples=1)
 def test_alter_configs_resource_roundtrip(instance: AlterConfigsResource) -> None:
     writer = entity_writer(AlterConfigsResource)
     with setup_buffer() as buffer:
@@ -51,7 +48,6 @@ read_alter_configs_request: Final = entity_reader(AlterConfigsRequest)
 
 @pytest.mark.roundtrip
 @given(from_type(AlterConfigsRequest))
-@settings(max_examples=1)
 def test_alter_configs_request_roundtrip(instance: AlterConfigsRequest) -> None:
     writer = entity_writer(AlterConfigsRequest)
     with setup_buffer() as buffer:

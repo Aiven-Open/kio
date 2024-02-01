@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.describe_groups.v5.response import DescribedGroup
@@ -21,7 +20,6 @@ read_described_group_member: Final = entity_reader(DescribedGroupMember)
 
 @pytest.mark.roundtrip
 @given(from_type(DescribedGroupMember))
-@settings(max_examples=1)
 def test_described_group_member_roundtrip(instance: DescribedGroupMember) -> None:
     writer = entity_writer(DescribedGroupMember)
     with setup_buffer() as buffer:
@@ -36,7 +34,6 @@ read_described_group: Final = entity_reader(DescribedGroup)
 
 @pytest.mark.roundtrip
 @given(from_type(DescribedGroup))
-@settings(max_examples=1)
 def test_described_group_roundtrip(instance: DescribedGroup) -> None:
     writer = entity_writer(DescribedGroup)
     with setup_buffer() as buffer:
@@ -51,7 +48,6 @@ read_describe_groups_response: Final = entity_reader(DescribeGroupsResponse)
 
 @pytest.mark.roundtrip
 @given(from_type(DescribeGroupsResponse))
-@settings(max_examples=1)
 def test_describe_groups_response_roundtrip(instance: DescribeGroupsResponse) -> None:
     writer = entity_writer(DescribeGroupsResponse)
     with setup_buffer() as buffer:

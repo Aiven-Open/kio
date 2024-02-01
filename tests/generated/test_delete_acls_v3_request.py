@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.delete_acls.v3.request import DeleteAclsFilter
@@ -20,7 +19,6 @@ read_delete_acls_filter: Final = entity_reader(DeleteAclsFilter)
 
 @pytest.mark.roundtrip
 @given(from_type(DeleteAclsFilter))
-@settings(max_examples=1)
 def test_delete_acls_filter_roundtrip(instance: DeleteAclsFilter) -> None:
     writer = entity_writer(DeleteAclsFilter)
     with setup_buffer() as buffer:
@@ -35,7 +33,6 @@ read_delete_acls_request: Final = entity_reader(DeleteAclsRequest)
 
 @pytest.mark.roundtrip
 @given(from_type(DeleteAclsRequest))
-@settings(max_examples=1)
 def test_delete_acls_request_roundtrip(instance: DeleteAclsRequest) -> None:
     writer = entity_writer(DeleteAclsRequest)
     with setup_buffer() as buffer:

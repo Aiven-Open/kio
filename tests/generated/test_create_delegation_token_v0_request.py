@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.create_delegation_token.v0.request import CreatableRenewers
@@ -20,7 +19,6 @@ read_creatable_renewers: Final = entity_reader(CreatableRenewers)
 
 @pytest.mark.roundtrip
 @given(from_type(CreatableRenewers))
-@settings(max_examples=1)
 def test_creatable_renewers_roundtrip(instance: CreatableRenewers) -> None:
     writer = entity_writer(CreatableRenewers)
     with setup_buffer() as buffer:
@@ -37,7 +35,6 @@ read_create_delegation_token_request: Final = entity_reader(
 
 @pytest.mark.roundtrip
 @given(from_type(CreateDelegationTokenRequest))
-@settings(max_examples=1)
 def test_create_delegation_token_request_roundtrip(
     instance: CreateDelegationTokenRequest,
 ) -> None:

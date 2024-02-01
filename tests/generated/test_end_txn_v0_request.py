@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.end_txn.v0.request import EndTxnRequest
@@ -19,7 +18,6 @@ read_end_txn_request: Final = entity_reader(EndTxnRequest)
 
 @pytest.mark.roundtrip
 @given(from_type(EndTxnRequest))
-@settings(max_examples=1)
 def test_end_txn_request_roundtrip(instance: EndTxnRequest) -> None:
     writer = entity_writer(EndTxnRequest)
     with setup_buffer() as buffer:
