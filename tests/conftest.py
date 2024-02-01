@@ -6,6 +6,7 @@ import dataclasses
 import io
 import json
 import os
+
 from collections.abc import AsyncIterator
 from collections.abc import Iterator
 from contextlib import closing
@@ -25,6 +26,7 @@ from uuid import UUID
 
 import pytest
 import pytest_asyncio
+
 from hypothesis import settings
 
 from kio._utils import DataclassInstance

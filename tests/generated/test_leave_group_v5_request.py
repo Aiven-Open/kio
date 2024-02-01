@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Final
 
 import pytest
+
 from hypothesis import given
 from hypothesis import settings
 from hypothesis.strategies import from_type

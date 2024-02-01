@@ -5,6 +5,7 @@ https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/mes
 """
 
 import uuid
+
 from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
@@ -100,7 +101,7 @@ class PartitionData:
         metadata={"kafka_type": "int32"}, default=BrokerId(-1)
     )
     """The preferred read replica for the consumer to use on its next fetch request"""
-    records: tuple[bytes | None, ...] = field(metadata={"kafka_type": "records"})
+    records: bytes | None = field(metadata={"kafka_type": "records"})
     """The record data."""
 
 

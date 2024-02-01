@@ -1,8 +1,10 @@
 import io
 import uuid
+
 from typing import TypeVar
 
 import pytest
+
 from hypothesis import given
 from hypothesis.strategies import binary
 from hypothesis.strategies import booleans

@@ -1,6 +1,7 @@
 import datetime
 import io
 import uuid
+
 from dataclasses import dataclass
 from dataclasses import field
 from typing import ClassVar
@@ -63,8 +64,10 @@ class TestGetWriter:
             ("bytes", False, True, writers.write_nullable_legacy_bytes),
             ("bytes", True, False, writers.write_compact_string),
             ("bytes", False, False, writers.write_legacy_bytes),
-            ("records", True, True, writers.write_nullable_legacy_string),
-            ("records", False, True, writers.write_nullable_legacy_string),
+            ("records", True, True, writers.write_nullable_compact_string),
+            ("records", False, True, writers.write_nullable_legacy_bytes),
+            ("records", True, False, writers.write_compact_string),
+            ("records", False, False, writers.write_legacy_bytes),
             ("uuid", False, False, writers.write_uuid),
             ("uuid", True, False, writers.write_uuid),
             ("uuid", False, True, writers.write_uuid),
@@ -115,8 +118,6 @@ class TestGetWriter:
             ("float64", False, True),
             ("bool", False, True),
             ("bool", True, True),
-            ("records", True, False),
-            ("records", False, False),
             ("error_code", True, True),
             ("error_code", False, True),
             ("timedelta_i32", True, True),
