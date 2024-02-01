@@ -27,14 +27,13 @@ from uuid import UUID
 import pytest
 import pytest_asyncio
 
-from hypothesis import settings
-
 from kio._utils import DataclassInstance
 from kio.serial import entity_writer
 from kio.static.protocol import Entity
 
-settings.register_profile("test", deadline=timedelta(minutes=10))
-settings.load_profile("test")
+from .hypothesis import configure_hypothesis
+
+configure_hypothesis()
 
 
 def buffer() -> Iterator[io.BytesIO]:
