@@ -312,7 +312,7 @@ class PrimitiveField(_BaseField):
         values: Mapping[str, object],
     ) -> Mapping[str, object]:
         if values["name"] in error_code_names:
-            return values | {"type": "error_code"}
+            return {**values, "type": "error_code"}
         return values
 
     @staticmethod
@@ -337,7 +337,8 @@ class PrimitiveField(_BaseField):
                     raise NotImplementedError(
                         f"Unknown timedelta primitive type: {values['type']!r}"
                     )
-            return values | {
+            return {
+                **values,
                 "type": primitive.value,
                 "name": cls._drop_ms_suffix(name),
             }
@@ -346,7 +347,8 @@ class PrimitiveField(_BaseField):
                 raise NotImplementedError(
                     f"Unknown datetime primitive type: {values['type']!r}"
                 )
-            return values | {
+            return {
+                **values,
                 "type": Primitive.datetime_i64.value,
                 "name": cls._drop_ms_suffix(name),
             }
