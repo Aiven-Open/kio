@@ -24,6 +24,7 @@ from kio.static.primitive import u16
 from kio.static.primitive import u32
 from kio.static.primitive import u64
 
+from .errors import OutOfBoundValue
 from .errors import UnexpectedNull
 
 T = TypeVar("T")
@@ -193,15 +194,20 @@ def read_timedelta_i64(buffer: IO[bytes]) -> i64Timedelta:
     return datetime.timedelta(milliseconds=read_int64(buffer))  # type: ignore[return-value]
 
 
+def _tz_aware_from_i64(timestamp: i64) -> TZAware:
+    dt = datetime.datetime.fromtimestamp(timestamp / 1000, datetime.UTC)
+    try:
+        return TZAware.truncate(dt)
+    except TypeError as exception:
+        raise OutOfBoundValue("Read invalid value for datetime") from exception
+
+
 def read_datetime_i64(buffer: IO[bytes]) -> TZAware:
-    return datetime.datetime.fromtimestamp(  # type: ignore[return-value]
-        read_int64(buffer) / 1000,
-        datetime.UTC,
-    )
+    return _tz_aware_from_i64(read_int64(buffer))
 
 
 def read_nullable_datetime_i64(buffer: IO[bytes]) -> TZAware | None:
     timestamp = read_int64(buffer)
     if timestamp == -1:
         return None
-    return TZAware.fromtimestamp(timestamp / 1000)
+    return _tz_aware_from_i64(timestamp)
