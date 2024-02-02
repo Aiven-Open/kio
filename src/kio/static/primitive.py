@@ -7,6 +7,8 @@ from collections.abc import Callable
 from typing import Final
 from typing import Self
 
+from hypothesis import assume
+
 from ._phantom import Phantom
 from ._phantom import Predicate
 
@@ -98,9 +100,16 @@ class f64(float, Phantom, bound=float, predicate=math.isfinite):
         register_type_strategy(cls, floats(allow_nan=False, allow_infinity=False))  # type: ignore[arg-type]
 
 
-def has_millisecond_precision(value: datetime.timedelta) -> bool:
-    milliseconds = value.total_seconds() * 1000
-    return int(milliseconds) == milliseconds
+# Note: because datetime.timedelta is float-based, there are values that do not
+# round-trip to the same value when going through timedelta -> milliseconds ->
+# timedelta. We'll pragmatically ignore the inconsistency for now, but we need
+# to eliminate such values to have stable tests.
+# Pragma no cover because this is only used in property tests, and those do not
+# contribute to coverage report.
+def _timedelta_survives_roundtrip(  # pragma: no cover
+    value: datetime.timedelta,
+) -> bool:
+    return value == datetime.timedelta(milliseconds=round(value.total_seconds() * 1000))
 
 
 i32_timedelta_min: Final = datetime.timedelta(milliseconds=-(2**31))
@@ -108,10 +117,7 @@ i32_timedelta_max: Final = datetime.timedelta(milliseconds=2**31 - 1)
 
 
 def is_i32_timedelta(value: datetime.timedelta) -> bool:
-    return (
-        i32_timedelta_min <= value <= i32_timedelta_max
-        and has_millisecond_precision(value)
-    )
+    return i32_timedelta_min <= value <= i32_timedelta_max
 
 
 class i32Timedelta(
@@ -121,7 +127,7 @@ class i32Timedelta(
     predicate=is_i32_timedelta,
 ):
     @classmethod
-    def __hypothesis_hook__(cls) -> None:
+    def __hypothesis_hook__(cls) -> None:  # pragma: no cover
         from hypothesis.strategies import SearchStrategy
         from hypothesis.strategies import composite
         from hypothesis.strategies import integers
@@ -132,22 +138,21 @@ class i32Timedelta(
             draw: Callable,
             elements: SearchStrategy[int] = integers(-(2**31), 2**31 - 1),
         ) -> i32Timedelta:
-            return datetime.timedelta(  # type: ignore[return-value]
-                milliseconds=draw(elements)
-            )
+            delta = datetime.timedelta(milliseconds=draw(elements))
+            assume(_timedelta_survives_roundtrip(delta))
+            return i32Timedelta.parse(delta)
 
         register_type_strategy(cls, i32_timedeltas())
 
 
 i64_timedelta_min: Final = datetime.timedelta.min
-i64_timedelta_max: Final = datetime.timedelta.max
+# If we allow days=999999999, seconds and microseconds can sum to more than
+# 24h, which in turn causes it to not round-trip.
+i64_timedelta_max: Final = datetime.timedelta.max - datetime.timedelta(days=1)
 
 
 def is_i64_timedelta(value: datetime.timedelta) -> bool:
-    return (
-        i64_timedelta_min <= value <= i64_timedelta_max
-        and has_millisecond_precision(value)
-    )
+    return i64_timedelta_min <= value <= i64_timedelta_max
 
 
 class i64Timedelta(
@@ -157,7 +162,7 @@ class i64Timedelta(
     predicate=is_i64_timedelta,
 ):
     @classmethod
-    def __hypothesis_hook__(cls) -> None:
+    def __hypothesis_hook__(cls) -> None:  # pragma: no cover
         from hypothesis.strategies import SearchStrategy
         from hypothesis.strategies import composite
         from hypothesis.strategies import integers
@@ -167,13 +172,13 @@ class i64Timedelta(
         def i64_timedeltas(
             draw: Callable,
             elements: SearchStrategy[int] = integers(
-                datetime.timedelta.min // datetime.timedelta(milliseconds=1),
-                datetime.timedelta.max // datetime.timedelta(milliseconds=1),
+                i64_timedelta_min // datetime.timedelta(milliseconds=1),
+                i64_timedelta_max // datetime.timedelta(milliseconds=1),
             ),
         ) -> i64Timedelta:
-            return datetime.timedelta(  # type: ignore[return-value]
-                milliseconds=draw(elements),
-            )
+            delta = datetime.timedelta(milliseconds=draw(elements))
+            assume(_timedelta_survives_roundtrip(delta))
+            return i64Timedelta.parse(delta)
 
         register_type_strategy(cls, i64_timedeltas())
 
@@ -207,7 +212,7 @@ class TZAware(
     tzinfo: datetime.tzinfo
 
     @classmethod
-    def __hypothesis_hook__(cls) -> None:
+    def __hypothesis_hook__(cls) -> None:  # pragma: no cover
         from hypothesis import assume
         from hypothesis.strategies import SearchStrategy
         from hypothesis.strategies import composite
