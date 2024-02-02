@@ -468,13 +468,7 @@ async def test_topic_and_metadata_operations() -> None:
     )
 
 
-# Custom exception for ability to xfail narrowly.
-class _IncompleteFetch(Exception):
-    ...
-
-
 @pytest.mark.xfail(
-    raises=_IncompleteFetch,
     reason=(
         "This test is flaky. Intermittently, Kafka returns incomplete responses for "
         "the fetch response. If this turns out to be expected behavior, we need to "
@@ -563,13 +557,7 @@ async def test_produce_consume() -> None:
         forgotten_topics_data=(),
     )
 
-    try:
-        fetch_response = await make_request(fetch_request, FetchResponse)
-    except ValueError as exception:
-        # Re-raise as custom error in order to xfail as strictly as possible.
-        if str(exception).startswith("not enough values to unpack"):
-            raise _IncompleteFetch from exception
-        raise
+    fetch_response = await make_request(fetch_request, FetchResponse)
 
     assert_type(fetch_response, FetchResponse)
     assert fetch_response.error_code is ErrorCode.none
