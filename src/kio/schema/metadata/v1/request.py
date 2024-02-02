@@ -32,5 +32,5 @@ class MetadataRequest:
     __flexible__: ClassVar[bool] = False
     __api_key__: ClassVar[i16] = i16(3)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
-    topics: tuple[MetadataRequestTopic, ...]
+    topics: tuple[MetadataRequestTopic, ...] | None
     """The topics to fetch metadata for."""

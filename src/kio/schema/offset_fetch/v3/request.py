@@ -40,5 +40,5 @@ class OffsetFetchRequest:
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     group_id: GroupId = field(metadata={"kafka_type": "string"})
     """The group to fetch offsets for."""
-    topics: tuple[OffsetFetchRequestTopic, ...]
+    topics: tuple[OffsetFetchRequestTopic, ...] | None
     """Each topic we would like to fetch offsets for, or null to fetch offsets for all topics."""

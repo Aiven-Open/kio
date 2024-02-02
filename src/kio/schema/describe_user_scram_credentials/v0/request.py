@@ -31,5 +31,5 @@ class DescribeUserScramCredentialsRequest:
     __flexible__: ClassVar[bool] = True
     __api_key__: ClassVar[i16] = i16(50)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
-    users: tuple[UserName, ...]
+    users: tuple[UserName, ...] | None
     """The users to describe, or null/empty to describe all users."""

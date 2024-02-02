@@ -62,7 +62,7 @@ class CreatableTopicResult:
     """Number of partitions of the topic."""
     replication_factor: i16 = field(metadata={"kafka_type": "int16"}, default=i16(-1))
     """Replication factor of the topic."""
-    configs: tuple[CreatableTopicConfigs, ...]
+    configs: tuple[CreatableTopicConfigs, ...] | None
     """Configuration of the topic."""
 
 

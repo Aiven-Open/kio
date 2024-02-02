@@ -38,7 +38,7 @@ class ElectLeadersRequest:
     __flexible__: ClassVar[bool] = False
     __api_key__: ClassVar[i16] = i16(43)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
-    topic_partitions: tuple[TopicPartitions, ...]
+    topic_partitions: tuple[TopicPartitions, ...] | None
     """The topic partitions to elect leaders."""
     timeout: i32Timedelta = field(
         metadata={"kafka_type": "timedelta_i32"},

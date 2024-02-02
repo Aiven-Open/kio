@@ -54,14 +54,18 @@ T = TypeVar("T")
 
 
 def classify_field(field: Field[T]) -> tuple[FieldKind, type[T]]:
-    type_origin = get_origin(field.type)
+    return _classify_field(field.type, field.name)
+
+
+def _classify_field(field_type: type[T], field_name: str) -> tuple[FieldKind, type[T]]:
+    type_origin = get_origin(field_type)
 
     if type_origin is UnionType:
         try:
-            a, b = get_args(field.type)
+            a, b = get_args(field_type)
         except ValueError:
             raise SchemaError(
-                f"Field {field.name} has unsupported union type: {field.type}"
+                f"Field {field_name} has unsupported union type: {field_type}"
             ) from None
 
         if a is NoneType:
@@ -71,20 +75,16 @@ def classify_field(field: Field[T]) -> tuple[FieldKind, type[T]]:
         else:
             raise SchemaError("Only union with None is supported")
 
-        return (
-            (FieldKind.entity, inner_type)
-            if is_dataclass(inner_type)
-            else (FieldKind.primitive, inner_type)
-        )
+        return _classify_field(inner_type, f"{field_name}.nested")
 
     if type_origin is not tuple:
         return (
-            (FieldKind.entity, field.type)  # type: ignore[return-value]
-            if is_dataclass(field.type)
-            else (FieldKind.primitive, field.type)
+            (FieldKind.entity, field_type)  # type: ignore[return-value]
+            if is_dataclass(field_type)
+            else (FieldKind.primitive, field_type)
         )
 
-    type_args = get_args(field.type)
+    type_args = get_args(field_type)
 
     match type_args:
         case (inner_type, EllipsisType()) if is_dataclass(inner_type):
@@ -92,7 +92,7 @@ def classify_field(field: Field[T]) -> tuple[FieldKind, type[T]]:
         case (inner_type, EllipsisType()):
             return FieldKind.primitive_tuple, inner_type
 
-    raise SchemaError(f"Field {field.name} has invalid tuple type args: {type_args}")
+    raise SchemaError(f"Field {field_name} has invalid tuple type args: {type_args}")
 
 
 def get_field_tag(field: Field) -> int | None:

@@ -35,5 +35,5 @@ class DescribeLogDirsRequest:
     __flexible__: ClassVar[bool] = False
     __api_key__: ClassVar[i16] = i16(35)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
-    topics: tuple[DescribableLogDirTopic, ...]
+    topics: tuple[DescribableLogDirTopic, ...] | None
     """Each topic that we want to describe log directories for, or null for all topics."""

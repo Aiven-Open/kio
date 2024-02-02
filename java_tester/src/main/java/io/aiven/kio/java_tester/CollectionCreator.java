@@ -1,5 +1,6 @@
 package io.aiven.kio.java_tester;
 
+import com.fasterxml.jackson.databind.node.NullNode;
 import java.lang.reflect.Method;
 import java.util.AbstractCollection;
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ class CollectionCreator extends BaseCreator {
     CollectionCreator(RootMessageInfo rootMessageInfo,
                       JsonNode fieldValue, String fieldName, Schema fieldSchema) throws Exception {
         super(rootMessageInfo);
-        if (!fieldValue.isArray()) {
+        if (!fieldValue.isArray() && !fieldValue.isNull()) {
             throw new Exception("The value of " + fieldName + " must be array but was " + fieldValue);
         }
         this.fieldValue = fieldValue;
@@ -28,6 +29,9 @@ class CollectionCreator extends BaseCreator {
     AbstractCollection<Object> createAbstractCollection(
         Class<AbstractCollection<Object>> collectionClazz
     ) throws Exception {
+        if (fieldValue.isNull()) {
+            return null;
+        }
         AbstractCollection<Object> collection = collectionClazz.getDeclaredConstructor().newInstance();
         Class<?> elementClazz = getCollectionElementClass(collectionClazz);
         fillCollectionFromChildren(elementClazz, collection);
@@ -47,6 +51,9 @@ class CollectionCreator extends BaseCreator {
     }
 
     List<?> createList() throws Exception {
+        if (fieldValue.isNull()) {
+            return null;
+        }
         final String elementTypeInSchema;
         {
             String tmp = fieldSchema.type();

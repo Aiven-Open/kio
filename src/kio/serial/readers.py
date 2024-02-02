@@ -164,20 +164,22 @@ def read_uuid(buffer: IO[bytes]) -> UUID | None:
     return UUID(bytes=byte_value)
 
 
-def compact_array_reader(item_reader: Reader[T]) -> Reader[tuple[T, ...]]:
-    def read_compact_array(buffer: IO[bytes]) -> tuple[T, ...]:
-        return tuple(
-            item_reader(buffer) for _ in range(read_compact_array_length(buffer))
-        )
+def compact_array_reader(item_reader: Reader[T]) -> Reader[tuple[T, ...] | None]:
+    def read_compact_array(buffer: IO[bytes]) -> tuple[T, ...] | None:
+        length = read_compact_array_length(buffer)
+        if length == -1:
+            return None
+        return tuple(item_reader(buffer) for _ in range(length))
 
     return read_compact_array
 
 
-def legacy_array_reader(item_reader: Reader[T]) -> Reader[tuple[T, ...]]:
-    def read_compact_array(buffer: IO[bytes]) -> tuple[T, ...]:
-        return tuple(
-            item_reader(buffer) for _ in range(read_legacy_array_length(buffer))
-        )
+def legacy_array_reader(item_reader: Reader[T]) -> Reader[tuple[T, ...] | None]:
+    def read_compact_array(buffer: IO[bytes]) -> tuple[T, ...] | None:
+        length = read_legacy_array_length(buffer)
+        if length == -1:
+            return None
+        return tuple(item_reader(buffer) for _ in range(length))
 
     return read_compact_array
 

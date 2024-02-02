@@ -33,5 +33,5 @@ class DescribeDelegationTokenRequest:
     __flexible__: ClassVar[bool] = False
     __api_key__: ClassVar[i16] = i16(41)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
-    owners: tuple[DescribeDelegationTokenOwner, ...]
+    owners: tuple[DescribeDelegationTokenOwner, ...] | None
     """Each owner that we want to describe delegation tokens for, or null to describe all tokens."""

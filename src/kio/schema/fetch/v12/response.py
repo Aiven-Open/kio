@@ -94,7 +94,7 @@ class PartitionData:
     )
     snapshot_id: SnapshotId = field(metadata={"tag": 2}, default=SnapshotId())
     """In the case of fetching an offset less than the LogStartOffset, this is the end offset and epoch that should be used in the FetchSnapshot request."""
-    aborted_transactions: tuple[AbortedTransaction, ...]
+    aborted_transactions: tuple[AbortedTransaction, ...] | None
     """The aborted transactions."""
     preferred_read_replica: BrokerId = field(
         metadata={"kafka_type": "int32"}, default=BrokerId(-1)

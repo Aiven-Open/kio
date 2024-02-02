@@ -198,16 +198,22 @@ def write_uuid(buffer: Writable, value: UUID | None) -> None:
 
 
 def compact_array_writer(item_writer: Writer[T]) -> Writer[Sequence[T]]:
-    def write_compact_array(buffer: Writable, items: Sequence[T]) -> None:
-        write_compact_array_length(buffer, len(items))
-        for item in items:
-            item_writer(buffer, item)
+    def write_compact_array(buffer: Writable, items: Sequence[T] | None) -> None:
+        if items is None:
+            write_compact_array_length(buffer, -1)
+        else:
+            write_compact_array_length(buffer, len(items))
+            for item in items:
+                item_writer(buffer, item)
 
     return write_compact_array
 
 
 def legacy_array_writer(item_writer: Writer[T]) -> Writer[Sequence[T]]:
-    def write_legacy_array(buffer: Writable, items: Sequence[T]) -> None:
+    def write_legacy_array(buffer: Writable, items: Sequence[T] | None) -> None:
+        if items is None:
+            write_legacy_array_length(buffer, i32(-1))
+            return
         try:
             length = i32(len(items))
         except TypeError as exception:
