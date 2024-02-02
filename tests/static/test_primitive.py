@@ -1,11 +1,22 @@
+import datetime
+
+import pytest
+
 from hypothesis import given
 from hypothesis.strategies import from_type
 from hypothesis.strategies import integers
 
+from kio.static.primitive import TZAware
 from kio.static.primitive import i8
 from kio.static.primitive import i16
 from kio.static.primitive import i32
+from kio.static.primitive import i32_timedelta_max
+from kio.static.primitive import i32_timedelta_min
+from kio.static.primitive import i32Timedelta
 from kio.static.primitive import i64
+from kio.static.primitive import i64_timedelta_max
+from kio.static.primitive import i64_timedelta_min
+from kio.static.primitive import i64Timedelta
 from kio.static.primitive import u8
 from kio.static.primitive import u16
 from kio.static.primitive import u32
@@ -138,3 +149,119 @@ class TestI64:
     @given(integers(min_value=high + 1) | integers(max_value=low - 1))
     def test_invalid_value_is_not_instance(self, value: int) -> None:
         assert not isinstance(value, i64)
+
+
+class TestI32Timedelta:
+    @pytest.mark.parametrize(
+        "value",
+        (
+            datetime.timedelta(milliseconds=1),
+            datetime.timedelta(microseconds=1),
+            datetime.timedelta(microseconds=-1),
+            datetime.timedelta(milliseconds=1, microseconds=1),
+            datetime.timedelta(milliseconds=1, microseconds=-1),
+            # Testing upper bound.
+            i32_timedelta_max,
+            # Testing lower bound.
+            i32_timedelta_min,
+        ),
+    )
+    def test_valid_value_is_instance(self, value: datetime.timedelta) -> None:
+        assert isinstance(value, i32Timedelta)
+
+    @pytest.mark.parametrize(
+        "value",
+        (
+            object(),
+            1,
+            # Testing lower bound.
+            i32_timedelta_min - datetime.timedelta(milliseconds=1),
+            # Testing both lower bound and sub precision.
+            i32_timedelta_min - datetime.timedelta(microseconds=1),
+            # Testing upper bound.
+            i32_timedelta_max + datetime.timedelta(milliseconds=1),
+            # Testing both upper bound and sub precision.
+            i32_timedelta_max + datetime.timedelta(microseconds=1),
+        ),
+    )
+    def test_invalid_value_is_not_instance(self, value: object) -> None:
+        assert not isinstance(value, i32Timedelta)
+
+
+class TestI64Timedelta:
+    @pytest.mark.parametrize(
+        "value",
+        (
+            datetime.timedelta(milliseconds=1),
+            datetime.timedelta(microseconds=1),
+            datetime.timedelta(microseconds=-1),
+            datetime.timedelta(milliseconds=1, microseconds=1),
+            datetime.timedelta(milliseconds=1, microseconds=-1),
+            # Testing upper bound.
+            i64_timedelta_max,
+            # Testing lower bound.
+            i64_timedelta_min,
+        ),
+    )
+    def test_valid_value_is_instance(self, value: datetime.timedelta) -> None:
+        assert isinstance(value, i64Timedelta)
+
+    @pytest.mark.parametrize(
+        "value",
+        (
+            object(),
+            1,
+            # Testing upper bound.
+            i64_timedelta_max + datetime.timedelta(microseconds=1),
+        ),
+    )
+    def test_invalid_value_is_not_instance(self, value: object) -> None:
+        assert not isinstance(value, i64Timedelta)
+
+    def test_cannot_represent_values_outside_lower_bound(self) -> None:
+        with pytest.raises(OverflowError):
+            i64_timedelta_min - datetime.timedelta(microseconds=1)
+
+        with pytest.raises(OverflowError):
+            i64_timedelta_min - datetime.timedelta(milliseconds=1)
+
+
+class TestTZAware:
+    @pytest.mark.parametrize(
+        "value",
+        (
+            datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC),
+            # Testing lower bound.
+            datetime.datetime.fromtimestamp(0, tz=datetime.UTC),
+            # Testing upper bound.
+            datetime.datetime.max.replace(tzinfo=datetime.UTC, microsecond=0),
+        ),
+    )
+    def test_valid_value_is_instance(self, value: datetime.datetime) -> None:
+        assert isinstance(value, TZAware)
+
+    @pytest.mark.parametrize(
+        "value",
+        (
+            # This has sub millisecond precision.
+            datetime.datetime.max.replace(tzinfo=datetime.UTC),
+            datetime.datetime(2024, 1, 1, microsecond=1, tzinfo=datetime.UTC),
+            (
+                datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC)
+                - datetime.timedelta(microseconds=1)
+            ),
+            # Testing lower bound.
+            datetime.datetime.fromtimestamp(-1, tz=datetime.UTC),
+            # No timezone.
+            datetime.datetime(2024, 1, 1),
+        ),
+    )
+    def test_invalid_value_is_not_instance(self, value: object) -> None:
+        assert not isinstance(value, TZAware)
+
+    def test_cannot_represent_value_over_upper_bound(self) -> None:
+        with pytest.raises(OverflowError):
+            (
+                datetime.datetime.max.replace(tzinfo=datetime.UTC)
+                + datetime.timedelta(milliseconds=1)
+            )
