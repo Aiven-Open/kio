@@ -5,9 +5,11 @@ import sys
 import uuid
 
 from typing import IO
+from typing import final
 
 import pytest
 
+from kio.serial.errors import BufferUnderflow
 from kio.serial.errors import OutOfBoundValue
 from kio.serial.errors import UnexpectedNull
 from kio.serial.readers import Reader
@@ -36,6 +38,41 @@ from kio.static.constants import uuid_zero
 from kio.static.primitive import TZAware
 
 
+class BufferUnderflowContract:
+    reader: Reader[object]
+    valid_serialization: bytes
+
+    @classmethod
+    def read(cls, buffer: IO[bytes]) -> object:
+        return cls.reader(buffer)
+
+    @final
+    def test_raises_buffer_underflow_when_not_enough_bytes_for_value(
+        self,
+        buffer: IO[bytes],
+    ) -> None:
+        buffer.write(self.valid_serialization[:-1])
+        buffer.seek(0)
+
+        with pytest.raises(BufferUnderflow):
+            self.read(buffer)
+
+
+class LengthBufferUnderflowContract(BufferUnderflowContract):
+    length_num_bytes: int
+
+    @final
+    def test_raises_buffer_underflow_when_not_enough_bytes_for_length(
+        self,
+        buffer: IO[bytes],
+    ) -> None:
+        buffer.write(self.valid_serialization[: self.length_num_bytes - 1])
+        buffer.seek(0)
+
+        with pytest.raises(BufferUnderflow):
+            self.read(buffer)
+
+
 class IntReaderContract:
     reader: Reader[int]
     lower_limit: int
@@ -48,99 +85,111 @@ class IntReaderContract:
     def read(cls, buffer: IO[bytes]) -> int:
         return cls.reader(buffer)
 
+    @final
     def test_can_read_lower_limit_sync(self, buffer: io.BytesIO) -> None:
         buffer.write(self.lower_limit_as_bytes)
         buffer.seek(0)
         assert self.lower_limit == self.read(buffer)
 
+    @final
     def test_can_read_upper_limit_sync(self, buffer: io.BytesIO) -> None:
         buffer.write(self.upper_limit_as_bytes)
         buffer.seek(0)
         assert self.upper_limit == self.read(buffer)
 
+    @final
     def test_can_read_zero_sync(self, buffer: io.BytesIO) -> None:
         buffer.write(self.zero_as_bytes)
         buffer.seek(0)
         assert self.read(buffer) == 0
 
 
-class TestReadInt8(IntReaderContract):
+class TestReadInt8(IntReaderContract, BufferUnderflowContract):
     reader = read_int8
     lower_limit = -128
     lower_limit_as_bytes = b"\x80"
     upper_limit = 127
     upper_limit_as_bytes = b"\x7f"
     zero_as_bytes = b"\x00"
+    valid_serialization = zero_as_bytes
 
 
-class TestReadInt16(IntReaderContract):
+class TestReadInt16(IntReaderContract, BufferUnderflowContract):
     reader = read_int16
     lower_limit = -(2**15)
     lower_limit_as_bytes = b"\x80\x00"
     upper_limit = 2**15 - 1
     upper_limit_as_bytes = b"\x7f\xff"
     zero_as_bytes = b"\x00\x00"
+    valid_serialization = zero_as_bytes
 
 
-class TestReadInt32(IntReaderContract):
+class TestReadInt32(IntReaderContract, BufferUnderflowContract):
     reader = read_int32
     lower_limit = -(2**31)
     lower_limit_as_bytes = b"\x80\x00\x00\x00"
     upper_limit = 2**31 - 1
     upper_limit_as_bytes = b"\x7f\xff\xff\xff"
     zero_as_bytes = b"\x00\x00\x00\x00"
+    valid_serialization = zero_as_bytes
 
 
-class TestReadInt64(IntReaderContract):
+class TestReadInt64(IntReaderContract, BufferUnderflowContract):
     reader = read_int64
     lower_limit = -(2**63)
     lower_limit_as_bytes = b"\x80\x00\x00\x00\x00\x00\x00\x00"
     upper_limit = 2**63 - 1
     upper_limit_as_bytes = b"\x7f\xff\xff\xff\xff\xff\xff\xff"
     zero_as_bytes = b"\x00\x00\x00\x00\x00\x00\x00\x00"
+    valid_serialization = zero_as_bytes
 
 
-class TestReadUint8(IntReaderContract):
+class TestReadUint8(IntReaderContract, BufferUnderflowContract):
     reader = read_uint8
     lower_limit = 0
     lower_limit_as_bytes = zero_as_bytes = b"\x00"
     upper_limit = 2**8 - 1
     upper_limit_as_bytes = b"\xff"
+    valid_serialization = zero_as_bytes
 
 
-class TestReadUint16(IntReaderContract):
+class TestReadUint16(IntReaderContract, BufferUnderflowContract):
     reader = read_uint16
     lower_limit = 0
     lower_limit_as_bytes = zero_as_bytes = b"\x00\x00"
     upper_limit = 2**16 - 1
     upper_limit_as_bytes = b"\xff\xff"
     lower_limit_error_message = "argument out of range"
+    valid_serialization = zero_as_bytes
 
 
-class TestReadUint32(IntReaderContract):
+class TestReadUint32(IntReaderContract, BufferUnderflowContract):
     reader = read_uint32
     lower_limit = 0
     lower_limit_as_bytes = zero_as_bytes = b"\x00\x00\x00\x00"
     upper_limit = 2**32 - 1
     upper_limit_as_bytes = b"\xff\xff\xff\xff"
     lower_limit_error_message = "argument out of range"
+    valid_serialization = zero_as_bytes
 
 
-class TestReadUint64(IntReaderContract):
+class TestReadUint64(IntReaderContract, BufferUnderflowContract):
     reader = read_uint64
     lower_limit = 0
     lower_limit_as_bytes = zero_as_bytes = b"\x00\x00\x00\x00\x00\x00\x00\x00"
     upper_limit = 2**64 - 1
     upper_limit_as_bytes = b"\xff\xff\xff\xff\xff\xff\xff\xff"
     match_error_message = r"int too large to convert"
+    valid_serialization = zero_as_bytes
 
 
-class TestReadUnsignedVarint(IntReaderContract):
+class TestReadUnsignedVarint(IntReaderContract, BufferUnderflowContract):
     reader = read_unsigned_varint
     lower_limit = 0
     lower_limit_as_bytes = zero_as_bytes = b"\x00"
     upper_limit = 2**31 - 1
     upper_limit_as_bytes = b"\xff\xff\xff\xff\x07"
+    valid_serialization = zero_as_bytes
 
     def test_raises_value_error_for_too_long_value(self, buffer: io.BytesIO) -> None:
         for _ in range(5):
@@ -170,7 +219,10 @@ class TestReadUnsignedVarint(IntReaderContract):
         assert self.read(buffer) == expected
 
 
-class TestReadFloat64:
+class TestReadFloat64(BufferUnderflowContract):
+    reader = read_float64
+    valid_serialization = struct.pack(">d", 0)
+
     @pytest.mark.parametrize(
         "value",
         (
@@ -186,10 +238,14 @@ class TestReadFloat64:
     def test_can_read_value(self, buffer: io.BytesIO, value: float) -> None:
         buffer.write(struct.pack(">d", value))
         buffer.seek(0)
-        assert read_float64(buffer) == value
+        assert self.read(buffer) == value
 
 
-class TestReadCompactStringAsBytes:
+class TestReadCompactStringAsBytes(LengthBufferUnderflowContract):
+    reader = read_compact_string_as_bytes
+    length_num_bytes = 1
+    valid_serialization = b"\x06hello"
+
     def test_raises_unexpected_null_for_negative_length_sync(
         self,
         buffer: io.BytesIO,
@@ -197,7 +253,7 @@ class TestReadCompactStringAsBytes:
         buffer.write(0b00000000.to_bytes(1, "little"))
         buffer.seek(0)
         with pytest.raises(UnexpectedNull):
-            read_compact_string_as_bytes(buffer)
+            self.read(buffer)
 
     def test_can_read_bytes_sync(
         self,
@@ -208,17 +264,21 @@ class TestReadCompactStringAsBytes:
         buffer.write(byte_length.to_bytes(1, "little"))
         buffer.write(value)
         buffer.seek(0)
-        assert value == read_compact_string_as_bytes(buffer)
+        assert value == self.read(buffer)
 
 
-class TestReadCompactStringAsBytesNullable:
+class TestReadCompactStringAsBytesNullable(LengthBufferUnderflowContract):
+    reader = read_compact_string_as_bytes_nullable
+    length_num_bytes = 1
+    valid_serialization = b"\x06hello"
+
     def test_returns_null_for_negative_length_sync(
         self,
         buffer: io.BytesIO,
     ) -> None:
         buffer.write(0b00000000.to_bytes(1, "little"))
         buffer.seek(0)
-        assert read_compact_string_as_bytes_nullable(buffer) is None
+        assert self.read(buffer) is None
 
     def test_can_read_bytes_sync(
         self,
@@ -229,10 +289,14 @@ class TestReadCompactStringAsBytesNullable:
         buffer.write(byte_length.to_bytes(1, "little"))
         buffer.write(value)
         buffer.seek(0)
-        assert value == read_compact_string_as_bytes_nullable(buffer)
+        assert value == self.read(buffer)
 
 
-class TestReadCompactString:
+class TestReadCompactString(LengthBufferUnderflowContract):
+    reader = read_compact_string
+    length_num_bytes = 1
+    valid_serialization = b"\x06hello"
+
     def test_raises_unexpected_null_for_negative_length_sync(
         self,
         buffer: io.BytesIO,
@@ -240,7 +304,7 @@ class TestReadCompactString:
         buffer.write((0).to_bytes(1, "little"))
         buffer.seek(0)
         with pytest.raises(UnexpectedNull):
-            read_compact_string(buffer)
+            self.read(buffer)
 
     def test_can_read_string_sync(
         self,
@@ -252,17 +316,21 @@ class TestReadCompactString:
         buffer.write(byte_length.to_bytes(1, "little"))
         buffer.write(byte_value)
         buffer.seek(0)
-        assert value == read_compact_string(buffer)
+        assert value == self.read(buffer)
 
 
-class TestReadCompactStringNullable:
+class TestReadCompactStringNullable(LengthBufferUnderflowContract):
+    reader = read_compact_string_nullable
+    length_num_bytes = 1
+    valid_serialization = b"\x06hello"
+
     def test_returns_null_for_negative_length_sync(
         self,
         buffer: io.BytesIO,
     ) -> None:
         buffer.write((0).to_bytes(1, "little"))
         buffer.seek(0)
-        assert read_compact_string_nullable(buffer) is None
+        assert self.read(buffer) is None
 
     def test_can_read_string_sync(
         self,
@@ -274,17 +342,21 @@ class TestReadCompactStringNullable:
         buffer.write(byte_length.to_bytes(1, "little"))
         buffer.write(byte_value)
         buffer.seek(0)
-        assert value == read_compact_string_nullable(buffer)
+        assert value == self.read(buffer)
 
 
-class TestReadNullableLegacyBytes:
+class TestReadNullableLegacyBytes(LengthBufferUnderflowContract):
+    reader = read_nullable_legacy_bytes
+    length_num_bytes = 4
+    valid_serialization = b"\x00\x00\x00\x05hello"
+
     def test_returns_none_for_negative_length_sync(
         self,
         buffer: io.BytesIO,
     ) -> None:
         buffer.write(struct.pack(">i", -1))
         buffer.seek(0)
-        assert read_nullable_legacy_bytes(buffer) is None
+        assert self.read(buffer) is None
 
     def test_can_read_bytes_sync(
         self,
@@ -295,10 +367,14 @@ class TestReadNullableLegacyBytes:
         buffer.write(struct.pack(">i", byte_length))
         buffer.write(value)
         buffer.seek(0)
-        assert value == read_nullable_legacy_bytes(buffer)
+        assert value == self.read(buffer)
 
 
-class TestReadLegacyString:
+class TestReadLegacyString(LengthBufferUnderflowContract):
+    reader = read_legacy_string
+    length_num_bytes = 2
+    valid_serialization = b"\x00\x05hello"
+
     def test_raises_unexpected_null_for_negative_length_sync(
         self,
         buffer: io.BytesIO,
@@ -306,7 +382,7 @@ class TestReadLegacyString:
         buffer.write(struct.pack(">h", -1))
         buffer.seek(0)
         with pytest.raises(UnexpectedNull):
-            read_legacy_string(buffer)
+            self.read(buffer)
 
     def test_can_read_string_sync(
         self,
@@ -318,17 +394,21 @@ class TestReadLegacyString:
         buffer.write(struct.pack(">h", byte_length))
         buffer.write(byte_value)
         buffer.seek(0)
-        assert value == read_legacy_string(buffer)
+        assert value == self.read(buffer)
 
 
-class TestReadNullableLegacyString:
+class TestReadNullableLegacyString(LengthBufferUnderflowContract):
+    reader = read_nullable_legacy_string
+    length_num_bytes = 2
+    valid_serialization = b"\x00\x05hello"
+
     def test_returns_null_for_negative_length_sync(
         self,
         buffer: io.BytesIO,
     ) -> None:
         buffer.write(struct.pack(">h", -1))
         buffer.seek(0)
-        assert read_nullable_legacy_string(buffer) is None
+        assert self.read(buffer) is None
 
     def test_can_read_string_sync(
         self,
@@ -340,10 +420,14 @@ class TestReadNullableLegacyString:
         buffer.write(struct.pack(">h", byte_length))
         buffer.write(byte_value)
         buffer.seek(0)
-        assert value == read_nullable_legacy_string(buffer)
+        assert value == self.read(buffer)
 
 
-class TestReadLegacyBytes:
+class TestReadLegacyBytes(LengthBufferUnderflowContract):
+    reader = read_legacy_bytes
+    length_num_bytes = 4
+    valid_serialization = b"\x00\x00\x00\x05hello"
+
     def test_raises_unexpected_null_for_negative_length_sync(
         self,
         buffer: io.BytesIO,
@@ -351,7 +435,7 @@ class TestReadLegacyBytes:
         buffer.write(struct.pack(">i", -1))
         buffer.seek(0)
         with pytest.raises(UnexpectedNull):
-            read_legacy_bytes(buffer)
+            self.read(buffer)
 
     def test_can_read_bytes_sync(
         self,
@@ -363,20 +447,23 @@ class TestReadLegacyBytes:
         buffer.write(struct.pack(">i", byte_length))
         buffer.write(byte_value)
         buffer.seek(0)
-        assert byte_value == read_legacy_bytes(buffer)
+        assert byte_value == self.read(buffer)
 
 
-class TestReadUUID:
+class TestReadUUID(BufferUnderflowContract):
+    reader = read_uuid
+    valid_serialization = uuid_zero.bytes
+
     def test_reads_zero_as_none(self, buffer: io.BytesIO) -> None:
         buffer.write(uuid_zero.bytes)
         buffer.seek(0)
-        assert read_uuid(buffer) is None
+        assert self.read(buffer) is None
 
     def test_can_read_uuid4(self, buffer: io.BytesIO) -> None:
         value = uuid.uuid4()
         buffer.write(value.bytes)
         buffer.seek(0)
-        assert read_uuid(buffer) == value
+        assert self.read(buffer) == value
 
 
 class TestReadDatetimeI64:
