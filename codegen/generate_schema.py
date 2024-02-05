@@ -364,9 +364,7 @@ def generate_entity_array_field(
     field: EntityArrayField,
     version: int,
 ) -> str:
-    optional = (
-        field.nullableVersions.matches(version) if field.nullableVersions else False
-    )
+    optional = field.is_nullable_for_version(version)
     field_call = format_array_field_call(field, version)
     opt = " | None" if optional else ""
     return (
@@ -399,9 +397,7 @@ def generate_entity_field(
     field: EntityField | CommonStructField,
     version: int,
 ) -> str:
-    optional = (
-        field.nullableVersions.matches(version) if field.nullableVersions else False
-    )
+    optional = field.is_nullable_for_version(version)
     field_call = format_dataclass_field(
         field_type=field.type,
         default=field.default,
@@ -419,9 +415,7 @@ def generate_common_struct_array_field(
     field: CommonStructArrayField,
     version: int,
 ) -> str:
-    optional = (
-        field.nullableVersions.matches(version) if field.nullableVersions else False
-    )
+    optional = field.is_nullable_for_version(version)
     field_call = format_array_field_call(field, version)
     opt = " | None" if optional else ""
     return (
@@ -437,9 +431,7 @@ def generate_common_struct_field(
     field_call = format_dataclass_field(
         field_type=field.type,
         default=None,
-        optional=(
-            field.nullableVersions.matches(version) if field.nullableVersions else False
-        ),
+        optional=field.is_nullable_for_version(version),
         custom_type=None,
         tag=field.get_tag(version),
         ignorable=field.ignorable,

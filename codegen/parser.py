@@ -233,6 +233,11 @@ class _BaseField(BaseModel):
         assert self.tag is not None  # guaranteed by model validator
         return self.tag
 
+    def is_nullable_for_version(self, value: int) -> bool:
+        if self.nullableVersions is None:
+            return False
+        return self.nullableVersions.matches(value)
+
 
 # Defining this union before its members allows not having to call
 # EntityField.update_forward_refs().
