@@ -56,13 +56,12 @@ jobs:
           coverage xml
 
       - name: Report coverage
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           file: coverage.xml
           fail_ci_if_error: true
           name: codecov-py${{ matrix.python-version }}
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   roundtrip-test:
     name: Roundtrip tests
