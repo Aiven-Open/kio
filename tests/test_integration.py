@@ -9,6 +9,7 @@ from contextlib import closing
 from typing import Any
 from typing import Final
 from typing import TypeVar
+from typing import assert_never
 from typing import assert_type
 from unittest import mock
 
@@ -49,6 +50,7 @@ from kio.schema.types import TopicName
 from kio.schema.types import TransactionalId
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from kio.serial.errors import BufferUnderflow
 from kio.serial.readers import read_int32
 from kio.serial.writers import Writable
 from kio.serial.writers import write_int32
@@ -59,8 +61,9 @@ from kio.static.primitive import i16
 from kio.static.primitive import i32
 from kio.static.primitive import i32Timedelta
 from kio.static.primitive import i64
-from kio.static.protocol import Entity
-from kio.static.protocol import Payload
+from kio.static.protocol import RequestHeader
+from kio.static.protocol import RequestPayload
+from kio.static.protocol import ResponsePayload
 
 from . import fixtures
 
@@ -71,12 +74,12 @@ timedelta_zero: Final = i32Timedelta.parse(datetime.timedelta())
 
 def write_request_header(
     buffer: Writable,
-    payload: Payload,
+    payload: RequestPayload,
     correlation_id: i32,
     client_id: str | None,
 ) -> None:
     header_schema = payload.__header_schema__
-    header: Entity
+    header: RequestHeader
 
     if issubclass(header_schema, kio.schema.request_header.v0.header.RequestHeader):
         header = header_schema(
@@ -98,14 +101,14 @@ def write_request_header(
             client_id=client_id,
         )
     else:
-        raise NotImplementedError(f"Unknown request header schema: {header_schema}")
+        assert_never(header_schema)
 
     entity_writer(header_schema)(buffer, header)
 
 
 async def send(
     stream: StreamWriter,
-    payload: Payload,
+    payload: RequestPayload,
     correlation_id: i32,
 ) -> None:
     write_request = entity_writer(type(payload))
@@ -142,7 +145,7 @@ async def read_response_bytes(stream: StreamReader) -> io.BytesIO:
     return io.BytesIO(await stream.read(response_length))
 
 
-R = TypeVar("R", bound=Payload)
+R = TypeVar("R", bound=ResponsePayload)
 
 
 def parse_response(
@@ -162,7 +165,7 @@ def parse_response(
 
 
 async def make_request(
-    request: Payload,
+    request: RequestPayload,
     response_type: type[R],
 ) -> R:
     correlation_id = i32(secrets.randbelow(i32.__high__ + 1))
@@ -468,13 +471,8 @@ async def test_topic_and_metadata_operations() -> None:
     )
 
 
-# Custom exception for ability to xfail narrowly.
-class _IncompleteFetch(Exception):
-    ...
-
-
 @pytest.mark.xfail(
-    raises=_IncompleteFetch,
+    raises=BufferUnderflow,
     reason=(
         "This test is flaky. Intermittently, Kafka returns incomplete responses for "
         "the fetch response. If this turns out to be expected behavior, we need to "
@@ -563,13 +561,7 @@ async def test_produce_consume() -> None:
         forgotten_topics_data=(),
     )
 
-    try:
-        fetch_response = await make_request(fetch_request, FetchResponse)
-    except ValueError as exception:
-        # Re-raise as custom error in order to xfail as strictly as possible.
-        if str(exception).startswith("not enough values to unpack"):
-            raise _IncompleteFetch from exception
-        raise
+    fetch_response = await make_request(fetch_request, FetchResponse)
 
     assert_type(fetch_response, FetchResponse)
     assert fetch_response.error_code is ErrorCode.none

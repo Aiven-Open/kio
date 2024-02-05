@@ -10,6 +10,10 @@ class UnexpectedNull(DecodeError):
     ...
 
 
+class BufferUnderflow(DecodeError):
+    ...
+
+
 class SchemaError(SerialError):
     ...
 
