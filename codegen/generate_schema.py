@@ -360,15 +360,17 @@ def format_array_field_call(
     return f" = field({formatted_kwargs})"
 
 
-def generate_entity_array_field(
-    field: EntityArrayField,
+def format_non_primitive_array_field(
+    field: EntityArrayField | CommonStructArrayField,
     version: int,
+    inner_type_name: str,
 ) -> str:
-    optional = field.is_nullable_for_version(version)
     field_call = format_array_field_call(field, version)
-    opt = " | None" if optional else ""
+    optional = " | None" if field.is_nullable_for_version(version) else ""
     return (
-        f"    {to_snake_case(field.name)}: tuple[{field.type}, ...]{opt}{field_call}\n"
+        f"    {to_snake_case(field.name)}: "
+        f"tuple[{inner_type_name}, ...]{optional}"
+        f"{field_call}\n"
     )
 
 
@@ -409,19 +411,6 @@ def generate_entity_field(
     )
     annotation = entity_annotation(field, optional)
     return f"    {to_snake_case(field.name)}: {annotation}{field_call}\n"
-
-
-def generate_common_struct_array_field(
-    field: CommonStructArrayField,
-    version: int,
-) -> str:
-    optional = field.is_nullable_for_version(version)
-    field_call = format_array_field_call(field, version)
-    opt = " | None" if optional else ""
-    return (
-        f"    {to_snake_case(field.name)}: tuple[{field.type.struct.name}, ...]{opt}"
-        f"{field_call}\n"
-    )
 
 
 def generate_common_struct_field(
@@ -542,10 +531,7 @@ def generate_dataclass(  # noqa: C901
                 version=version,
             )
             class_fields.append(
-                generate_entity_array_field(
-                    field=field,
-                    version=version,
-                )
+                format_non_primitive_array_field(field, version, field.type)
             )
         elif isinstance(field, EntityField):
             yield from generate_dataclass(
@@ -562,7 +548,9 @@ def generate_dataclass(  # noqa: C901
                 fields=field.type.struct.fields,
                 version=version,
             )
-            class_fields.append(generate_common_struct_array_field(field, version))
+            class_fields.append(
+                format_non_primitive_array_field(field, version, field.type.struct.name)
+            )
         elif isinstance(field, CommonStructField):
             yield from generate_dataclass(
                 schema=schema,
