@@ -9,6 +9,7 @@ from contextlib import closing
 from typing import Any
 from typing import Final
 from typing import TypeVar
+from typing import assert_never
 from typing import assert_type
 from unittest import mock
 
@@ -60,8 +61,9 @@ from kio.static.primitive import i16
 from kio.static.primitive import i32
 from kio.static.primitive import i32Timedelta
 from kio.static.primitive import i64
-from kio.static.protocol import Entity
-from kio.static.protocol import Payload
+from kio.static.protocol import RequestHeader
+from kio.static.protocol import RequestPayload
+from kio.static.protocol import ResponsePayload
 
 from . import fixtures
 
@@ -72,12 +74,12 @@ timedelta_zero: Final = i32Timedelta.parse(datetime.timedelta())
 
 def write_request_header(
     buffer: Writable,
-    payload: Payload,
+    payload: RequestPayload,
     correlation_id: i32,
     client_id: str | None,
 ) -> None:
     header_schema = payload.__header_schema__
-    header: Entity
+    header: RequestHeader
 
     if issubclass(header_schema, kio.schema.request_header.v0.header.RequestHeader):
         header = header_schema(
@@ -99,14 +101,14 @@ def write_request_header(
             client_id=client_id,
         )
     else:
-        raise NotImplementedError(f"Unknown request header schema: {header_schema}")
+        assert_never(header_schema)
 
     entity_writer(header_schema)(buffer, header)
 
 
 async def send(
     stream: StreamWriter,
-    payload: Payload,
+    payload: RequestPayload,
     correlation_id: i32,
 ) -> None:
     write_request = entity_writer(type(payload))
@@ -143,7 +145,7 @@ async def read_response_bytes(stream: StreamReader) -> io.BytesIO:
     return io.BytesIO(await stream.read(response_length))
 
 
-R = TypeVar("R", bound=Payload)
+R = TypeVar("R", bound=ResponsePayload)
 
 
 def parse_response(
@@ -163,7 +165,7 @@ def parse_response(
 
 
 async def make_request(
-    request: Payload,
+    request: RequestPayload,
     response_type: type[R],
 ) -> R:
     correlation_id = i32(secrets.randbelow(i32.__high__ + 1))
