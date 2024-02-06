@@ -50,7 +50,6 @@ from kio.schema.types import TopicName
 from kio.schema.types import TransactionalId
 from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.serial.errors import BufferUnderflow
 from kio.serial.readers import read_int32
 from kio.serial.writers import Writable
 from kio.serial.writers import write_int32
@@ -140,9 +139,9 @@ class CorrelationIdMismatch(RuntimeError):
 
 
 async def read_response_bytes(stream: StreamReader) -> io.BytesIO:
-    response_length_bytes = await stream.read(4)
+    response_length_bytes = await stream.readexactly(4)
     response_length = read_int32(io.BytesIO(response_length_bytes))
-    return io.BytesIO(await stream.read(response_length))
+    return io.BytesIO(await stream.readexactly(response_length))
 
 
 R = TypeVar("R", bound=ResponsePayload)
@@ -471,14 +470,6 @@ async def test_topic_and_metadata_operations() -> None:
     )
 
 
-@pytest.mark.xfail(
-    raises=BufferUnderflow,
-    reason=(
-        "This test is flaky. Intermittently, Kafka returns incomplete responses for "
-        "the fetch response. If this turns out to be expected behavior, we need to "
-        "adjust this test to retry fetching until it parses successfully."
-    ),
-)
 async def test_produce_consume() -> None:
     topic_name = TopicName("le-topic-2")
 

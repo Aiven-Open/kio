@@ -58,8 +58,9 @@ to Apache Kafka®, and receive and parse the response into a full entity.
             await stream_writer.drain()
 
             # Read response into a temporary buffer.
-            response_length = read_int32(stream_reader)
-            response_buffer = io.BytesIO(await stream_reader.read(response_length))
+            response_length_bytes = await stream.readexactly(4)
+            response_length = read_int32(io.BytesIO(response_length_bytes))
+            response_buffer = io.BytesIO(await stream_reader.readexactly(response_length))
 
         # Parse header and payload from response buffer.
         response_header = read_header(response_buffer)
