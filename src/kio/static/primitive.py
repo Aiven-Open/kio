@@ -7,8 +7,6 @@ from collections.abc import Callable
 from typing import Final
 from typing import Self
 
-from hypothesis import assume
-
 from ._phantom import Phantom
 from ._phantom import Predicate
 
@@ -128,6 +126,7 @@ class i32Timedelta(
 ):
     @classmethod
     def __hypothesis_hook__(cls) -> None:  # pragma: no cover
+        from hypothesis import assume
         from hypothesis.strategies import SearchStrategy
         from hypothesis.strategies import composite
         from hypothesis.strategies import integers
@@ -163,6 +162,7 @@ class i64Timedelta(
 ):
     @classmethod
     def __hypothesis_hook__(cls) -> None:  # pragma: no cover
+        from hypothesis import assume
         from hypothesis.strategies import SearchStrategy
         from hypothesis.strategies import composite
         from hypothesis.strategies import integers
