@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.sync_group.v5.response import SyncGroupResponse
@@ -19,7 +18,6 @@ read_sync_group_response: Final = entity_reader(SyncGroupResponse)
 
 @pytest.mark.roundtrip
 @given(from_type(SyncGroupResponse))
-@settings(max_examples=1)
 def test_sync_group_response_roundtrip(instance: SyncGroupResponse) -> None:
     writer = entity_writer(SyncGroupResponse)
     with setup_buffer() as buffer:

@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.write_txn_markers.v1.response import WritableTxnMarkerPartitionResult
@@ -24,7 +23,6 @@ read_writable_txn_marker_partition_result: Final = entity_reader(
 
 @pytest.mark.roundtrip
 @given(from_type(WritableTxnMarkerPartitionResult))
-@settings(max_examples=1)
 def test_writable_txn_marker_partition_result_roundtrip(
     instance: WritableTxnMarkerPartitionResult,
 ) -> None:
@@ -43,7 +41,6 @@ read_writable_txn_marker_topic_result: Final = entity_reader(
 
 @pytest.mark.roundtrip
 @given(from_type(WritableTxnMarkerTopicResult))
-@settings(max_examples=1)
 def test_writable_txn_marker_topic_result_roundtrip(
     instance: WritableTxnMarkerTopicResult,
 ) -> None:
@@ -60,7 +57,6 @@ read_writable_txn_marker_result: Final = entity_reader(WritableTxnMarkerResult)
 
 @pytest.mark.roundtrip
 @given(from_type(WritableTxnMarkerResult))
-@settings(max_examples=1)
 def test_writable_txn_marker_result_roundtrip(
     instance: WritableTxnMarkerResult,
 ) -> None:
@@ -77,7 +73,6 @@ read_write_txn_markers_response: Final = entity_reader(WriteTxnMarkersResponse)
 
 @pytest.mark.roundtrip
 @given(from_type(WriteTxnMarkersResponse))
-@settings(max_examples=1)
 def test_write_txn_markers_response_roundtrip(
     instance: WriteTxnMarkersResponse,
 ) -> None:

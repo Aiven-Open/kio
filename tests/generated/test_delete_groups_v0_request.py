@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.delete_groups.v0.request import DeleteGroupsRequest
@@ -19,7 +18,6 @@ read_delete_groups_request: Final = entity_reader(DeleteGroupsRequest)
 
 @pytest.mark.roundtrip
 @given(from_type(DeleteGroupsRequest))
-@settings(max_examples=1)
 def test_delete_groups_request_roundtrip(instance: DeleteGroupsRequest) -> None:
     writer = entity_writer(DeleteGroupsRequest)
     with setup_buffer() as buffer:

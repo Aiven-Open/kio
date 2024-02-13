@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.join_group.v5.response import JoinGroupResponse
@@ -20,7 +19,6 @@ read_join_group_response_member: Final = entity_reader(JoinGroupResponseMember)
 
 @pytest.mark.roundtrip
 @given(from_type(JoinGroupResponseMember))
-@settings(max_examples=1)
 def test_join_group_response_member_roundtrip(
     instance: JoinGroupResponseMember,
 ) -> None:
@@ -37,7 +35,6 @@ read_join_group_response: Final = entity_reader(JoinGroupResponse)
 
 @pytest.mark.roundtrip
 @given(from_type(JoinGroupResponse))
-@settings(max_examples=1)
 def test_join_group_response_roundtrip(instance: JoinGroupResponse) -> None:
     writer = entity_writer(JoinGroupResponse)
     with setup_buffer() as buffer:

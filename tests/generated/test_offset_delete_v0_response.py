@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.offset_delete.v0.response import OffsetDeleteResponse
@@ -23,7 +22,6 @@ read_offset_delete_response_partition: Final = entity_reader(
 
 @pytest.mark.roundtrip
 @given(from_type(OffsetDeleteResponsePartition))
-@settings(max_examples=1)
 def test_offset_delete_response_partition_roundtrip(
     instance: OffsetDeleteResponsePartition,
 ) -> None:
@@ -40,7 +38,6 @@ read_offset_delete_response_topic: Final = entity_reader(OffsetDeleteResponseTop
 
 @pytest.mark.roundtrip
 @given(from_type(OffsetDeleteResponseTopic))
-@settings(max_examples=1)
 def test_offset_delete_response_topic_roundtrip(
     instance: OffsetDeleteResponseTopic,
 ) -> None:
@@ -57,7 +54,6 @@ read_offset_delete_response: Final = entity_reader(OffsetDeleteResponse)
 
 @pytest.mark.roundtrip
 @given(from_type(OffsetDeleteResponse))
-@settings(max_examples=1)
 def test_offset_delete_response_roundtrip(instance: OffsetDeleteResponse) -> None:
     writer = entity_writer(OffsetDeleteResponse)
     with setup_buffer() as buffer:

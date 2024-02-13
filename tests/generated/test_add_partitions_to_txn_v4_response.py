@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.add_partitions_to_txn.v4.response import (
@@ -26,7 +25,6 @@ read_add_partitions_to_txn_partition_result: Final = entity_reader(
 
 @pytest.mark.roundtrip
 @given(from_type(AddPartitionsToTxnPartitionResult))
-@settings(max_examples=1)
 def test_add_partitions_to_txn_partition_result_roundtrip(
     instance: AddPartitionsToTxnPartitionResult,
 ) -> None:
@@ -45,7 +43,6 @@ read_add_partitions_to_txn_topic_result: Final = entity_reader(
 
 @pytest.mark.roundtrip
 @given(from_type(AddPartitionsToTxnTopicResult))
-@settings(max_examples=1)
 def test_add_partitions_to_txn_topic_result_roundtrip(
     instance: AddPartitionsToTxnTopicResult,
 ) -> None:
@@ -62,7 +59,6 @@ read_add_partitions_to_txn_result: Final = entity_reader(AddPartitionsToTxnResul
 
 @pytest.mark.roundtrip
 @given(from_type(AddPartitionsToTxnResult))
-@settings(max_examples=1)
 def test_add_partitions_to_txn_result_roundtrip(
     instance: AddPartitionsToTxnResult,
 ) -> None:
@@ -79,7 +75,6 @@ read_add_partitions_to_txn_response: Final = entity_reader(AddPartitionsToTxnRes
 
 @pytest.mark.roundtrip
 @given(from_type(AddPartitionsToTxnResponse))
-@settings(max_examples=1)
 def test_add_partitions_to_txn_response_roundtrip(
     instance: AddPartitionsToTxnResponse,
 ) -> None:

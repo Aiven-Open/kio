@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.unregister_broker.v0.response import UnregisterBrokerResponse
@@ -19,7 +18,6 @@ read_unregister_broker_response: Final = entity_reader(UnregisterBrokerResponse)
 
 @pytest.mark.roundtrip
 @given(from_type(UnregisterBrokerResponse))
-@settings(max_examples=1)
 def test_unregister_broker_response_roundtrip(
     instance: UnregisterBrokerResponse,
 ) -> None:

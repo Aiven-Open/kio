@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.consumer_protocol_subscription.v0.data import (
@@ -21,7 +20,6 @@ read_consumer_protocol_subscription: Final = entity_reader(ConsumerProtocolSubsc
 
 @pytest.mark.roundtrip
 @given(from_type(ConsumerProtocolSubscription))
-@settings(max_examples=1)
 def test_consumer_protocol_subscription_roundtrip(
     instance: ConsumerProtocolSubscription,
 ) -> None:

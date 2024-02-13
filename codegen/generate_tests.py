@@ -49,7 +49,7 @@ def get_entities() -> Iterator[tuple[type[Entity], str]]:
 imports = """\
 from __future__ import annotations
 import io
-from hypothesis import given, settings
+from hypothesis import given
 from hypothesis.strategies import from_type
 from kio.serial import entity_writer
 from tests.conftest import setup_buffer, JavaTester
@@ -68,7 +68,6 @@ read_{entity_snake_case}: Final = entity_reader({entity_type})
 
 @pytest.mark.roundtrip
 @given(from_type({entity_type}))
-@settings(max_examples=1)
 def test_{entity_snake_case}_roundtrip(instance: {entity_type}) -> None:
     writer = entity_writer({entity_type})
     with setup_buffer() as buffer:

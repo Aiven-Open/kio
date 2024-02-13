@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.elect_leaders.v2.response import ElectLeadersResponse
@@ -21,7 +20,6 @@ read_partition_result: Final = entity_reader(PartitionResult)
 
 @pytest.mark.roundtrip
 @given(from_type(PartitionResult))
-@settings(max_examples=1)
 def test_partition_result_roundtrip(instance: PartitionResult) -> None:
     writer = entity_writer(PartitionResult)
     with setup_buffer() as buffer:
@@ -36,7 +34,6 @@ read_replica_election_result: Final = entity_reader(ReplicaElectionResult)
 
 @pytest.mark.roundtrip
 @given(from_type(ReplicaElectionResult))
-@settings(max_examples=1)
 def test_replica_election_result_roundtrip(instance: ReplicaElectionResult) -> None:
     writer = entity_writer(ReplicaElectionResult)
     with setup_buffer() as buffer:
@@ -51,7 +48,6 @@ read_elect_leaders_response: Final = entity_reader(ElectLeadersResponse)
 
 @pytest.mark.roundtrip
 @given(from_type(ElectLeadersResponse))
-@settings(max_examples=1)
 def test_elect_leaders_response_roundtrip(instance: ElectLeadersResponse) -> None:
     writer = entity_writer(ElectLeadersResponse)
     with setup_buffer() as buffer:

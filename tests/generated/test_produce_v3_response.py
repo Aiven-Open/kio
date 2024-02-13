@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.produce.v3.response import PartitionProduceResponse
@@ -21,7 +20,6 @@ read_partition_produce_response: Final = entity_reader(PartitionProduceResponse)
 
 @pytest.mark.roundtrip
 @given(from_type(PartitionProduceResponse))
-@settings(max_examples=1)
 def test_partition_produce_response_roundtrip(
     instance: PartitionProduceResponse,
 ) -> None:
@@ -38,7 +36,6 @@ read_topic_produce_response: Final = entity_reader(TopicProduceResponse)
 
 @pytest.mark.roundtrip
 @given(from_type(TopicProduceResponse))
-@settings(max_examples=1)
 def test_topic_produce_response_roundtrip(instance: TopicProduceResponse) -> None:
     writer = entity_writer(TopicProduceResponse)
     with setup_buffer() as buffer:
@@ -53,7 +50,6 @@ read_produce_response: Final = entity_reader(ProduceResponse)
 
 @pytest.mark.roundtrip
 @given(from_type(ProduceResponse))
-@settings(max_examples=1)
 def test_produce_response_roundtrip(instance: ProduceResponse) -> None:
     writer = entity_writer(ProduceResponse)
     with setup_buffer() as buffer:

@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.sasl_handshake.v0.response import SaslHandshakeResponse
@@ -19,7 +18,6 @@ read_sasl_handshake_response: Final = entity_reader(SaslHandshakeResponse)
 
 @pytest.mark.roundtrip
 @given(from_type(SaslHandshakeResponse))
-@settings(max_examples=1)
 def test_sasl_handshake_response_roundtrip(instance: SaslHandshakeResponse) -> None:
     writer = entity_writer(SaslHandshakeResponse)
     with setup_buffer() as buffer:

@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.create_acls.v3.response import AclCreationResult
@@ -20,7 +19,6 @@ read_acl_creation_result: Final = entity_reader(AclCreationResult)
 
 @pytest.mark.roundtrip
 @given(from_type(AclCreationResult))
-@settings(max_examples=1)
 def test_acl_creation_result_roundtrip(instance: AclCreationResult) -> None:
     writer = entity_writer(AclCreationResult)
     with setup_buffer() as buffer:
@@ -35,7 +33,6 @@ read_create_acls_response: Final = entity_reader(CreateAclsResponse)
 
 @pytest.mark.roundtrip
 @given(from_type(CreateAclsResponse))
-@settings(max_examples=1)
 def test_create_acls_response_roundtrip(instance: CreateAclsResponse) -> None:
     writer = entity_writer(CreateAclsResponse)
     with setup_buffer() as buffer:

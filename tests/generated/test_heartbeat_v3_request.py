@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.heartbeat.v3.request import HeartbeatRequest
@@ -19,7 +18,6 @@ read_heartbeat_request: Final = entity_reader(HeartbeatRequest)
 
 @pytest.mark.roundtrip
 @given(from_type(HeartbeatRequest))
-@settings(max_examples=1)
 def test_heartbeat_request_roundtrip(instance: HeartbeatRequest) -> None:
     writer = entity_writer(HeartbeatRequest)
     with setup_buffer() as buffer:

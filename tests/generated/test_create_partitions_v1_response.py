@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.create_partitions.v1.response import CreatePartitionsResponse
@@ -20,7 +19,6 @@ read_create_partitions_topic_result: Final = entity_reader(CreatePartitionsTopic
 
 @pytest.mark.roundtrip
 @given(from_type(CreatePartitionsTopicResult))
-@settings(max_examples=1)
 def test_create_partitions_topic_result_roundtrip(
     instance: CreatePartitionsTopicResult,
 ) -> None:
@@ -37,7 +35,6 @@ read_create_partitions_response: Final = entity_reader(CreatePartitionsResponse)
 
 @pytest.mark.roundtrip
 @given(from_type(CreatePartitionsResponse))
-@settings(max_examples=1)
 def test_create_partitions_response_roundtrip(
     instance: CreatePartitionsResponse,
 ) -> None:

@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.request_header.v2.header import RequestHeader
@@ -19,7 +18,6 @@ read_request_header: Final = entity_reader(RequestHeader)
 
 @pytest.mark.roundtrip
 @given(from_type(RequestHeader))
-@settings(max_examples=1)
 def test_request_header_roundtrip(instance: RequestHeader) -> None:
     writer = entity_writer(RequestHeader)
     with setup_buffer() as buffer:

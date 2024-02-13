@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.describe_log_dirs.v4.response import DescribeLogDirsPartition
@@ -22,7 +21,6 @@ read_describe_log_dirs_partition: Final = entity_reader(DescribeLogDirsPartition
 
 @pytest.mark.roundtrip
 @given(from_type(DescribeLogDirsPartition))
-@settings(max_examples=1)
 def test_describe_log_dirs_partition_roundtrip(
     instance: DescribeLogDirsPartition,
 ) -> None:
@@ -39,7 +37,6 @@ read_describe_log_dirs_topic: Final = entity_reader(DescribeLogDirsTopic)
 
 @pytest.mark.roundtrip
 @given(from_type(DescribeLogDirsTopic))
-@settings(max_examples=1)
 def test_describe_log_dirs_topic_roundtrip(instance: DescribeLogDirsTopic) -> None:
     writer = entity_writer(DescribeLogDirsTopic)
     with setup_buffer() as buffer:
@@ -54,7 +51,6 @@ read_describe_log_dirs_result: Final = entity_reader(DescribeLogDirsResult)
 
 @pytest.mark.roundtrip
 @given(from_type(DescribeLogDirsResult))
-@settings(max_examples=1)
 def test_describe_log_dirs_result_roundtrip(instance: DescribeLogDirsResult) -> None:
     writer = entity_writer(DescribeLogDirsResult)
     with setup_buffer() as buffer:
@@ -69,7 +65,6 @@ read_describe_log_dirs_response: Final = entity_reader(DescribeLogDirsResponse)
 
 @pytest.mark.roundtrip
 @given(from_type(DescribeLogDirsResponse))
-@settings(max_examples=1)
 def test_describe_log_dirs_response_roundtrip(
     instance: DescribeLogDirsResponse,
 ) -> None:

@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.snapshot_header_record.v0.data import SnapshotHeaderRecord
@@ -19,7 +18,6 @@ read_snapshot_header_record: Final = entity_reader(SnapshotHeaderRecord)
 
 @pytest.mark.roundtrip
 @given(from_type(SnapshotHeaderRecord))
-@settings(max_examples=1)
 def test_snapshot_header_record_roundtrip(instance: SnapshotHeaderRecord) -> None:
     writer = entity_writer(SnapshotHeaderRecord)
     with setup_buffer() as buffer:

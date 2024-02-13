@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.consumer_group_heartbeat.v0.request import Assignor
@@ -21,7 +20,6 @@ read_assignor: Final = entity_reader(Assignor)
 
 @pytest.mark.roundtrip
 @given(from_type(Assignor))
-@settings(max_examples=1)
 def test_assignor_roundtrip(instance: Assignor) -> None:
     writer = entity_writer(Assignor)
     with setup_buffer() as buffer:
@@ -36,7 +34,6 @@ read_topic_partitions: Final = entity_reader(TopicPartitions)
 
 @pytest.mark.roundtrip
 @given(from_type(TopicPartitions))
-@settings(max_examples=1)
 def test_topic_partitions_roundtrip(instance: TopicPartitions) -> None:
     writer = entity_writer(TopicPartitions)
     with setup_buffer() as buffer:
@@ -53,7 +50,6 @@ read_consumer_group_heartbeat_request: Final = entity_reader(
 
 @pytest.mark.roundtrip
 @given(from_type(ConsumerGroupHeartbeatRequest))
-@settings(max_examples=1)
 def test_consumer_group_heartbeat_request_roundtrip(
     instance: ConsumerGroupHeartbeatRequest,
 ) -> None:

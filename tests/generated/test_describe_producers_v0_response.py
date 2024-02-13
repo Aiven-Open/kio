@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.describe_producers.v0.response import DescribeProducersResponse
@@ -22,7 +21,6 @@ read_producer_state: Final = entity_reader(ProducerState)
 
 @pytest.mark.roundtrip
 @given(from_type(ProducerState))
-@settings(max_examples=1)
 def test_producer_state_roundtrip(instance: ProducerState) -> None:
     writer = entity_writer(ProducerState)
     with setup_buffer() as buffer:
@@ -37,7 +35,6 @@ read_partition_response: Final = entity_reader(PartitionResponse)
 
 @pytest.mark.roundtrip
 @given(from_type(PartitionResponse))
-@settings(max_examples=1)
 def test_partition_response_roundtrip(instance: PartitionResponse) -> None:
     writer = entity_writer(PartitionResponse)
     with setup_buffer() as buffer:
@@ -52,7 +49,6 @@ read_topic_response: Final = entity_reader(TopicResponse)
 
 @pytest.mark.roundtrip
 @given(from_type(TopicResponse))
-@settings(max_examples=1)
 def test_topic_response_roundtrip(instance: TopicResponse) -> None:
     writer = entity_writer(TopicResponse)
     with setup_buffer() as buffer:
@@ -67,7 +63,6 @@ read_describe_producers_response: Final = entity_reader(DescribeProducersRespons
 
 @pytest.mark.roundtrip
 @given(from_type(DescribeProducersResponse))
-@settings(max_examples=1)
 def test_describe_producers_response_roundtrip(
     instance: DescribeProducersResponse,
 ) -> None:

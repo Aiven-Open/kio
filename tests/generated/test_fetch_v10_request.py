@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.fetch.v10.request import FetchPartition
@@ -22,7 +21,6 @@ read_fetch_partition: Final = entity_reader(FetchPartition)
 
 @pytest.mark.roundtrip
 @given(from_type(FetchPartition))
-@settings(max_examples=1)
 def test_fetch_partition_roundtrip(instance: FetchPartition) -> None:
     writer = entity_writer(FetchPartition)
     with setup_buffer() as buffer:
@@ -37,7 +35,6 @@ read_fetch_topic: Final = entity_reader(FetchTopic)
 
 @pytest.mark.roundtrip
 @given(from_type(FetchTopic))
-@settings(max_examples=1)
 def test_fetch_topic_roundtrip(instance: FetchTopic) -> None:
     writer = entity_writer(FetchTopic)
     with setup_buffer() as buffer:
@@ -52,7 +49,6 @@ read_forgotten_topic: Final = entity_reader(ForgottenTopic)
 
 @pytest.mark.roundtrip
 @given(from_type(ForgottenTopic))
-@settings(max_examples=1)
 def test_forgotten_topic_roundtrip(instance: ForgottenTopic) -> None:
     writer = entity_writer(ForgottenTopic)
     with setup_buffer() as buffer:
@@ -67,7 +63,6 @@ read_fetch_request: Final = entity_reader(FetchRequest)
 
 @pytest.mark.roundtrip
 @given(from_type(FetchRequest))
-@settings(max_examples=1)
 def test_fetch_request_roundtrip(instance: FetchRequest) -> None:
     writer = entity_writer(FetchRequest)
     with setup_buffer() as buffer:

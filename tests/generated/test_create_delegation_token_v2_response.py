@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.create_delegation_token.v2.response import CreateDelegationTokenResponse
@@ -21,7 +20,6 @@ read_create_delegation_token_response: Final = entity_reader(
 
 @pytest.mark.roundtrip
 @given(from_type(CreateDelegationTokenResponse))
-@settings(max_examples=1)
 def test_create_delegation_token_response_roundtrip(
     instance: CreateDelegationTokenResponse,
 ) -> None:

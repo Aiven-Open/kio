@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.describe_log_dirs.v4.request import DescribableLogDirTopic
@@ -20,7 +19,6 @@ read_describable_log_dir_topic: Final = entity_reader(DescribableLogDirTopic)
 
 @pytest.mark.roundtrip
 @given(from_type(DescribableLogDirTopic))
-@settings(max_examples=1)
 def test_describable_log_dir_topic_roundtrip(instance: DescribableLogDirTopic) -> None:
     writer = entity_writer(DescribableLogDirTopic)
     with setup_buffer() as buffer:
@@ -35,7 +33,6 @@ read_describe_log_dirs_request: Final = entity_reader(DescribeLogDirsRequest)
 
 @pytest.mark.roundtrip
 @given(from_type(DescribeLogDirsRequest))
-@settings(max_examples=1)
 def test_describe_log_dirs_request_roundtrip(instance: DescribeLogDirsRequest) -> None:
     writer = entity_writer(DescribeLogDirsRequest)
     with setup_buffer() as buffer:

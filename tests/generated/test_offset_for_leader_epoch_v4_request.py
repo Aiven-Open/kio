@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.offset_for_leader_epoch.v4.request import OffsetForLeaderEpochRequest
@@ -21,7 +20,6 @@ read_offset_for_leader_partition: Final = entity_reader(OffsetForLeaderPartition
 
 @pytest.mark.roundtrip
 @given(from_type(OffsetForLeaderPartition))
-@settings(max_examples=1)
 def test_offset_for_leader_partition_roundtrip(
     instance: OffsetForLeaderPartition,
 ) -> None:
@@ -38,7 +36,6 @@ read_offset_for_leader_topic: Final = entity_reader(OffsetForLeaderTopic)
 
 @pytest.mark.roundtrip
 @given(from_type(OffsetForLeaderTopic))
-@settings(max_examples=1)
 def test_offset_for_leader_topic_roundtrip(instance: OffsetForLeaderTopic) -> None:
     writer = entity_writer(OffsetForLeaderTopic)
     with setup_buffer() as buffer:
@@ -53,7 +50,6 @@ read_offset_for_leader_epoch_request: Final = entity_reader(OffsetForLeaderEpoch
 
 @pytest.mark.roundtrip
 @given(from_type(OffsetForLeaderEpochRequest))
-@settings(max_examples=1)
 def test_offset_for_leader_epoch_request_roundtrip(
     instance: OffsetForLeaderEpochRequest,
 ) -> None:

@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.list_transactions.v0.request import ListTransactionsRequest
@@ -19,7 +18,6 @@ read_list_transactions_request: Final = entity_reader(ListTransactionsRequest)
 
 @pytest.mark.roundtrip
 @given(from_type(ListTransactionsRequest))
-@settings(max_examples=1)
 def test_list_transactions_request_roundtrip(instance: ListTransactionsRequest) -> None:
     writer = entity_writer(ListTransactionsRequest)
     with setup_buffer() as buffer:

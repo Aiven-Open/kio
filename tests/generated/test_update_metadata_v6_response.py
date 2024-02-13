@@ -5,7 +5,6 @@ from typing import Final
 import pytest
 
 from hypothesis import given
-from hypothesis import settings
 from hypothesis.strategies import from_type
 
 from kio.schema.update_metadata.v6.response import UpdateMetadataResponse
@@ -19,7 +18,6 @@ read_update_metadata_response: Final = entity_reader(UpdateMetadataResponse)
 
 @pytest.mark.roundtrip
 @given(from_type(UpdateMetadataResponse))
-@settings(max_examples=1)
 def test_update_metadata_response_roundtrip(instance: UpdateMetadataResponse) -> None:
     writer = entity_writer(UpdateMetadataResponse)
     with setup_buffer() as buffer:
