@@ -15,7 +15,7 @@ Please report (suspected) security vulnerabilities to our **[bug bounty program]
 will receive a response from us within 2 working days. If the issue is confirmed, we
 will release a patch as soon as possible depending on impact and complexity.
 
-[bug bounty program]: https://hackerone.com/aiven_ltd
+[bug bounty program]: https://bugcrowd.com/aiven-mbb-og
 
 ## Qualifying Vulnerabilities
 
