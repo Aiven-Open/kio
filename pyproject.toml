@@ -145,6 +145,7 @@ max-complexity = 10
 [tool.ruff.flake8-tidy-imports]
 ban-relative-imports = "parents"
 
+
 [tool.importlinter]
 root_packages = ["kio", "codegen", "tests"]
 
