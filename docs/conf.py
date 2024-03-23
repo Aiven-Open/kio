@@ -9,7 +9,7 @@ import sys
 # root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath("../src"))
 
-import kio  # noqa: E402
+import kio
 
 current_dir = pathlib.Path(__file__).resolve().parent
 

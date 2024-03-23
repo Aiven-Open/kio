@@ -92,14 +92,17 @@ def format_default(
         case Primitive.string, default:
             return f"{custom_type_open}{default!r}{custom_type_close}"
         case (
-            Primitive.int8
-            | Primitive.int16
-            | Primitive.int32
-            | Primitive.int64
-            | Primitive.uint16
-            | Primitive.uint32
-            | Primitive.uint64
-        ), str(default):
+            (
+                Primitive.int8
+                | Primitive.int16
+                | Primitive.int32
+                | Primitive.int64
+                | Primitive.uint16
+                | Primitive.uint32
+                | Primitive.uint64
+            ),
+            str(default),
+        ):
             assert not isinstance(type_, EntityType | CommonStructType)
             if custom_type_open:
                 return "".join(

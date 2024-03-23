@@ -305,8 +305,7 @@ class PrimitiveField(_BaseField):
             or (
                 # Datetime fields might not be optional in the underlying representation,
                 # but if they have a default of -1, we want to represent that as None.
-                self.type is Primitive.datetime_i64
-                and self.default == "-1"
+                self.type is Primitive.datetime_i64 and self.default == "-1"
             )
         )
 

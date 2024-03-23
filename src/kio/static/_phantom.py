@@ -2,6 +2,7 @@
 This is a less powerful, but good enough approximation of the phantom-types library,
 lacking some bells and whistles like Pydantic support and bounds checks.
 """
+
 from __future__ import annotations
 
 import abc
@@ -29,16 +30,13 @@ Predicate: TypeAlias = Callable[[U], bool]
 
 @runtime_checkable
 class InstanceCheckable(Protocol):
-    def __instancecheck__(self, instance: object) -> bool:
-        ...
+    def __instancecheck__(self, instance: object) -> bool: ...
 
 
 class PhantomMeta(abc.ABCMeta):
     def __instancecheck__(self, instance: object) -> bool:
-        return issubclass(
-            self, InstanceCheckable
-        ) and self.__instancecheck__(  # type: ignore[attr-defined]
-            instance,
+        return (
+            issubclass(self, InstanceCheckable) and self.__instancecheck__(instance)  # type: ignore[attr-defined]
         )
 
     def __call__(cls, instance):  # type: ignore[no-untyped-def]
@@ -75,8 +73,7 @@ class Phantom(Generic[T], metaclass=PhantomMeta):
             cls.__hypothesis_hook__()
 
     @classmethod
-    def __hypothesis_hook__(cls) -> None:
-        ...
+    def __hypothesis_hook__(cls) -> None: ...
 
     @classmethod
     def __instancecheck__(cls, instance: object) -> bool:
