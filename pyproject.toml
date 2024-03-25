@@ -46,7 +46,7 @@ all = [
 "Bug Tracker" = "https://github.com/Aiven-Open/kio/issues"
 
 [build-system]
-requires = ["setuptools>=68.1.2", "wheel"]
+requires = ["setuptools==69.0.3", "wheel==0.43.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
@@ -89,6 +89,8 @@ markers = [
 [tool.ruff]
 fix = true
 target-version = "py311"
+
+[tool.ruff.lint]
 extend-select = [
   # bugbear
   "B",
@@ -134,15 +136,15 @@ extend-ignore = [
   "B008",
 ]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 lines-between-types = 1
 force-single-line = true
 known-first-party = ["kio", "tests", "codegen"]
 
-[tool.ruff.mccabe]
+[tool.ruff.lint.mccabe]
 max-complexity = 10
 
-[tool.ruff.flake8-tidy-imports]
+[tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "parents"
 
 [tool.importlinter]

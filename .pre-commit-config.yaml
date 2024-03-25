@@ -20,41 +20,37 @@ repos:
           - -disable-indent-size
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: "v0.1.11"
+    rev: "v0.3.4"
     hooks:
       - id: ruff
-
-  - repo: https://github.com/psf/black
-    rev: "23.12.1"
-    hooks:
-      - id: black
+      - id: ruff-format
 
   - repo: https://github.com/asottile/blacken-docs
     rev: "1.16.0"
     hooks:
       - id: blacken-docs
-        additional_dependencies: ["black==22.10.0"]
+        additional_dependencies: ["black==24.3.0"]
 
   - repo: https://github.com/sirosen/check-jsonschema
-    rev: "0.27.3"
+    rev: "0.28.0"
     hooks:
       - id: check-github-workflows
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: "v1.8.0"
+    rev: "v1.9.0"
     hooks:
       - id: mypy
         pass_filenames: false
         additional_dependencies:
-          - typing-extensions==4.4.0
-          - pytest==7.2.0
-          - pydantic==1.10.2
-          - hypothesis==6.61.0
-          - types-setuptools==67.6.0.0
-          - types-requests==2.28.11.14
+          - typing-extensions==4.10.0
+          - pytest==7.4.3
+          - pydantic==1.10.13
+          - hypothesis==6.99.12
+          - types-setuptools==69.2.0.20240317
+          - types-requests==2.31.0.20240311
 
   - repo: https://github.com/seddonym/import-linter
-    rev: "v1.12.1"
+    rev: "v2.0"
     hooks:
       - id: import-linter
         entry: env PYTHONPATH=src lint-imports --verbose
@@ -66,7 +62,7 @@ repos:
         alias: format-markdown
         types: [ markdown ]
         additional_dependencies:
-          - "prettier@3.1.1"
+          - "prettier@3.2.5"
         args:
           - --parser=markdown
           - --print-width=88
@@ -78,4 +74,5 @@ repos:
       - id: check-manifest
         args: ["--no-build-isolation"]
         additional_dependencies:
-          - setuptools==68.1.2
+          - setuptools==69.0.3
+          - wheel==0.43.0

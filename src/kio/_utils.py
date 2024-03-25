@@ -22,5 +22,4 @@ if TYPE_CHECKING:
     from _typeshed import DataclassInstance
 else:
 
-    class DataclassInstance(Protocol):
-        ...
+    class DataclassInstance(Protocol): ...

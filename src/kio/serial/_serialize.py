@@ -161,15 +161,15 @@ def _wrap_nullable(write_entity: Writer[E]) -> Writer[E | None]:
 
 
 @overload
-def entity_writer(entity_type: type[E], nullable: Literal[False] = ...) -> Writer[E]:
-    ...
-
-
+def entity_writer(
+    entity_type: type[E],
+    nullable: Literal[False] = ...,
+) -> Writer[E]: ...
 @overload
-def entity_writer(entity_type: type[E], nullable: Literal[True]) -> Writer[E | None]:
-    ...
-
-
+def entity_writer(
+    entity_type: type[E],
+    nullable: Literal[True],
+) -> Writer[E | None]: ...
 @cache
 def entity_writer(entity_type: type[E], nullable: bool = False) -> Writer[E | None]:
     field_writers = {}

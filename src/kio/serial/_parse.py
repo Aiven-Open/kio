@@ -136,18 +136,12 @@ E = TypeVar("E", bound=Entity)
 def entity_reader(
     entity_type: type[E],
     nullable: Literal[False] = ...,
-) -> readers.Reader[E]:
-    ...
-
-
+) -> readers.Reader[E]: ...
 @overload
 def entity_reader(
     entity_type: type[E],
     nullable: Literal[True],
-) -> readers.Reader[E | None]:
-    ...
-
-
+) -> readers.Reader[E | None]: ...
 @cache
 def entity_reader(
     entity_type: type[E],

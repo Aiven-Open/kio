@@ -134,8 +134,7 @@ async def send(
     await stream.drain()
 
 
-class CorrelationIdMismatch(RuntimeError):
-    ...
+class CorrelationIdMismatch(RuntimeError): ...
 
 
 async def read_response_bytes(stream: StreamReader) -> io.BytesIO:
