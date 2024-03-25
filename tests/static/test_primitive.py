@@ -6,6 +6,7 @@ from hypothesis import given
 from hypothesis.strategies import from_type
 from hypothesis.strategies import integers
 
+from kio.static.primitive import Interval
 from kio.static.primitive import TZAware
 from kio.static.primitive import i8
 from kio.static.primitive import i16
@@ -21,6 +22,20 @@ from kio.static.primitive import u8
 from kio.static.primitive import u16
 from kio.static.primitive import u32
 from kio.static.primitive import u64
+
+
+class TestInterval:
+    def test_cannot_subclass_without_lower_bound(self) -> None:
+        with pytest.raises(TypeError, match=r"must set lower bound"):
+
+            class T(Interval, high=1):
+                ...
+
+    def test_cannot_subclass_without_upper_bound(self) -> None:
+        with pytest.raises(TypeError, match=r"must set upper bound"):
+
+            class T(Interval, low=1):
+                ...
 
 
 class TestU8:
