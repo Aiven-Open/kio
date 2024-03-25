@@ -10,6 +10,7 @@ Documentation sections
   :maxdepth: 1
 
   pages/schema.rst
+  pages/dynamic-index-lookups.rst
   pages/serial.rst
   pages/usage.rst
   pages/goals.rst
