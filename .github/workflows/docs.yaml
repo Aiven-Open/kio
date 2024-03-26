@@ -1,0 +1,43 @@
+name: Deploy Sphinx documentation to Pages
+
+on:
+  push:
+    branches: [main] # branch to trigger deployment
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: docs/requirements.txt
+      - name: Install kio dependencies
+        run: pip install --upgrade -e '.[all]'
+      - name: Install documentation dependencies
+        run: pip install --require-hashes -r docs/requirements.txt
+      - name: Build docs
+        # Should use -W here to promote warnings to errors, but can't for now because of
+        # a false positive for usage of _typeshed.DataclassInstance.
+        run: sphinx-build -b html docs docs/_build
+      - name: Upload artifacts
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/_build/
+
+  publish:
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Github Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
