@@ -7,8 +7,7 @@ def truthy(value: bool) -> bool:
     return value is True
 
 
-class Truthy(Phantom, predicate=truthy, bound=object):
-    ...
+class Truthy(Phantom, predicate=truthy, bound=object): ...
 
 
 class TestPhantom:
@@ -18,8 +17,7 @@ class TestPhantom:
             match=r"^Definition of phantom type must set bound\.$",
         ):
 
-            class A(Phantom, predicate=truthy):
-                ...
+            class A(Phantom, predicate=truthy): ...
 
     def test_raises_type_error_when_omitting_predicate(self) -> None:
         with pytest.raises(
@@ -27,15 +25,12 @@ class TestPhantom:
             match=r"^Definition of phantom type must set predicate\.$",
         ):
 
-            class A(Phantom, bound=bool):
-                ...
+            class A(Phantom, bound=bool): ...
 
     def test_can_inherit_attributes(self) -> None:
-        class A(Phantom, predicate=truthy, bound=bool):
-            ...
+        class A(Phantom, predicate=truthy, bound=bool): ...
 
-        class B(A):
-            ...
+        class B(A): ...
 
         assert B.__bound__ is bool  # type: ignore[misc]
         assert B.__predicate__ is truthy  # type: ignore[misc]

@@ -14,8 +14,7 @@ from kio.serial.errors import SchemaError
 
 
 @dataclass
-class Nested:
-    ...
+class Nested: ...
 
 
 @dataclass

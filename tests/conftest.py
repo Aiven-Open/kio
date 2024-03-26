@@ -50,9 +50,9 @@ buffer_fixture = pytest.fixture(
 setup_buffer = contextlib.contextmanager(buffer)
 
 
-async def async_buffers() -> AsyncIterator[
-    tuple[asyncio.StreamReader, asyncio.StreamWriter]
-]:
+async def async_buffers() -> (
+    AsyncIterator[tuple[asyncio.StreamReader, asyncio.StreamWriter]]
+):
     read_fd, write_fd = os.pipe()
     reader = asyncio.StreamReader()
     reader_protocol = asyncio.StreamReaderProtocol(reader)

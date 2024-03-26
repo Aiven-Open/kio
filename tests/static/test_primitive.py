@@ -28,14 +28,12 @@ class TestInterval:
     def test_cannot_subclass_without_lower_bound(self) -> None:
         with pytest.raises(TypeError, match=r"must set lower bound"):
 
-            class T(Interval, high=1):
-                ...
+            class T(Interval, high=1): ...
 
     def test_cannot_subclass_without_upper_bound(self) -> None:
         with pytest.raises(TypeError, match=r"must set upper bound"):
 
-            class T(Interval, low=1):
-                ...
+            class T(Interval, low=1): ...
 
 
 class TestU8:

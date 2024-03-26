@@ -182,9 +182,8 @@ class TestWriteUint64(IntWriterContract):
         return (
             rf"^'Q' format requires {self.lower_limit} <= number <= {self.upper_limit}$"
             if sys.version_info >= (3, 12)
-            else
             # Note: this error message is clearly incorrect prior to 3.12.
-            "^int too large to convert$"
+            else "^int too large to convert$"
         )
 
     @property
