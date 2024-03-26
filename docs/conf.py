@@ -57,8 +57,11 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 html_theme = "furo"
 # Set typing.TYPE_CHECKING to True to enable "expensive" typing imports.
 set_type_checking_flag = True
-typehints_fully_qualified = True
+typehints_fully_qualified = False
 always_document_param_types = True
+always_use_bars_union = True
+typehints_use_signature = True
+typehints_use_signature_return = True
 
 # Add any paths that contain custom static files (such as style sheets) here, relative
 # to this directory. They are copied after the builtin static files, so a file named
