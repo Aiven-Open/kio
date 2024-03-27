@@ -59,7 +59,7 @@ class OffsetCommitRequest:
     generation_id_or_member_epoch: i32 = field(
         metadata={"kafka_type": "int32"}, default=i32(-1)
     )
-    """The generation of the group if using the generic group protocol or the member epoch if using the consumer protocol."""
+    """The generation of the group if using the classic group protocol or the member epoch if using the consumer protocol."""
     member_id: str = field(metadata={"kafka_type": "string"})
     """The member ID assigned by the group coordinator."""
     topics: tuple[OffsetCommitRequestTopic, ...]

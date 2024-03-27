@@ -1,3 +1,5 @@
 from typing import Final
 
-build_tag: Final = "3.6.0"
+# Note: the kafka-clients dependency of the Java tester also needs updating when
+# this is bumped (in java_tester/build.gradle).
+build_tag: Final = "3.7.0"
