@@ -251,3 +251,15 @@ class ErrorCode(enum.IntEnum):
     """The assignor or its version range is not supported by the consumer group."""
     stale_member_epoch = 113, False
     """The member epoch is stale. The member must retry after receiving its updated member epoch via the ConsumerGroupHeartbeat API."""
+    mismatched_endpoint_type = 114, False
+    """The request was sent to an endpoint of the wrong type."""
+    unsupported_endpoint_type = 115, False
+    """This endpoint type is not supported yet."""
+    unknown_controller_id = 116, False
+    """This controller ID is not known."""
+    unknown_subscription_id = 117, False
+    """Client sent a push telemetry request with an invalid or outdated subscription ID."""
+    telemetry_too_large = 118, False
+    """Client sent a push telemetry request larger than the maximum size the broker will accept."""
+    invalid_registration = 119, False
+    """The controller has considered the broker registration to be invalid."""
