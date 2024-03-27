@@ -1,7 +1,5 @@
 """
-Generated from DescribeClusterRequest.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/DescribeClusterRequest.json
+Generated from ``clients/src/main/resources/common/message/DescribeClusterRequest.json``.
 """
 
 from dataclasses import dataclass

@@ -1,7 +1,5 @@
 """
-Generated from DescribeDelegationTokenResponse.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/DescribeDelegationTokenResponse.json
+Generated from ``clients/src/main/resources/common/message/DescribeDelegationTokenResponse.json``.
 """
 
 from dataclasses import dataclass

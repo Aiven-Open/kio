@@ -1,7 +1,5 @@
 """
-Generated from ListPartitionReassignmentsRequest.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/ListPartitionReassignmentsRequest.json
+Generated from ``clients/src/main/resources/common/message/ListPartitionReassignmentsRequest.json``.
 """
 
 import datetime

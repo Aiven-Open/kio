@@ -1,7 +1,5 @@
 """
-Generated from OffsetCommitResponse.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/OffsetCommitResponse.json
+Generated from ``clients/src/main/resources/common/message/OffsetCommitResponse.json``.
 """
 
 from dataclasses import dataclass

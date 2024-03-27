@@ -1,7 +1,5 @@
 """
-Generated from OffsetCommitRequest.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/OffsetCommitRequest.json
+Generated from ``clients/src/main/resources/common/message/OffsetCommitRequest.json``.
 """
 
 import datetime

@@ -1,7 +1,5 @@
 """
-Generated from HeartbeatRequest.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/HeartbeatRequest.json
+Generated from ``clients/src/main/resources/common/message/HeartbeatRequest.json``.
 """
 
 from dataclasses import dataclass

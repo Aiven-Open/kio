@@ -1,7 +1,5 @@
 """
-Generated from ListOffsetsResponse.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/ListOffsetsResponse.json
+Generated from ``clients/src/main/resources/common/message/ListOffsetsResponse.json``.
 """
 
 from dataclasses import dataclass

@@ -1,7 +1,5 @@
 """
-Generated from VoteResponse.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/VoteResponse.json
+Generated from ``clients/src/main/resources/common/message/VoteResponse.json``.
 """
 
 from dataclasses import dataclass

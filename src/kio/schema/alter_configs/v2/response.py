@@ -1,7 +1,5 @@
 """
-Generated from AlterConfigsResponse.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/AlterConfigsResponse.json
+Generated from ``clients/src/main/resources/common/message/AlterConfigsResponse.json``.
 """
 
 from dataclasses import dataclass

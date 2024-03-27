@@ -1,7 +1,5 @@
 """
-Generated from TxnOffsetCommitResponse.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/TxnOffsetCommitResponse.json
+Generated from ``clients/src/main/resources/common/message/TxnOffsetCommitResponse.json``.
 """
 
 from dataclasses import dataclass

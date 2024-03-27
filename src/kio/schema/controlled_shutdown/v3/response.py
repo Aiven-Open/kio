@@ -1,7 +1,5 @@
 """
-Generated from ControlledShutdownResponse.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/ControlledShutdownResponse.json
+Generated from ``clients/src/main/resources/common/message/ControlledShutdownResponse.json``.
 """
 
 from dataclasses import dataclass

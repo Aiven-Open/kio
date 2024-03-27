@@ -1,7 +1,5 @@
 """
-Generated from AllocateProducerIdsResponse.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/AllocateProducerIdsResponse.json
+Generated from ``clients/src/main/resources/common/message/AllocateProducerIdsResponse.json``.
 """
 
 from dataclasses import dataclass

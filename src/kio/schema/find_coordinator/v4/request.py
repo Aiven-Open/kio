@@ -1,7 +1,5 @@
 """
-Generated from FindCoordinatorRequest.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/FindCoordinatorRequest.json
+Generated from ``clients/src/main/resources/common/message/FindCoordinatorRequest.json``.
 """
 
 from dataclasses import dataclass
