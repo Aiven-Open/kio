@@ -1,50 +1,19 @@
+# ruff: noqa: T201
+
 import os
 import shutil
+import sys
 
 from collections import defaultdict
-from collections.abc import Iterator
-from importlib import import_module
 from itertools import chain
 from pathlib import Path
-from pkgutil import walk_packages
-from types import ModuleType
-
-import kio.schema
 
 from kio.static.constants import EntityType
-from kio.static.protocol import Entity
 
 from .case import to_snake_case
-
-
-def generate_modules(parent: ModuleType) -> Iterator[ModuleType]:
-    for package in walk_packages(parent.__path__):
-        module = import_module(f"{parent.__name__}.{package.name}")
-        if package.ispkg:
-            yield from generate_modules(module)
-        else:
-            yield module
-
-
-def get_entities() -> Iterator[tuple[type[Entity], str]]:
-    modules = list(generate_modules(import_module("kio.schema")))
-    for module in modules:
-        items = module.__dict__.copy()
-        # Eliminate non-entity modules, situated directly under `kio.schema`.
-        if sum(1 for c in module.__name__ if c == ".") < 3:
-            continue
-        for key, value in items.items():
-            if key.startswith("__"):
-                continue
-            # Eliminate anything not defined in the module.
-            if getattr(value, "__module__", None) != module.__name__:
-                continue
-            # Eliminate anything that's not a class.
-            if type(value) is not type:
-                continue
-            assert isinstance(module.__file__, str)
-            yield value, module.__file__
-
+from .introspect_schema import base_dir
+from .introspect_schema import get_entities
+from .introspect_schema import schema_src_dir
 
 imports = """\
 from __future__ import annotations
@@ -85,9 +54,7 @@ def test_{entity_snake_case}_java(instance: {entity_type}, java_tester: JavaTest
 """
 
 
-base_dir = Path(__file__).parent.parent.resolve()
 generated_tests_module = base_dir / "tests" / "generated"
-schema_src_dir = Path(kio.schema.__file__).parent.resolve()
 
 
 def build_filename(source_path: str) -> str:
@@ -97,6 +64,7 @@ def build_filename(source_path: str) -> str:
 
 
 def main() -> None:
+    print("Generating tests.", file=sys.stderr)
     shutil.rmtree(generated_tests_module, ignore_errors=True)
     os.mkdir(generated_tests_module)
     (generated_tests_module / "__init__.py").touch()
