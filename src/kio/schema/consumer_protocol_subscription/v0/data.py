@@ -1,7 +1,5 @@
 """
-Generated from ConsumerProtocolSubscription.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/ConsumerProtocolSubscription.json
+Generated from ``clients/src/main/resources/common/message/ConsumerProtocolSubscription.json``.
 """
 
 from dataclasses import dataclass

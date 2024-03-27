@@ -1,7 +1,5 @@
 """
-Generated from FetchRequest.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/FetchRequest.json
+Generated from ``clients/src/main/resources/common/message/FetchRequest.json``.
 """
 
 import uuid

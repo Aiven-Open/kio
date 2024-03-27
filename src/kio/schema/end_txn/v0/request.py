@@ -1,7 +1,5 @@
 """
-Generated from EndTxnRequest.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/EndTxnRequest.json
+Generated from ``clients/src/main/resources/common/message/EndTxnRequest.json``.
 """
 
 from dataclasses import dataclass

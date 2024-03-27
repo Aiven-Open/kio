@@ -1,7 +1,5 @@
 """
-Generated from StopReplicaResponse.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/StopReplicaResponse.json
+Generated from ``clients/src/main/resources/common/message/StopReplicaResponse.json``.
 """
 
 from dataclasses import dataclass

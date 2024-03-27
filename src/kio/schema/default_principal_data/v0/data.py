@@ -1,7 +1,5 @@
 """
-Generated from DefaultPrincipalData.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/DefaultPrincipalData.json
+Generated from ``clients/src/main/resources/common/message/DefaultPrincipalData.json``.
 """
 
 from dataclasses import dataclass

@@ -1,7 +1,5 @@
 """
-Generated from DescribeUserScramCredentialsRequest.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/DescribeUserScramCredentialsRequest.json
+Generated from ``clients/src/main/resources/common/message/DescribeUserScramCredentialsRequest.json``.
 """
 
 from dataclasses import dataclass

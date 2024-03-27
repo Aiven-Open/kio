@@ -40,15 +40,10 @@ from .parser import PrimitiveArrayType
 from .parser import PrimitiveField
 from .parser import parse_file
 
-schema_repository_source: Final = (
-    f"https://github.com/apache/kafka"
-    f"/tree/{build_tag}/clients/src/main/resources/common/message/"
-)
+schema_repository_source: Final = "clients/src/main/resources/common/message/"
 imports_and_docstring: Final = '''\
 """
-Generated from {schema_source}.
-
-{schema_repository_source}{schema_source}
+Generated from ``{schema_repository_source}{schema_source}``.
 """
 
 import datetime

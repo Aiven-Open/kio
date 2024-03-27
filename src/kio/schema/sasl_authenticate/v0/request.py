@@ -1,7 +1,5 @@
 """
-Generated from SaslAuthenticateRequest.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/SaslAuthenticateRequest.json
+Generated from ``clients/src/main/resources/common/message/SaslAuthenticateRequest.json``.
 """
 
 from dataclasses import dataclass

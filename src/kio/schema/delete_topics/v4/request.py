@@ -1,7 +1,5 @@
 """
-Generated from DeleteTopicsRequest.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/DeleteTopicsRequest.json
+Generated from ``clients/src/main/resources/common/message/DeleteTopicsRequest.json``.
 """
 
 from dataclasses import dataclass

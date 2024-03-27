@@ -1,7 +1,5 @@
 """
-Generated from AlterPartitionReassignmentsResponse.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/AlterPartitionReassignmentsResponse.json
+Generated from ``clients/src/main/resources/common/message/AlterPartitionReassignmentsResponse.json``.
 """
 
 from dataclasses import dataclass

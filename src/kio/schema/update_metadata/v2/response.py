@@ -1,7 +1,5 @@
 """
-Generated from UpdateMetadataResponse.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/UpdateMetadataResponse.json
+Generated from ``clients/src/main/resources/common/message/UpdateMetadataResponse.json``.
 """
 
 from dataclasses import dataclass

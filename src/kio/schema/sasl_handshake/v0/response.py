@@ -1,7 +1,5 @@
 """
-Generated from SaslHandshakeResponse.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/SaslHandshakeResponse.json
+Generated from ``clients/src/main/resources/common/message/SaslHandshakeResponse.json``.
 """
 
 from dataclasses import dataclass

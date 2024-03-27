@@ -1,7 +1,5 @@
 """
-Generated from LeaderChangeMessage.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/LeaderChangeMessage.json
+Generated from ``clients/src/main/resources/common/message/LeaderChangeMessage.json``.
 """
 
 from dataclasses import dataclass

@@ -1,7 +1,5 @@
 """
-Generated from FetchSnapshotResponse.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/FetchSnapshotResponse.json
+Generated from ``clients/src/main/resources/common/message/FetchSnapshotResponse.json``.
 """
 
 from dataclasses import dataclass

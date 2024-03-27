@@ -1,7 +1,5 @@
 """
-Generated from DeleteAclsRequest.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/DeleteAclsRequest.json
+Generated from ``clients/src/main/resources/common/message/DeleteAclsRequest.json``.
 """
 
 from dataclasses import dataclass
