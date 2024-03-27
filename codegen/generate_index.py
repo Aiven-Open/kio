@@ -1,20 +1,27 @@
 # ruff: noqa: T201
 
+from __future__ import annotations
+
 import sys
 
 from collections import defaultdict
 from collections.abc import Iterator
 from collections.abc import Mapping
 from functools import partial
+from typing import TYPE_CHECKING
 from typing import Final
 from typing import NamedTuple
 from typing import TypeAlias
 
 from kio.static.constants import EntityType
-from kio.static.protocol import Entity
 
 from .introspect_schema import base_dir
 from .introspect_schema import get_message_entities
+
+# Chickens and eggs ...
+if TYPE_CHECKING:
+    from kio.static.protocol import Entity
+
 
 target_path: Final = base_dir / "src/kio/schema/index.py"
 prefix: Final = "kio.schema."

@@ -1,14 +1,21 @@
+from __future__ import annotations
+
 from collections.abc import Iterator
 from importlib import import_module
 from pathlib import Path
 from pkgutil import walk_packages
 from types import ModuleType
+from typing import TYPE_CHECKING
 from typing import Final
 
 import kio.schema
 
 from kio.static.constants import EntityType
-from kio.static.protocol import Entity
+
+# Chickens and eggs ...
+if TYPE_CHECKING:
+    from kio.static.protocol import Entity
+
 
 base_dir: Final = Path(__file__).parent.parent.resolve()
 schema_src_dir: Final = Path(kio.schema.__file__).parent.resolve()
