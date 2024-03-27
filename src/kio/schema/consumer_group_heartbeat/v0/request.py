@@ -13,31 +13,9 @@ from kio.schema.request_header.v2.header import RequestHeader
 from kio.schema.types import GroupId
 from kio.schema.types import TopicName
 from kio.static.constants import EntityType
-from kio.static.primitive import i8
 from kio.static.primitive import i16
 from kio.static.primitive import i32
 from kio.static.primitive import i32Timedelta
-
-
-@dataclass(frozen=True, slots=True, kw_only=True)
-class Assignor:
-    __type__: ClassVar = EntityType.nested
-    __version__: ClassVar[i16] = i16(0)
-    __flexible__: ClassVar[bool] = True
-    __api_key__: ClassVar[i16] = i16(68)
-    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
-    name: str = field(metadata={"kafka_type": "string"})
-    """The name of the assignor."""
-    minimum_version: i16 = field(metadata={"kafka_type": "int16"})
-    """The minimum supported version for the metadata."""
-    maximum_version: i16 = field(metadata={"kafka_type": "int16"})
-    """The maximum supported version for the metadata."""
-    reason: i8 = field(metadata={"kafka_type": "int8"})
-    """The reason of the metadata update."""
-    metadata_version: i16 = field(metadata={"kafka_type": "int16"})
-    """The version of the metadata."""
-    metadata_bytes: bytes = field(metadata={"kafka_type": "bytes"})
-    """The metadata."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -74,18 +52,12 @@ class ConsumerGroupHeartbeatRequest:
         metadata={"kafka_type": "timedelta_i32"},
         default=i32Timedelta.parse(datetime.timedelta(milliseconds=-1)),
     )
-    """-1 if it didn't chance since the last heartbeat; the maximum time in milliseconds that the coordinator will wait on the member to revoke its partitions otherwise."""
+    """-1 if it didn't change since the last heartbeat; the maximum time in milliseconds that the coordinator will wait on the member to revoke its partitions otherwise."""
     subscribed_topic_names: tuple[TopicName, ...] = field(
         metadata={"kafka_type": "string"}, default=()
     )
     """null if it didn't change since the last heartbeat; the subscribed topic names otherwise."""
-    subscribed_topic_regex: str | None = field(
-        metadata={"kafka_type": "string"}, default=None
-    )
-    """null if it didn't change since the last heartbeat; the subscribed topic regex otherwise"""
     server_assignor: str | None = field(metadata={"kafka_type": "string"}, default=None)
     """null if not used or if it didn't change since the last heartbeat; the server side assignor to use otherwise."""
-    client_assignors: tuple[Assignor, ...] | None
-    """null if not used or if it didn't change since the last heartbeat; the list of client-side assignors otherwise."""
     topic_partitions: tuple[TopicPartitions, ...] | None
     """null if it didn't change since the last heartbeat; the partitions owned by the member."""

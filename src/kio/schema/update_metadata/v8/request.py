@@ -12,6 +12,7 @@ from kio.schema.request_header.v2.header import RequestHeader
 from kio.schema.types import BrokerId
 from kio.schema.types import TopicName
 from kio.static.constants import EntityType
+from kio.static.primitive import i8
 from kio.static.primitive import i16
 from kio.static.primitive import i32
 from kio.static.primitive import i64
@@ -102,6 +103,8 @@ class UpdateMetadataRequest:
     """The controller id."""
     is_k_raft_controller: bool = field(metadata={"kafka_type": "bool"}, default=False)
     """If KRaft controller id is used during migration. See KIP-866"""
+    type_: i8 = field(metadata={"kafka_type": "int8", "tag": 0}, default=i8(0))
+    """Indicates if this request is a Full metadata snapshot (2), Incremental (1), or Unknown (0). Using during ZK migration, see KIP-866"""
     controller_epoch: i32 = field(metadata={"kafka_type": "int32"})
     """The controller epoch."""
     broker_epoch: i64 = field(metadata={"kafka_type": "int64"}, default=i64(-1))
