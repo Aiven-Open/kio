@@ -32,7 +32,7 @@ test = [
   "coverage",
 ]
 codegen = [
-  "pydantic>=1.10.4,<2",
+  "pydantic>=1.10.4,<3",
   "requests",
   "pre-commit",
 ]
