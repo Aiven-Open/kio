@@ -31,7 +31,7 @@ def get_entities() -> Iterator[tuple[type[Entity], str]]:
     for module in modules:
         items = module.__dict__.copy()
         # Eliminate non-entity modules, situated directly under `kio.schema`.
-        if sum(1 for c in module.__name__ if c == ".") < 3:
+        if module.__name__.count(".") < 3:
             continue
         for key, value in items.items():
             if key.startswith("__"):
