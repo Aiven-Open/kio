@@ -43,6 +43,7 @@ all = [
 
 [project.urls]
 "Source Repository" = "https://github.com/Aiven-Open/kio"
+"Documentation" = "https://aiven-open.github.io/kio/"
 "Bug Tracker" = "https://github.com/Aiven-Open/kio/issues"
 
 [build-system]
