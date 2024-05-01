@@ -234,9 +234,9 @@ sphinx==7.2.6 \
     #   kio-docs (pyproject.toml)
     #   sphinx-autodoc-typehints
     #   sphinx-basic-ng
-sphinx-autodoc-typehints==2.0.0 \
-    --hash=sha256:12c0e161f6fe191c2cdfd8fa3caea271f5387d9fbc67ebcd6f4f1f24ce880993 \
-    --hash=sha256:7f2cdac2e70fd9787926b6e9e541cd4ded1e838d2b46fda2a1bb0a75ec5b7f3a
+sphinx-autodoc-typehints==2.1.0 \
+    --hash=sha256:46f1a710b3ed35904f63a77c5e68334c5ee1c2e22828b75fdcd147f1c52c199b \
+    --hash=sha256:51bf8dc77c4fba747e32f0735002a91500747d0553cae616863848e8f5e49fe8
     # via kio-docs (pyproject.toml)
 sphinx-basic-ng==1.0.0b2 \
     --hash=sha256:9ec55a47c90c8c002b5960c57492ec3021f5193cb26cebc2dc4ea226848651c9 \
