@@ -118,9 +118,9 @@ docutils==0.20.1 \
     # via
     #   m2r2
     #   sphinx
-furo==2024.1.29 \
-    --hash=sha256:3548be2cef45a32f8cdc0272d415fcb3e5fa6a0eb4ddfe21df3ecf1fe45a13cf \
-    --hash=sha256:4d6b2fe3f10a6e36eb9cc24c1e7beb38d7a23fc7b3c382867503b7fcac8a1e02
+furo==2024.4.27 \
+    --hash=sha256:15a9b65269038def2cefafb86c71c6616e3969b8f07ba231f588c10c4aee6d88 \
+    --hash=sha256:f7eb1b2c2204fd9cbd4af42e027289a67f17a98a4e14f4f9e2f17b96d61bb020
     # via kio-docs (pyproject.toml)
 idna==3.7 \
     --hash=sha256:028ff3aadf0609c1fd278d8ea3089299412a7a8b9bd005dd08b9f8285bcb5cfc \
