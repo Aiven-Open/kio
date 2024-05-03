@@ -13,6 +13,7 @@ from kio.schema.types import BrokerId
 from kio.schema.types import TopicName
 from kio.static.constants import EntityType
 from kio.static.constants import ErrorCode
+from kio.static.primitive import Records
 from kio.static.primitive import i16
 from kio.static.primitive import i32
 from kio.static.primitive import i32Timedelta
@@ -61,7 +62,7 @@ class PartitionSnapshot:
     """The total size of the snapshot."""
     position: i64 = field(metadata={"kafka_type": "int64"})
     """The starting byte position within the snapshot included in the Bytes field."""
-    unaligned_records: bytes = field(metadata={"kafka_type": "records"})
+    unaligned_records: Records = field(metadata={"kafka_type": "records"})
     """Snapshot data in records format which may not be aligned on an offset boundary"""
 
 

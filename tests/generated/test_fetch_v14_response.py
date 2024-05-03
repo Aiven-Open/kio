@@ -16,6 +16,7 @@ from kio.schema.fetch.v14.response import PartitionData
 from kio.schema.fetch.v14.response import SnapshotId
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_epoch_end_offset: Final = entity_reader(EpochEndOffset)
@@ -114,3 +115,9 @@ def test_fetch_response_roundtrip(instance: FetchResponse) -> None:
         buffer.seek(0)
         result = read_fetch_response(buffer)
     assert instance == result
+
+
+@pytest.mark.java
+@given(instance=from_type(FetchResponse))
+def test_fetch_response_java(instance: FetchResponse, java_tester: JavaTester) -> None:
+    java_tester.test(instance)

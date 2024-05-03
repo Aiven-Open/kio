@@ -12,6 +12,7 @@ from kio.schema.request_header.v2.header import RequestHeader
 from kio.schema.types import TopicName
 from kio.schema.types import TransactionalId
 from kio.static.constants import EntityType
+from kio.static.primitive import Records
 from kio.static.primitive import i16
 from kio.static.primitive import i32
 from kio.static.primitive import i32Timedelta
@@ -26,7 +27,7 @@ class PartitionProduceData:
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     index: i32 = field(metadata={"kafka_type": "int32"})
     """The partition index."""
-    records: bytes | None = field(metadata={"kafka_type": "records"})
+    records: Records | None = field(metadata={"kafka_type": "records"})
     """The record data to be produced."""
 
 

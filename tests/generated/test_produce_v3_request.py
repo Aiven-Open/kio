@@ -12,6 +12,7 @@ from kio.schema.produce.v3.request import ProduceRequest
 from kio.schema.produce.v3.request import TopicProduceData
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from tests.conftest import JavaTester
 from tests.conftest import setup_buffer
 
 read_partition_produce_data: Final = entity_reader(PartitionProduceData)
@@ -54,3 +55,11 @@ def test_produce_request_roundtrip(instance: ProduceRequest) -> None:
         buffer.seek(0)
         result = read_produce_request(buffer)
     assert instance == result
+
+
+@pytest.mark.java
+@given(instance=from_type(ProduceRequest))
+def test_produce_request_java(
+    instance: ProduceRequest, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)
