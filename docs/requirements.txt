@@ -112,9 +112,9 @@ charset-normalizer==3.3.2 \
     --hash=sha256:fd1abc0d89e30cc4e02e4064dc67fcc51bd941eb395c502aac3ec19fab46b519 \
     --hash=sha256:ff8fa367d09b717b2a17a052544193ad76cd49979c805768879cb63d9ca50561
     # via requests
-docutils==0.20.1 \
-    --hash=sha256:96f387a2c5562db4476f09f13bbab2192e764cac08ebbf3a34a95d9b1e4a59d6 \
-    --hash=sha256:f08a4e276c3a1583a86dce3e34aba3fe04d02bba2dd51ed16106244e8a923e3b
+docutils==0.21.2 \
+    --hash=sha256:3a6b18732edf182daa3cd12775bbb338cf5691468f91eeeb109deff6ebfa986f \
+    --hash=sha256:dafca5b9e384f0e419294eb4d2ff9fa826435bf15f15b7bd45723e8ad76811b2
     # via
     #   m2r2
     #   sphinx
@@ -226,17 +226,17 @@ soupsieve==2.5 \
     --hash=sha256:5663d5a7b3bfaeee0bc4372e7fc48f9cff4940b3eec54a6451cc5299f1097690 \
     --hash=sha256:eaa337ff55a1579b6549dc679565eac1e3d000563bcb1c8ab0d0fefbc0c2cdc7
     # via beautifulsoup4
-sphinx==7.2.6 \
-    --hash=sha256:1e09160a40b956dc623c910118fa636da93bd3ca0b9876a7b3df90f07d691560 \
-    --hash=sha256:9a5160e1ea90688d5963ba09a2dcd8bdd526620edbb65c328728f1b2228d5ab5
+sphinx==7.3.7 \
+    --hash=sha256:413f75440be4cacf328f580b4274ada4565fb2187d696a84970c23f77b64d8c3 \
+    --hash=sha256:a4a7db75ed37531c05002d56ed6948d4c42f473a36f46e1382b0bd76ca9627bc
     # via
     #   furo
     #   kio-docs (pyproject.toml)
     #   sphinx-autodoc-typehints
     #   sphinx-basic-ng
-sphinx-autodoc-typehints==2.0.0 \
-    --hash=sha256:12c0e161f6fe191c2cdfd8fa3caea271f5387d9fbc67ebcd6f4f1f24ce880993 \
-    --hash=sha256:7f2cdac2e70fd9787926b6e9e541cd4ded1e838d2b46fda2a1bb0a75ec5b7f3a
+sphinx-autodoc-typehints==2.1.0 \
+    --hash=sha256:46f1a710b3ed35904f63a77c5e68334c5ee1c2e22828b75fdcd147f1c52c199b \
+    --hash=sha256:51bf8dc77c4fba747e32f0735002a91500747d0553cae616863848e8f5e49fe8
     # via kio-docs (pyproject.toml)
 sphinx-basic-ng==1.0.0b2 \
     --hash=sha256:9ec55a47c90c8c002b5960c57492ec3021f5193cb26cebc2dc4ea226848651c9 \
