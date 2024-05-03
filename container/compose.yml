@@ -1,4 +1,3 @@
-version: '2'
 name: kio
 services:
   # Adopted from

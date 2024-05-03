@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.kafka.common.Uuid;
 import org.apache.kafka.common.record.BaseRecords;
+import org.apache.kafka.common.record.MemoryRecords;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.text.CaseUtils;
@@ -88,7 +89,10 @@ class ObjectCreator<T> extends BaseCreator {
                 List<?> list = new CollectionCreator(rootMessageInfo, fieldValue, fieldName, fieldSchema).createList();
                 setter.invoke(instance, list);
             } else if (BaseRecords.class.isAssignableFrom(parameterType)) {
-                throw new Exception("Not implemented");
+                ByteBuffer buffer = getByteBuffer(fieldValue, fieldName);
+                if (buffer != null) {
+                    setter.invoke(instance, MemoryRecords.readableRecords(buffer));
+                }
             } else {
                 Object o = new ObjectCreator<>(
                     rootMessageInfo, new EntityClass<>(parameterType), fieldSchema).create(fieldValue);
