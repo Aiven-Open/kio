@@ -67,6 +67,7 @@ from kio.static.primitive import f64
 from kio.static.primitive import i32Timedelta
 from kio.static.primitive import i64Timedelta
 from kio.static.primitive import TZAware
+from kio.static.primitive import Records
 from kio.static.constants import ErrorCode
 from kio.static.constants import EntityType
 '''

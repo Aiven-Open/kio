@@ -13,6 +13,7 @@ from kio.schema.types import ProducerId
 from kio.schema.types import TopicName
 from kio.static.constants import EntityType
 from kio.static.constants import ErrorCode
+from kio.static.primitive import Records
 from kio.static.primitive import i16
 from kio.static.primitive import i32
 from kio.static.primitive import i32Timedelta
@@ -49,7 +50,7 @@ class PartitionData:
     """The last stable offset (or LSO) of the partition. This is the last offset such that the state of all transactional records prior to this offset have been decided (ABORTED or COMMITTED)"""
     aborted_transactions: tuple[AbortedTransaction, ...] | None
     """The aborted transactions."""
-    records: bytes | None = field(metadata={"kafka_type": "records"})
+    records: Records | None = field(metadata={"kafka_type": "records"})
     """The record data."""
 
 

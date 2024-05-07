@@ -11,6 +11,9 @@ from ._phantom import Phantom
 from ._phantom import Predicate
 
 
+class Records(bytes, Phantom, predicate=lambda _: True, bound=bytes): ...
+
+
 def inclusive_interval(low: int, high: int) -> Predicate[int]:
     def check(value: int) -> bool:
         return low <= value <= high

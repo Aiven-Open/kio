@@ -6,6 +6,12 @@ from typing import Self
 import hypothesis
 
 from hypothesis import settings
+from hypothesis.strategies import register_type_strategy
+from hypothesis.strategies import sampled_from
+
+from kio.static.primitive import Records
+
+from .fixtures import record_batch_data_v2
 
 
 class HypothesisProfile(enum.Enum):
@@ -35,3 +41,5 @@ settings.register_profile(
 
 def configure_hypothesis() -> None:
     settings.load_profile(HypothesisProfile.from_env().name)
+
+    register_type_strategy(Records, sampled_from(record_batch_data_v2))

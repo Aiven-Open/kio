@@ -98,8 +98,10 @@ class Primitive(enum.Enum):
                 hint = "f64"
             case Primitive.string:
                 hint = "str"
-            case Primitive.bytes_ | Primitive.records:
+            case Primitive.bytes_:
                 hint = "bytes"
+            case Primitive.records:
+                hint = "Records"
             case Primitive.bool_:
                 hint = "bool"
             case Primitive.uuid:

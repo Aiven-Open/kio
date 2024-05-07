@@ -86,15 +86,7 @@ def main() -> None:
                 entity_snake_case=to_snake_case(entity_type.__name__),
             )
         )
-        if (
-            entity_type.__type__ is not EntityType.nested
-            and entity_type.__name__
-            not in {
-                "ProduceRequest",  # Records
-                "FetchResponse",  # Records
-                "FetchSnapshotResponse",  # Records
-            }
-        ):
+        if entity_type.__type__ is not EntityType.nested:
             module_code[module_path].append(
                 test_code_java.format(
                     entity_type=entity_type.__name__,

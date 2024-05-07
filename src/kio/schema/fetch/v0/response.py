@@ -12,6 +12,7 @@ from kio.schema.response_header.v0.header import ResponseHeader
 from kio.schema.types import TopicName
 from kio.static.constants import EntityType
 from kio.static.constants import ErrorCode
+from kio.static.primitive import Records
 from kio.static.primitive import i16
 from kio.static.primitive import i32
 from kio.static.primitive import i64
@@ -30,7 +31,7 @@ class PartitionData:
     """The error code, or 0 if there was no fetch error."""
     high_watermark: i64 = field(metadata={"kafka_type": "int64"})
     """The current high water mark."""
-    records: bytes | None = field(metadata={"kafka_type": "records"})
+    records: Records | None = field(metadata={"kafka_type": "records"})
     """The record data."""
 
 
