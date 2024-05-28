@@ -30,6 +30,7 @@ from kio.serial.writers import write_int64
 from kio.serial.writers import write_legacy_bytes
 from kio.serial.writers import write_legacy_string
 from kio.serial.writers import write_nullable_compact_string
+from kio.serial.writers import write_nullable_datetime_i64
 from kio.serial.writers import write_nullable_legacy_bytes
 from kio.serial.writers import write_nullable_legacy_string
 from kio.serial.writers import write_timedelta_i32
@@ -545,5 +546,31 @@ class TestWriteDatetimeI64:
         expected_bytes: bytes,
     ) -> None:
         write_datetime_i64(buffer, value)
+        buffer.seek(0)
+        assert buffer.read(8) == expected_bytes
+
+
+class TestWriteNullableDatetimeI64:
+    @pytest.mark.parametrize(
+        ("value", "expected_bytes"),
+        (
+            (None, b"\xff\xff\xff\xff\xff\xff\xff\xff"),
+            (
+                datetime.datetime(2024, 5, 28, 12, 31, tzinfo=datetime.UTC),
+                b"\x00\x00\x01\x8f\xbf.\xb3\xa0",
+            ),
+            (
+                datetime.datetime(1970, 1, 1, tzinfo=datetime.UTC),
+                b"\x00\x00\x00\x00\x00\x00\x00\x00",
+            ),
+        ),
+    )
+    def test_can_write_datetime(
+        self,
+        buffer: io.BytesIO,
+        value: datetime.datetime | None,
+        expected_bytes: bytes,
+    ) -> None:
+        write_nullable_datetime_i64(buffer, value)
         buffer.seek(0)
         assert buffer.read(8) == expected_bytes
