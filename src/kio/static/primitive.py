@@ -99,9 +99,9 @@ class f64(float, Phantom, bound=float, predicate=math.isfinite):
 # to eliminate such values to have stable tests.
 # Pragma no cover because this is only used in property tests, and those do not
 # contribute to coverage report.
-def _timedelta_survives_roundtrip(  # pragma: no cover
+def _timedelta_survives_roundtrip(
     value: datetime.timedelta,
-) -> bool:
+) -> bool:  # pragma: no cover
     return value == datetime.timedelta(milliseconds=round(value.total_seconds() * 1000))
 
 
