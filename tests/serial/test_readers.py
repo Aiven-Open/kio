@@ -35,6 +35,7 @@ from kio.serial.readers import read_legacy_string
 from kio.serial.readers import read_nullable_datetime_i64
 from kio.serial.readers import read_nullable_legacy_bytes
 from kio.serial.readers import read_nullable_legacy_string
+from kio.serial.readers import read_timedelta_i32
 from kio.serial.readers import read_uint8
 from kio.serial.readers import read_uint16
 from kio.serial.readers import read_uint32
@@ -599,6 +600,31 @@ class TestReadErrorCode:
         buffer.write(buffer_bytes)
         buffer.seek(0)
         assert read_error_code(buffer) is expected_code
+
+
+class TestReadTimedeltaI32:
+    def test_raises_buffer_underflow(self, buffer: io.BytesIO) -> None:
+        buffer.write(b"\x00")
+        buffer.seek(0)
+        with pytest.raises(BufferUnderflow):
+            assert read_timedelta_i32(buffer)
+
+    @pytest.mark.parametrize(
+        ("buffer_bytes", "expected"),
+        (
+            (b"\x00\x00\x00\x00", datetime.timedelta()),
+            (b"\x00\x00\x00\x01", datetime.timedelta(milliseconds=1)),
+        ),
+    )
+    def test_can_read_valid_timedelta(
+        self,
+        buffer: io.BytesIO,
+        buffer_bytes: bytes,
+        expected: datetime.timedelta,
+    ) -> None:
+        buffer.write(buffer_bytes)
+        buffer.seek(0)
+        assert read_timedelta_i32(buffer) == expected
 
 
 class TestReadDatetimeI64:
