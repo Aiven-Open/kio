@@ -20,6 +20,7 @@ from kio.serial.writers import write_int32
 from kio.serial.writers import write_int64
 from kio.serial.writers import write_legacy_string
 from kio.serial.writers import write_nullable_compact_string
+from kio.serial.writers import write_nullable_legacy_bytes
 from kio.serial.writers import write_nullable_legacy_string
 from kio.serial.writers import write_uint8
 from kio.serial.writers import write_uint16
@@ -339,6 +340,29 @@ class TestWriteNullableLegacyString:
     ) -> None:
         with pytest.raises(OutOfBoundValue):
             write_nullable_legacy_string(buffer, 2**15 * "a")
+
+
+class TestWriteNullableLegacyBytes:
+    def test_can_write_valid_value(self, buffer: io.BytesIO) -> None:
+        value = "The quick brown 🦊 jumps over the lazy dog 🧖".encode()
+        write_nullable_legacy_bytes(buffer, value)
+        buffer.seek(0)
+        (read_length,) = struct.unpack(">i", buffer.read(4))
+        assert read_length == len(value)
+        assert buffer.read(read_length) == value
+
+    def test_can_write_none(self, buffer: io.BytesIO) -> None:
+        write_nullable_legacy_bytes(buffer, None)
+        buffer.seek(0)
+        (read_length,) = struct.unpack(">i", buffer.read(4))
+        assert read_length == -1
+
+    def test_raises_out_of_bound_value_for_too_large_string(
+        self,
+        buffer: io.BytesIO,
+    ) -> None:
+        with pytest.raises(OutOfBoundValue):
+            write_nullable_legacy_bytes(buffer, 2**31 * b"a")
 
 
 class TestWriteUUID:
