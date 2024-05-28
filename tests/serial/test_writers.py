@@ -4,13 +4,18 @@ import sys
 import uuid
 
 from contextlib import closing
+from dataclasses import dataclass
+from dataclasses import field
+from typing import ClassVar
 from typing import Generic
 from typing import TypeVar
 
 import pytest
 
+from kio.serial import entity_writer
 from kio.serial.errors import OutOfBoundValue
 from kio.serial.writers import Writer
+from kio.serial.writers import compact_array_writer
 from kio.serial.writers import write_compact_string
 from kio.serial.writers import write_empty_tagged_fields
 from kio.serial.writers import write_float64
@@ -29,7 +34,10 @@ from kio.serial.writers import write_uint32
 from kio.serial.writers import write_uint64
 from kio.serial.writers import write_unsigned_varint
 from kio.serial.writers import write_uuid
+from kio.static.constants import EntityType
 from kio.static.constants import uuid_zero
+from kio.static.primitive import i8
+from kio.static.primitive import i16
 
 _I = TypeVar("_I", bound=int, contravariant=True)
 
@@ -391,3 +399,31 @@ class TestWriteUUID:
         write_uuid(buffer, value)
         buffer.seek(0)
         assert buffer.read(16) == value.bytes
+
+
+class TestCompactArrayWriter:
+    def test_can_write_primitive_values(self, buffer: io.BytesIO) -> None:
+        writer = compact_array_writer(write_int8)
+        writer(buffer, (i8(1), i8(2), i8(3)))
+        buffer.seek(0)
+        assert buffer.read(4) == b"\x04\x01\x02\x03"
+
+    def test_can_write_entity_values(self, buffer: io.BytesIO) -> None:
+        @dataclass
+        class A:
+            __type__: ClassVar = EntityType.nested
+            __version__: ClassVar = i16(0)
+            __flexible__: ClassVar = True
+            p: i8 = field(metadata={"kafka_type": "int8"})
+            q: str = field(metadata={"kafka_type": "string"})
+
+        writer = compact_array_writer(entity_writer(A))
+        writer(buffer, (A(p=i8(23), q="foo bar"),))
+        buffer.seek(0)
+        assert buffer.read(11) == b"\x02\x17\x08foo bar\x00"
+
+    def test_can_write_none(self, buffer: io.BytesIO) -> None:
+        writer = compact_array_writer(write_int8)
+        writer(buffer, None)
+        buffer.seek(0)
+        assert buffer.read(4) == b"\x00"

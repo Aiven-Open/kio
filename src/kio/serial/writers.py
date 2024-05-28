@@ -197,7 +197,7 @@ def write_uuid(buffer: Writable, value: UUID | None) -> None:
         buffer.write(value.bytes)
 
 
-def compact_array_writer(item_writer: Writer[T]) -> Writer[Sequence[T]]:
+def compact_array_writer(item_writer: Writer[T]) -> Writer[Sequence[T] | None]:
     def write_compact_array(buffer: Writable, items: Sequence[T] | None) -> None:
         if items is None:
             write_compact_array_length(buffer, -1)
