@@ -4,15 +4,20 @@ import struct
 import sys
 import uuid
 
+from dataclasses import dataclass
+from dataclasses import field
 from typing import IO
+from typing import ClassVar
 from typing import final
 
 import pytest
 
+from kio.serial import entity_reader
 from kio.serial.errors import BufferUnderflow
 from kio.serial.errors import OutOfBoundValue
 from kio.serial.errors import UnexpectedNull
 from kio.serial.readers import Reader
+from kio.serial.readers import compact_array_reader
 from kio.serial.readers import read_compact_string
 from kio.serial.readers import read_compact_string_as_bytes
 from kio.serial.readers import read_compact_string_as_bytes_nullable
@@ -34,8 +39,11 @@ from kio.serial.readers import read_uint32
 from kio.serial.readers import read_uint64
 from kio.serial.readers import read_unsigned_varint
 from kio.serial.readers import read_uuid
+from kio.static.constants import EntityType
 from kio.static.constants import uuid_zero
 from kio.static.primitive import TZAware
+from kio.static.primitive import i8
+from kio.static.primitive import i16
 
 
 class BufferUnderflowContract:
@@ -464,6 +472,51 @@ class TestReadUUID(BufferUnderflowContract):
         buffer.write(value.bytes)
         buffer.seek(0)
         assert self.read(buffer) == value
+
+
+class TestCompactArrayReader:
+    def test_can_read_none(self, buffer: io.BytesIO) -> None:
+        reader = compact_array_reader(read_int8)
+        buffer.write(b"\x00")
+        buffer.seek(0)
+        assert reader(buffer) is None
+
+    def test_can_read_empty_array(self, buffer: io.BytesIO) -> None:
+        reader = compact_array_reader(read_int8)
+        buffer.write(b"\x01")
+        buffer.seek(0)
+        assert reader(buffer) == ()
+
+    def test_can_read_primitive_array(self, buffer: io.BytesIO) -> None:
+        reader = compact_array_reader(read_int8)
+        buffer.write(b"\x02\x20")
+        buffer.seek(0)
+        assert reader(buffer) == (32,)
+
+    def test_can_read_entity_array(self, buffer: io.BytesIO) -> None:
+        @dataclass
+        class A:
+            __type__: ClassVar = EntityType.nested
+            __version__: ClassVar = i16(0)
+            __flexible__: ClassVar = True
+            p: i8 = field(metadata={"kafka_type": "int8"})
+            q: str = field(metadata={"kafka_type": "string"})
+
+        reader = compact_array_reader(entity_reader(A))
+        buffer.write(
+            b"\x02"  # array length
+            b"\x17"  # A.p
+            b"\x08foo bar"  # A.q
+            b"\00"  # no tagged fields
+        )
+        buffer.seek(0)
+
+        result = reader(buffer)
+        assert result is not None
+        [entity] = result
+        assert isinstance(entity, A)
+        assert entity.p == 23
+        assert entity.q == "foo bar"
 
 
 class TestReadDatetimeI64:
