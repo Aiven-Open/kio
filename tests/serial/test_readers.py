@@ -18,6 +18,7 @@ from kio.serial.errors import OutOfBoundValue
 from kio.serial.errors import UnexpectedNull
 from kio.serial.readers import Reader
 from kio.serial.readers import compact_array_reader
+from kio.serial.readers import legacy_array_reader
 from kio.serial.readers import read_compact_string
 from kio.serial.readers import read_compact_string_as_bytes
 from kio.serial.readers import read_compact_string_as_bytes_nullable
@@ -508,6 +509,50 @@ class TestCompactArrayReader:
             b"\x17"  # A.p
             b"\x08foo bar"  # A.q
             b"\00"  # no tagged fields
+        )
+        buffer.seek(0)
+
+        result = reader(buffer)
+        assert result is not None
+        [entity] = result
+        assert isinstance(entity, A)
+        assert entity.p == 23
+        assert entity.q == "foo bar"
+
+
+class TestLegacyArrayReader:
+    def test_can_read_none(self, buffer: io.BytesIO) -> None:
+        reader = legacy_array_reader(read_int8)
+        buffer.write(b"\xff\xff\xff\xff")
+        buffer.seek(0)
+        assert reader(buffer) is None
+
+    def test_can_read_empty_array(self, buffer: io.BytesIO) -> None:
+        reader = legacy_array_reader(read_int8)
+        buffer.write(b"\x00\x00\x00\x00")
+        buffer.seek(0)
+        assert reader(buffer) == ()
+
+    def test_can_read_primitive_array(self, buffer: io.BytesIO) -> None:
+        reader = legacy_array_reader(read_int8)
+        buffer.write(b"\x00\x00\x00\x01\x20")
+        buffer.seek(0)
+        assert reader(buffer) == (32,)
+
+    def test_can_read_entity_array(self, buffer: io.BytesIO) -> None:
+        @dataclass
+        class A:
+            __type__: ClassVar = EntityType.nested
+            __version__: ClassVar = i16(0)
+            __flexible__: ClassVar = False
+            p: i8 = field(metadata={"kafka_type": "int8"})
+            q: str = field(metadata={"kafka_type": "string"})
+
+        reader = legacy_array_reader(entity_reader(A))
+        buffer.write(
+            b"\x00\x00\x00\x01"  # array length
+            b"\x17"  # A.p
+            b"\x00\x07foo bar"  # A.q
         )
         buffer.seek(0)
 
