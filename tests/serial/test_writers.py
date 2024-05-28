@@ -16,6 +16,7 @@ from kio.serial import entity_writer
 from kio.serial.errors import OutOfBoundValue
 from kio.serial.writers import Writer
 from kio.serial.writers import compact_array_writer
+from kio.serial.writers import legacy_array_writer
 from kio.serial.writers import write_compact_string
 from kio.serial.writers import write_empty_tagged_fields
 from kio.serial.writers import write_float64
@@ -427,3 +428,31 @@ class TestCompactArrayWriter:
         writer(buffer, None)
         buffer.seek(0)
         assert buffer.read(4) == b"\x00"
+
+
+class TestLegacyArrayWriter:
+    def test_can_write_primitive_values(self, buffer: io.BytesIO) -> None:
+        writer = legacy_array_writer(write_int8)
+        writer(buffer, (i8(1), i8(2), i8(3)))
+        buffer.seek(0)
+        assert buffer.read(7) == b"\x00\x00\x00\x03\x01\x02\x03"
+
+    def test_can_write_entity_values(self, buffer: io.BytesIO) -> None:
+        @dataclass
+        class A:
+            __type__: ClassVar = EntityType.nested
+            __version__: ClassVar = i16(0)
+            __flexible__: ClassVar = False
+            p: i8 = field(metadata={"kafka_type": "int8"})
+            q: str = field(metadata={"kafka_type": "string"})
+
+        writer = legacy_array_writer(entity_writer(A))
+        writer(buffer, (A(p=i8(23), q="foo bar"),))
+        buffer.seek(0)
+        assert buffer.read(14) == b"\x00\x00\x00\x01\x17\x00\x07foo bar"
+
+    def test_can_write_none(self, buffer: io.BytesIO) -> None:
+        writer = legacy_array_writer(write_int8)
+        writer(buffer, None)
+        buffer.seek(0)
+        assert buffer.read(4) == b"\xff\xff\xff\xff"

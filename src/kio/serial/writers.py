@@ -209,7 +209,7 @@ def compact_array_writer(item_writer: Writer[T]) -> Writer[Sequence[T] | None]:
     return write_compact_array
 
 
-def legacy_array_writer(item_writer: Writer[T]) -> Writer[Sequence[T]]:
+def legacy_array_writer(item_writer: Writer[T]) -> Writer[Sequence[T] | None]:
     def write_legacy_array(buffer: Writable, items: Sequence[T] | None) -> None:
         if items is None:
             write_legacy_array_length(buffer, i32(-1))
