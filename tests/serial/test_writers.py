@@ -18,6 +18,7 @@ from kio.serial.writers import write_int8
 from kio.serial.writers import write_int16
 from kio.serial.writers import write_int32
 from kio.serial.writers import write_int64
+from kio.serial.writers import write_legacy_bytes
 from kio.serial.writers import write_legacy_string
 from kio.serial.writers import write_nullable_compact_string
 from kio.serial.writers import write_nullable_legacy_bytes
@@ -315,6 +316,20 @@ class TestWriteLegacyString:
     def test_raises_type_error_for_none(self, buffer: io.BytesIO) -> None:
         with pytest.raises(TypeError, match=r"^Unexpectedly received None value"):
             write_legacy_string(buffer, None)  # type: ignore[arg-type]
+
+
+class TestWriteLegacyBytes:
+    def test_can_write_valid_value(self, buffer: io.BytesIO) -> None:
+        value = "The quick brown 🦊 jumps over the lazy dog 🧖".encode()
+        write_legacy_bytes(buffer, value)
+        buffer.seek(0)
+        (read_length,) = struct.unpack(">i", buffer.read(4))
+        assert read_length == len(value)
+        assert buffer.read(read_length) == value
+
+    def test_raises_type_error_for_none(self, buffer: io.BytesIO) -> None:
+        with pytest.raises(TypeError, match=r"^Unexpectedly received None value"):
+            write_legacy_bytes(buffer, None)  # type: ignore[arg-type]
 
 
 class TestWriteNullableLegacyString:
