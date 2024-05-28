@@ -19,6 +19,7 @@ from kio.serial.writers import Writer
 from kio.serial.writers import compact_array_writer
 from kio.serial.writers import legacy_array_writer
 from kio.serial.writers import write_compact_string
+from kio.serial.writers import write_datetime_i64
 from kio.serial.writers import write_empty_tagged_fields
 from kio.serial.writers import write_error_code
 from kio.serial.writers import write_float64
@@ -519,5 +520,30 @@ class TestWriteTimedeltaI64:
         expected_bytes: bytes,
     ) -> None:
         write_timedelta_i64(buffer, value)
+        buffer.seek(0)
+        assert buffer.read(8) == expected_bytes
+
+
+class TestWriteDatetimeI64:
+    @pytest.mark.parametrize(
+        ("value", "expected_bytes"),
+        (
+            (
+                datetime.datetime(2024, 5, 28, 12, 31, tzinfo=datetime.UTC),
+                b"\x00\x00\x01\x8f\xbf.\xb3\xa0",
+            ),
+            (
+                datetime.datetime(1970, 1, 1, tzinfo=datetime.UTC),
+                b"\x00\x00\x00\x00\x00\x00\x00\x00",
+            ),
+        ),
+    )
+    def test_can_write_datetime(
+        self,
+        buffer: io.BytesIO,
+        value: datetime.datetime,
+        expected_bytes: bytes,
+    ) -> None:
+        write_datetime_i64(buffer, value)
         buffer.seek(0)
         assert buffer.read(8) == expected_bytes
