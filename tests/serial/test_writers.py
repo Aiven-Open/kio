@@ -32,6 +32,7 @@ from kio.serial.writers import write_nullable_compact_string
 from kio.serial.writers import write_nullable_legacy_bytes
 from kio.serial.writers import write_nullable_legacy_string
 from kio.serial.writers import write_timedelta_i32
+from kio.serial.writers import write_timedelta_i64
 from kio.serial.writers import write_uint8
 from kio.serial.writers import write_uint16
 from kio.serial.writers import write_uint32
@@ -44,6 +45,7 @@ from kio.static.constants import uuid_zero
 from kio.static.primitive import i8
 from kio.static.primitive import i16
 from kio.static.primitive import i32Timedelta
+from kio.static.primitive import i64Timedelta
 
 _I = TypeVar("_I", bound=int, contravariant=True)
 
@@ -500,3 +502,22 @@ class TestWriteTimedeltaI32:
         write_timedelta_i32(buffer, value)
         buffer.seek(0)
         assert buffer.read(4) == expected_bytes
+
+
+class TestWriteTimedeltaI64:
+    @pytest.mark.parametrize(
+        ("value", "expected_bytes"),
+        (
+            (datetime.timedelta(), b"\x00\x00\x00\x00\x00\x00\x00\x00"),
+            (datetime.timedelta(milliseconds=1), b"\x00\x00\x00\x00\x00\x00\x00\x01"),
+        ),
+    )
+    def test_can_write_timedelta(
+        self,
+        buffer: io.BytesIO,
+        value: i64Timedelta,
+        expected_bytes: bytes,
+    ) -> None:
+        write_timedelta_i64(buffer, value)
+        buffer.seek(0)
+        assert buffer.read(8) == expected_bytes
