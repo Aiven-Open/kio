@@ -1,2 +1,6 @@
 comment:
   require_changes: true
+  status:
+    project:
+      default:
+        target: 100
