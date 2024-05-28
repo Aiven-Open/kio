@@ -19,6 +19,7 @@ from kio.serial.writers import compact_array_writer
 from kio.serial.writers import legacy_array_writer
 from kio.serial.writers import write_compact_string
 from kio.serial.writers import write_empty_tagged_fields
+from kio.serial.writers import write_error_code
 from kio.serial.writers import write_float64
 from kio.serial.writers import write_int8
 from kio.serial.writers import write_int16
@@ -36,6 +37,7 @@ from kio.serial.writers import write_uint64
 from kio.serial.writers import write_unsigned_varint
 from kio.serial.writers import write_uuid
 from kio.static.constants import EntityType
+from kio.static.constants import ErrorCode
 from kio.static.constants import uuid_zero
 from kio.static.primitive import i8
 from kio.static.primitive import i16
@@ -456,3 +458,23 @@ class TestLegacyArrayWriter:
         writer(buffer, None)
         buffer.seek(0)
         assert buffer.read(4) == b"\xff\xff\xff\xff"
+
+
+class TestWriteErrorCode:
+    @pytest.mark.parametrize(
+        ("error_code", "expected_bytes"),
+        (
+            (ErrorCode.unknown_server_error, b"\xff\xff"),
+            (ErrorCode.none, b"\x00\x00"),
+            (ErrorCode.offset_out_of_range, b"\x00\x01"),
+        ),
+    )
+    def test_can_write_error_code(
+        self,
+        buffer: io.BytesIO,
+        error_code: ErrorCode,
+        expected_bytes: bytes,
+    ) -> None:
+        write_error_code(buffer, error_code)
+        buffer.seek(0)
+        assert buffer.read(2) == expected_bytes
