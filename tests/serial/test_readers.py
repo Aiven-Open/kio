@@ -24,6 +24,7 @@ from kio.serial.readers import read_compact_string_as_bytes
 from kio.serial.readers import read_compact_string_as_bytes_nullable
 from kio.serial.readers import read_compact_string_nullable
 from kio.serial.readers import read_datetime_i64
+from kio.serial.readers import read_error_code
 from kio.serial.readers import read_float64
 from kio.serial.readers import read_int8
 from kio.serial.readers import read_int16
@@ -41,6 +42,7 @@ from kio.serial.readers import read_uint64
 from kio.serial.readers import read_unsigned_varint
 from kio.serial.readers import read_uuid
 from kio.static.constants import EntityType
+from kio.static.constants import ErrorCode
 from kio.static.constants import uuid_zero
 from kio.static.primitive import TZAware
 from kio.static.primitive import i8
@@ -562,6 +564,41 @@ class TestLegacyArrayReader:
         assert isinstance(entity, A)
         assert entity.p == 23
         assert entity.q == "foo bar"
+
+
+class TestReadErrorCode:
+    def test_raises_buffer_underflow(self, buffer: io.BytesIO) -> None:
+        buffer.write(b"\x00")
+        buffer.seek(0)
+        with pytest.raises(BufferUnderflow):
+            read_error_code(buffer)
+
+    def test_raises_value_error_for_unknown_error_code(
+        self,
+        buffer: io.BytesIO,
+    ) -> None:
+        buffer.write(b"\xff\xfe")
+        buffer.seek(0)
+        with pytest.raises(ValueError, match=r"^-2 is not a valid ErrorCode$"):
+            read_error_code(buffer)
+
+    @pytest.mark.parametrize(
+        ("buffer_bytes", "expected_code"),
+        (
+            (b"\x00\x00", ErrorCode.none),
+            (b"\x00\x01", ErrorCode.offset_out_of_range),
+            (b"\xff\xff", ErrorCode.unknown_server_error),
+        ),
+    )
+    def test_can_read_valid_error_code(
+        self,
+        buffer: io.BytesIO,
+        buffer_bytes: bytes,
+        expected_code: ErrorCode,
+    ) -> None:
+        buffer.write(buffer_bytes)
+        buffer.seek(0)
+        assert read_error_code(buffer) is expected_code
 
 
 class TestReadDatetimeI64:
