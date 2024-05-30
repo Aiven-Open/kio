@@ -1,9 +1,7 @@
 name: kio
 services:
-  # Adopted from
-  # https://github.com/confluentinc/cp-all-in-one/tree/6.2.0-post/cp-all-in-one-kraft
   kafka:
-    image: confluentinc/cp-kafka:7.3.1
+    image: apache/kafka:3.7.0
     hostname: broker
     container_name: broker
     ports:
@@ -28,8 +26,5 @@ services:
       KAFKA_BUFFER_MEMORY: 104857600
       KAFKA_MAX_REQUEST_SIZE: 104857600
       KAFKA_REPLICA_FETCH_MAX_BYTES: 104857600
-    volumes:
-      - ./update-run.sh:/tmp/update-run.sh
     tmpfs:
       - /tmp
-    command: "bash -c 'if [ ! -f /tmp/update-run.sh ]; then echo \"ERROR: Did you forget the update-run.sh file that came with this compose.yml file?\" && exit 1 ; else /tmp/update-run.sh && /etc/confluent/docker/run ; fi'"
