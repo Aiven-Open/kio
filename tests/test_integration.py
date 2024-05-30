@@ -33,6 +33,7 @@ from kio.schema.delete_topics.v6 import DeleteTopicsRequest
 from kio.schema.delete_topics.v6 import DeleteTopicsResponse
 from kio.schema.delete_topics.v6.request import DeleteTopicState
 from kio.schema.delete_topics.v6.response import DeletableTopicResult
+from kio.schema.errors import ErrorCode
 from kio.schema.fetch.v13.request import FetchPartition
 from kio.schema.fetch.v13.request import FetchRequest
 from kio.schema.fetch.v13.request import FetchTopic
@@ -53,7 +54,6 @@ from kio.serial import entity_writer
 from kio.serial.readers import read_int32
 from kio.serial.writers import Writable
 from kio.serial.writers import write_int32
-from kio.static.constants import ErrorCode
 from kio.static.constants import uuid_zero
 from kio.static.primitive import i8
 from kio.static.primitive import i16

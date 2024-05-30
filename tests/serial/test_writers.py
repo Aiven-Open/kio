@@ -13,6 +13,7 @@ from typing import TypeVar
 
 import pytest
 
+from kio.schema.errors import ErrorCode
 from kio.serial import entity_writer
 from kio.serial.errors import OutOfBoundValue
 from kio.serial.writers import Writer
@@ -42,7 +43,6 @@ from kio.serial.writers import write_uint64
 from kio.serial.writers import write_unsigned_varint
 from kio.serial.writers import write_uuid
 from kio.static.constants import EntityType
-from kio.static.constants import ErrorCode
 from kio.static.constants import uuid_zero
 from kio.static.primitive import i8
 from kio.static.primitive import i16

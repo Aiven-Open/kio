@@ -8,8 +8,6 @@ from types import ModuleType
 from typing import TYPE_CHECKING
 from typing import Final
 
-import kio.schema
-
 from kio.static.constants import EntityType
 
 # Chickens and eggs ...
@@ -18,7 +16,7 @@ if TYPE_CHECKING:
 
 
 base_dir: Final = Path(__file__).parent.parent.resolve()
-schema_src_dir: Final = Path(kio.schema.__file__).parent.resolve()
+schema_src_dir: Final = base_dir / "src/kio/schema"
 ignore_modules: Final = frozenset({"index"})
 
 

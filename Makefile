@@ -4,7 +4,9 @@ fetch-schema-src:
 
 .PHONY: generate-schema
 generate-schema:
-	python3 -m codegen
+	docker compose build java_tester
+	docker compose run --rm java_tester --print-error-codes > error-codes.txt
+	python3 -m codegen error-codes.txt
 	pre-commit run --all-files || true
 
 .PHONY: build-schema

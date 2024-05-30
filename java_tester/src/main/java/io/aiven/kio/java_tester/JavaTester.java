@@ -8,8 +8,10 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Base64;
 
+import org.apache.kafka.common.errors.RetriableException;
 import org.apache.kafka.common.protocol.ApiMessage;
 import org.apache.kafka.common.protocol.ByteBufferAccessor;
+import org.apache.kafka.common.protocol.Errors;
 import org.apache.kafka.common.protocol.ObjectSerializationCache;
 import org.apache.kafka.common.protocol.Readable;
 
@@ -23,7 +25,28 @@ public class JavaTester {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
+    private static final String CMD_PRINT_ERROR_CODES = "--print-error-codes";
+
     public static void main(String[] args) throws Exception {
+        if (Arrays.stream(args).anyMatch(CMD_PRINT_ERROR_CODES::equals)) {
+            System.err.println("Printing error codes");
+
+            for (Errors error : Errors.values()) {
+                System.out.print(error.code());
+                System.out.print(" ");
+                System.out.print(error.name());
+                System.out.print(" ");
+                // https://github.com/apache/kafka/blob/84b2d5bedf4381ebfcf32a4671f096de937beb31/clients/src/main/java/org/apache/kafka/common/protocol/Errors.java#L551
+                System.out.print(
+                    error.exception() != null && error.exception() instanceof RetriableException ? "True" : "False"
+                );
+                System.out.print(" ");
+                System.out.println(error.message());
+            }
+
+            return;
+        }
+
         System.out.println("Java tester started");
         System.out.flush();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {

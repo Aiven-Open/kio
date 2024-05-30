@@ -1,4 +1,0 @@
-services:
-  java_tester:
-    build:
-      context: ../java_tester
