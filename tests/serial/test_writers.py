@@ -1,33 +1,53 @@
+import datetime
 import io
 import struct
 import sys
 import uuid
 
 from contextlib import closing
+from dataclasses import dataclass
+from dataclasses import field
+from typing import ClassVar
 from typing import Generic
 from typing import TypeVar
 
 import pytest
 
+from kio.serial import entity_writer
 from kio.serial.errors import OutOfBoundValue
 from kio.serial.writers import Writer
+from kio.serial.writers import compact_array_writer
+from kio.serial.writers import legacy_array_writer
 from kio.serial.writers import write_compact_string
+from kio.serial.writers import write_datetime_i64
 from kio.serial.writers import write_empty_tagged_fields
+from kio.serial.writers import write_error_code
 from kio.serial.writers import write_float64
 from kio.serial.writers import write_int8
 from kio.serial.writers import write_int16
 from kio.serial.writers import write_int32
 from kio.serial.writers import write_int64
+from kio.serial.writers import write_legacy_bytes
 from kio.serial.writers import write_legacy_string
 from kio.serial.writers import write_nullable_compact_string
+from kio.serial.writers import write_nullable_datetime_i64
+from kio.serial.writers import write_nullable_legacy_bytes
 from kio.serial.writers import write_nullable_legacy_string
+from kio.serial.writers import write_timedelta_i32
+from kio.serial.writers import write_timedelta_i64
 from kio.serial.writers import write_uint8
 from kio.serial.writers import write_uint16
 from kio.serial.writers import write_uint32
 from kio.serial.writers import write_uint64
 from kio.serial.writers import write_unsigned_varint
 from kio.serial.writers import write_uuid
+from kio.static.constants import EntityType
+from kio.static.constants import ErrorCode
 from kio.static.constants import uuid_zero
+from kio.static.primitive import i8
+from kio.static.primitive import i16
+from kio.static.primitive import i32Timedelta
+from kio.static.primitive import i64Timedelta
 
 _I = TypeVar("_I", bound=int, contravariant=True)
 
@@ -316,6 +336,20 @@ class TestWriteLegacyString:
             write_legacy_string(buffer, None)  # type: ignore[arg-type]
 
 
+class TestWriteLegacyBytes:
+    def test_can_write_valid_value(self, buffer: io.BytesIO) -> None:
+        value = "The quick brown 🦊 jumps over the lazy dog 🧖".encode()
+        write_legacy_bytes(buffer, value)
+        buffer.seek(0)
+        (read_length,) = struct.unpack(">i", buffer.read(4))
+        assert read_length == len(value)
+        assert buffer.read(read_length) == value
+
+    def test_raises_type_error_for_none(self, buffer: io.BytesIO) -> None:
+        with pytest.raises(TypeError, match=r"^Unexpectedly received None value"):
+            write_legacy_bytes(buffer, None)  # type: ignore[arg-type]
+
+
 class TestWriteNullableLegacyString:
     def test_can_write_valid_value(self, buffer: io.BytesIO) -> None:
         value = "The quick brown 🦊 jumps over the lazy dog 🧖"
@@ -341,6 +375,29 @@ class TestWriteNullableLegacyString:
             write_nullable_legacy_string(buffer, 2**15 * "a")
 
 
+class TestWriteNullableLegacyBytes:
+    def test_can_write_valid_value(self, buffer: io.BytesIO) -> None:
+        value = "The quick brown 🦊 jumps over the lazy dog 🧖".encode()
+        write_nullable_legacy_bytes(buffer, value)
+        buffer.seek(0)
+        (read_length,) = struct.unpack(">i", buffer.read(4))
+        assert read_length == len(value)
+        assert buffer.read(read_length) == value
+
+    def test_can_write_none(self, buffer: io.BytesIO) -> None:
+        write_nullable_legacy_bytes(buffer, None)
+        buffer.seek(0)
+        (read_length,) = struct.unpack(">i", buffer.read(4))
+        assert read_length == -1
+
+    def test_raises_out_of_bound_value_for_too_large_string(
+        self,
+        buffer: io.BytesIO,
+    ) -> None:
+        with pytest.raises(OutOfBoundValue):
+            write_nullable_legacy_bytes(buffer, 2**31 * b"a")
+
+
 class TestWriteUUID:
     def test_writes_none_as_uuid_zero(self, buffer: io.BytesIO) -> None:
         write_uuid(buffer, None)
@@ -352,3 +409,168 @@ class TestWriteUUID:
         write_uuid(buffer, value)
         buffer.seek(0)
         assert buffer.read(16) == value.bytes
+
+
+class TestCompactArrayWriter:
+    def test_can_write_primitive_values(self, buffer: io.BytesIO) -> None:
+        writer = compact_array_writer(write_int8)
+        writer(buffer, (i8(1), i8(2), i8(3)))
+        buffer.seek(0)
+        assert buffer.read(4) == b"\x04\x01\x02\x03"
+
+    def test_can_write_entity_values(self, buffer: io.BytesIO) -> None:
+        @dataclass
+        class A:
+            __type__: ClassVar = EntityType.nested
+            __version__: ClassVar = i16(0)
+            __flexible__: ClassVar = True
+            p: i8 = field(metadata={"kafka_type": "int8"})
+            q: str = field(metadata={"kafka_type": "string"})
+
+        writer = compact_array_writer(entity_writer(A))
+        writer(buffer, (A(p=i8(23), q="foo bar"),))
+        buffer.seek(0)
+        assert buffer.read(11) == b"\x02\x17\x08foo bar\x00"
+
+    def test_can_write_none(self, buffer: io.BytesIO) -> None:
+        writer = compact_array_writer(write_int8)
+        writer(buffer, None)
+        buffer.seek(0)
+        assert buffer.read(4) == b"\x00"
+
+
+class TestLegacyArrayWriter:
+    def test_can_write_primitive_values(self, buffer: io.BytesIO) -> None:
+        writer = legacy_array_writer(write_int8)
+        writer(buffer, (i8(1), i8(2), i8(3)))
+        buffer.seek(0)
+        assert buffer.read(7) == b"\x00\x00\x00\x03\x01\x02\x03"
+
+    def test_can_write_entity_values(self, buffer: io.BytesIO) -> None:
+        @dataclass
+        class A:
+            __type__: ClassVar = EntityType.nested
+            __version__: ClassVar = i16(0)
+            __flexible__: ClassVar = False
+            p: i8 = field(metadata={"kafka_type": "int8"})
+            q: str = field(metadata={"kafka_type": "string"})
+
+        writer = legacy_array_writer(entity_writer(A))
+        writer(buffer, (A(p=i8(23), q="foo bar"),))
+        buffer.seek(0)
+        assert buffer.read(14) == b"\x00\x00\x00\x01\x17\x00\x07foo bar"
+
+    def test_can_write_none(self, buffer: io.BytesIO) -> None:
+        writer = legacy_array_writer(write_int8)
+        writer(buffer, None)
+        buffer.seek(0)
+        assert buffer.read(4) == b"\xff\xff\xff\xff"
+
+
+class TestWriteErrorCode:
+    @pytest.mark.parametrize(
+        ("error_code", "expected_bytes"),
+        (
+            (ErrorCode.unknown_server_error, b"\xff\xff"),
+            (ErrorCode.none, b"\x00\x00"),
+            (ErrorCode.offset_out_of_range, b"\x00\x01"),
+        ),
+    )
+    def test_can_write_error_code(
+        self,
+        buffer: io.BytesIO,
+        error_code: ErrorCode,
+        expected_bytes: bytes,
+    ) -> None:
+        write_error_code(buffer, error_code)
+        buffer.seek(0)
+        assert buffer.read(2) == expected_bytes
+
+
+class TestWriteTimedeltaI32:
+    @pytest.mark.parametrize(
+        ("value", "expected_bytes"),
+        (
+            (datetime.timedelta(), b"\x00\x00\x00\x00"),
+            (datetime.timedelta(milliseconds=1), b"\x00\x00\x00\x01"),
+        ),
+    )
+    def test_can_write_timedelta(
+        self,
+        buffer: io.BytesIO,
+        value: i32Timedelta,
+        expected_bytes: bytes,
+    ) -> None:
+        write_timedelta_i32(buffer, value)
+        buffer.seek(0)
+        assert buffer.read(4) == expected_bytes
+
+
+class TestWriteTimedeltaI64:
+    @pytest.mark.parametrize(
+        ("value", "expected_bytes"),
+        (
+            (datetime.timedelta(), b"\x00\x00\x00\x00\x00\x00\x00\x00"),
+            (datetime.timedelta(milliseconds=1), b"\x00\x00\x00\x00\x00\x00\x00\x01"),
+        ),
+    )
+    def test_can_write_timedelta(
+        self,
+        buffer: io.BytesIO,
+        value: i64Timedelta,
+        expected_bytes: bytes,
+    ) -> None:
+        write_timedelta_i64(buffer, value)
+        buffer.seek(0)
+        assert buffer.read(8) == expected_bytes
+
+
+class TestWriteDatetimeI64:
+    @pytest.mark.parametrize(
+        ("value", "expected_bytes"),
+        (
+            (
+                datetime.datetime(2024, 5, 28, 12, 31, tzinfo=datetime.UTC),
+                b"\x00\x00\x01\x8f\xbf.\xb3\xa0",
+            ),
+            (
+                datetime.datetime(1970, 1, 1, tzinfo=datetime.UTC),
+                b"\x00\x00\x00\x00\x00\x00\x00\x00",
+            ),
+        ),
+    )
+    def test_can_write_datetime(
+        self,
+        buffer: io.BytesIO,
+        value: datetime.datetime,
+        expected_bytes: bytes,
+    ) -> None:
+        write_datetime_i64(buffer, value)
+        buffer.seek(0)
+        assert buffer.read(8) == expected_bytes
+
+
+class TestWriteNullableDatetimeI64:
+    @pytest.mark.parametrize(
+        ("value", "expected_bytes"),
+        (
+            (None, b"\xff\xff\xff\xff\xff\xff\xff\xff"),
+            (
+                datetime.datetime(2024, 5, 28, 12, 31, tzinfo=datetime.UTC),
+                b"\x00\x00\x01\x8f\xbf.\xb3\xa0",
+            ),
+            (
+                datetime.datetime(1970, 1, 1, tzinfo=datetime.UTC),
+                b"\x00\x00\x00\x00\x00\x00\x00\x00",
+            ),
+        ),
+    )
+    def test_can_write_datetime(
+        self,
+        buffer: io.BytesIO,
+        value: datetime.datetime | None,
+        expected_bytes: bytes,
+    ) -> None:
+        write_nullable_datetime_i64(buffer, value)
+        buffer.seek(0)
+        assert buffer.read(8) == expected_bytes

@@ -4,20 +4,27 @@ import struct
 import sys
 import uuid
 
+from dataclasses import dataclass
+from dataclasses import field
 from typing import IO
+from typing import ClassVar
 from typing import final
 
 import pytest
 
+from kio.serial import entity_reader
 from kio.serial.errors import BufferUnderflow
 from kio.serial.errors import OutOfBoundValue
 from kio.serial.errors import UnexpectedNull
 from kio.serial.readers import Reader
+from kio.serial.readers import compact_array_reader
+from kio.serial.readers import legacy_array_reader
 from kio.serial.readers import read_compact_string
 from kio.serial.readers import read_compact_string_as_bytes
 from kio.serial.readers import read_compact_string_as_bytes_nullable
 from kio.serial.readers import read_compact_string_nullable
 from kio.serial.readers import read_datetime_i64
+from kio.serial.readers import read_error_code
 from kio.serial.readers import read_float64
 from kio.serial.readers import read_int8
 from kio.serial.readers import read_int16
@@ -28,14 +35,20 @@ from kio.serial.readers import read_legacy_string
 from kio.serial.readers import read_nullable_datetime_i64
 from kio.serial.readers import read_nullable_legacy_bytes
 from kio.serial.readers import read_nullable_legacy_string
+from kio.serial.readers import read_timedelta_i32
+from kio.serial.readers import read_timedelta_i64
 from kio.serial.readers import read_uint8
 from kio.serial.readers import read_uint16
 from kio.serial.readers import read_uint32
 from kio.serial.readers import read_uint64
 from kio.serial.readers import read_unsigned_varint
 from kio.serial.readers import read_uuid
+from kio.static.constants import EntityType
+from kio.static.constants import ErrorCode
 from kio.static.constants import uuid_zero
 from kio.static.primitive import TZAware
+from kio.static.primitive import i8
+from kio.static.primitive import i16
 
 
 class BufferUnderflowContract:
@@ -464,6 +477,180 @@ class TestReadUUID(BufferUnderflowContract):
         buffer.write(value.bytes)
         buffer.seek(0)
         assert self.read(buffer) == value
+
+
+class TestCompactArrayReader:
+    def test_can_read_none(self, buffer: io.BytesIO) -> None:
+        reader = compact_array_reader(read_int8)
+        buffer.write(b"\x00")
+        buffer.seek(0)
+        assert reader(buffer) is None
+
+    def test_can_read_empty_array(self, buffer: io.BytesIO) -> None:
+        reader = compact_array_reader(read_int8)
+        buffer.write(b"\x01")
+        buffer.seek(0)
+        assert reader(buffer) == ()
+
+    def test_can_read_primitive_array(self, buffer: io.BytesIO) -> None:
+        reader = compact_array_reader(read_int8)
+        buffer.write(b"\x02\x20")
+        buffer.seek(0)
+        assert reader(buffer) == (32,)
+
+    def test_can_read_entity_array(self, buffer: io.BytesIO) -> None:
+        @dataclass
+        class A:
+            __type__: ClassVar = EntityType.nested
+            __version__: ClassVar = i16(0)
+            __flexible__: ClassVar = True
+            p: i8 = field(metadata={"kafka_type": "int8"})
+            q: str = field(metadata={"kafka_type": "string"})
+
+        reader = compact_array_reader(entity_reader(A))
+        buffer.write(
+            b"\x02"  # array length
+            b"\x17"  # A.p
+            b"\x08foo bar"  # A.q
+            b"\00"  # no tagged fields
+        )
+        buffer.seek(0)
+
+        result = reader(buffer)
+        assert result is not None
+        [entity] = result
+        assert isinstance(entity, A)
+        assert entity.p == 23
+        assert entity.q == "foo bar"
+
+
+class TestLegacyArrayReader:
+    def test_can_read_none(self, buffer: io.BytesIO) -> None:
+        reader = legacy_array_reader(read_int8)
+        buffer.write(b"\xff\xff\xff\xff")
+        buffer.seek(0)
+        assert reader(buffer) is None
+
+    def test_can_read_empty_array(self, buffer: io.BytesIO) -> None:
+        reader = legacy_array_reader(read_int8)
+        buffer.write(b"\x00\x00\x00\x00")
+        buffer.seek(0)
+        assert reader(buffer) == ()
+
+    def test_can_read_primitive_array(self, buffer: io.BytesIO) -> None:
+        reader = legacy_array_reader(read_int8)
+        buffer.write(b"\x00\x00\x00\x01\x20")
+        buffer.seek(0)
+        assert reader(buffer) == (32,)
+
+    def test_can_read_entity_array(self, buffer: io.BytesIO) -> None:
+        @dataclass
+        class A:
+            __type__: ClassVar = EntityType.nested
+            __version__: ClassVar = i16(0)
+            __flexible__: ClassVar = False
+            p: i8 = field(metadata={"kafka_type": "int8"})
+            q: str = field(metadata={"kafka_type": "string"})
+
+        reader = legacy_array_reader(entity_reader(A))
+        buffer.write(
+            b"\x00\x00\x00\x01"  # array length
+            b"\x17"  # A.p
+            b"\x00\x07foo bar"  # A.q
+        )
+        buffer.seek(0)
+
+        result = reader(buffer)
+        assert result is not None
+        [entity] = result
+        assert isinstance(entity, A)
+        assert entity.p == 23
+        assert entity.q == "foo bar"
+
+
+class TestReadErrorCode:
+    def test_raises_buffer_underflow(self, buffer: io.BytesIO) -> None:
+        buffer.write(b"\x00")
+        buffer.seek(0)
+        with pytest.raises(BufferUnderflow):
+            read_error_code(buffer)
+
+    def test_raises_value_error_for_unknown_error_code(
+        self,
+        buffer: io.BytesIO,
+    ) -> None:
+        buffer.write(b"\xff\xfe")
+        buffer.seek(0)
+        with pytest.raises(ValueError, match=r"^-2 is not a valid ErrorCode$"):
+            read_error_code(buffer)
+
+    @pytest.mark.parametrize(
+        ("buffer_bytes", "expected_code"),
+        (
+            (b"\x00\x00", ErrorCode.none),
+            (b"\x00\x01", ErrorCode.offset_out_of_range),
+            (b"\xff\xff", ErrorCode.unknown_server_error),
+        ),
+    )
+    def test_can_read_valid_error_code(
+        self,
+        buffer: io.BytesIO,
+        buffer_bytes: bytes,
+        expected_code: ErrorCode,
+    ) -> None:
+        buffer.write(buffer_bytes)
+        buffer.seek(0)
+        assert read_error_code(buffer) is expected_code
+
+
+class TestReadTimedeltaI32:
+    def test_raises_buffer_underflow(self, buffer: io.BytesIO) -> None:
+        buffer.write(b"\x00")
+        buffer.seek(0)
+        with pytest.raises(BufferUnderflow):
+            assert read_timedelta_i32(buffer)
+
+    @pytest.mark.parametrize(
+        ("buffer_bytes", "expected"),
+        (
+            (b"\x00\x00\x00\x00", datetime.timedelta()),
+            (b"\x00\x00\x00\x01", datetime.timedelta(milliseconds=1)),
+        ),
+    )
+    def test_can_read_valid_timedelta(
+        self,
+        buffer: io.BytesIO,
+        buffer_bytes: bytes,
+        expected: datetime.timedelta,
+    ) -> None:
+        buffer.write(buffer_bytes)
+        buffer.seek(0)
+        assert read_timedelta_i32(buffer) == expected
+
+
+class TestReadTimedeltaI64:
+    def test_raises_buffer_underflow(self, buffer: io.BytesIO) -> None:
+        buffer.write(b"\x00\x00\x00\x00")
+        buffer.seek(0)
+        with pytest.raises(BufferUnderflow):
+            assert read_timedelta_i64(buffer)
+
+    @pytest.mark.parametrize(
+        ("buffer_bytes", "expected"),
+        (
+            (b"\x00\x00\x00\x00\x00\x00\x00\x00", datetime.timedelta()),
+            (b"\x00\x00\x00\x00\x00\x00\x00\x01", datetime.timedelta(milliseconds=1)),
+        ),
+    )
+    def test_can_read_valid_timedelta(
+        self,
+        buffer: io.BytesIO,
+        buffer_bytes: bytes,
+        expected: datetime.timedelta,
+    ) -> None:
+        buffer.write(buffer_bytes)
+        buffer.seek(0)
+        assert read_timedelta_i64(buffer) == expected
 
 
 class TestReadDatetimeI64:
