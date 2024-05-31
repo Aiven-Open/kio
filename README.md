@@ -12,15 +12,20 @@
     Python data types for the Apache Kafka® Protocol.
 </p>
 
+<h4 align=center>
+    <a href=https://aiven-open.github.io/kio/>Checkout the complete documentation →</a>
+</h4>
+
 ## Features
 
 - Exposes immutable dataclass entities for all protocol messages, generated from the
   [same source][schema-source] as used internally in Apache Kafka®.
-- Message classes are simply light-weight data containers and does not inherit anything
-  or expose any methods other than a vanilla dataclass. Encoding and decoding is enabled
+- Message classes are simple light-weight data containers that do not inherit anything
+  or expose any methods other than a regular dataclass. Encoding and decoding is enabled
   by making all the necessary details about Kafka encoding introspectable.
-- Supports encoding and decoding of messages through `IO[bytes]`.
-- Test suite with focus on roundtrip property tests using Hypothesis.
+- Widely compatible encoding and decoding of messages through the `IO[bytes]` interface.
+- Test suite with focus on roundtrip property tests using Hypothesis, including
+  compatibility testing against the internals of upstream Apache Kafka®.
 
 [schema-source]:
   https://github.com/apache/kafka/tree/trunk/clients/src/main/resources/common/message
