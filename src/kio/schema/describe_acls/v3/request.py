@@ -1,7 +1,5 @@
 """
-Generated from DescribeAclsRequest.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/DescribeAclsRequest.json
+Generated from ``clients/src/main/resources/common/message/DescribeAclsRequest.json``.
 """
 
 from dataclasses import dataclass

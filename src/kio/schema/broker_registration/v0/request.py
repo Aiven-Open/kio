@@ -1,7 +1,5 @@
 """
-Generated from BrokerRegistrationRequest.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/BrokerRegistrationRequest.json
+Generated from ``clients/src/main/resources/common/message/BrokerRegistrationRequest.json``.
 """
 
 import uuid

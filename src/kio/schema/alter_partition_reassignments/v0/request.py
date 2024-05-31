@@ -1,7 +1,5 @@
 """
-Generated from AlterPartitionReassignmentsRequest.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/AlterPartitionReassignmentsRequest.json
+Generated from ``clients/src/main/resources/common/message/AlterPartitionReassignmentsRequest.json``.
 """
 
 import datetime

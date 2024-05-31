@@ -1,7 +1,5 @@
 """
-Generated from DescribeLogDirsResponse.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/DescribeLogDirsResponse.json
+Generated from ``clients/src/main/resources/common/message/DescribeLogDirsResponse.json``.
 """
 
 from dataclasses import dataclass

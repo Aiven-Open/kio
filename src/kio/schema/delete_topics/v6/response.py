@@ -1,7 +1,5 @@
 """
-Generated from DeleteTopicsResponse.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/DeleteTopicsResponse.json
+Generated from ``clients/src/main/resources/common/message/DeleteTopicsResponse.json``.
 """
 
 import uuid

@@ -1,7 +1,5 @@
 """
-Generated from IncrementalAlterConfigsRequest.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/IncrementalAlterConfigsRequest.json
+Generated from ``clients/src/main/resources/common/message/IncrementalAlterConfigsRequest.json``.
 """
 
 from dataclasses import dataclass

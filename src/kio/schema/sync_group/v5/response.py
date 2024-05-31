@@ -1,7 +1,5 @@
 """
-Generated from SyncGroupResponse.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/SyncGroupResponse.json
+Generated from ``clients/src/main/resources/common/message/SyncGroupResponse.json``.
 """
 
 from dataclasses import dataclass

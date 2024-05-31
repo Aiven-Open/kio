@@ -1,7 +1,5 @@
 """
-Generated from OffsetDeleteRequest.json.
-
-https://github.com/apache/kafka/tree/3.6.0/clients/src/main/resources/common/message/OffsetDeleteRequest.json
+Generated from ``clients/src/main/resources/common/message/OffsetDeleteRequest.json``.
 """
 
 from dataclasses import dataclass
