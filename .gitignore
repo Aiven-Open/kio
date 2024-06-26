@@ -135,7 +135,9 @@ dmypy.json
 # pytype static type analyzer
 .pytype/
 
+# IDE
+/.idea
+
 # Project specific
 /schema/
-
-/.idea
+error-codes.txt

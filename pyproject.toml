@@ -135,6 +135,8 @@ extend-ignore = [
   "E501",
   # Allow function calls in argument defaults.
   "B008",
+  # Bad advice, builtin syntax is simpler than imports.
+  "SIM105",
 ]
 
 [tool.ruff.lint.isort]

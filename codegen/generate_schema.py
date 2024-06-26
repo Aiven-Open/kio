@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import pathlib
-import shutil
 import textwrap
 
 from collections import defaultdict
@@ -39,6 +38,7 @@ from .parser import PrimitiveArrayField
 from .parser import PrimitiveArrayType
 from .parser import PrimitiveField
 from .parser import parse_file
+from .util import create_package
 
 schema_repository_source: Final = "clients/src/main/resources/common/message/"
 imports_and_docstring: Final = '''\
@@ -50,6 +50,7 @@ import datetime
 from dataclasses import dataclass, field
 from typing import Annotated, ClassVar
 import uuid
+from kio.schema.errors import ErrorCode
 from kio.static.primitive import i8
 from kio.static.primitive import i16
 from kio.static.primitive import i32
@@ -63,7 +64,6 @@ from kio.static.primitive import i32Timedelta
 from kio.static.primitive import i64Timedelta
 from kio.static.primitive import TZAware
 from kio.static.primitive import Records
-from kio.static.constants import ErrorCode
 from kio.static.constants import EntityType
 '''
 
@@ -607,11 +607,6 @@ def basic_name(schema_name: str) -> str:
     return to_snake_case(schema_name).removesuffix("_response").removesuffix("_request")
 
 
-def create_package(path: pathlib.Path) -> None:
-    path.mkdir(exist_ok=True)
-    (path / "__init__.py").touch(exist_ok=True)
-
-
 seen_custom_types = set[str]()
 custom_type_imports = """\
 from typing import NewType
@@ -697,8 +692,6 @@ def finalize_exports() -> None:
 def main() -> None:
     schema_output_path = pathlib.Path("src/kio/schema/")
     types_module_path = schema_output_path / "types.py"
-    shutil.rmtree(schema_output_path)
-    create_package(schema_output_path)
     schemas = (pathlib.Path("schema") / build_tag).glob("*.json")
     custom_types = set[CustomTypeDef]()
 

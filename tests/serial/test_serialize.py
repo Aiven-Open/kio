@@ -9,6 +9,7 @@ from typing import ClassVar
 
 import pytest
 
+from kio.schema.errors import ErrorCode
 from kio.schema.metadata.v12 import MetadataResponse
 from kio.schema.metadata.v12.response import MetadataResponseBroker
 from kio.schema.metadata.v12.response import MetadataResponsePartition
@@ -30,7 +31,6 @@ from kio.serial.readers import read_int32
 from kio.serial.readers import read_unsigned_varint
 from kio.serial.readers import read_uuid
 from kio.static.constants import EntityType
-from kio.static.constants import ErrorCode
 from kio.static.primitive import i8
 from kio.static.primitive import i16
 from kio.static.primitive import i32

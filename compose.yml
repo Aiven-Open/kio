@@ -28,3 +28,7 @@ services:
       KAFKA_REPLICA_FETCH_MAX_BYTES: 104857600
     tmpfs:
       - /tmp
+
+  java_tester:
+    build:
+      context: java_tester

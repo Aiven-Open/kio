@@ -157,7 +157,7 @@ class JavaTester:
             "docker",
             "compose",
             "-f",
-            str(Path(__file__).parent / "docker-compose-java-tester.yaml"),
+            str(Path(__file__).parent.parent / "compose.yml"),
             "run",
             "--build",
             "--rm",

@@ -12,6 +12,7 @@ from typing import final
 
 import pytest
 
+from kio.schema.errors import ErrorCode
 from kio.serial import entity_reader
 from kio.serial.errors import BufferUnderflow
 from kio.serial.errors import OutOfBoundValue
@@ -44,7 +45,6 @@ from kio.serial.readers import read_uint64
 from kio.serial.readers import read_unsigned_varint
 from kio.serial.readers import read_uuid
 from kio.static.constants import EntityType
-from kio.static.constants import ErrorCode
 from kio.static.constants import uuid_zero
 from kio.static.primitive import TZAware
 from kio.static.primitive import i8

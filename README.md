@@ -49,7 +49,7 @@ Apache Kafka® instance running on `127.0.0.1:9092`. There is a Docker Compose f
 `container/compose.yml` that you can use to conveniently start up an instance.
 
 ```shell
-$ docker compose --file=container/compose.yml up -d
+$ docker compose up -d kafka
 ```
 
 Run tests.

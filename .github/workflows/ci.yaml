@@ -117,7 +117,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Start Kafka backend
-        run: docker compose --file=container/compose.yml up -d
+        run: docker compose up -d
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -166,7 +166,7 @@ jobs:
           key: schema-${{ hashFiles('codegen/fetch_schema.py') }}
           restore-keys: schema
 
-      - run: pip install --upgrade .[all]
+      - run: pip install --upgrade -e .[all]
 
       - run: make fetch-schema-src
 

@@ -6,6 +6,7 @@ import uuid
 
 import pyperf
 
+from kio.schema.errors import ErrorCode
 from kio.schema.metadata.v12 import MetadataResponse
 from kio.schema.metadata.v12.response import MetadataResponseBroker
 from kio.schema.metadata.v12.response import MetadataResponsePartition
@@ -14,7 +15,6 @@ from kio.schema.types import BrokerId
 from kio.schema.types import TopicName
 from kio.serial import entity_reader
 from kio.serial import entity_writer
-from kio.static.constants import ErrorCode
 from kio.static.primitive import i32
 from kio.static.primitive import i32Timedelta
 
