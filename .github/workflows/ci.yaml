@@ -20,13 +20,13 @@ env:
 jobs:
   lint:
     name: Static analysis
-    uses: less-action/reusables/.github/workflows/pre-commit.yaml@ca0fad76d52873b95b89d4aa5ef53fe3230aacf6
+    uses: less-action/reusables/.github/workflows/pre-commit.yaml@0f0da22d88bdf0d450cf3f20a5709f4b74cfa1fb
     with:
       python-version: "3.11"
 
   check-build:
     name: Check packaging metadata
-    uses: less-action/reusables/.github/workflows/python-test-build.yaml@ca0fad76d52873b95b89d4aa5ef53fe3230aacf6
+    uses: less-action/reusables/.github/workflows/python-test-build.yaml@0f0da22d88bdf0d450cf3f20a5709f4b74cfa1fb
 
   unit-test:
     name: Unit tests
