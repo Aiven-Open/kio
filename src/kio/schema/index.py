@@ -94,6 +94,12 @@ api_key_map: Final[APIKeyMap] = MappingProxyType(
         66: "list_transactions",
         67: "allocate_producer_ids",
         68: "consumer_group_heartbeat",
+        69: "consumer_group_describe",
+        70: "controller_registration",
+        71: "get_telemetry_subscriptions",
+        72: "push_telemetry",
+        73: "assign_replicas_to_dirs",
+        74: "list_client_metrics_resources",
     }
 )
 
@@ -419,6 +425,20 @@ schema_name_map: Final[SchemaNameMap] = MappingProxyType(
                 ),
             }
         ),
+        "assign_replicas_to_dirs": MappingProxyType(
+            {
+                0: MappingProxyType(
+                    {
+                        EntityType.request: (
+                            "kio.schema.assign_replicas_to_dirs.v0.request:AssignReplicasToDirsRequest"
+                        ),
+                        EntityType.response: (
+                            "kio.schema.assign_replicas_to_dirs.v0.response:AssignReplicasToDirsResponse"
+                        ),
+                    }
+                ),
+            }
+        ),
         "begin_quorum_epoch": MappingProxyType(
             {
                 0: MappingProxyType(
@@ -445,6 +465,16 @@ schema_name_map: Final[SchemaNameMap] = MappingProxyType(
                         ),
                     }
                 ),
+                1: MappingProxyType(
+                    {
+                        EntityType.request: (
+                            "kio.schema.broker_heartbeat.v1.request:BrokerHeartbeatRequest"
+                        ),
+                        EntityType.response: (
+                            "kio.schema.broker_heartbeat.v1.response:BrokerHeartbeatResponse"
+                        ),
+                    }
+                ),
             }
         ),
         "broker_registration": MappingProxyType(
@@ -466,6 +496,40 @@ schema_name_map: Final[SchemaNameMap] = MappingProxyType(
                         ),
                         EntityType.response: (
                             "kio.schema.broker_registration.v1.response:BrokerRegistrationResponse"
+                        ),
+                    }
+                ),
+                2: MappingProxyType(
+                    {
+                        EntityType.request: (
+                            "kio.schema.broker_registration.v2.request:BrokerRegistrationRequest"
+                        ),
+                        EntityType.response: (
+                            "kio.schema.broker_registration.v2.response:BrokerRegistrationResponse"
+                        ),
+                    }
+                ),
+                3: MappingProxyType(
+                    {
+                        EntityType.request: (
+                            "kio.schema.broker_registration.v3.request:BrokerRegistrationRequest"
+                        ),
+                        EntityType.response: (
+                            "kio.schema.broker_registration.v3.response:BrokerRegistrationResponse"
+                        ),
+                    }
+                ),
+            }
+        ),
+        "consumer_group_describe": MappingProxyType(
+            {
+                0: MappingProxyType(
+                    {
+                        EntityType.request: (
+                            "kio.schema.consumer_group_describe.v0.request:ConsumerGroupDescribeRequest"
+                        ),
+                        EntityType.response: (
+                            "kio.schema.consumer_group_describe.v0.response:ConsumerGroupDescribeResponse"
                         ),
                     }
                 ),
@@ -588,6 +652,20 @@ schema_name_map: Final[SchemaNameMap] = MappingProxyType(
                         ),
                         EntityType.response: (
                             "kio.schema.controlled_shutdown.v3.response:ControlledShutdownResponse"
+                        ),
+                    }
+                ),
+            }
+        ),
+        "controller_registration": MappingProxyType(
+            {
+                0: MappingProxyType(
+                    {
+                        EntityType.request: (
+                            "kio.schema.controller_registration.v0.request:ControllerRegistrationRequest"
+                        ),
+                        EntityType.response: (
+                            "kio.schema.controller_registration.v0.response:ControllerRegistrationResponse"
                         ),
                     }
                 ),
@@ -1083,6 +1161,16 @@ schema_name_map: Final[SchemaNameMap] = MappingProxyType(
                         ),
                         EntityType.response: (
                             "kio.schema.describe_cluster.v0.response:DescribeClusterResponse"
+                        ),
+                    }
+                ),
+                1: MappingProxyType(
+                    {
+                        EntityType.request: (
+                            "kio.schema.describe_cluster.v1.request:DescribeClusterRequest"
+                        ),
+                        EntityType.response: (
+                            "kio.schema.describe_cluster.v1.response:DescribeClusterResponse"
                         ),
                     }
                 ),
@@ -1592,6 +1680,16 @@ schema_name_map: Final[SchemaNameMap] = MappingProxyType(
                         ),
                     }
                 ),
+                16: MappingProxyType(
+                    {
+                        EntityType.request: (
+                            "kio.schema.fetch.v16.request:FetchRequest"
+                        ),
+                        EntityType.response: (
+                            "kio.schema.fetch.v16.response:FetchResponse"
+                        ),
+                    }
+                ),
                 2: MappingProxyType(
                     {
                         EntityType.request: (
@@ -1737,6 +1835,20 @@ schema_name_map: Final[SchemaNameMap] = MappingProxyType(
                         ),
                         EntityType.response: (
                             "kio.schema.find_coordinator.v4.response:FindCoordinatorResponse"
+                        ),
+                    }
+                ),
+            }
+        ),
+        "get_telemetry_subscriptions": MappingProxyType(
+            {
+                0: MappingProxyType(
+                    {
+                        EntityType.request: (
+                            "kio.schema.get_telemetry_subscriptions.v0.request:GetTelemetrySubscriptionsRequest"
+                        ),
+                        EntityType.response: (
+                            "kio.schema.get_telemetry_subscriptions.v0.response:GetTelemetrySubscriptionsResponse"
                         ),
                     }
                 ),
@@ -2132,6 +2244,20 @@ schema_name_map: Final[SchemaNameMap] = MappingProxyType(
                         ),
                         EntityType.response: (
                             "kio.schema.leave_group.v5.response:LeaveGroupResponse"
+                        ),
+                    }
+                ),
+            }
+        ),
+        "list_client_metrics_resources": MappingProxyType(
+            {
+                0: MappingProxyType(
+                    {
+                        EntityType.request: (
+                            "kio.schema.list_client_metrics_resources.v0.request:ListClientMetricsResourcesRequest"
+                        ),
+                        EntityType.response: (
+                            "kio.schema.list_client_metrics_resources.v0.response:ListClientMetricsResourcesResponse"
                         ),
                     }
                 ),
@@ -2657,6 +2783,16 @@ schema_name_map: Final[SchemaNameMap] = MappingProxyType(
                         ),
                     }
                 ),
+                9: MappingProxyType(
+                    {
+                        EntityType.request: (
+                            "kio.schema.offset_fetch.v9.request:OffsetFetchRequest"
+                        ),
+                        EntityType.response: (
+                            "kio.schema.offset_fetch.v9.response:OffsetFetchResponse"
+                        ),
+                    }
+                ),
             }
         ),
         "offset_for_leader_epoch": MappingProxyType(
@@ -2732,6 +2868,16 @@ schema_name_map: Final[SchemaNameMap] = MappingProxyType(
                         ),
                         EntityType.response: (
                             "kio.schema.produce.v1.response:ProduceResponse"
+                        ),
+                    }
+                ),
+                10: MappingProxyType(
+                    {
+                        EntityType.request: (
+                            "kio.schema.produce.v10.request:ProduceRequest"
+                        ),
+                        EntityType.response: (
+                            "kio.schema.produce.v10.response:ProduceResponse"
                         ),
                     }
                 ),
@@ -2812,6 +2958,20 @@ schema_name_map: Final[SchemaNameMap] = MappingProxyType(
                         ),
                         EntityType.response: (
                             "kio.schema.produce.v9.response:ProduceResponse"
+                        ),
+                    }
+                ),
+            }
+        ),
+        "push_telemetry": MappingProxyType(
+            {
+                0: MappingProxyType(
+                    {
+                        EntityType.request: (
+                            "kio.schema.push_telemetry.v0.request:PushTelemetryRequest"
+                        ),
+                        EntityType.response: (
+                            "kio.schema.push_telemetry.v0.response:PushTelemetryResponse"
                         ),
                     }
                 ),
