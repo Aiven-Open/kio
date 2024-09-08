@@ -149,5 +149,5 @@ class FetchResponse:
     """The fetch session ID, or 0 if this is not part of a fetch session."""
     responses: tuple[FetchableTopicResponse, ...]
     """The response topics."""
-    node_endpoints: tuple[NodeEndpoint, ...] = field(metadata={"tag": 0})
+    node_endpoints: tuple[NodeEndpoint, ...] = field(metadata={"tag": 0}, default=())
     """Endpoints for all current-leaders enumerated in PartitionData, with errors NOT_LEADER_OR_FOLLOWER & FENCED_LEADER_EPOCH."""

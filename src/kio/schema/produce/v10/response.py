@@ -120,5 +120,5 @@ class ProduceResponse:
         default=i32Timedelta.parse(datetime.timedelta(milliseconds=0)),
     )
     """The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota."""
-    node_endpoints: tuple[NodeEndpoint, ...] = field(metadata={"tag": 0})
+    node_endpoints: tuple[NodeEndpoint, ...] = field(metadata={"tag": 0}, default=())
     """Endpoints for all current-leaders enumerated in PartitionProduceResponses, with errors NOT_LEADER_OR_FOLLOWER."""

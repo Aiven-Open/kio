@@ -87,11 +87,14 @@ public class JavaTester {
                 return failureResponse(message);
             } else {
                 byte[] serializedInJava = writer.buffer().array();
+                String serializedInJavaB64 = Base64.getEncoder().encodeToString(serializedInJava);
+
                 if (!Arrays.equals(serializedFromPython, serializedInJava)) {
                     String message = "Message serialized in Java is not equal to message serialized in Python\n"
                         + "Input: " + caseStr + "\n"
                         + "Deserialized: " + messageDeserializedFromPython + "\n"
-                        + "Constructed: " + constructedMessage;
+                        + "Constructed: " + constructedMessage + "\n"
+                        + "Serialized: " + serializedInJavaB64;
                     return failureResponse(message);
                 } else {
                     return SUCCESS_RESPONSE;

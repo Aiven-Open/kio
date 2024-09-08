@@ -347,7 +347,7 @@ def format_array_field_call(
     field_kwargs = {}
     if metadata:
         field_kwargs["metadata"] = repr(metadata)
-    if tag is not None and field.ignorable:
+    if tag is not None:
         field_kwargs["default"] = "()"
 
     if not field_kwargs:
