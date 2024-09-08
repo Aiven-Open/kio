@@ -26,8 +26,6 @@ services:
       KAFKA_BUFFER_MEMORY: 104857600
       KAFKA_MAX_REQUEST_SIZE: 104857600
       KAFKA_REPLICA_FETCH_MAX_BYTES: 104857600
-    tmpfs:
-      - /tmp
 
   java_tester:
     build:
