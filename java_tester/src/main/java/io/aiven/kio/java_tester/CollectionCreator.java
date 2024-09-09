@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -69,9 +70,13 @@ class CollectionCreator extends BaseCreator {
             case "int32" -> Integer.class;
             case "int64" -> Long.class;
             case "string" -> String.class;
-            default -> rootMessageInfo.rootClazz.declaredClasses()
+            case "uuid" -> UUID.class;
+            default -> rootMessageInfo
+                .rootClazz
+                .declaredClasses()
                 .filter(c -> c.getName().endsWith("$" + elementTypeInSchema))
-                .findFirst().get();
+                .findFirst()
+                .get();
         };
 
         List<Object> list = new ArrayList<>();
@@ -100,6 +105,8 @@ class CollectionCreator extends BaseCreator {
                 elementObj = getLong(elementValue, fieldName);
             } else if (elementClazz.equals(String.class)) {
                 elementObj = getString(elementValue, fieldName);
+            } else if (elementClazz.equals(UUID.class)) {
+                elementObj = getUuid(elementValue, fieldName);
             } else {
                 elementObj = new ObjectCreator<>(rootMessageInfo, new EntityClass<>(elementClazz), fieldSchema)
                     .create(elementValue);

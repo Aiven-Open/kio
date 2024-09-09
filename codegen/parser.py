@@ -259,6 +259,7 @@ timedelta_names: Final = frozenset(
         "RenewPeriodMs",
         "RetentionTimeMs",
         "HeartbeatIntervalMs",
+        "PushIntervalMs",
     }
 )
 datetime_names: Final = frozenset(

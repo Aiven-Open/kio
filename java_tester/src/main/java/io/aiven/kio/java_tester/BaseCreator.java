@@ -88,10 +88,12 @@ abstract class BaseCreator {
 
     protected static Uuid getUuid(JsonNode fieldValue, String fieldName) throws Exception {
         String str = getString(fieldValue, fieldName);
+        UUID tmpUuid;
         if (str == null) {
-            return null;
+            tmpUuid = new UUID(0, 0);
+        } else {
+            tmpUuid = UUID.fromString(str);
         }
-        UUID tmpUuid = UUID.fromString(str);
         return new Uuid(tmpUuid.getMostSignificantBits(), tmpUuid.getLeastSignificantBits());
     }
 

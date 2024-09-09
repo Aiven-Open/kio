@@ -112,7 +112,7 @@ def get_field_reader(
                 get_reader(
                     kafka_type=get_schema_field_type(field),
                     flexible=flexible,
-                    optional=is_optional(field) and not is_tagged_field,
+                    optional=is_optional(field),
                 )
             )
         case FieldKind.entity:
