@@ -1,14 +1,18 @@
-import enum
-
 from dataclasses import Field
+from dataclasses import dataclass
 from dataclasses import is_dataclass
 from types import EllipsisType
 from types import NoneType
 from types import UnionType
+from typing import ClassVar
+from typing import TypeAlias
 from typing import TypeVar
 from typing import Union
+from typing import final
 from typing import get_args
 from typing import get_origin
+
+from kio.static.protocol import Entity
 
 from .errors import SchemaError
 
@@ -43,21 +47,47 @@ def is_optional(field: Field) -> bool:
     return NoneType in get_args(inner_type)
 
 
-class FieldKind(enum.Enum):
-    primitive = enum.auto()
-    primitive_tuple = enum.auto()
-    entity = enum.auto()
-    entity_tuple = enum.auto()
+@final
+@dataclass(frozen=True, slots=True)
+class PrimitiveField:
+    is_array: ClassVar = False
+    type_: type
+
+
+@final
+@dataclass(frozen=True, slots=True)
+class PrimitiveTupleField:
+    is_array: ClassVar = True
+    type_: type
+
+
+@final
+@dataclass(frozen=True, slots=True)
+class EntityField:
+    is_array: ClassVar = False
+    type_: type[Entity]
+
+
+@final
+@dataclass(frozen=True, slots=True)
+class EntityTupleField:
+    is_array: ClassVar = True
+    type_: type[Entity]
+
+
+FieldClass: TypeAlias = (
+    PrimitiveField | PrimitiveTupleField | EntityField | EntityTupleField
+)
 
 
 T = TypeVar("T")
 
 
-def classify_field(field: Field[T]) -> tuple[FieldKind, type[T]]:
+def classify_field(field: Field[T]) -> FieldClass:
     return _classify_field(field.type, field.name)
 
 
-def _classify_field(field_type: type[T], field_name: str) -> tuple[FieldKind, type[T]]:
+def _classify_field(field_type: type[T], field_name: str) -> FieldClass:
     type_origin = get_origin(field_type)
 
     if type_origin is UnionType:
@@ -79,18 +109,18 @@ def _classify_field(field_type: type[T], field_name: str) -> tuple[FieldKind, ty
 
     if type_origin is not tuple:
         return (
-            (FieldKind.entity, field_type)  # type: ignore[return-value]
+            EntityField(field_type)  # type: ignore[arg-type]
             if is_dataclass(field_type)
-            else (FieldKind.primitive, field_type)
+            else PrimitiveField(field_type)
         )
 
     type_args = get_args(field_type)
 
     match type_args:
         case (inner_type, EllipsisType()) if is_dataclass(inner_type):
-            return FieldKind.entity_tuple, inner_type
+            return EntityTupleField(inner_type)
         case (inner_type, EllipsisType()):
-            return FieldKind.primitive_tuple, inner_type
+            return PrimitiveTupleField(inner_type)
 
     raise SchemaError(f"Field {field_name} has invalid tuple type args: {type_args}")
 
