@@ -10,7 +10,10 @@ from kio._utils import cache
 from kio.static.protocol import Entity
 
 from . import readers
-from ._introspect import FieldKind
+from ._introspect import EntityField
+from ._introspect import EntityTupleField
+from ._introspect import PrimitiveField
+from ._introspect import PrimitiveTupleField
 from ._introspect import classify_field
 from ._introspect import get_field_tag
 from ._introspect import get_schema_field_type
@@ -94,39 +97,41 @@ def get_field_reader(
     if is_request_header and field.name == "client_id":
         return readers.read_nullable_legacy_string  # type: ignore[return-value]
 
-    field_kind, field_type = classify_field(field)
     flexible = entity_type.__flexible__
-    array_reader = (
-        readers.compact_array_reader if flexible else readers.legacy_array_reader
-    )
+    field_class = classify_field(field)
 
-    match field_kind:
-        case FieldKind.primitive:
-            return get_reader(
+    match field_class:
+        case PrimitiveField():
+            inner_type_reader = get_reader(
                 kafka_type=get_schema_field_type(field),
                 flexible=flexible,
                 optional=is_optional(field) and not is_tagged_field,
             )
-        case FieldKind.primitive_tuple:
-            return array_reader(  # type: ignore[return-value]
-                get_reader(
-                    kafka_type=get_schema_field_type(field),
-                    flexible=flexible,
-                    optional=is_optional(field),
-                )
+        case PrimitiveTupleField():
+            inner_type_reader = get_reader(
+                kafka_type=get_schema_field_type(field),
+                flexible=flexible,
+                optional=is_optional(field),
             )
-        case FieldKind.entity:
-            return (  # type: ignore[no-any-return]
-                entity_reader(field_type, nullable=True)  # type: ignore[call-overload]
+        case EntityField(field_type):
+            inner_type_reader = (
+                entity_reader(field_type, nullable=True)
                 if is_optional(field)
-                else entity_reader(field_type, nullable=False)  # type: ignore[call-overload]
+                else entity_reader(field_type, nullable=False)
             )
-        case FieldKind.entity_tuple:
-            return array_reader(  # type: ignore[return-value]
-                entity_reader(field_type)  # type: ignore[type-var]
-            )
+        case EntityTupleField(field_type):
+            inner_type_reader = entity_reader(field_type)
         case no_match:
             assert_never(no_match)
+
+    if field_class.is_array:
+        array_reader = (
+            readers.compact_array_reader if flexible else readers.legacy_array_reader
+        )
+        # mypy fails to bind T to Sequence[object] here.
+        return array_reader(inner_type_reader)  # type: ignore[return-value]
+
+    return inner_type_reader
 
 
 E = TypeVar("E", bound=Entity)

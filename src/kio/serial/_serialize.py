@@ -11,7 +11,10 @@ from kio._utils import cache
 from kio.static.protocol import Entity
 
 from . import writers
-from ._introspect import FieldKind
+from ._introspect import EntityField
+from ._introspect import EntityTupleField
+from ._introspect import PrimitiveField
+from ._introspect import PrimitiveTupleField
 from ._introspect import classify_field
 from ._introspect import get_field_tag
 from ._introspect import get_schema_field_type
@@ -104,9 +107,6 @@ def get_field_writer(
     if is_request_header and field.name == "client_id":
         return writers.write_nullable_legacy_string  # type: ignore[return-value]
 
-    field_kind, field_type = classify_field(field)
-    array_writer = compact_array_writer if flexible else legacy_array_writer
-
     # Optionality needs to be special cased for tagged fields, because they are optional
     # by definition. This optionality is implemented in a different way from normal
     # fields, it's implemented by the presence or absence by the tag itself. Hence, we
@@ -114,34 +114,32 @@ def get_field_writer(
     # To be able to match an optional tagged field to a writer that cannot accept None,
     # we hard-code all tagged fields as not optional here.
     optional = False if is_tag else is_optional(field)
+    field_class = classify_field(field)
 
-    match field_kind:
-        case FieldKind.primitive:
-            return get_writer(
+    match field_class:
+        case PrimitiveField() | PrimitiveTupleField():
+            inner_type_writer = get_writer(
                 kafka_type=get_schema_field_type(field),
                 flexible=flexible,
                 optional=optional,
             )
-        case FieldKind.primitive_tuple:
-            return array_writer(  # type: ignore[return-value]
-                get_writer(
-                    kafka_type=get_schema_field_type(field),
-                    flexible=flexible,
-                    optional=optional,
-                )
-            )
-        case FieldKind.entity:
-            return (  # type: ignore[no-any-return]
-                entity_writer(field_type, nullable=True)  # type: ignore[call-overload]
+        case EntityField(field_type):
+            inner_type_writer = (
+                entity_writer(field_type, nullable=True)
                 if optional
-                else entity_writer(field_type, nullable=False)  # type: ignore[call-overload]
+                else entity_writer(field_type, nullable=False)
             )
-        case FieldKind.entity_tuple:
-            return array_writer(  # type: ignore[return-value]
-                entity_writer(field_type)  # type: ignore[type-var]
-            )
+        case EntityTupleField(field_type):
+            inner_type_writer = entity_writer(field_type)
         case no_match:
             assert_never(no_match)
+
+    if field_class.is_array:
+        array_writer = compact_array_writer if flexible else legacy_array_writer
+        # mypy fails to bind T to Sequence[object] here.
+        return array_writer(inner_type_writer)  # type: ignore[return-value]
+
+    return inner_type_writer
 
 
 E = TypeVar("E", bound=Entity)
