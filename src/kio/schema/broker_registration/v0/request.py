@@ -63,6 +63,6 @@ class BrokerRegistrationRequest:
     listeners: tuple[Listener, ...]
     """The listeners of this broker"""
     features: tuple[Feature, ...]
-    """The features on this broker"""
+    """The features on this broker. Note: in v0-v3, features with MinSupportedVersion = 0 are omitted."""
     rack: str | None = field(metadata={"kafka_type": "string"})
     """The rack which this broker is in."""

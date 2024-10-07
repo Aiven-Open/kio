@@ -22,7 +22,7 @@ class PartitionData:
     __api_key__: ClassVar[i16] = i16(53)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     partition_index: i32 = field(metadata={"kafka_type": "int32"})
-    """The partition index."""
+    """The partition index"""
     leader_id: BrokerId = field(metadata={"kafka_type": "int32"})
     """The ID of the newly elected leader"""
     leader_epoch: i32 = field(metadata={"kafka_type": "int32"})
@@ -37,7 +37,7 @@ class TopicData:
     __api_key__: ClassVar[i16] = i16(53)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     topic_name: TopicName = field(metadata={"kafka_type": "string"})
-    """The topic name."""
+    """The topic name"""
     partitions: tuple[PartitionData, ...]
 
 

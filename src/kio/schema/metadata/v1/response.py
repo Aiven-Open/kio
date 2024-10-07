@@ -65,7 +65,7 @@ class MetadataResponseTopic:
     error_code: ErrorCode = field(metadata={"kafka_type": "error_code"})
     """The topic error, or 0 if there was no error."""
     name: TopicName = field(metadata={"kafka_type": "string"})
-    """The topic name."""
+    """The topic name. Null for non-existing topics queried by ID. This is never null when ErrorCode is zero. One of Name and TopicId is always populated."""
     is_internal: bool = field(metadata={"kafka_type": "bool"}, default=False)
     """True if the topic is internal."""
     partitions: tuple[MetadataResponsePartition, ...]
@@ -80,7 +80,7 @@ class MetadataResponse:
     __api_key__: ClassVar[i16] = i16(3)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     brokers: tuple[MetadataResponseBroker, ...]
-    """Each broker in the response."""
+    """A list of brokers present in the cluster."""
     controller_id: BrokerId = field(
         metadata={"kafka_type": "int32"}, default=BrokerId(-1)
     )
