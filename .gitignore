@@ -141,3 +141,4 @@ dmypy.json
 # Project specific
 /schema/
 error-codes.txt
+src/kio/_version.py

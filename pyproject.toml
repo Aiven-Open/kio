@@ -47,7 +47,7 @@ all = [
 "Bug Tracker" = "https://github.com/Aiven-Open/kio/issues"
 
 [build-system]
-requires = ["setuptools==69.0.3", "wheel==0.43.0"]
+requires = ["setuptools==75.1.0", "setuptools-scm==8.1.0", "wheel==0.44.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
@@ -60,6 +60,14 @@ readme = {file = "README.md", content-type = "text/markdown; charset=UTF-8"}
 [tool.setuptools.packages.find]
 where = ["src"]
 namespaces = false
+
+
+[tool.setuptools_scm]
+version_file = "src/kio/_version.py"
+
+
+[tool.check-manifest]
+ignore = ["src/kio/_version.py"]
 
 
 [tool.black]
