@@ -21,6 +21,7 @@ class ClientMetricsResource:
     __api_key__: ClassVar[i16] = i16(74)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     name: str = field(metadata={"kafka_type": "string"})
+    """The resource name."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -33,4 +34,6 @@ class ListClientMetricsResourcesResponse:
     throttle_time: i32Timedelta = field(metadata={"kafka_type": "timedelta_i32"})
     """The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota."""
     error_code: ErrorCode = field(metadata={"kafka_type": "error_code"})
+    """The error code, or 0 if there was no error."""
     client_metrics_resources: tuple[ClientMetricsResource, ...]
+    """Each client metrics resource in the response."""

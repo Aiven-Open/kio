@@ -21,4 +21,4 @@ class ListGroupsRequest:
     states_filter: tuple[str, ...] = field(
         metadata={"kafka_type": "string"}, default=()
     )
-    """The states of the groups we want to list. If empty all groups are returned with their state."""
+    """The states of the groups we want to list. If empty, all groups are returned with their state."""
