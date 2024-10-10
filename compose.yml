@@ -1,7 +1,7 @@
 name: kio
 services:
   kafka:
-    image: apache/kafka:3.8.0
+    image: apache/kafka:3.9.0-rc5
     hostname: broker
     container_name: broker
     ports:
