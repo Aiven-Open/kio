@@ -27,7 +27,7 @@ class PartitionData:
     candidate_epoch: i32 = field(metadata={"kafka_type": "int32"})
     """The bumped epoch of the candidate sending the request"""
     candidate_id: BrokerId = field(metadata={"kafka_type": "int32"})
-    """The ID of the voter sending the request"""
+    """The replica id of the voter sending the request"""
     last_offset_epoch: i32 = field(metadata={"kafka_type": "int32"})
     """The epoch of the last record written to the metadata log"""
     last_offset: i64 = field(metadata={"kafka_type": "int64"})
