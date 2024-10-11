@@ -33,7 +33,7 @@ class CreatableReplicaAssignment:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class CreateableTopicConfig:
+class CreatableTopicConfig:
     __type__: ClassVar = EntityType.nested
     __version__: ClassVar[i16] = i16(5)
     __flexible__: ClassVar[bool] = True
@@ -60,7 +60,7 @@ class CreatableTopic:
     """The number of replicas to create for each partition in the topic, or -1 if we are either specifying a manual partition assignment or using the default replication factor."""
     assignments: tuple[CreatableReplicaAssignment, ...]
     """The manual partition assignment, or the empty array if we are using automatic assignment."""
-    configs: tuple[CreateableTopicConfig, ...]
+    configs: tuple[CreatableTopicConfig, ...]
     """The custom topic configurations to set."""
 
 

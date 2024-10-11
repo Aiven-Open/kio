@@ -75,7 +75,7 @@ class ApiVersionsResponse:
     supported_features: tuple[SupportedFeatureKey, ...] = field(
         metadata={"tag": 0}, default=()
     )
-    """Features supported by the broker."""
+    """Features supported by the broker. Note: in v0-v3, features with MinSupportedVersion = 0 are omitted."""
     finalized_features_epoch: i64 = field(
         metadata={"kafka_type": "int64", "tag": 1}, default=i64(-1)
     )
