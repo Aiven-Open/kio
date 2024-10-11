@@ -265,3 +265,17 @@ class ErrorCode(enum.IntEnum):
     """The controller has considered the broker registration to be invalid."""
     transaction_abortable = 120, False
     """The server encountered an error with the transaction. The client can abort the transaction to continue using this transactional ID."""
+    invalid_record_state = 121, False
+    """The record state is invalid. The acknowledgement of delivery could not be completed."""
+    share_session_not_found = 122, True
+    """The share session was not found."""
+    invalid_share_session_epoch = 123, True
+    """The share session epoch is invalid."""
+    fenced_state_epoch = 124, False
+    """The share coordinator rejected the request because the share-group state epoch did not match."""
+    invalid_voter_key = 125, False
+    """The voter key doesn't match the receiving replica's key."""
+    duplicate_voter = 126, False
+    """The voter is already part of the set of voters."""
+    voter_not_found = 127, False
+    """The voter is not part of the set of voters."""
