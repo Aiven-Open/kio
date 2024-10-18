@@ -13,7 +13,6 @@ from kio.schema.response_header.v1.header import ResponseHeader
 from kio.schema.types import GroupId
 from kio.schema.types import TopicName
 from kio.static.constants import EntityType
-from kio.static.primitive import i8
 from kio.static.primitive import i16
 from kio.static.primitive import i32
 from kio.static.primitive import i32Timedelta
@@ -43,12 +42,6 @@ class Assignment:
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     topic_partitions: tuple[TopicPartitions, ...]
     """The assigned topic-partitions to the member."""
-    error: i8 = field(metadata={"kafka_type": "int8"})
-    """The assigned error."""
-    metadata_version: i32 = field(metadata={"kafka_type": "int32"})
-    """The assignor metadata version."""
-    metadata_bytes: bytes = field(metadata={"kafka_type": "bytes"})
-    """The assignor metadata bytes."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

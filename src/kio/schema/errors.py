@@ -212,7 +212,7 @@ class ErrorCode(enum.IntEnum):
     unacceptable_credential = 93, False
     """Requested credential would not meet criteria for acceptability."""
     inconsistent_voter_set = 94, False
-    """Indicates that the either the sender or recipient of a voter-only request is not one of the expected voters"""
+    """Indicates that the either the sender or recipient of a voter-only request is not one of the expected voters."""
     invalid_update_version = 95, False
     """The given update version was invalid."""
     feature_update_failed = 96, False
@@ -220,7 +220,7 @@ class ErrorCode(enum.IntEnum):
     principal_deserialization_failure = 97, False
     """Request principal deserialization failed during forwarding. This indicates an internal error on the broker cluster security setup."""
     snapshot_not_found = 98, False
-    """Requested snapshot was not found"""
+    """Requested snapshot was not found."""
     position_out_of_range = 99, False
     """Requested position is not greater than or equal to zero, and less than the size of the snapshot."""
     unknown_topic_id = 100, True
@@ -230,13 +230,13 @@ class ErrorCode(enum.IntEnum):
     broker_id_not_registered = 102, False
     """The given broker ID was not registered."""
     inconsistent_topic_id = 103, True
-    """The log's topic ID did not match the topic ID in the request"""
+    """The log's topic ID did not match the topic ID in the request."""
     inconsistent_cluster_id = 104, False
-    """The clusterId in the request does not match that found on the server"""
+    """The clusterId in the request does not match that found on the server."""
     transactional_id_not_found = 105, False
-    """The transactionalId could not be found"""
+    """The transactionalId could not be found."""
     fetch_session_topic_id_error = 106, True
-    """The fetch session encountered inconsistent topic ID usage"""
+    """The fetch session encountered inconsistent topic ID usage."""
     ineligible_replica = 107, False
     """The new ISR contains at least one ineligible replica."""
     new_leader_elected = 108, False
@@ -263,3 +263,5 @@ class ErrorCode(enum.IntEnum):
     """Client sent a push telemetry request larger than the maximum size the broker will accept."""
     invalid_registration = 119, False
     """The controller has considered the broker registration to be invalid."""
+    transaction_abortable = 120, False
+    """The server encountered an error with the transaction. The client can abort the transaction to continue using this transactional ID."""
