@@ -50,6 +50,9 @@ class A:
     unsupported_union: int | str | bool
 
     uuid_or_none: UUID | None
+    uuid_tag: UUID | None = field(
+        metadata={"kafka_type": "uuid", "tag": 0}, default=None
+    )
 
 
 model_fields = {field.name: field for field in fields(A)}
@@ -98,6 +101,9 @@ class TestIsOptional:
 
     def test_returns_true_for_nullable_uuid(self) -> None:
         assert is_optional(model_fields["uuid_or_none"]) is True
+
+    def test_returns_true_for_tagged_field_uuid(self) -> None:
+        assert is_optional(model_fields["uuid_tag"]) is True
 
     def test_raises_schema_error_for_invalid_tuple_type(self) -> None:
         with pytest.raises(SchemaError, match=r"has invalid tuple type"):
