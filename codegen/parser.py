@@ -105,7 +105,7 @@ class Primitive(enum.Enum):
             case Primitive.bool_:
                 hint = "bool"
             case Primitive.uuid:
-                hint = "uuid.UUID | None"
+                hint = "uuid.UUID"
             case Primitive.error_code:
                 hint = "ErrorCode"
             case Primitive.timedelta_i32:
@@ -117,7 +117,7 @@ class Primitive(enum.Enum):
             case no_match:
                 assert_never(no_match)
 
-        if optional:
+        if optional or self is Primitive.uuid:
             return f"{hint} | None"
         return hint
 
