@@ -44,6 +44,7 @@ def test_update_raft_voter_response_roundtrip(
     assert instance == result
 
 
+@pytest.mark.xfail(reason="https://github.com/Aiven-Open/kio/issues/215")
 @pytest.mark.java
 @given(instance=from_type(UpdateRaftVoterResponse))
 def test_update_raft_voter_response_java(
