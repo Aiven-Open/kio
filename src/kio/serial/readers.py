@@ -204,7 +204,7 @@ def read_timedelta_i64(buffer: IO[bytes]) -> i64Timedelta:
     return datetime.timedelta(milliseconds=read_int64(buffer))  # type: ignore[return-value]
 
 
-def _tz_aware_from_i64(timestamp: i64) -> TZAware:
+def tz_aware_from_i64(timestamp: i64) -> TZAware:
     dt = datetime.datetime.fromtimestamp(timestamp / 1000, datetime.UTC)
     try:
         return TZAware.truncate(dt)
@@ -213,11 +213,11 @@ def _tz_aware_from_i64(timestamp: i64) -> TZAware:
 
 
 def read_datetime_i64(buffer: IO[bytes]) -> TZAware:
-    return _tz_aware_from_i64(read_int64(buffer))
+    return tz_aware_from_i64(read_int64(buffer))
 
 
 def read_nullable_datetime_i64(buffer: IO[bytes]) -> TZAware | None:
     timestamp = read_int64(buffer)
     if timestamp == -1:
         return None
-    return _tz_aware_from_i64(timestamp)
+    return tz_aware_from_i64(timestamp)
