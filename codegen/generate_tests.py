@@ -47,7 +47,6 @@ def test_{entity_snake_case}_roundtrip(instance: {entity_type}) -> None:
 """
 
 test_code_java = """\
-{xfail}
 @pytest.mark.java
 @given(instance=from_type({entity_type}))
 def test_{entity_snake_case}_java(instance: {entity_type}, java_tester: JavaTester) -> None:
@@ -89,20 +88,10 @@ def main() -> None:
         )
 
         if entity_type.__type__ is not EntityType.nested:
-            xfail = (
-                ""
-                if entity_type.__name__ not in "UpdateRaftVoterResponse"
-                else (
-                    "@pytest.mark.xfail("
-                    'reason="https://github.com/Aiven-Open/kio/issues/215"'
-                    ")"
-                )
-            )
             module_code[module_path].append(
                 test_code_java.format(
                     entity_type=entity_type.__name__,
                     entity_snake_case=to_snake_case(entity_type.__name__),
-                    xfail=xfail,
                 )
             )
 
