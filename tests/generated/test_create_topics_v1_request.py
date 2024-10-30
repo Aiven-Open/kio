@@ -9,7 +9,7 @@ from hypothesis.strategies import from_type
 
 from kio.schema.create_topics.v1.request import CreatableReplicaAssignment
 from kio.schema.create_topics.v1.request import CreatableTopic
-from kio.schema.create_topics.v1.request import CreateableTopicConfig
+from kio.schema.create_topics.v1.request import CreatableTopicConfig
 from kio.schema.create_topics.v1.request import CreateTopicsRequest
 from kio.serial import entity_reader
 from kio.serial import entity_writer
@@ -32,17 +32,17 @@ def test_creatable_replica_assignment_roundtrip(
     assert instance == result
 
 
-read_createable_topic_config: Final = entity_reader(CreateableTopicConfig)
+read_creatable_topic_config: Final = entity_reader(CreatableTopicConfig)
 
 
 @pytest.mark.roundtrip
-@given(from_type(CreateableTopicConfig))
-def test_createable_topic_config_roundtrip(instance: CreateableTopicConfig) -> None:
-    writer = entity_writer(CreateableTopicConfig)
+@given(from_type(CreatableTopicConfig))
+def test_creatable_topic_config_roundtrip(instance: CreatableTopicConfig) -> None:
+    writer = entity_writer(CreatableTopicConfig)
     with setup_buffer() as buffer:
         writer(buffer, instance)
         buffer.seek(0)
-        result = read_createable_topic_config(buffer)
+        result = read_creatable_topic_config(buffer)
     assert instance == result
 
 
