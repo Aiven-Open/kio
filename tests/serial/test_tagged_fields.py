@@ -26,6 +26,16 @@ from kio.static.primitive import u8
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
+class Nested:
+    __type__: ClassVar = EntityType.data
+    __version__: ClassVar[i16] = i16(0)
+    __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(-1)
+    str_field: str = field(metadata={"kafka_type": "string"})
+    int_field: u8 = field(metadata={"kafka_type": "uint8"})
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
 class Person:
     __type__: ClassVar = EntityType.data
     __version__: ClassVar[i16] = i16(0)
@@ -38,6 +48,7 @@ class Person:
         metadata={"kafka_type": "string", "tag": 1},
         default=None,
     )
+    tagged_struct: Nested = field(metadata={"tag": 2})
 
 
 read_person = entity_reader(Person)
@@ -57,14 +68,42 @@ class WritableTag(Generic[T]):
     [
         (
             [WritableTag(tag=0, writer=write_uint8, value=u8(123))],
-            Person(age=u8(123)),
+            Person(
+                age=u8(123),
+                tagged_struct=Nested(str_field="", int_field=u8(0)),
+            ),
         ),
         (
             [
                 WritableTag(tag=0, writer=write_uint8, value=u8(12)),
                 WritableTag(tag=1, writer=write_compact_string, value="Borduria"),
             ],
-            Person(age=u8(12), country="Borduria"),
+            Person(
+                age=u8(12),
+                country="Borduria",
+                tagged_struct=Nested(str_field="", int_field=u8(0)),
+            ),
+        ),
+        (
+            [WritableTag(tag=1, writer=write_compact_string, value="Borduria")],
+            Person(
+                age=u8(0),
+                country="Borduria",
+                tagged_struct=Nested(str_field="", int_field=u8(0)),
+            ),
+        ),
+        (
+            [
+                WritableTag(
+                    tag=2,
+                    writer=entity_writer(Nested),
+                    value=Nested(str_field="hello", int_field=u8(123)),
+                ),
+            ],
+            Person(
+                age=u8(0),
+                tagged_struct=Nested(str_field="hello", int_field=u8(123)),
+            ),
         ),
     ],
 )
@@ -89,24 +128,6 @@ def test_can_parse_tagged_fields(
     assert read_person(buffer) == expected
 
 
-def test_raises_type_error_when_missing_required_tagged_field(
-    buffer: io.BytesIO,
-) -> None:
-    write_compact_string(buffer, "Almaszout")  # name
-
-    write_unsigned_varint(buffer, 1)  # num tagged fields
-    # Only write country, omit age.
-    write_tagged_field(buffer, 1, write_compact_string, "Borduria")
-
-    buffer.seek(0)
-
-    with pytest.raises(
-        TypeError,
-        match=r"missing 1 required keyword-only argument: 'age'",
-    ):
-        read_person(buffer)
-
-
 @dataclass(frozen=True, slots=True, kw_only=True)
 class ReadableTag(Generic[T]):
     tag: int
@@ -118,19 +139,54 @@ class ReadableTag(Generic[T]):
     ("instance", "expected_tags"),
     [
         (
-            Person(age=u8(123)),
+            Person(
+                age=u8(123),
+                tagged_struct=Nested(str_field="", int_field=u8(0)),
+            ),
             [ReadableTag(tag=0, reader=read_uint8, value=u8(123))],
         ),
         (
-            Person(age=u8(12), country="Borduria"),
+            Person(
+                age=u8(12),
+                country="Borduria",
+                tagged_struct=Nested(str_field="", int_field=u8(0)),
+            ),
             [
                 ReadableTag(tag=0, reader=read_uint8, value=u8(12)),
                 ReadableTag(tag=1, reader=read_compact_string, value="Borduria"),
             ],
         ),
         (
-            Person(age=u8(1), country=None),
+            Person(
+                age=u8(1),
+                country=None,
+                tagged_struct=Nested(str_field="", int_field=u8(0)),
+            ),
             [ReadableTag(tag=0, reader=read_uint8, value=u8(1))],
+        ),
+        (
+            Person(age=u8(0), tagged_struct=Nested(str_field="", int_field=u8(0))),
+            [],
+        ),
+        (
+            Person(age=u8(0), tagged_struct=Nested(str_field="hello", int_field=u8(0))),
+            [
+                ReadableTag(
+                    tag=2,
+                    reader=entity_reader(Nested),
+                    value=Nested(str_field="hello", int_field=u8(0)),
+                )
+            ],
+        ),
+        (
+            Person(age=u8(0), tagged_struct=Nested(str_field="", int_field=u8(1))),
+            [
+                ReadableTag(
+                    tag=2,
+                    reader=entity_reader(Nested),
+                    value=Nested(str_field="", int_field=u8(1)),
+                )
+            ],
         ),
     ],
 )

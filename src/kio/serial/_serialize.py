@@ -1,5 +1,6 @@
 import io
 
+from dataclasses import MISSING
 from dataclasses import Field
 from dataclasses import fields
 from typing import Literal
@@ -11,6 +12,7 @@ from kio._utils import cache
 from kio.static.protocol import Entity
 
 from . import writers
+from ._implicit_defaults import get_tagged_field_default
 from ._introspect import EntityField
 from ._introspect import EntityTupleField
 from ._introspect import PrimitiveField
@@ -183,7 +185,11 @@ def entity_writer(entity_type: type[E], nullable: bool = False) -> Writer[E | No
             is_tag=tag is not None,
         )
         if tag is not None:
-            tagged_field_writers[tag] = field, field_writer
+            tagged_field_writers[tag] = (
+                field,
+                field_writer,
+                get_tagged_field_default(field),
+            )
         else:
             field_writers[field] = field_writer
 
@@ -212,11 +218,17 @@ def entity_writer(entity_type: type[E], nullable: bool = False) -> Writer[E | No
         num_tagged_fields = 0
         with io.BytesIO() as tag_buffer:
             # Serialize tagged fields. Note that order is important to fulfill spec.
-            for tag, (field, field_writer) in tagged_field_writers.items():
+            for tag, (
+                field,
+                field_writer,
+                implicit_default,
+            ) in tagged_field_writers.items():
                 field_value = getattr(entity, field.name)
 
                 # Skip default-valued fields.
-                if field_value == field.default:
+                if field_value == field.default or (
+                    field.default == MISSING and field_value == implicit_default
+                ):
                     continue
 
                 # Write the tag to the buffer and increase counter.

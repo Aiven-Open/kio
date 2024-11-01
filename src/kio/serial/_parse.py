@@ -10,6 +10,7 @@ from kio._utils import cache
 from kio.static.protocol import Entity
 
 from . import readers
+from ._implicit_defaults import get_tagged_field_default
 from ._introspect import EntityField
 from ._introspect import EntityTupleField
 from ._introspect import PrimitiveField
@@ -165,7 +166,11 @@ def entity_reader(
             is_tagged_field=tag is not None,
         )
         if tag is not None:
-            tagged_field_readers[tag] = field, field_reader
+            tagged_field_readers[tag] = (
+                field,
+                field_reader,
+                get_tagged_field_default(field),
+            )
         else:
             field_readers[field] = field_reader
 
@@ -185,12 +190,17 @@ def entity_reader(
             return entity_type(**kwargs)
 
         # Read tagged fields.
+        tagged_field_values = {}
         num_tagged_fields = readers.read_unsigned_varint(buffer)
         for _ in range(num_tagged_fields):
             field_tag = readers.read_unsigned_varint(buffer)
             readers.read_unsigned_varint(buffer)  # field length
-            field, field_reader = tagged_field_readers[field_tag]
-            kwargs[field.name] = field_reader(buffer)
+            field, field_reader, _ = tagged_field_readers[field_tag]
+            tagged_field_values[field.name] = field_reader(buffer)
+
+        # Resolve tagged field implicit defaults.
+        for field, _, implicit_default in tagged_field_readers.values():
+            kwargs[field.name] = tagged_field_values.get(field.name, implicit_default)
 
         return entity_type(**kwargs)
 
