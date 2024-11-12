@@ -1,13 +1,15 @@
 [project]
 name = "kio-docs"
 version = "0"
-requires-python = ">3.11,<3.12"
+requires-python = ">=3.13,<3.14"
 classifiers = ["Private :: Do Not Upload"]
 dependencies = [
   "sphinx",
   "sphinx-autodoc-typehints",
   "m2r2",
   "furo",
+  # Implicit requirement of m2r2.
+  "setuptools",
 
   # Package dependencies.
   "typing-extensions",
@@ -17,3 +19,4 @@ dependencies = [
 generate-hashes = true
 strip-extras = true
 upgrade = true
+allow-unsafe = true
