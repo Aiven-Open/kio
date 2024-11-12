@@ -11,9 +11,9 @@ java {
 repositories {
     mavenCentral()
     // This allows installing release candidates.
-    maven {
-        url = uri("https://repository.apache.org/content/groups/staging/")
-    }
+    // maven {
+    //     url = uri("https://repository.apache.org/content/groups/staging/")
+    // }
 }
 
 dependencies {
