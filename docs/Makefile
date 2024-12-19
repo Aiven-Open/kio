@@ -22,4 +22,5 @@ help:
 
 requirements: export CUSTOM_COMPILE_COMMAND='make requirements'
 requirements:
+	pip install --upgrade pip setuptools wheel pip-tools
 	@pip-compile --config=pyproject.toml
