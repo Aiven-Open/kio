@@ -9,6 +9,7 @@ from typing import assert_never
 from typing import overload
 
 from kio._utils import cache
+from kio.static.primitive import uvarint
 from kio.static.protocol import Entity
 
 from . import writers
@@ -241,7 +242,7 @@ def entity_writer(entity_type: type[E], nullable: bool = False) -> Writer[E | No
                 num_tagged_fields += 1
 
             # Write number of tagged fields followed by the serialized tags.
-            write_unsigned_varint(buffer, num_tagged_fields)
+            write_unsigned_varint(buffer, uvarint(num_tagged_fields))
             buffer.write(tag_buffer.getvalue())
 
     return _wrap_nullable(write_entity) if nullable else write_entity  # type: ignore[return-value]

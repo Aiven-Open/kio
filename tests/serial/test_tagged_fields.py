@@ -23,6 +23,7 @@ from kio.serial.writers import write_unsigned_varint
 from kio.static.constants import EntityType
 from kio.static.primitive import i16
 from kio.static.primitive import u8
+from kio.static.primitive import uvarint
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -114,11 +115,11 @@ def test_can_parse_tagged_fields(
 ) -> None:
     write_compact_string(buffer, "Almaszout")  # name
 
-    write_unsigned_varint(buffer, len(tagged_values))  # num tagged fields
+    write_unsigned_varint(buffer, uvarint(len(tagged_values)))  # num tagged fields
     for tagged_value in tagged_values:
         write_tagged_field(
             buffer,
-            tagged_value.tag,
+            uvarint(tagged_value.tag),
             tagged_value.writer,
             tagged_value.value,
         )

@@ -41,6 +41,7 @@ from kio.serial.writers import write_uint16
 from kio.serial.writers import write_uint32
 from kio.serial.writers import write_uint64
 from kio.serial.writers import write_unsigned_varint
+from kio.serial.writers import write_unsigned_varlong
 from kio.serial.writers import write_uuid
 from kio.static.constants import EntityType
 from kio.static.constants import uuid_zero
@@ -48,6 +49,7 @@ from kio.static.primitive import i8
 from kio.static.primitive import i16
 from kio.static.primitive import i32Timedelta
 from kio.static.primitive import i64Timedelta
+from kio.static.primitive import uvarint
 
 _I = TypeVar("_I", bound=int, contravariant=True)
 
@@ -216,17 +218,6 @@ class TestWriteUint64(IntWriterContract):
 
 
 class TestWriteUnsignedVarint:
-    def test_raises_value_error_for_negative_value(self, buffer: io.BytesIO) -> None:
-        with pytest.raises(ValueError, match=r"^Value must be positive$"):
-            write_unsigned_varint(buffer, -1)
-
-    def test_raises_value_error_when_upper_limit_exceeded(
-        self,
-        buffer: io.BytesIO,
-    ) -> None:
-        with pytest.raises(ValueError, match=r"^Value cannot exceed 2147483647$"):
-            write_unsigned_varint(buffer, 2**31)
-
     @pytest.mark.parametrize(
         ("value", "expected"),
         [
@@ -239,15 +230,43 @@ class TestWriteUnsignedVarint:
             (12345, b"\xb9`"),
             (54321, b"\xb1\xa8\x03"),
             (2147483647, b"\xff\xff\xff\xff\x07"),
+            (2**35 - 1, b"\xff\xff\xff\xff\x7f"),
         ],
     )
     def test_can_write_valid_value(
         self,
         buffer: io.BytesIO,
-        value: int,
+        value: uvarint,
         expected: bytes,
     ) -> None:
         write_unsigned_varint(buffer, value)
+        buffer.seek(0)
+        assert buffer.read(1000) == expected
+
+
+class TestWriteUnsignedVarlong:
+    @pytest.mark.parametrize(
+        ("value", "expected"),
+        [
+            (0, b"\x00"),
+            (10, b"\n"),
+            (256, b"\x80\x02"),
+            (1073741823, b"\xff\xff\xff\xff\x03"),
+            (2**31 - 1, b"\xff\xff\xff\xff\x07"),
+            (1, b"\x01"),
+            (12345, b"\xb9`"),
+            (54321, b"\xb1\xa8\x03"),
+            (2147483647, b"\xff\xff\xff\xff\x07"),
+            (2**70 - 1, b"\xff\xff\xff\xff\xff\xff\xff\xff\xff\x7f"),
+        ],
+    )
+    def test_can_write_valid_value(
+        self,
+        buffer: io.BytesIO,
+        value: uvarint,
+        expected: bytes,
+    ) -> None:
+        write_unsigned_varlong(buffer, value)
         buffer.seek(0)
         assert buffer.read(1000) == expected
 
