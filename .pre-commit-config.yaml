@@ -44,7 +44,7 @@ repos:
           - pytest==7.4.3
           - pydantic==1.10.13
           - hypothesis==6.99.12
-          - types-setuptools==69.2.0.20240317
+          - types-setuptools==78.1.0.20250329
           - types-requests==2.31.0.20240311
 
   - repo: https://github.com/seddonym/import-linter
@@ -72,6 +72,6 @@ repos:
       - id: check-manifest
         args: ["--no-build-isolation"]
         additional_dependencies:
-          - setuptools==75.1.0
-          - setuptools-scm==8.1.0
-          - wheel==0.44.0
+          - setuptools==78.1.0
+          - setuptools-scm==8.2.0
+          - wheel==0.45.1
