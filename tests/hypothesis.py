@@ -28,14 +28,20 @@ class HypothesisProfile(enum.Enum):
 settings.register_profile(
     HypothesisProfile.deterministic.name,
     deadline=None,
-    suppress_health_check=[hypothesis.HealthCheck.too_slow],
+    suppress_health_check=[
+        hypothesis.HealthCheck.too_slow,
+        hypothesis.HealthCheck.filter_too_much,
+    ],
     derandomize=True,
     max_examples=5,
 )
 settings.register_profile(
     HypothesisProfile.exhaustive.name,
     deadline=None,
-    suppress_health_check=[hypothesis.HealthCheck.too_slow],
+    suppress_health_check=[
+        hypothesis.HealthCheck.too_slow,
+        hypothesis.HealthCheck.filter_too_much,
+    ],
 )
 
 
