@@ -12,6 +12,7 @@ from typing import final
 from typing import get_args
 from typing import get_origin
 
+from kio.static.primitive import uvarint
 from kio.static.protocol import Entity
 
 from .errors import SchemaError
@@ -125,8 +126,8 @@ def _classify_field(field_type: type[T], field_name: str) -> FieldClass:
     raise SchemaError(f"Field {field_name} has invalid tuple type args: {type_args}")
 
 
-def get_field_tag(field: Field) -> int | None:
+def get_field_tag(field: Field) -> uvarint | None:
     try:
-        return int(field.metadata["tag"])
+        return uvarint(field.metadata["tag"])
     except KeyError:
         return None

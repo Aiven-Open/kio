@@ -72,16 +72,28 @@ class i16(i32, low=-(2**15), high=2**15 - 1): ...
 class i8(i16, low=-128, high=127): ...
 
 
-class u64(Interval, low=0, high=2**64 - 1): ...
+class uvarlong(Interval, low=0, high=2**70 - 1): ...
 
 
-class u32(u64, high=2**32 - 1): ...
+class u64(uvarlong, high=2**64 - 1): ...
+
+
+class uvarint(u64, high=2**35 - 1): ...
+
+
+class u32(uvarint, high=2**32 - 1): ...
 
 
 class u16(u32, high=2**16 - 1): ...
 
 
 class u8(u16, high=2**8 - 1): ...
+
+
+class svarlong(Interval, low=-(2**69), high=2**69 - 1): ...
+
+
+class svarint(svarlong, low=-(2**34), high=2**34 - 1): ...
 
 
 class f64(float, Phantom, bound=float, predicate=math.isfinite):
@@ -182,6 +194,72 @@ def is_tz_aware(dt: datetime.datetime) -> bool:
     return (
         dt.tzinfo is not None
         and dt.tzinfo.utcoffset(dt) is not None
+        and dt.timestamp() >= 0
+    )
+
+
+class TZAwareMicros(
+    datetime.datetime,
+    Phantom,
+    bound=datetime.datetime,
+    predicate=is_tz_aware,
+):
+    """
+    Type describing all datetime.datetime instances that are timezone aware,
+    and have a non-negative unix timestamp representation.
+
+    - Timezone awareness means any object lacking timezone data is excluded.
+    - Kafka uses -1 to represent NULL, so negative unix timestamps are not
+      supported.
+    """
+
+    tzinfo: datetime.tzinfo
+
+    @classmethod
+    def __hypothesis_hook__(cls) -> None:  # pragma: no cover
+        from hypothesis import assume
+        from hypothesis.strategies import SearchStrategy
+        from hypothesis.strategies import composite
+        from hypothesis.strategies import integers
+        from hypothesis.strategies import register_type_strategy
+        from hypothesis.strategies import timezones
+
+        min_ts = 0
+        max_ts = int(datetime.datetime.max.replace(tzinfo=datetime.UTC).timestamp()) - 1
+
+        @composite
+        def tz_aware_datetimes(
+            draw: Callable,
+            timestamp_strategy: SearchStrategy[int] = integers(min_ts, max_ts),
+            timezone_strategy: SearchStrategy[datetime.tzinfo] = timezones(),
+        ) -> TZAwareMicros:
+            """
+            Generate datetime objects that are representable both within the legal
+            boundaries of UTC timestamps, and within the boundaries of Python datetime
+            objects (i.e. with 0 < year 10_000.
+            """
+            try:
+                return TZAwareMicros.parse(
+                    datetime.datetime.fromtimestamp(
+                        draw(timestamp_strategy),
+                        tz=datetime.UTC,
+                    ).astimezone(draw(timezone_strategy))
+                )
+            except OverflowError:
+                # Both timestamps and dates have an upper limit. This means that the
+                # upper boundary for timestamps cannot be represented in all timezones.
+                # For timezones where the date wraps around to the year 10_000, an
+                # OverflowError occurs.
+                assume(False)
+                raise  # make mypy aware this branch always raises
+
+        register_type_strategy(cls, tz_aware_datetimes())
+
+
+def is_tz_aware_with_millisecond_precision(dt: datetime.datetime) -> bool:
+    return (
+        dt.tzinfo is not None
+        and dt.tzinfo.utcoffset(dt) is not None
         and dt.microsecond == 0
         and dt.timestamp() >= 0
     )
@@ -191,7 +269,7 @@ class TZAware(
     datetime.datetime,
     Phantom,
     bound=datetime.datetime,
-    predicate=is_tz_aware,
+    predicate=is_tz_aware_with_millisecond_precision,
 ):
     """
     Type describing all datetime.datetime instances that are timezone aware,

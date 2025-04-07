@@ -24,6 +24,7 @@ from kio.static.primitive import u8
 from kio.static.primitive import u16
 from kio.static.primitive import u32
 from kio.static.primitive import u64
+from kio.static.primitive import uvarint
 
 from .errors import OutOfBoundValue
 
@@ -68,22 +69,10 @@ def write_uint64(buffer: Writable, value: u64) -> None:
     buffer.write(struct.pack(">Q", value))
 
 
-unsigned_varint_upper_limit: Final = 2**31 - 1
-
-
 # See description and upstream implementation.
 # https://developers.google.com/protocol-buffers/docs/encoding?csw=1#varints
 # https://github.com/apache/kafka/blob/ef96ac07f565a73e35c5b0f4c56c8e87cfbaaf59/clients/src/main/java/org/apache/kafka/common/utils/ByteUtils.java#L262
-def write_unsigned_varint(buffer: Writable, value: int) -> None:
-    """
-    Serialize an integer value between 0 and 2^31 - 1 to bytearray using 1-5
-    bytes depending on value size.
-    """
-    if value < 0:
-        raise ValueError("Value must be positive")
-    if value > unsigned_varint_upper_limit:
-        raise ValueError(f"Value cannot exceed {unsigned_varint_upper_limit}")
-
+def _write_varint(buffer: Writable, value: int) -> None:
     # Read value by 7-bit chunks, shift.
     seven_bit_chunk = value & 0b01111111
     value >>= 7
@@ -100,6 +89,31 @@ def write_unsigned_varint(buffer: Writable, value: int) -> None:
     buffer.write(seven_bit_chunk.to_bytes(1, "little"))
 
 
+unsigned_varint_upper_limit: Final = 2**31 - 1
+
+
+def write_unsigned_varint(buffer: Writable, value: uvarint) -> None:
+    _write_varint(buffer, value)
+
+
+def write_unsigned_varlong(buffer: Writable, value: int) -> None:
+    _write_varint(buffer, value)
+
+
+def write_signed_varint(buffer: Writable, value: int) -> None:
+    _write_varint(
+        buffer=buffer,
+        value=(value << 1) ^ (value >> 31),
+    )
+
+
+def write_signed_varlong(buffer: Writable, value: int) -> None:
+    _write_varint(
+        buffer=buffer,
+        value=(value << 1) ^ (value >> 63),
+    )
+
+
 def write_float64(buffer: Writable, value: float) -> None:
     buffer.write(struct.pack(">d", value))
 
@@ -107,13 +121,13 @@ def write_float64(buffer: Writable, value: float) -> None:
 def write_nullable_compact_string(buffer: Writable, value: str | bytes | None) -> None:
     """Write a nullable string with compact length encoding."""
     if value is None:
-        write_unsigned_varint(buffer, 0)
+        write_unsigned_varint(buffer, uvarint(0))
         return
     if isinstance(value, str):
         value = value.encode()
     # The compact string format uses the string length plus 1, so that null can be
     # encoded as an unsigned integer 0.
-    write_unsigned_varint(buffer, len(value) + 1)
+    write_unsigned_varint(buffer, uvarint(len(value) + 1))
     buffer.write(value)
 
 
@@ -177,7 +191,7 @@ def write_legacy_bytes(buffer: Writable, value: bytes) -> None:
 
 
 def write_empty_tagged_fields(buffer: Writable) -> None:
-    write_unsigned_varint(buffer, 0)
+    write_unsigned_varint(buffer, uvarint(0))
 
 
 def write_legacy_array_length(buffer: Writable, value: i32) -> None:
@@ -187,7 +201,7 @@ def write_legacy_array_length(buffer: Writable, value: i32) -> None:
 def write_compact_array_length(buffer: Writable, value: int) -> None:
     # Apache Kafka® uses the array size plus 1 to ensure that `None` can be
     # distinguished from empty.
-    write_unsigned_varint(buffer, value + 1)
+    write_unsigned_varint(buffer, uvarint(value + 1))
 
 
 def write_uuid(buffer: Writable, value: UUID | None) -> None:
@@ -230,7 +244,7 @@ def legacy_array_writer(item_writer: Writer[T]) -> Writer[Sequence[T] | None]:
 
 def write_tagged_field(
     buffer: Writable,
-    tag: int,
+    tag: uvarint,
     writer: Writer[T],
     value: T,
 ) -> None:
@@ -243,7 +257,7 @@ def write_tagged_field(
         encoded = value_buffer.getvalue()
 
     write_unsigned_varint(buffer, tag)  # tag
-    write_unsigned_varint(buffer, len(encoded))  # length
+    write_unsigned_varint(buffer, uvarint(len(encoded)))  # length
     buffer.write(encoded)  # data
 
 
