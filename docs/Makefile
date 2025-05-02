@@ -20,7 +20,7 @@ help:
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 
-requirements: export CUSTOM_COMPILE_COMMAND='make requirements'
+requirements: export UV_CUSTOM_COMPILE_COMMAND='make requirements'
 requirements:
-	pip install --upgrade pip setuptools wheel pip-tools
-	@pip-compile --config=pyproject.toml
+	uv pip install --upgrade pip setuptools wheel pip-tools
+	uv pip compile --generate-hashes --upgrade --strip-extras --output-file=requirements.txt pyproject.toml
