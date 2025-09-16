@@ -50,7 +50,7 @@ all = [
 "Bug Tracker" = "https://github.com/Aiven-Open/kio/issues"
 
 [build-system]
-requires = ["setuptools==78.1.0", "setuptools-scm==8.2.0", "wheel==0.45.1"]
+requires = ["setuptools==80.9.0", "setuptools-scm==9.2.0", "wheel==0.45.1"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
