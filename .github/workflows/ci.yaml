@@ -147,7 +147,7 @@ jobs:
           check-latest: true
 
       - name: pre-commit cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/pre-commit
           key: >-
@@ -160,7 +160,7 @@ jobs:
             ${{ runner.os }}-pre-commit
 
       - name: Schema cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: schema
           key: schema-${{ hashFiles('codegen/fetch_schema.py') }}
