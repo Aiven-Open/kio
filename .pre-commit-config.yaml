@@ -73,5 +73,5 @@ repos:
         args: ["--no-build-isolation"]
         additional_dependencies:
           - setuptools==80.9.0
-          - setuptools-scm==9.2.0
+          - setuptools-scm==9.2.2
           - wheel==0.45.1
