@@ -267,9 +267,9 @@ sphinx==8.2.3 \
     #   furo
     #   sphinx-autodoc-typehints
     #   sphinx-basic-ng
-sphinx-autodoc-typehints==3.2.0 \
-    --hash=sha256:107ac98bc8b4837202c88c0736d59d6da44076e65a0d7d7d543a78631f662a9b \
-    --hash=sha256:884b39be23b1d884dcc825d4680c9c6357a476936e3b381a67ae80091984eb49
+sphinx-autodoc-typehints==3.6.1 \
+    --hash=sha256:dd818ba31d4c97f219a8c0fcacef280424f84a3589cedcb73003ad99c7da41ca \
+    --hash=sha256:fa0b686ae1b85965116c88260e5e4b82faec3687c2e94d6a10f9b36c3743e2fe
     # via kio-docs (pyproject.toml)
 sphinx-basic-ng==1.0.0b2 \
     --hash=sha256:9ec55a47c90c8c002b5960c57492ec3021f5193cb26cebc2dc4ea226848651c9 \
