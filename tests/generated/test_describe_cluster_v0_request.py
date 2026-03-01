@@ -22,8 +22,11 @@ def test_describe_cluster_request_roundtrip(instance: DescribeClusterRequest) ->
     writer = entity_writer(DescribeClusterRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_describe_cluster_request(buffer)
+        result, _ = read_describe_cluster_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

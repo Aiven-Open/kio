@@ -24,8 +24,11 @@ def test_allocate_producer_ids_response_roundtrip(
     writer = entity_writer(AllocateProducerIdsResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_allocate_producer_ids_response(buffer)
+        result, _ = read_allocate_producer_ids_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

@@ -24,8 +24,11 @@ def test_described_group_member_roundtrip(instance: DescribedGroupMember) -> Non
     writer = entity_writer(DescribedGroupMember)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_described_group_member(buffer)
+        result, _ = read_described_group_member(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -38,8 +41,11 @@ def test_described_group_roundtrip(instance: DescribedGroup) -> None:
     writer = entity_writer(DescribedGroup)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_described_group(buffer)
+        result, _ = read_described_group(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -52,8 +58,11 @@ def test_describe_groups_response_roundtrip(instance: DescribeGroupsResponse) ->
     writer = entity_writer(DescribeGroupsResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_describe_groups_response(buffer)
+        result, _ = read_describe_groups_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

@@ -25,8 +25,11 @@ def test_acknowledgement_batch_roundtrip(instance: AcknowledgementBatch) -> None
     writer = entity_writer(AcknowledgementBatch)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_acknowledgement_batch(buffer)
+        result, _ = read_acknowledgement_batch(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -39,8 +42,11 @@ def test_acknowledge_partition_roundtrip(instance: AcknowledgePartition) -> None
     writer = entity_writer(AcknowledgePartition)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_acknowledge_partition(buffer)
+        result, _ = read_acknowledge_partition(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -53,8 +59,11 @@ def test_acknowledge_topic_roundtrip(instance: AcknowledgeTopic) -> None:
     writer = entity_writer(AcknowledgeTopic)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_acknowledge_topic(buffer)
+        result, _ = read_acknowledge_topic(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -67,8 +76,11 @@ def test_share_acknowledge_request_roundtrip(instance: ShareAcknowledgeRequest) 
     writer = entity_writer(ShareAcknowledgeRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_share_acknowledge_request(buffer)
+        result, _ = read_share_acknowledge_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

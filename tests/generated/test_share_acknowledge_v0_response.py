@@ -26,8 +26,11 @@ def test_leader_id_and_epoch_roundtrip(instance: LeaderIdAndEpoch) -> None:
     writer = entity_writer(LeaderIdAndEpoch)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_leader_id_and_epoch(buffer)
+        result, _ = read_leader_id_and_epoch(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -40,8 +43,11 @@ def test_partition_data_roundtrip(instance: PartitionData) -> None:
     writer = entity_writer(PartitionData)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_partition_data(buffer)
+        result, _ = read_partition_data(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -58,8 +64,11 @@ def test_share_acknowledge_topic_response_roundtrip(
     writer = entity_writer(ShareAcknowledgeTopicResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_share_acknowledge_topic_response(buffer)
+        result, _ = read_share_acknowledge_topic_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -72,8 +81,11 @@ def test_node_endpoint_roundtrip(instance: NodeEndpoint) -> None:
     writer = entity_writer(NodeEndpoint)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_node_endpoint(buffer)
+        result, _ = read_node_endpoint(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -88,8 +100,11 @@ def test_share_acknowledge_response_roundtrip(
     writer = entity_writer(ShareAcknowledgeResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_share_acknowledge_response(buffer)
+        result, _ = read_share_acknowledge_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

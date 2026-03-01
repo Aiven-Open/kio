@@ -124,9 +124,9 @@ def test_can_parse_tagged_fields(
             tagged_value.value,
         )
 
-    buffer.seek(0)
-
-    assert read_person(buffer) == expected
+    instance, size = read_person(buffer.getvalue(), 0)
+    assert size == buffer.tell()
+    assert instance == expected
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -192,19 +192,31 @@ class ReadableTag(Generic[T]):
     ],
 )
 def test_can_serialize_tagged_fields(
-    buffer: io.BytesIO,
     instance: Person,
     expected_tags: Sequence[ReadableTag],
 ) -> None:
-    entity_writer(Person)(buffer, instance)
+    offset = 0
+    with io.BytesIO() as stream:
+        entity_writer(Person)(stream, instance)
+        buffer = stream.getvalue()
 
-    buffer.seek(0)
+    name, size = read_compact_string(buffer, offset)
+    offset += size
 
-    assert read_compact_string(buffer) == "Almaszout"  # name
+    assert size == len(name) + 1
+    assert name == "Almaszout"  # name
 
-    num_tagged_values = read_unsigned_varint(buffer)
+    num_tagged_values, size = read_unsigned_varint(buffer, offset)
+    offset += size
     assert num_tagged_values == len(expected_tags)
-    for tag in expected_tags:
-        assert read_unsigned_varint(buffer) == tag.tag
-        read_unsigned_varint(buffer)  # length
-        assert tag.reader(buffer) == tag.value
+    for expected_tag in expected_tags:
+        tag, size = read_unsigned_varint(buffer, offset)
+        offset += size
+        assert tag == expected_tag.tag
+        _, size = read_unsigned_varint(buffer, offset)  # length
+        offset += size
+        value, size = expected_tag.reader(buffer, offset)
+        offset += size
+        assert value == expected_tag.value
+
+    assert offset == len(buffer)

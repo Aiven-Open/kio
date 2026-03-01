@@ -26,8 +26,11 @@ def test_create_partitions_assignment_roundtrip(
     writer = entity_writer(CreatePartitionsAssignment)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_create_partitions_assignment(buffer)
+        result, _ = read_create_partitions_assignment(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -40,8 +43,11 @@ def test_create_partitions_topic_roundtrip(instance: CreatePartitionsTopic) -> N
     writer = entity_writer(CreatePartitionsTopic)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_create_partitions_topic(buffer)
+        result, _ = read_create_partitions_topic(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -54,8 +60,11 @@ def test_create_partitions_request_roundtrip(instance: CreatePartitionsRequest) 
     writer = entity_writer(CreatePartitionsRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_create_partitions_request(buffer)
+        result, _ = read_create_partitions_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

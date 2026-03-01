@@ -22,8 +22,11 @@ def test_default_principal_data_roundtrip(instance: DefaultPrincipalData) -> Non
     writer = entity_writer(DefaultPrincipalData)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_default_principal_data(buffer)
+        result, _ = read_default_principal_data(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

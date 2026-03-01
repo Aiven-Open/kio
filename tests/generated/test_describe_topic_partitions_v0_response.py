@@ -35,8 +35,11 @@ def test_describe_topic_partitions_response_partition_roundtrip(
     writer = entity_writer(DescribeTopicPartitionsResponsePartition)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_describe_topic_partitions_response_partition(buffer)
+        result, _ = read_describe_topic_partitions_response_partition(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -53,8 +56,11 @@ def test_describe_topic_partitions_response_topic_roundtrip(
     writer = entity_writer(DescribeTopicPartitionsResponseTopic)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_describe_topic_partitions_response_topic(buffer)
+        result, _ = read_describe_topic_partitions_response_topic(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -67,8 +73,11 @@ def test_cursor_roundtrip(instance: Cursor) -> None:
     writer = entity_writer(Cursor)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_cursor(buffer)
+        result, _ = read_cursor(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -85,8 +94,11 @@ def test_describe_topic_partitions_response_roundtrip(
     writer = entity_writer(DescribeTopicPartitionsResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_describe_topic_partitions_response(buffer)
+        result, _ = read_describe_topic_partitions_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

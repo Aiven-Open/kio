@@ -26,8 +26,11 @@ def test_alter_replica_log_dir_topic_roundtrip(
     writer = entity_writer(AlterReplicaLogDirTopic)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_alter_replica_log_dir_topic(buffer)
+        result, _ = read_alter_replica_log_dir_topic(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -40,8 +43,11 @@ def test_alter_replica_log_dir_roundtrip(instance: AlterReplicaLogDir) -> None:
     writer = entity_writer(AlterReplicaLogDir)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_alter_replica_log_dir(buffer)
+        result, _ = read_alter_replica_log_dir(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -56,8 +62,11 @@ def test_alter_replica_log_dirs_request_roundtrip(
     writer = entity_writer(AlterReplicaLogDirsRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_alter_replica_log_dirs_request(buffer)
+        result, _ = read_alter_replica_log_dirs_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

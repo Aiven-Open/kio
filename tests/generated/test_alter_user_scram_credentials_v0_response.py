@@ -31,8 +31,11 @@ def test_alter_user_scram_credentials_result_roundtrip(
     writer = entity_writer(AlterUserScramCredentialsResult)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_alter_user_scram_credentials_result(buffer)
+        result, _ = read_alter_user_scram_credentials_result(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -49,8 +52,11 @@ def test_alter_user_scram_credentials_response_roundtrip(
     writer = entity_writer(AlterUserScramCredentialsResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_alter_user_scram_credentials_response(buffer)
+        result, _ = read_alter_user_scram_credentials_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

@@ -29,8 +29,11 @@ def test_epoch_end_offset_roundtrip(instance: EpochEndOffset) -> None:
     writer = entity_writer(EpochEndOffset)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_epoch_end_offset(buffer)
+        result, _ = read_epoch_end_offset(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -43,8 +46,11 @@ def test_leader_id_and_epoch_roundtrip(instance: LeaderIdAndEpoch) -> None:
     writer = entity_writer(LeaderIdAndEpoch)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_leader_id_and_epoch(buffer)
+        result, _ = read_leader_id_and_epoch(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -57,8 +63,11 @@ def test_snapshot_id_roundtrip(instance: SnapshotId) -> None:
     writer = entity_writer(SnapshotId)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_snapshot_id(buffer)
+        result, _ = read_snapshot_id(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -71,8 +80,11 @@ def test_aborted_transaction_roundtrip(instance: AbortedTransaction) -> None:
     writer = entity_writer(AbortedTransaction)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_aborted_transaction(buffer)
+        result, _ = read_aborted_transaction(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -85,8 +97,11 @@ def test_partition_data_roundtrip(instance: PartitionData) -> None:
     writer = entity_writer(PartitionData)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_partition_data(buffer)
+        result, _ = read_partition_data(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -99,8 +114,11 @@ def test_fetchable_topic_response_roundtrip(instance: FetchableTopicResponse) ->
     writer = entity_writer(FetchableTopicResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_fetchable_topic_response(buffer)
+        result, _ = read_fetchable_topic_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -113,8 +131,11 @@ def test_node_endpoint_roundtrip(instance: NodeEndpoint) -> None:
     writer = entity_writer(NodeEndpoint)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_node_endpoint(buffer)
+        result, _ = read_node_endpoint(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -127,8 +148,11 @@ def test_fetch_response_roundtrip(instance: FetchResponse) -> None:
     writer = entity_writer(FetchResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_fetch_response(buffer)
+        result, _ = read_fetch_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

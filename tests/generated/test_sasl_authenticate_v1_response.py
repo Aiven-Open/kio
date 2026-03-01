@@ -24,8 +24,11 @@ def test_sasl_authenticate_response_roundtrip(
     writer = entity_writer(SaslAuthenticateResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_sasl_authenticate_response(buffer)
+        result, _ = read_sasl_authenticate_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

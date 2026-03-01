@@ -24,8 +24,11 @@ def test_listener_roundtrip(instance: Listener) -> None:
     writer = entity_writer(Listener)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_listener(buffer)
+        result, _ = read_listener(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -38,8 +41,11 @@ def test_feature_roundtrip(instance: Feature) -> None:
     writer = entity_writer(Feature)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_feature(buffer)
+        result, _ = read_feature(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -56,8 +62,11 @@ def test_controller_registration_request_roundtrip(
     writer = entity_writer(ControllerRegistrationRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_controller_registration_request(buffer)
+        result, _ = read_controller_registration_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

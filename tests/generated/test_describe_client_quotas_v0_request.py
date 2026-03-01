@@ -23,8 +23,11 @@ def test_component_data_roundtrip(instance: ComponentData) -> None:
     writer = entity_writer(ComponentData)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_component_data(buffer)
+        result, _ = read_component_data(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -39,8 +42,11 @@ def test_describe_client_quotas_request_roundtrip(
     writer = entity_writer(DescribeClientQuotasRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_describe_client_quotas_request(buffer)
+        result, _ = read_describe_client_quotas_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

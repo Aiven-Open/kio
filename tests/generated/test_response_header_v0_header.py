@@ -22,8 +22,11 @@ def test_response_header_roundtrip(instance: ResponseHeader) -> None:
     writer = entity_writer(ResponseHeader)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_response_header(buffer)
+        result, _ = read_response_header(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

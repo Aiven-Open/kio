@@ -22,8 +22,11 @@ def test_find_coordinator_request_roundtrip(instance: FindCoordinatorRequest) ->
     writer = entity_writer(FindCoordinatorRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_find_coordinator_request(buffer)
+        result, _ = read_find_coordinator_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

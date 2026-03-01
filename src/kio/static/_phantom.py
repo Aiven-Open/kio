@@ -34,9 +34,9 @@ class InstanceCheckable(Protocol):
 
 
 class PhantomMeta(abc.ABCMeta):
-    def __instancecheck__(self, instance: object) -> bool:
+    def __instancecheck__(self: type[object], instance: object) -> bool:
         return (
-            issubclass(self, InstanceCheckable) and self.__instancecheck__(instance)  # type: ignore[attr-defined]
+            issubclass(self, InstanceCheckable) and self.__instancecheck__(instance)  # type: ignore[call-arg,arg-type]
         )
 
     def __call__(cls, instance):  # type: ignore[no-untyped-def]

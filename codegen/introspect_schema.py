@@ -16,7 +16,6 @@ if TYPE_CHECKING:
 
 
 base_dir: Final = Path(__file__).parent.parent.resolve()
-schema_src_dir: Final = base_dir / "src/kio/schema"
 ignore_modules: Final = frozenset({"index"})
 
 

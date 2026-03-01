@@ -22,8 +22,11 @@ def test_api_versions_request_roundtrip(instance: ApiVersionsRequest) -> None:
     writer = entity_writer(ApiVersionsRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_api_versions_request(buffer)
+        result, _ = read_api_versions_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

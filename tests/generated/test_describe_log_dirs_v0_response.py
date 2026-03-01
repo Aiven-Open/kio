@@ -27,8 +27,11 @@ def test_describe_log_dirs_partition_roundtrip(
     writer = entity_writer(DescribeLogDirsPartition)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_describe_log_dirs_partition(buffer)
+        result, _ = read_describe_log_dirs_partition(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -41,8 +44,11 @@ def test_describe_log_dirs_topic_roundtrip(instance: DescribeLogDirsTopic) -> No
     writer = entity_writer(DescribeLogDirsTopic)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_describe_log_dirs_topic(buffer)
+        result, _ = read_describe_log_dirs_topic(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -55,8 +61,11 @@ def test_describe_log_dirs_result_roundtrip(instance: DescribeLogDirsResult) -> 
     writer = entity_writer(DescribeLogDirsResult)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_describe_log_dirs_result(buffer)
+        result, _ = read_describe_log_dirs_result(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -71,8 +80,11 @@ def test_describe_log_dirs_response_roundtrip(
     writer = entity_writer(DescribeLogDirsResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_describe_log_dirs_response(buffer)
+        result, _ = read_describe_log_dirs_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

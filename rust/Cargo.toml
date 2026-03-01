@@ -1,0 +1,14 @@
+[package]
+name = "python-kio"
+version = "0.0.0"
+edition = "2024"
+
+[package.metadata.maturin]
+name = "kio._kio_native"
+
+[lib]
+name = "_kio_native"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = "0.28.2"

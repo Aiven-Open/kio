@@ -23,8 +23,11 @@ def test_member_identity_roundtrip(instance: MemberIdentity) -> None:
     writer = entity_writer(MemberIdentity)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_member_identity(buffer)
+        result, _ = read_member_identity(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -37,8 +40,11 @@ def test_leave_group_request_roundtrip(instance: LeaveGroupRequest) -> None:
     writer = entity_writer(LeaveGroupRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_leave_group_request(buffer)
+        result, _ = read_leave_group_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

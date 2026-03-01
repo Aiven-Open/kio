@@ -1,6 +1,6 @@
 import datetime
 
-from typing import IO
+from io import BytesIO
 
 import pytest
 
@@ -28,45 +28,52 @@ from .fixtures import record_batch_data_v2
 
 
 class TestReadSignedCompactStringAsBytesNullable:
-    def test_can_read_bytes(self, buffer: IO[bytes]) -> None:
+    def test_can_read_bytes(self, buffer: BytesIO) -> None:
         write_signed_varint(buffer, 5)
         buffer.write(b"abcde")
-        buffer.seek(0)
-        assert read_signed_compact_string_as_bytes_nullable(buffer) == b"abcde"
+        result, size = read_signed_compact_string_as_bytes_nullable(
+            buffer.getvalue(),
+            0,
+        )
+        assert result == b"abcde"
+        assert size == 6
 
-    def test_returns_none_for_length_minus_one(self, buffer: IO[bytes]) -> None:
+    def test_returns_none_for_length_minus_one(self, buffer: BytesIO) -> None:
         write_signed_varint(buffer, -1)
-        buffer.seek(0)
-        assert read_signed_compact_string_as_bytes_nullable(buffer) is None
+        result, size = read_signed_compact_string_as_bytes_nullable(
+            buffer.getvalue(),
+            0,
+        )
+        assert result is None
+        assert size == 1
 
-    def test_raises_value_error_for_negative_length(self, buffer: IO[bytes]) -> None:
+    def test_raises_value_error_for_negative_length(self, buffer: BytesIO) -> None:
         write_signed_varint(buffer, -2)
-        buffer.seek(0)
         with pytest.raises(
             ValueError,
             match=r"^Invalid length for signed compact string: -2$",
         ):
-            read_signed_compact_string_as_bytes_nullable(buffer)
+            read_signed_compact_string_as_bytes_nullable(buffer.getvalue(), 0)
 
 
-def test_read_header(buffer: IO[bytes]) -> None:
+def test_read_header(buffer: BytesIO) -> None:
     write_signed_varint(buffer, 5)
     buffer.write(b"abcde")
     write_signed_varint(buffer, 5)
     buffer.write(b"bcdef")
-    buffer.seek(0)
-    assert read_header(buffer) == RecordHeader(
+    result, size = read_header(buffer.getvalue(), 0)
+    assert result == RecordHeader(
         key=b"abcde",
         value=b"bcdef",
     )
+    assert size == 12
 
 
 class TestReadBatch:
-    def test_can_read_record_batches(self, buffer: IO[bytes]) -> None:
-        buffer.write(b"".join(record_batch_data_v2))
-        buffer.seek(0)
-
-        batch = read_batch(buffer)
+    def test_can_read_record_batches(self) -> None:
+        buffer = b"".join(record_batch_data_v2)
+        batch, size = read_batch(buffer, 0)
+        assert size == 71
         assert batch.base_offset == 0
         assert batch.batch_length == 59
         assert batch.partition_leader_epoch == 1
@@ -88,7 +95,8 @@ class TestReadBatch:
         assert record.value == b"123"
         assert record.headers == ()
 
-        batch = read_batch(buffer)
+        batch, size = read_batch(buffer, 71)
+        assert size == 76
         assert batch.base_offset == 1
         assert batch.batch_length == 64
         assert batch.partition_leader_epoch == 2
@@ -118,7 +126,8 @@ class TestReadBatch:
         assert second_record.value == b""
         assert second_record.headers == ()
 
-        batch = read_batch(buffer)
+        batch, size = read_batch(buffer, 71 + 76)
+        assert size == 71
         assert batch.base_offset == 3
         assert batch.batch_length == 59
         assert batch.partition_leader_epoch == 2
@@ -140,7 +149,8 @@ class TestReadBatch:
         assert record.value == b"123"
         assert record.headers == ()
 
-        batch = read_batch(buffer)
+        batch, size = read_batch(buffer, 71 + 76 + 71)
+        assert size == 81
         assert batch.base_offset == 0
         assert batch.batch_length == 69
         assert batch.partition_leader_epoch == 0
@@ -166,7 +176,7 @@ class TestReadBatch:
 
     def test_raises_value_error_for_unrecognized_magic_byte(
         self,
-        buffer: IO[bytes],
+        buffer: BytesIO,
     ) -> None:
         # base offset
         write_int64(buffer, i64(0))
@@ -177,15 +187,13 @@ class TestReadBatch:
         # magic byte value
         write_int8(buffer, i8(RecordBatch.magic - 1))
 
-        buffer.seek(0)
-
         with pytest.raises(
             ValueError,
             match=r"^Expected record batch magic byte == 2$",
         ):
-            read_batch(buffer)
+            read_batch(buffer.getvalue(), 0)
 
-    def test_raises_value_error_for_checksum_mismatch(self, buffer: IO[bytes]) -> None:
+    def test_raises_value_error_for_checksum_mismatch(self, buffer: BytesIO) -> None:
         # base offset
         write_int64(buffer, i64(0))
         # batch length
@@ -201,17 +209,15 @@ class TestReadBatch:
         # last offset delta
         write_int32(buffer, i32(0))
 
-        buffer.seek(0)
-
         with pytest.raises(
             ValueError,
             match=r"^Checksum mismatch when reading record batch$",
         ):
-            read_batch(buffer)
+            read_batch(buffer.getvalue(), 0)
 
     def test_raises_value_error_for_timestamp_larger_than_max(
         self,
-        buffer: IO[bytes],
+        buffer: BytesIO,
     ) -> None:
         write_batch(
             buffer,
@@ -242,10 +248,8 @@ class TestReadBatch:
             ),
         )
 
-        buffer.seek(0)
-
         with pytest.raises(
             ValueError,
             match=r"^Record has timestamp larger than batch max timestamp$",
         ):
-            read_batch(buffer)
+            read_batch(buffer.getvalue(), 0)

@@ -24,8 +24,11 @@ def test_remove_raft_voter_response_roundtrip(
     writer = entity_writer(RemoveRaftVoterResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_remove_raft_voter_response(buffer)
+        result, _ = read_remove_raft_voter_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

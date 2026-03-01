@@ -28,8 +28,11 @@ def test_update_metadata_partition_state_roundtrip(
     writer = entity_writer(UpdateMetadataPartitionState)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_update_metadata_partition_state(buffer)
+        result, _ = read_update_metadata_partition_state(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -42,8 +45,11 @@ def test_update_metadata_broker_roundtrip(instance: UpdateMetadataBroker) -> Non
     writer = entity_writer(UpdateMetadataBroker)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_update_metadata_broker(buffer)
+        result, _ = read_update_metadata_broker(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -56,8 +62,11 @@ def test_update_metadata_request_roundtrip(instance: UpdateMetadataRequest) -> N
     writer = entity_writer(UpdateMetadataRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_update_metadata_request(buffer)
+        result, _ = read_update_metadata_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

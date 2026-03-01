@@ -25,8 +25,11 @@ def test_partition_data_roundtrip(instance: PartitionData) -> None:
     writer = entity_writer(PartitionData)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_partition_data(buffer)
+        result, _ = read_partition_data(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -39,8 +42,11 @@ def test_topic_data_roundtrip(instance: TopicData) -> None:
     writer = entity_writer(TopicData)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_topic_data(buffer)
+        result, _ = read_topic_data(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -53,8 +59,11 @@ def test_directory_data_roundtrip(instance: DirectoryData) -> None:
     writer = entity_writer(DirectoryData)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_directory_data(buffer)
+        result, _ = read_directory_data(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -71,8 +80,11 @@ def test_assign_replicas_to_dirs_response_roundtrip(
     writer = entity_writer(AssignReplicasToDirsResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_assign_replicas_to_dirs_response(buffer)
+        result, _ = read_assign_replicas_to_dirs_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

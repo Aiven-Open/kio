@@ -26,8 +26,11 @@ def test_reassignable_partition_roundtrip(instance: ReassignablePartition) -> No
     writer = entity_writer(ReassignablePartition)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_reassignable_partition(buffer)
+        result, _ = read_reassignable_partition(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -40,8 +43,11 @@ def test_reassignable_topic_roundtrip(instance: ReassignableTopic) -> None:
     writer = entity_writer(ReassignableTopic)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_reassignable_topic(buffer)
+        result, _ = read_reassignable_topic(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -58,8 +64,11 @@ def test_alter_partition_reassignments_request_roundtrip(
     writer = entity_writer(AlterPartitionReassignmentsRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_alter_partition_reassignments_request(buffer)
+        result, _ = read_alter_partition_reassignments_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

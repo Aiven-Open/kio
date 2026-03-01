@@ -23,8 +23,11 @@ def test_describe_cluster_broker_roundtrip(instance: DescribeClusterBroker) -> N
     writer = entity_writer(DescribeClusterBroker)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_describe_cluster_broker(buffer)
+        result, _ = read_describe_cluster_broker(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -37,8 +40,11 @@ def test_describe_cluster_response_roundtrip(instance: DescribeClusterResponse) 
     writer = entity_writer(DescribeClusterResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_describe_cluster_response(buffer)
+        result, _ = read_describe_cluster_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

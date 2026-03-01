@@ -31,8 +31,9 @@ from kio.static.primitive import i32
 def test_roundtrip_new_record_batch(new_record_batch: NewRecordBatch) -> None:
     with io.BytesIO() as buffer:
         write_new_batch(buffer, new_record_batch)
-        buffer.seek(0)
-        result = read_batch(buffer)
+        batch_bytes = buffer.getvalue()
+
+    result, _ = read_batch(batch_bytes, 0)
 
     assert result.producer_id == new_record_batch.producer_id
     assert result.producer_epoch == new_record_batch.producer_epoch
