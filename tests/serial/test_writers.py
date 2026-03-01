@@ -10,6 +10,7 @@ from dataclasses import field
 from typing import ClassVar
 from typing import Generic
 from typing import TypeVar
+from typing import cast
 
 import pytest
 
@@ -76,7 +77,7 @@ class IntWriterContract(Generic[_I]):
 
     @classmethod
     def call_function(cls, buffer: io.BytesIO, value: int) -> None:
-        cls.write_function(buffer, value)
+        cls.write_function(buffer, cast(_I, value))
 
     def test_raises_struct_error_when_exceeding_lower_limit(
         self,
