@@ -447,7 +447,7 @@ class CommonStructSchema(BaseModel):
         global structs_registry
 
         if not isinstance(value, Sequence) or not value:
-            return value
+            return value  # type: ignore[return-value]
 
         def resolve_structs(raw_structs: Sequence[object]) -> Iterator[CommonStruct]:
             unsolved = []
