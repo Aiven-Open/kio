@@ -31,8 +31,11 @@ def test_list_partition_reassignments_topics_roundtrip(
     writer = entity_writer(ListPartitionReassignmentsTopics)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_list_partition_reassignments_topics(buffer)
+        result, _ = read_list_partition_reassignments_topics(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -49,8 +52,11 @@ def test_list_partition_reassignments_request_roundtrip(
     writer = entity_writer(ListPartitionReassignmentsRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_list_partition_reassignments_request(buffer)
+        result, _ = read_list_partition_reassignments_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

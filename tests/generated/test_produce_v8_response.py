@@ -27,8 +27,11 @@ def test_batch_index_and_error_message_roundtrip(
     writer = entity_writer(BatchIndexAndErrorMessage)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_batch_index_and_error_message(buffer)
+        result, _ = read_batch_index_and_error_message(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -43,8 +46,11 @@ def test_partition_produce_response_roundtrip(
     writer = entity_writer(PartitionProduceResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_partition_produce_response(buffer)
+        result, _ = read_partition_produce_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -57,8 +63,11 @@ def test_topic_produce_response_roundtrip(instance: TopicProduceResponse) -> Non
     writer = entity_writer(TopicProduceResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_topic_produce_response(buffer)
+        result, _ = read_topic_produce_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -71,8 +80,11 @@ def test_produce_response_roundtrip(instance: ProduceResponse) -> None:
     writer = entity_writer(ProduceResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_produce_response(buffer)
+        result, _ = read_produce_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

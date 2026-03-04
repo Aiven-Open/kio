@@ -23,8 +23,11 @@ def test_topic_request_roundtrip(instance: TopicRequest) -> None:
     writer = entity_writer(TopicRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_topic_request(buffer)
+        result, _ = read_topic_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -39,8 +42,11 @@ def test_describe_producers_request_roundtrip(
     writer = entity_writer(DescribeProducersRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_describe_producers_request(buffer)
+        result, _ = read_describe_producers_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

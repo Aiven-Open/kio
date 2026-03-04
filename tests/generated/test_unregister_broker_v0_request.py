@@ -22,8 +22,11 @@ def test_unregister_broker_request_roundtrip(instance: UnregisterBrokerRequest) 
     writer = entity_writer(UnregisterBrokerRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_unregister_broker_request(buffer)
+        result, _ = read_unregister_broker_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

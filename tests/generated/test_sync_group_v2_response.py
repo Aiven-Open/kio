@@ -22,8 +22,11 @@ def test_sync_group_response_roundtrip(instance: SyncGroupResponse) -> None:
     writer = entity_writer(SyncGroupResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_sync_group_response(buffer)
+        result, _ = read_sync_group_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

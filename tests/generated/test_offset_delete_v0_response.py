@@ -28,8 +28,11 @@ def test_offset_delete_response_partition_roundtrip(
     writer = entity_writer(OffsetDeleteResponsePartition)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_offset_delete_response_partition(buffer)
+        result, _ = read_offset_delete_response_partition(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -44,8 +47,11 @@ def test_offset_delete_response_topic_roundtrip(
     writer = entity_writer(OffsetDeleteResponseTopic)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_offset_delete_response_topic(buffer)
+        result, _ = read_offset_delete_response_topic(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -58,8 +64,11 @@ def test_offset_delete_response_roundtrip(instance: OffsetDeleteResponse) -> Non
     writer = entity_writer(OffsetDeleteResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_offset_delete_response(buffer)
+        result, _ = read_offset_delete_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

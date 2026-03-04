@@ -149,10 +149,10 @@ def test_can_parse_entity(buffer: io.BytesIO) -> None:
     # tagged fields
     write_empty_tagged_fields(buffer)
 
-    buffer.seek(0)
-    instance = entity_reader(MetadataResponseBrokerV12)(buffer)
-    assert isinstance(instance, MetadataResponseBrokerV12)
+    instance, size = entity_reader(MetadataResponseBrokerV12)(buffer.getvalue(), 0)
 
+    assert size == buffer.tell()
+    assert isinstance(instance, MetadataResponseBrokerV12)
     assert instance.node_id == 123
     assert instance.host == "kafka.aiven.test"
     assert instance.port == 23_126
@@ -170,10 +170,10 @@ def test_can_parse_legacy_entity(buffer: io.BytesIO) -> None:
     # rack
     write_legacy_string(buffer, "da best")
 
-    buffer.seek(0)
-    instance = entity_reader(MetadataResponseBrokerV5)(buffer)
-    assert isinstance(instance, MetadataResponseBrokerV5)
+    instance, size = entity_reader(MetadataResponseBrokerV5)(buffer.getvalue(), 0)
 
+    assert size == buffer.tell()
+    assert isinstance(instance, MetadataResponseBrokerV5)
     assert instance.node_id == 123
     assert instance.host == "kafka.aiven.test"
     assert instance.port == 23_126
@@ -250,11 +250,10 @@ def test_can_parse_complex_entity(buffer: io.BytesIO) -> None:
     # main entity tagged fields
     write_empty_tagged_fields(buffer)
 
-    buffer.seek(0)
+    instance, size = entity_reader(MetadataResponse)(buffer.getvalue(), 0)
 
-    instance = entity_reader(MetadataResponse)(buffer)
+    assert size == buffer.tell()
     assert isinstance(instance, MetadataResponse)
-
     assert instance.throttle_time == datetime.timedelta(milliseconds=123)
     assert len(instance.brokers) == 2
     assert instance.cluster_id is None
@@ -292,10 +291,10 @@ def test_can_parse_nested_non_array_entity(buffer: io.BytesIO) -> None:
     write_compact_string(buffer, "child name")
     write_empty_tagged_fields(buffer)  # child fields
     write_empty_tagged_fields(buffer)  # parent fields
-    buffer.seek(0)
 
-    instance = entity_reader(UniParent)(buffer)
+    instance, size = entity_reader(UniParent)(buffer.getvalue(), 0)
 
+    assert size == buffer.tell()
     assert instance == UniParent(
         name="parent name",
         child=Child(name="child name"),
@@ -320,10 +319,10 @@ def test_can_parse_nested_entity_array(buffer: io.BytesIO) -> None:
     write_compact_string(buffer, "second child")
     write_empty_tagged_fields(buffer)  # second child fields
     write_empty_tagged_fields(buffer)  # parent fields
-    buffer.seek(0)
 
-    instance = entity_reader(MultiParent)(buffer)
+    instance, size = entity_reader(MultiParent)(buffer.getvalue(), 0)
 
+    assert size == buffer.tell()
     assert instance == MultiParent(
         name="parent name",
         children=(
@@ -349,13 +348,14 @@ class EmptyLegacy:
 
 def test_can_read_empty_flexible_entity(buffer: io.BytesIO) -> None:
     write_empty_tagged_fields(buffer)
-    buffer.seek(0)
-    instance = entity_reader(EmptyFlexible)(buffer)
+    instance, size = entity_reader(EmptyFlexible)(buffer.getvalue(), 0)
+    assert size == buffer.tell()
     assert instance == EmptyFlexible()
 
 
-def test_can_read_empty_legacy_entity(buffer: io.BytesIO) -> None:
-    instance = entity_reader(EmptyLegacy)(buffer)
+def test_can_read_empty_legacy_entity() -> None:
+    instance, size = entity_reader(EmptyLegacy)(b"", 0)
+    assert size == 0
     assert instance == EmptyLegacy()
 
 
@@ -391,10 +391,10 @@ def test_can_read_populated_nested_nullable_entity(buffer: io.BytesIO) -> None:
     write_empty_tagged_fields(buffer)  # child fields
     write_compact_string(buffer, "parent name")
     write_empty_tagged_fields(buffer)  # parent fields
-    buffer.seek(0)
 
-    instance = entity_reader(NestedNullable)(buffer)
+    instance, size = entity_reader(NestedNullable)(buffer.getvalue(), 0)
 
+    assert size == buffer.tell()
     assert instance == NestedNullable(
         child=Child(name="child name"),
         name="parent name",
@@ -405,10 +405,10 @@ def test_can_read_empty_nested_nullable_entity(buffer: io.BytesIO) -> None:
     write_int8(buffer, NullableEntityMarker.null.value)
     write_compact_string(buffer, "parent name")
     write_empty_tagged_fields(buffer)  # parent fields
-    buffer.seek(0)
 
-    instance = entity_reader(NestedNullable)(buffer)
+    instance, size = entity_reader(NestedNullable)(buffer.getvalue(), 0)
 
+    assert size == buffer.tell()
     assert instance == NestedNullable(
         child=None,
         name="parent name",

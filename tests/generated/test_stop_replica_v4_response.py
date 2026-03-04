@@ -25,8 +25,11 @@ def test_stop_replica_partition_error_roundtrip(
     writer = entity_writer(StopReplicaPartitionError)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_stop_replica_partition_error(buffer)
+        result, _ = read_stop_replica_partition_error(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -39,8 +42,11 @@ def test_stop_replica_response_roundtrip(instance: StopReplicaResponse) -> None:
     writer = entity_writer(StopReplicaResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_stop_replica_response(buffer)
+        result, _ = read_stop_replica_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

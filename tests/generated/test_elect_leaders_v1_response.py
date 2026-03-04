@@ -24,8 +24,11 @@ def test_partition_result_roundtrip(instance: PartitionResult) -> None:
     writer = entity_writer(PartitionResult)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_partition_result(buffer)
+        result, _ = read_partition_result(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -38,8 +41,11 @@ def test_replica_election_result_roundtrip(instance: ReplicaElectionResult) -> N
     writer = entity_writer(ReplicaElectionResult)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_replica_election_result(buffer)
+        result, _ = read_replica_election_result(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -52,8 +58,11 @@ def test_elect_leaders_response_roundtrip(instance: ElectLeadersResponse) -> Non
     writer = entity_writer(ElectLeadersResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_elect_leaders_response(buffer)
+        result, _ = read_elect_leaders_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

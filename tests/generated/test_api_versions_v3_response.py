@@ -25,8 +25,11 @@ def test_api_version_roundtrip(instance: ApiVersion) -> None:
     writer = entity_writer(ApiVersion)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_api_version(buffer)
+        result, _ = read_api_version(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -39,8 +42,11 @@ def test_supported_feature_key_roundtrip(instance: SupportedFeatureKey) -> None:
     writer = entity_writer(SupportedFeatureKey)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_supported_feature_key(buffer)
+        result, _ = read_supported_feature_key(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -53,8 +59,11 @@ def test_finalized_feature_key_roundtrip(instance: FinalizedFeatureKey) -> None:
     writer = entity_writer(FinalizedFeatureKey)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_finalized_feature_key(buffer)
+        result, _ = read_finalized_feature_key(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -67,8 +76,11 @@ def test_api_versions_response_roundtrip(instance: ApiVersionsResponse) -> None:
     writer = entity_writer(ApiVersionsResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_api_versions_response(buffer)
+        result, _ = read_api_versions_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

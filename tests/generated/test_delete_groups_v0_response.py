@@ -23,8 +23,11 @@ def test_deletable_group_result_roundtrip(instance: DeletableGroupResult) -> Non
     writer = entity_writer(DeletableGroupResult)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_deletable_group_result(buffer)
+        result, _ = read_deletable_group_result(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -37,8 +40,11 @@ def test_delete_groups_response_roundtrip(instance: DeleteGroupsResponse) -> Non
     writer = entity_writer(DeleteGroupsResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_delete_groups_response(buffer)
+        result, _ = read_delete_groups_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

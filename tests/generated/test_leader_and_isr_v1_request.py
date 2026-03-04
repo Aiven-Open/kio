@@ -26,8 +26,11 @@ def test_leader_and_isr_partition_state_roundtrip(
     writer = entity_writer(LeaderAndIsrPartitionState)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_leader_and_isr_partition_state(buffer)
+        result, _ = read_leader_and_isr_partition_state(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -40,8 +43,11 @@ def test_leader_and_isr_live_leader_roundtrip(instance: LeaderAndIsrLiveLeader) 
     writer = entity_writer(LeaderAndIsrLiveLeader)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_leader_and_isr_live_leader(buffer)
+        result, _ = read_leader_and_isr_live_leader(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -54,8 +60,11 @@ def test_leader_and_isr_request_roundtrip(instance: LeaderAndIsrRequest) -> None
     writer = entity_writer(LeaderAndIsrRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_leader_and_isr_request(buffer)
+        result, _ = read_leader_and_isr_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

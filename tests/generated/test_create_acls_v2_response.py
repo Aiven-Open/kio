@@ -23,8 +23,11 @@ def test_acl_creation_result_roundtrip(instance: AclCreationResult) -> None:
     writer = entity_writer(AclCreationResult)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_acl_creation_result(buffer)
+        result, _ = read_acl_creation_result(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -37,8 +40,11 @@ def test_create_acls_response_roundtrip(instance: CreateAclsResponse) -> None:
     writer = entity_writer(CreateAclsResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_create_acls_response(buffer)
+        result, _ = read_create_acls_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

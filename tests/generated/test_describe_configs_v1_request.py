@@ -23,8 +23,11 @@ def test_describe_configs_resource_roundtrip(instance: DescribeConfigsResource) 
     writer = entity_writer(DescribeConfigsResource)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_describe_configs_resource(buffer)
+        result, _ = read_describe_configs_resource(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -37,8 +40,11 @@ def test_describe_configs_request_roundtrip(instance: DescribeConfigsRequest) ->
     writer = entity_writer(DescribeConfigsRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_describe_configs_request(buffer)
+        result, _ = read_describe_configs_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

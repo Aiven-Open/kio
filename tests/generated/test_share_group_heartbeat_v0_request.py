@@ -24,8 +24,11 @@ def test_share_group_heartbeat_request_roundtrip(
     writer = entity_writer(ShareGroupHeartbeatRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_share_group_heartbeat_request(buffer)
+        result, _ = read_share_group_heartbeat_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

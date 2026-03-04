@@ -24,8 +24,11 @@ def test_add_offsets_to_txn_response_roundtrip(
     writer = entity_writer(AddOffsetsToTxnResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_add_offsets_to_txn_response(buffer)
+        result, _ = read_add_offsets_to_txn_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

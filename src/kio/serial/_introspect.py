@@ -85,6 +85,7 @@ T = TypeVar("T")
 
 
 def classify_field(field: Field[T]) -> FieldClass:
+    assert not isinstance(field.type, str)
     return _classify_field(field.type, field.name)
 
 

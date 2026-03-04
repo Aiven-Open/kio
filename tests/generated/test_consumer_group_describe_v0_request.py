@@ -26,8 +26,11 @@ def test_consumer_group_describe_request_roundtrip(
     writer = entity_writer(ConsumerGroupDescribeRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_consumer_group_describe_request(buffer)
+        result, _ = read_consumer_group_describe_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

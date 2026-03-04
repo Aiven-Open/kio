@@ -24,8 +24,11 @@ def test_broker_registration_response_roundtrip(
     writer = entity_writer(BrokerRegistrationResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_broker_registration_response(buffer)
+        result, _ = read_broker_registration_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

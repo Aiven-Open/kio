@@ -25,8 +25,11 @@ def test_snapshot_id_roundtrip(instance: SnapshotId) -> None:
     writer = entity_writer(SnapshotId)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_snapshot_id(buffer)
+        result, _ = read_snapshot_id(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -39,8 +42,11 @@ def test_partition_snapshot_roundtrip(instance: PartitionSnapshot) -> None:
     writer = entity_writer(PartitionSnapshot)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_partition_snapshot(buffer)
+        result, _ = read_partition_snapshot(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -53,8 +59,11 @@ def test_topic_snapshot_roundtrip(instance: TopicSnapshot) -> None:
     writer = entity_writer(TopicSnapshot)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_topic_snapshot(buffer)
+        result, _ = read_topic_snapshot(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -67,8 +76,11 @@ def test_fetch_snapshot_request_roundtrip(instance: FetchSnapshotRequest) -> Non
     writer = entity_writer(FetchSnapshotRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_fetch_snapshot_request(buffer)
+        result, _ = read_fetch_snapshot_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

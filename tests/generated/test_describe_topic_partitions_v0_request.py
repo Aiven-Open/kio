@@ -26,8 +26,11 @@ def test_topic_request_roundtrip(instance: TopicRequest) -> None:
     writer = entity_writer(TopicRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_topic_request(buffer)
+        result, _ = read_topic_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -40,8 +43,11 @@ def test_cursor_roundtrip(instance: Cursor) -> None:
     writer = entity_writer(Cursor)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_cursor(buffer)
+        result, _ = read_cursor(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -58,8 +64,11 @@ def test_describe_topic_partitions_request_roundtrip(
     writer = entity_writer(DescribeTopicPartitionsRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_describe_topic_partitions_request(buffer)
+        result, _ = read_describe_topic_partitions_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

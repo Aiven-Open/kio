@@ -25,8 +25,11 @@ def test_entity_data_roundtrip(instance: EntityData) -> None:
     writer = entity_writer(EntityData)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_entity_data(buffer)
+        result, _ = read_entity_data(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -39,8 +42,11 @@ def test_op_data_roundtrip(instance: OpData) -> None:
     writer = entity_writer(OpData)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_op_data(buffer)
+        result, _ = read_op_data(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -53,8 +59,11 @@ def test_entry_data_roundtrip(instance: EntryData) -> None:
     writer = entity_writer(EntryData)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_entry_data(buffer)
+        result, _ = read_entry_data(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -69,8 +78,11 @@ def test_alter_client_quotas_request_roundtrip(
     writer = entity_writer(AlterClientQuotasRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_alter_client_quotas_request(buffer)
+        result, _ = read_alter_client_quotas_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

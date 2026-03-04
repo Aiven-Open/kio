@@ -30,8 +30,11 @@ def test_add_partitions_to_txn_partition_result_roundtrip(
     writer = entity_writer(AddPartitionsToTxnPartitionResult)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_add_partitions_to_txn_partition_result(buffer)
+        result, _ = read_add_partitions_to_txn_partition_result(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -48,8 +51,11 @@ def test_add_partitions_to_txn_topic_result_roundtrip(
     writer = entity_writer(AddPartitionsToTxnTopicResult)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_add_partitions_to_txn_topic_result(buffer)
+        result, _ = read_add_partitions_to_txn_topic_result(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -64,8 +70,11 @@ def test_add_partitions_to_txn_response_roundtrip(
     writer = entity_writer(AddPartitionsToTxnResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_add_partitions_to_txn_response(buffer)
+        result, _ = read_add_partitions_to_txn_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

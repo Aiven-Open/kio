@@ -22,8 +22,11 @@ def test_envelope_response_roundtrip(instance: EnvelopeResponse) -> None:
     writer = entity_writer(EnvelopeResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_envelope_response(buffer)
+        result, _ = read_envelope_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

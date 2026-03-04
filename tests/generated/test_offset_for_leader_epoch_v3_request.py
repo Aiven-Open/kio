@@ -26,8 +26,11 @@ def test_offset_for_leader_partition_roundtrip(
     writer = entity_writer(OffsetForLeaderPartition)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_offset_for_leader_partition(buffer)
+        result, _ = read_offset_for_leader_partition(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -40,8 +43,11 @@ def test_offset_for_leader_topic_roundtrip(instance: OffsetForLeaderTopic) -> No
     writer = entity_writer(OffsetForLeaderTopic)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_offset_for_leader_topic(buffer)
+        result, _ = read_offset_for_leader_topic(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -56,8 +62,11 @@ def test_offset_for_leader_epoch_request_roundtrip(
     writer = entity_writer(OffsetForLeaderEpochRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_offset_for_leader_epoch_request(buffer)
+        result, _ = read_offset_for_leader_epoch_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

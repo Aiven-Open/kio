@@ -22,8 +22,11 @@ def test_snapshot_footer_record_roundtrip(instance: SnapshotFooterRecord) -> Non
     writer = entity_writer(SnapshotFooterRecord)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_snapshot_footer_record(buffer)
+        result, _ = read_snapshot_footer_record(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

@@ -24,8 +24,11 @@ def test_topic_data_roundtrip(instance: TopicData) -> None:
     writer = entity_writer(TopicData)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_topic_data(buffer)
+        result, _ = read_topic_data(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -38,8 +41,11 @@ def test_transaction_state_roundtrip(instance: TransactionState) -> None:
     writer = entity_writer(TransactionState)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_transaction_state(buffer)
+        result, _ = read_transaction_state(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -54,8 +60,11 @@ def test_describe_transactions_response_roundtrip(
     writer = entity_writer(DescribeTransactionsResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_describe_transactions_response(buffer)
+        result, _ = read_describe_transactions_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

@@ -22,8 +22,11 @@ def test_update_metadata_response_roundtrip(instance: UpdateMetadataResponse) ->
     writer = entity_writer(UpdateMetadataResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_update_metadata_response(buffer)
+        result, _ = read_update_metadata_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

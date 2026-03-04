@@ -28,8 +28,11 @@ def test_controller_registration_response_roundtrip(
     writer = entity_writer(ControllerRegistrationResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_controller_registration_response(buffer)
+        result, _ = read_controller_registration_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

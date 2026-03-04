@@ -23,8 +23,11 @@ def test_current_leader_roundtrip(instance: CurrentLeader) -> None:
     writer = entity_writer(CurrentLeader)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_current_leader(buffer)
+        result, _ = read_current_leader(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -39,8 +42,11 @@ def test_update_raft_voter_response_roundtrip(
     writer = entity_writer(UpdateRaftVoterResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_update_raft_voter_response(buffer)
+        result, _ = read_update_raft_voter_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

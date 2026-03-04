@@ -15,6 +15,8 @@ from unittest import mock
 
 import pytest
 
+from typing_extensions import Buffer
+
 import kio.schema.request_header.v0.header
 import kio.schema.request_header.v1.header
 import kio.schema.request_header.v2.header
@@ -65,6 +67,7 @@ from kio.static.protocol import RequestPayload
 from kio.static.protocol import ResponsePayload
 
 from . import fixtures
+from .read import read
 
 pytestmark = pytest.mark.integration
 
@@ -137,29 +140,30 @@ async def send(
 class CorrelationIdMismatch(RuntimeError): ...
 
 
-async def read_response_bytes(stream: StreamReader) -> io.BytesIO:
-    response_length_bytes = await stream.readexactly(4)
-    response_length = read_int32(io.BytesIO(response_length_bytes))
-    return io.BytesIO(await stream.readexactly(response_length))
+async def read_response_bytes(stream: StreamReader) -> memoryview:
+    response_length_bytes = memoryview(await stream.readexactly(4))
+    response_length, remaining = read(read_int32, response_length_bytes)
+    assert remaining == b""
+    return memoryview(await stream.readexactly(response_length))
 
 
 R = TypeVar("R", bound=ResponsePayload)
 
 
 def parse_response(
-    buffer: io.BytesIO,
+    buffer: Buffer,
     response_type: type[R],
     correlation_id: i32,
-) -> R:
+) -> tuple[R, memoryview]:
     header_schema: Any = response_type.__header_schema__
     read_header = entity_reader(header_schema)
-    header = read_header(buffer)
+    header, remaining = read(read_header, buffer)
 
     if header.correlation_id != correlation_id:
         raise CorrelationIdMismatch
 
     read_payload = entity_reader(response_type)
-    return read_payload(buffer)
+    return read(read_payload, remaining)
 
 
 async def make_request(
@@ -177,12 +181,19 @@ async def make_request(
     with closing(stream_writer):
         async with asyncio.timeout(10):
             await send(stream_writer, request, correlation_id)
-            response = await read_response_bytes(stream_reader)
+            response_bytes = await read_response_bytes(stream_reader)
 
-    # After this point, the connection is closed, and we're making synchronously reading
-    # the response from the in-memory buffer.
-    with response as open_message_buffer:
-        return parse_response(open_message_buffer, response_type, correlation_id)
+    # After this point, the connection is closed, and we're synchronously reading the
+    # response from the in-memory buffer.
+    with response_bytes as open_message_buffer:
+        response, remaining = parse_response(
+            open_message_buffer,
+            response_type,
+            correlation_id,
+        )
+        assert remaining == b""
+
+    return response
 
 
 async def test_roundtrip_api_versions_v3() -> None:

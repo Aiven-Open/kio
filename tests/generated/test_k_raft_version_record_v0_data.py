@@ -22,8 +22,11 @@ def test_k_raft_version_record_roundtrip(instance: KRaftVersionRecord) -> None:
     writer = entity_writer(KRaftVersionRecord)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_k_raft_version_record(buffer)
+        result, _ = read_k_raft_version_record(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

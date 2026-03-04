@@ -48,10 +48,9 @@ def test_can_parse_flexible_entity_array(buffer: io.BytesIO) -> None:
     # Parent tagged fields
     write_empty_tagged_fields(buffer)
 
-    buffer.seek(0)
+    instance, size = entity_reader(Parent)(buffer.getvalue(), 0)
 
-    instance = entity_reader(Parent)(buffer)
-
+    assert size == buffer.tell()
     assert instance == Parent(
         name="Parent Name",
         children=(
@@ -61,7 +60,7 @@ def test_can_parse_flexible_entity_array(buffer: io.BytesIO) -> None:
     )
 
 
-def test_can_serialize_flexible_entity_array(buffer: io.BytesIO) -> None:
+def test_can_serialize_flexible_entity_array() -> None:
     write_parent = entity_writer(Parent)
     instance = Parent(
         name="Parent Name",
@@ -70,16 +69,41 @@ def test_can_serialize_flexible_entity_array(buffer: io.BytesIO) -> None:
             Child(name="Child 2"),
         ),
     )
-    write_parent(buffer, instance)
-    buffer.seek(0)
+    with io.BytesIO() as stream:
+        write_parent(stream, instance)
+        buffer = stream.getvalue()
 
-    assert read_compact_string(buffer) == "Parent Name"
-    assert read_compact_array_length(buffer) == 2
-    assert read_compact_string(buffer) == "Child 1"
-    assert read_unsigned_varint(buffer) == 0  # child 1 tagged fields
-    assert read_compact_string(buffer) == "Child 2"
-    assert read_unsigned_varint(buffer) == 0  # child 2 tagged fields
-    assert read_unsigned_varint(buffer) == 0  # parent tagged fields
+    offset = 0
+
+    parent_name, size = read_compact_string(buffer, offset)
+    offset += size
+    assert parent_name == "Parent Name"
+
+    array_length, size = read_compact_array_length(buffer, offset)
+    offset += size
+    assert array_length == 2
+
+    child_name, size = read_compact_string(buffer, offset)
+    offset += size
+    assert child_name == "Child 1"
+
+    tagged_fields, size = read_unsigned_varint(buffer, offset)
+    offset += size
+    assert tagged_fields == 0
+
+    child_name, size = read_compact_string(buffer, offset)
+    offset += size
+    assert child_name == "Child 2"
+
+    tagged_fields, size = read_unsigned_varint(buffer, offset)
+    offset += size
+    assert tagged_fields == 0
+
+    tagged_fields, size = read_unsigned_varint(buffer, offset)
+    offset += size
+    assert tagged_fields == 0
+
+    assert offset == len(buffer)
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -96,21 +120,40 @@ def test_can_parse_flexible_primitive_array(buffer: io.BytesIO) -> None:
     write_uint8(buffer, u8(0))
     write_uint8(buffer, u8(255))
     write_empty_tagged_fields(buffer)
-    buffer.seek(0)
 
-    instance = entity_reader(Flat)(buffer)
+    instance, size = entity_reader(Flat)(buffer.getvalue(), 0)
 
+    assert size == buffer.tell()
     assert instance == Flat(values=(u8(123), u8(0), u8(255)))
 
 
-def test_can_serialize_flexible_primitive_array(buffer: io.BytesIO) -> None:
+def test_can_serialize_flexible_primitive_array() -> None:
     write_flat = entity_writer(Flat)
     instance = Flat(values=(u8(123), u8(0), u8(255)))
-    write_flat(buffer, instance)
-    buffer.seek(0)
+    offset = 0
 
-    assert read_compact_array_length(buffer) == 3
-    assert read_uint8(buffer) == 123
-    assert read_uint8(buffer) == 0
-    assert read_uint8(buffer) == 255
-    assert read_unsigned_varint(buffer) == 0  # tagged fields
+    with io.BytesIO() as stream:
+        write_flat(stream, instance)
+        buffer = stream.getvalue()
+
+    array_length, size = read_compact_array_length(buffer, offset)
+    offset += size
+    assert array_length == 3
+
+    value, size = read_uint8(buffer, offset)
+    offset += size
+    assert value == 123
+
+    value, size = read_uint8(buffer, offset)
+    offset += size
+    assert value == 0
+
+    value, size = read_uint8(buffer, offset)
+    offset += size
+    assert value == 255
+
+    tagged_fields, size = read_unsigned_varint(buffer, offset)
+    offset += size
+    assert tagged_fields == 0
+
+    assert offset == len(buffer)

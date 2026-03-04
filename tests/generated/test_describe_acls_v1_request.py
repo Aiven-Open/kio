@@ -22,8 +22,11 @@ def test_describe_acls_request_roundtrip(instance: DescribeAclsRequest) -> None:
     writer = entity_writer(DescribeAclsRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_describe_acls_request(buffer)
+        result, _ = read_describe_acls_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

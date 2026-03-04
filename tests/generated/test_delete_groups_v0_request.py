@@ -22,8 +22,11 @@ def test_delete_groups_request_roundtrip(instance: DeleteGroupsRequest) -> None:
     writer = entity_writer(DeleteGroupsRequest)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_delete_groups_request(buffer)
+        result, _ = read_delete_groups_request(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 

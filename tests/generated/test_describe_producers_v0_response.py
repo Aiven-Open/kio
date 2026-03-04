@@ -25,8 +25,11 @@ def test_producer_state_roundtrip(instance: ProducerState) -> None:
     writer = entity_writer(ProducerState)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_producer_state(buffer)
+        result, _ = read_producer_state(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -39,8 +42,11 @@ def test_partition_response_roundtrip(instance: PartitionResponse) -> None:
     writer = entity_writer(PartitionResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_partition_response(buffer)
+        result, _ = read_partition_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -53,8 +59,11 @@ def test_topic_response_roundtrip(instance: TopicResponse) -> None:
     writer = entity_writer(TopicResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_topic_response(buffer)
+        result, _ = read_topic_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
@@ -69,8 +78,11 @@ def test_describe_producers_response_roundtrip(
     writer = entity_writer(DescribeProducersResponse)
     with setup_buffer() as buffer:
         writer(buffer, instance)
-        buffer.seek(0)
-        result = read_describe_producers_response(buffer)
+        result, _ = read_describe_producers_response(
+            buffer.getvalue(),
+            0,
+        )
+
     assert instance == result
 
 
