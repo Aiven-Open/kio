@@ -120,11 +120,19 @@ def get_field_writer(
     field_class = classify_field(field)
 
     match field_class:
-        case PrimitiveField() | PrimitiveTupleField():
+        case PrimitiveField():
             inner_type_writer = get_writer(
                 kafka_type=get_schema_field_type(field),
                 flexible=flexible,
                 optional=optional,
+            )
+        case PrimitiveTupleField():
+            # For primitive arrays, nullability applies to the array itself,
+            # not the inner type. The inner type writer is always non-nullable.
+            inner_type_writer = get_writer(
+                kafka_type=get_schema_field_type(field),
+                flexible=flexible,
+                optional=False,
             )
         case EntityField(field_type):
             inner_type_writer = (

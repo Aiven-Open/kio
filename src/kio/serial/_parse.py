@@ -123,10 +123,12 @@ def get_field_reader(
                 optional=is_optional(field) and not is_tagged_field,
             )
         case PrimitiveTupleField():
+            # For primitive arrays, nullability applies to the array itself,
+            # not the inner type. The inner type reader is always non-nullable.
             inner_type_reader = get_reader(
                 kafka_type=get_schema_field_type(field),
                 flexible=flexible,
-                optional=is_optional(field),
+                optional=False,
             )
         case EntityField(field_type):
             inner_type_reader = (

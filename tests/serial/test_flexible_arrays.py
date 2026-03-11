@@ -8,15 +8,20 @@ from kio.serial import entity_reader
 from kio.serial import entity_writer
 from kio.serial.readers import read_compact_array_length
 from kio.serial.readers import read_compact_string
+from kio.serial.readers import read_int32
 from kio.serial.readers import read_uint8
 from kio.serial.readers import read_unsigned_varint
 from kio.serial.writers import write_compact_array_length
 from kio.serial.writers import write_compact_string
 from kio.serial.writers import write_empty_tagged_fields
+from kio.serial.writers import write_int32
 from kio.serial.writers import write_uint8
 from kio.static.constants import EntityType
 from kio.static.primitive import i16
+from kio.static.primitive import i32
 from kio.static.primitive import u8
+from tests.read import exhaust
+from tests.read import read
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -157,3 +162,89 @@ def test_can_serialize_flexible_primitive_array() -> None:
     assert tagged_fields == 0
 
     assert offset == len(buffer)
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class NullablePrimitiveArray:
+    __type__: ClassVar = EntityType.request
+    __version__: ClassVar[i16] = i16(0)
+    __flexible__: ClassVar[bool] = True
+    values: tuple[i32, ...] | None = field(
+        metadata={"kafka_type": "int32"},
+        default=None,
+    )
+
+
+def test_can_serialize_nullable_primitive_array_with_values(
+    buffer: io.BytesIO,
+) -> None:
+    entity_writer(NullablePrimitiveArray)(
+        buffer,
+        NullablePrimitiveArray(values=(i32(1), i32(2), i32(3))),
+    )
+
+    length, remaining = read(read_compact_array_length, buffer.getvalue())
+    assert length == 3
+    value, remaining = read(read_int32, remaining)
+    assert value == 1
+    value, remaining = read(read_int32, remaining)
+    assert value == 2
+    value, remaining = read(read_int32, remaining)
+    assert value == 3
+    tagged_fields = exhaust(read_unsigned_varint, remaining)
+    assert tagged_fields == 0
+
+
+def test_can_serialize_nullable_primitive_array_with_null(buffer: io.BytesIO) -> None:
+    entity_writer(NullablePrimitiveArray)(
+        buffer,
+        NullablePrimitiveArray(values=None),
+    )
+
+    length, remaining = read(read_compact_array_length, buffer.getvalue())
+    assert length is None
+    tagged_fields = exhaust(read_unsigned_varint, remaining)
+    assert tagged_fields == 0
+
+
+def test_can_parse_nullable_primitive_array_with_values(buffer: io.BytesIO) -> None:
+    write_compact_array_length(buffer, 2)
+    write_int32(buffer, i32(42))
+    write_int32(buffer, i32(99))
+    write_empty_tagged_fields(buffer)
+
+    instance, size = entity_reader(NullablePrimitiveArray)(buffer.getvalue(), 0)
+
+    assert size == buffer.tell()
+    assert instance.values == (i32(42), i32(99))
+
+
+def test_can_parse_nullable_primitive_array_with_null(buffer: io.BytesIO) -> None:
+    write_compact_array_length(buffer, -1)
+    write_empty_tagged_fields(buffer)
+
+    instance, size = entity_reader(NullablePrimitiveArray)(buffer.getvalue(), 0)
+
+    assert size == buffer.tell()
+    assert instance.values is None
+
+
+def test_can_roundtrip_nullable_primitive_array_with_values(
+    buffer: io.BytesIO,
+) -> None:
+    original = NullablePrimitiveArray(values=(i32(10), i32(20)))
+
+    entity_writer(NullablePrimitiveArray)(buffer, original)
+    result = exhaust(entity_reader(NullablePrimitiveArray), buffer.getvalue())
+
+    assert result == original
+
+
+def test_can_roundtrip_nullable_primitive_array_with_null(buffer: io.BytesIO) -> None:
+    original = NullablePrimitiveArray(values=None)
+
+    entity_writer(NullablePrimitiveArray)(buffer, original)
+    result = exhaust(entity_reader(NullablePrimitiveArray), buffer.getvalue())
+
+    assert result == original
+    assert result.values is None

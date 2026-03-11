@@ -53,8 +53,8 @@ class ConsumerGroupHeartbeatRequest:
         default=i32Timedelta.parse(datetime.timedelta(milliseconds=-1)),
     )
     """-1 if it didn't change since the last heartbeat; the maximum time in milliseconds that the coordinator will wait on the member to revoke its partitions otherwise."""
-    subscribed_topic_names: tuple[TopicName, ...] = field(
-        metadata={"kafka_type": "string"}, default=()
+    subscribed_topic_names: tuple[TopicName, ...] | None = field(
+        metadata={"kafka_type": "string"}, default=None
     )
     """null if it didn't change since the last heartbeat; the subscribed topic names otherwise."""
     server_assignor: str | None = field(metadata={"kafka_type": "string"}, default=None)

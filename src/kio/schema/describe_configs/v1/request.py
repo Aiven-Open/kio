@@ -23,7 +23,7 @@ class DescribeConfigsResource:
     """The resource type."""
     resource_name: str = field(metadata={"kafka_type": "string"})
     """The resource name."""
-    configuration_keys: tuple[str, ...] = field(
+    configuration_keys: tuple[str, ...] | None = field(
         metadata={"kafka_type": "string"}, default=()
     )
     """The configuration keys to list, or null to list all configuration keys."""
