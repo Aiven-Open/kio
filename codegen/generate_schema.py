@@ -166,7 +166,11 @@ def format_dataclass_field(
         field_kwargs["metadata"] = repr(metadata)
 
     if isinstance(field_type, PrimitiveArrayType):
-        field_kwargs["default"] = "()"
+        if default == "null":
+            assert optional, "non-optional array field cannot be 'null'"
+            field_kwargs["default"] = "None"
+        else:
+            field_kwargs["default"] = "()"
     elif default is not None:
         field_kwargs["default"] = format_default(
             field_type, default, optional, custom_type
@@ -319,17 +323,19 @@ def generate_primitive_array_field(
         if custom_type is None
         else custom_type.get_type_hint()
     )
+    optional = field.is_nullable_for_version(version)
     dataclass_field = format_dataclass_field(
         field_type=field.type,
-        default=None,
-        optional=False,
+        default=field.default,
+        optional=optional,
         custom_type=None,
         tag=field.get_tag(version),
         ignorable=field.ignorable,
     )
+    optional_suffix = " | None" if optional else ""
     return (
         f"    {to_snake_case(field.name)}: "
-        f"tuple[{inner_type_hint}, ...] "
+        f"tuple[{inner_type_hint}, ...]{optional_suffix}"
         f"{dataclass_field}\n"
     )
 

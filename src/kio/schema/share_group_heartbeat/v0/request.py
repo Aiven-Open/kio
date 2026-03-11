@@ -28,7 +28,7 @@ class ShareGroupHeartbeatRequest:
     """The current member epoch; 0 to join the group; -1 to leave the group."""
     rack_id: str | None = field(metadata={"kafka_type": "string"}, default=None)
     """null if not provided or if it didn't change since the last heartbeat; the rack ID of consumer otherwise."""
-    subscribed_topic_names: tuple[str, ...] = field(
-        metadata={"kafka_type": "string"}, default=()
+    subscribed_topic_names: tuple[str, ...] | None = field(
+        metadata={"kafka_type": "string"}, default=None
     )
     """null if it didn't change since the last heartbeat; the subscribed topic names otherwise."""

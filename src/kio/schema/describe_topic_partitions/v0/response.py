@@ -41,12 +41,12 @@ class DescribeTopicPartitionsResponsePartition:
         metadata={"kafka_type": "int32"}, default=()
     )
     """The set of nodes that are in sync with the leader for this partition."""
-    eligible_leader_replicas: tuple[BrokerId, ...] = field(
-        metadata={"kafka_type": "int32"}, default=()
+    eligible_leader_replicas: tuple[BrokerId, ...] | None = field(
+        metadata={"kafka_type": "int32"}, default=None
     )
     """The new eligible leader replicas otherwise."""
-    last_known_elr: tuple[BrokerId, ...] = field(
-        metadata={"kafka_type": "int32"}, default=()
+    last_known_elr: tuple[BrokerId, ...] | None = field(
+        metadata={"kafka_type": "int32"}, default=None
     )
     """The last known ELR."""
     offline_replicas: tuple[BrokerId, ...] = field(

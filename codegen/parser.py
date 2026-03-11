@@ -373,6 +373,7 @@ class RecordsField(_BaseField):
 
 class PrimitiveArrayField(_BaseField):
     type: PrimitiveArrayType
+    default: Literal["null"] | None = None
 
 
 class CommonStructArrayField(_BaseField):

@@ -26,7 +26,9 @@ class ReassignablePartition:
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     partition_index: i32 = field(metadata={"kafka_type": "int32"})
     """The partition index."""
-    replicas: tuple[BrokerId, ...] = field(metadata={"kafka_type": "int32"}, default=())
+    replicas: tuple[BrokerId, ...] | None = field(
+        metadata={"kafka_type": "int32"}, default=None
+    )
     """The replicas to place the partitions on, or null to cancel a pending reassignment for this partition."""
 
 
