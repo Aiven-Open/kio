@@ -18,7 +18,7 @@ repos:
           - -disable-indent-size
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: "v0.3.4"
+    rev: "v0.15.6"
     hooks:
       - id: ruff
       - id: ruff-format
@@ -58,7 +58,7 @@ repos:
     hooks:
       - id: prettier
         alias: format-markdown
-        types: [ markdown ]
+        types: [markdown]
         additional_dependencies:
           - "prettier@3.2.5"
         args:
