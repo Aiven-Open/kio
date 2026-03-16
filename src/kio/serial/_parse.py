@@ -37,7 +37,7 @@ from .readers import SizedResult
 logger: Final = logging.getLogger(__name__)
 
 
-def get_reader(
+def get_reader(  # noqa: C901
     kafka_type: str,
     flexible: bool,
     optional: bool,

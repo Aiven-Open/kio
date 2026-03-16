@@ -32,7 +32,7 @@ from .writers import write_tagged_field
 from .writers import write_unsigned_varint
 
 
-def get_writer(
+def get_writer(  # noqa: C901
     kafka_type: str,
     flexible: bool,
     optional: bool,

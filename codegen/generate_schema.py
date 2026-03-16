@@ -1,5 +1,4 @@
 # ruff: noqa: T201
-# ruff: noqa: A003
 
 from __future__ import annotations
 
@@ -68,7 +67,7 @@ from kio.static.constants import EntityType
 '''
 
 
-def format_default(
+def format_default(  # noqa: C901
     type_: Primitive | EntityType | CommonStructType,
     default: str | int | float | bool,
     optional: bool,
@@ -199,7 +198,7 @@ def format_dataclass_field(
     return f" = field({formatted_kwargs})"
 
 
-def _format_default_for_tagged(
+def _format_default_for_tagged(  # noqa: C901
     field_type: Primitive | PrimitiveArrayType | EntityType | CommonStructType,
 ) -> str:
     match field_type:

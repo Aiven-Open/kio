@@ -1,5 +1,3 @@
-# ruff: noqa: A003
-
 from __future__ import annotations
 
 import enum
@@ -78,7 +76,7 @@ class Primitive(enum.Enum):
     timedelta_i64 = "timedelta_i64"
     datetime_i64 = "datetime_i64"
 
-    def get_type_hint(self, optional: bool = False) -> str:
+    def get_type_hint(self, optional: bool = False) -> str:  # noqa: C901
         match self:
             case Primitive.int8:
                 hint = "i8"
