@@ -719,14 +719,14 @@ def main() -> None:
                     module_entity_dependencies[key].append(custom_type)
                     custom_types.add(custom_type)
                 case (version, ExportName() as name):
-                    write_version_export(  # type: ignore[unreachable]
+                    write_version_export(
                         api_name=api_name,
                         api_package_path=api_package,
                         name=name,
                         version=version,
                     )
                 case (version, code):
-                    write_to_version_module(  # type: ignore[unreachable]
+                    write_to_version_module(
                         schema=schema,
                         api_name=api_name,
                         api_package_path=api_package,

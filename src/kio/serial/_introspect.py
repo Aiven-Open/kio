@@ -120,7 +120,7 @@ def _classify_field(field_type: type[T], field_name: str) -> FieldClass:
 
     match type_args:
         case (inner_type, EllipsisType()) if is_dataclass(inner_type):
-            return EntityTupleField(inner_type)
+            return EntityTupleField(inner_type)  # type: ignore[arg-type]
         case (inner_type, EllipsisType()):
             return PrimitiveTupleField(inner_type)
 
