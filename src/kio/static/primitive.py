@@ -14,6 +14,23 @@ from ._phantom import Predicate
 class Records(bytes, Phantom, predicate=lambda _: True, bound=bytes): ...
 
 
+class PhantomStr(str, Phantom, bound=str, predicate=lambda _: True):
+    """
+    Phantom base for nominal string types (e.g. TopicName, GroupId).
+
+    Any plain ``str`` satisfies ``isinstance(x, SubClass)`` at runtime, so the
+    Rust decoder can hand over a raw Python ``str`` without an extra wrapping
+    call-object allocation.
+    """
+
+    @classmethod
+    def __hypothesis_hook__(cls) -> None:  # pragma: no cover
+        from hypothesis.strategies import register_type_strategy
+        from hypothesis.strategies import text
+
+        register_type_strategy(cls, text())
+
+
 def inclusive_interval(low: int, high: int) -> Predicate[int]:
     def check(value: int) -> bool:
         return low <= value <= high
@@ -53,7 +70,7 @@ class Interval(int, Phantom, bound=int, predicate=lambda _: True):
 
         register_type_strategy(
             cls,
-            integers(  # type: ignore[arg-type]
+            integers(
                 min_value=getattr(cls, "__low__", None),
                 max_value=getattr(cls, "__high__", None),
             ),
@@ -102,7 +119,7 @@ class f64(float, Phantom, bound=float, predicate=math.isfinite):
         from hypothesis.strategies import floats
         from hypothesis.strategies import register_type_strategy
 
-        register_type_strategy(cls, floats(allow_nan=False, allow_infinity=False))  # type: ignore[arg-type]
+        register_type_strategy(cls, floats(allow_nan=False, allow_infinity=False))
 
 
 # Note: because datetime.timedelta is float-based, there are values that do not
