@@ -142,3 +142,6 @@ dmypy.json
 /schema/
 error-codes.txt
 src/kio/_version.py
+
+# Maturin
+src/kio/lib_kio_native.dylib.dSYM/

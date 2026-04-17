@@ -24,6 +24,34 @@ jobs:
     with:
       python-version: "3.13"
 
+  rust-lint:
+    name: Rust static analysis
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: rust
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache Rust build artefacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+
+      - name: Check formatting
+        run: cargo fmt --check
+
+      - name: Clippy
+        run: cargo clippy -- -D warnings
+
+      - name: Test
+        run: cargo test
+
   check-build:
     name: Check packaging metadata
     uses: less-action/reusables/.github/workflows/python-test-build.yaml@f26f5812fa62d31b9a4e0af9f75f19f7f028425c
@@ -36,6 +64,14 @@ jobs:
         python-version: ["3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v6
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build artefacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -72,6 +108,14 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build artefacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
@@ -94,6 +138,14 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build artefacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
@@ -115,6 +167,14 @@ jobs:
         python-version: ["3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v6
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build artefacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
 
       - name: Start Kafka backend
         run: docker compose up -d
@@ -196,6 +256,6 @@ jobs:
       - name: Install dependencies
         run: pip install --require-hashes -r docs/requirements.txt
       - name: Install pushed version
-        run: pip install --no-dependencies .
+        run: pip install .
       - name: Build docs
         run: sphinx-build -Wb html docs docs/_build

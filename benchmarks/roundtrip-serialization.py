@@ -78,18 +78,29 @@ def perform_roundtrip(
             write_metadata_response(buffer, test_instance)
             write_metadata_response(buffer, test_instance)
             write_metadata_response(buffer, test_instance)
-            buffer.seek(0)
-            read_metadata_response(buffer)
-            read_metadata_response(buffer)
-            read_metadata_response(buffer)
-            read_metadata_response(buffer)
-            read_metadata_response(buffer)
-            read_metadata_response(buffer)
-            read_metadata_response(buffer)
-            read_metadata_response(buffer)
-            read_metadata_response(buffer)
-            read_metadata_response(buffer)
-            assert buffer.read(1) == b"", "buffer not exhausted after read"
+            buffer = buffer.getvalue()
+            offset = 0
+            _, size = read_metadata_response(buffer, offset)
+            offset += size
+            _, size = read_metadata_response(buffer, offset)
+            offset += size
+            _, size = read_metadata_response(buffer, offset)
+            offset += size
+            _, size = read_metadata_response(buffer, offset)
+            offset += size
+            _, size = read_metadata_response(buffer, offset)
+            offset += size
+            _, size = read_metadata_response(buffer, offset)
+            offset += size
+            _, size = read_metadata_response(buffer, offset)
+            offset += size
+            _, size = read_metadata_response(buffer, offset)
+            offset += size
+            _, size = read_metadata_response(buffer, offset)
+            offset += size
+            _, size = read_metadata_response(buffer, offset)
+            offset += size
+            assert offset == len(buffer), "buffer not exhausted after read"
 
     return pyperf.perf_counter() - t0
 

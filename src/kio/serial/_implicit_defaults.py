@@ -19,6 +19,7 @@ from kio.serial._introspect import classify_field
 from kio.serial._introspect import is_optional
 from kio.serial.readers import tz_aware_from_i64
 from kio.static.constants import uuid_zero
+from kio.static.primitive import PhantomStr
 from kio.static.primitive import Records
 from kio.static.primitive import TZAware
 from kio.static.primitive import f64
@@ -52,6 +53,7 @@ primitive_implicit_defaults: Final[Mapping[type, object]] = MappingProxyType(
         TZAware: tz_aware_from_i64(i64(0)),
         UUID: uuid_zero,
         str: "",
+        PhantomStr: "",
         bytes: b"",
     }
 )
