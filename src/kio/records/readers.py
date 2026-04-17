@@ -36,7 +36,7 @@ def read_signed_compact_string_as_bytes_nullable(
     string_start_offset = offset + length_size
     string_end_offset = string_start_offset + string_length
     return (
-        bytes(memoryview(buffer))[string_start_offset:string_end_offset],
+        bytes(memoryview(buffer)[string_start_offset:string_end_offset]),
         length_size + string_length,
     )
 
