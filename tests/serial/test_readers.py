@@ -15,12 +15,14 @@ import pytest
 from kio.schema.errors import ErrorCode
 from kio.serial import entity_reader
 from kio.serial.errors import BufferUnderflow
+from kio.serial.errors import InvalidUnicode
 from kio.serial.errors import OutOfBoundValue
 from kio.serial.errors import UnexpectedNull
 from kio.serial.readers import Reader
 from kio.serial.readers import SizedResult
 from kio.serial.readers import compact_array_reader
 from kio.serial.readers import legacy_array_reader
+from kio.serial.readers import read_boolean
 from kio.serial.readers import read_compact_array_length
 from kio.serial.readers import read_compact_string
 from kio.serial.readers import read_compact_string_as_bytes
@@ -120,8 +122,36 @@ class IntReaderContract:
         assert size == self.byte_size
 
 
+class TestReadBoolean(BufferUnderflowContract):
+    reader = staticmethod(read_boolean)
+    valid_serialization = b"\x00"
+
+    def test_reads_false(self, buffer: io.BytesIO) -> None:
+        buffer.write(b"\x00")
+        result, size = self.read(buffer)
+        assert result is False
+        assert size == 1
+
+    def test_reads_true(self, buffer: io.BytesIO) -> None:
+        buffer.write(b"\x01")
+        result, size = self.read(buffer)
+        assert result is True
+        assert size == 1
+
+    def test_ignores_trailing_bytes(self, buffer: io.BytesIO) -> None:
+        buffer.write(b"\x00\xff")
+        result, size = self.read(buffer)
+        assert result is False
+        assert size == 1
+
+    def test_raises_value_error_for_invalid_value(self, buffer: io.BytesIO) -> None:
+        buffer.write(b"\x02")
+        with pytest.raises(ValueError):
+            self.read(buffer)
+
+
 class TestReadInt8(IntReaderContract, BufferUnderflowContract):
-    reader = read_int8
+    reader = staticmethod(read_int8)
     byte_size = 1
     lower_limit = -128
     lower_limit_as_bytes = b"\x80"
@@ -132,7 +162,7 @@ class TestReadInt8(IntReaderContract, BufferUnderflowContract):
 
 
 class TestReadInt16(IntReaderContract, BufferUnderflowContract):
-    reader = read_int16
+    reader = staticmethod(read_int16)
     byte_size = 2
     lower_limit = -(2**15)
     lower_limit_as_bytes = b"\x80\x00"
@@ -143,7 +173,7 @@ class TestReadInt16(IntReaderContract, BufferUnderflowContract):
 
 
 class TestReadInt32(IntReaderContract, BufferUnderflowContract):
-    reader = read_int32
+    reader = staticmethod(read_int32)
     byte_size = 4
     lower_limit = -(2**31)
     lower_limit_as_bytes = b"\x80\x00\x00\x00"
@@ -154,7 +184,7 @@ class TestReadInt32(IntReaderContract, BufferUnderflowContract):
 
 
 class TestReadInt64(IntReaderContract, BufferUnderflowContract):
-    reader = read_int64
+    reader = staticmethod(read_int64)
     byte_size = 8
     lower_limit = -(2**63)
     lower_limit_as_bytes = b"\x80\x00\x00\x00\x00\x00\x00\x00"
@@ -165,7 +195,7 @@ class TestReadInt64(IntReaderContract, BufferUnderflowContract):
 
 
 class TestReadUint8(IntReaderContract, BufferUnderflowContract):
-    reader = read_uint8
+    reader = staticmethod(read_uint8)
     byte_size = 1
     lower_limit = 0
     lower_limit_as_bytes = zero_as_bytes = b"\x00"
@@ -175,7 +205,7 @@ class TestReadUint8(IntReaderContract, BufferUnderflowContract):
 
 
 class TestReadUint16(IntReaderContract, BufferUnderflowContract):
-    reader = read_uint16
+    reader = staticmethod(read_uint16)
     byte_size = 2
     lower_limit = 0
     lower_limit_as_bytes = zero_as_bytes = b"\x00\x00"
@@ -186,7 +216,7 @@ class TestReadUint16(IntReaderContract, BufferUnderflowContract):
 
 
 class TestReadUint32(IntReaderContract, BufferUnderflowContract):
-    reader = read_uint32
+    reader = staticmethod(read_uint32)
     byte_size = 4
     lower_limit = 0
     lower_limit_as_bytes = zero_as_bytes = b"\x00\x00\x00\x00"
@@ -197,7 +227,7 @@ class TestReadUint32(IntReaderContract, BufferUnderflowContract):
 
 
 class TestReadUint64(IntReaderContract, BufferUnderflowContract):
-    reader = read_uint64
+    reader = staticmethod(read_uint64)
     byte_size = 8
     lower_limit = 0
     lower_limit_as_bytes = zero_as_bytes = b"\x00\x00\x00\x00\x00\x00\x00\x00"
@@ -217,11 +247,24 @@ class TestReadUnsignedVarint(BufferUnderflowContract):
         with pytest.raises(ValueError, match=r"^Varint is too long"):
             self.read(buffer)
 
+    def test_raises_buffer_underflow_for_truncated_sequence(
+        self, buffer: io.BytesIO
+    ) -> None:
+        # A first byte with the continuation bit set but no second byte follows.
+        # This is distinct from the completely-empty-buffer case covered by
+        # BufferUnderflowContract.
+        buffer.write(b"\x80")
+        with pytest.raises(BufferUnderflow):
+            self.read(buffer)
+
     @pytest.mark.parametrize(
         "byte_value, expected",
         [
             (b"\x00", 0),
             (b"\x01", 1),
+            (b"\x7f", 127),  # largest single-byte value
+            (b"\x80\x01", 128),  # smallest two-byte value
+            (b"\xff\x7f", 16383),  # largest two-byte value
             (b"\xb9`", 12345),
             (b"\xb1\xa8\x03", 54321),
             (b"\xff\xff\xff\xff\x07", 2**31 - 1),
@@ -240,7 +283,7 @@ class TestReadUnsignedVarint(BufferUnderflowContract):
 
 
 class TestReadFloat64(BufferUnderflowContract):
-    reader = read_float64
+    reader = staticmethod(read_float64)
     valid_serialization = struct.pack(">d", 0)
 
     @pytest.mark.parametrize(
@@ -275,6 +318,13 @@ class TestReadCompactStringAsBytes(LengthBufferUnderflowContract):
         with pytest.raises(UnexpectedNull):
             self.read(buffer)
 
+    def test_can_read_empty(self, buffer: io.BytesIO) -> None:
+        # Encoded 1 → actual byte count = 1 - 1 = 0: empty but not null.
+        buffer.write(b"\x01")
+        result, size = self.read(buffer)
+        assert result == b""
+        assert size == 1
+
     def test_can_read_bytes(
         self,
         buffer: io.BytesIO,
@@ -302,6 +352,13 @@ class TestReadCompactStringAsBytesNullable(LengthBufferUnderflowContract):
         assert result is None
         assert size == 1
 
+    def test_can_read_empty(self, buffer: io.BytesIO) -> None:
+        # Encoded 1 → Some([]): empty bytes, not null.
+        buffer.write(b"\x01")
+        result, size = self.read(buffer)
+        assert result == b""
+        assert size == 1
+
     def test_can_read_bytes(
         self,
         buffer: io.BytesIO,
@@ -326,6 +383,14 @@ class TestReadCompactString(LengthBufferUnderflowContract):
     ) -> None:
         buffer.write((0).to_bytes(1, "little"))
         with pytest.raises(UnexpectedNull):
+            self.read(buffer)
+
+    def test_raises_invalid_unicode_for_non_utf8_bytes(
+        self, buffer: io.BytesIO
+    ) -> None:
+        # 0xff 0xfe are never valid UTF-8 start bytes.
+        buffer.write(b"\x03\xff\xfe")
+        with pytest.raises(InvalidUnicode):
             self.read(buffer)
 
     def test_can_read_string(
@@ -488,7 +553,7 @@ class TestReadCompactArrayLength:
 
 
 class TestReadUUID(BufferUnderflowContract):
-    reader = read_uuid
+    reader = staticmethod(read_uuid)
     valid_serialization = uuid_zero.bytes
 
     def test_reads_zero_as_none(self, buffer: io.BytesIO) -> None:
