@@ -1,0 +1,5 @@
+[lint]
+extend-ignore = [
+  "T201",  # print() is intentional output in benchmark scripts
+  "S108",  # /tmp paths are fine for local benchmark artefacts
+]
