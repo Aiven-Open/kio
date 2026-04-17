@@ -19,7 +19,9 @@ classifiers = [
   "Typing :: Typed",
   "Topic :: Database",
 ]
-dynamic = ["version", "readme"]
+readme = "README.md"
+# Note: this is dynamically overwritten by the build_kio.py script at build time.
+version = "0.0.0"
 dependencies = [
   "typing-extensions>=4.6.0",
   "crc32c>=2.3",
@@ -50,19 +52,17 @@ all = [
 "Bug Tracker" = "https://github.com/Aiven-Open/kio/issues"
 
 [build-system]
-requires = ["setuptools==80.9.0", "setuptools-scm==9.2.2", "wheel==0.45.1"]
-build-backend = "setuptools.build_meta"
+requires = ["maturin==1.12.5", "setuptools-scm==9.2.2"]
+build-backend = "build_kio"
+backend-path = ["."]
 
-[tool.setuptools]
-include-package-data = true
 
-[tool.setuptools.dynamic]
-version = {attr = "kio.__version__"}
-readme = {file = "README.md", content-type = "text/markdown; charset=UTF-8"}
-
-[tool.setuptools.packages.find]
-where = ["src"]
-namespaces = false
+[tool.maturin]
+features = ["pyo3/extension-module"]
+python-source = "src"
+module-name = "kio._kio_native"
+include = ["MANIFEST.in", "README.md", "src/kio/_version.py"]
+editable-profile = "release"
 
 
 [tool.setuptools_scm]

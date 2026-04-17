@@ -9,6 +9,7 @@ exclude *.yaml
 exclude *.yml
 exclude Makefile
 exclude setup.cfg
+exclude build_kio.py
 recursive-include src py.typed
 recursive-include src *.py
 include LICENSE
