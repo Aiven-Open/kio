@@ -17,6 +17,15 @@ repos:
         args:
           - -disable-indent-size
 
+  - repo: local
+    hooks:
+      - id: cargo-fmt
+        name: cargo fmt
+        entry: cargo fmt --manifest-path rust/Cargo.toml --
+        language: system
+        types: [rust]
+        pass_filenames: false
+
   - repo: https://github.com/charliermarsh/ruff-pre-commit
     rev: "v0.15.6"
     hooks:
@@ -43,7 +52,7 @@ repos:
           - typing-extensions==4.10.0
           - pytest==7.4.3
           - pydantic==1.10.13
-          - hypothesis==6.99.12
+          - hypothesis==6.151.9
           - types-setuptools==78.1.0.20250329
           - types-requests==2.31.0.20240311
 
@@ -72,6 +81,5 @@ repos:
       - id: check-manifest
         args: ["--no-build-isolation"]
         additional_dependencies:
-          - setuptools==80.9.0
+          - maturin==1.12.5
           - setuptools-scm==9.2.2
-          - wheel==0.45.1

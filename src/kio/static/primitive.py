@@ -53,7 +53,7 @@ class Interval(int, Phantom, bound=int, predicate=lambda _: True):
 
         register_type_strategy(
             cls,
-            integers(  # type: ignore[arg-type]
+            integers(
                 min_value=getattr(cls, "__low__", None),
                 max_value=getattr(cls, "__high__", None),
             ),
@@ -102,7 +102,7 @@ class f64(float, Phantom, bound=float, predicate=math.isfinite):
         from hypothesis.strategies import floats
         from hypothesis.strategies import register_type_strategy
 
-        register_type_strategy(cls, floats(allow_nan=False, allow_infinity=False))  # type: ignore[arg-type]
+        register_type_strategy(cls, floats(allow_nan=False, allow_infinity=False))
 
 
 # Note: because datetime.timedelta is float-based, there are values that do not
