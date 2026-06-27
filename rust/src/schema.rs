@@ -12,8 +12,9 @@ use std::sync::{Arc, LazyLock, Mutex};
 use pyo3::BoundObject;
 use pyo3::exceptions::{PyKeyError, PyValueError};
 use pyo3::prelude::*;
-use pyo3::types::{PyModule, PyString, PyTuple, PyType};
+use pyo3::types::{PyString, PyTuple, PyType};
 
+use crate::py_imports;
 use crate::readers::{
     self, instantiate_timedelta, instantiate_uuid, internal_nullable_read_legacy_string,
     internal_read_boolean, internal_read_compact_array_length, internal_read_compact_string,
@@ -416,7 +417,7 @@ fn primitive_kind_from_kafka(
     Ok(k)
 }
 
-#[allow(clippy::too_many_arguments)]
+#[allow(clippy::too_many_arguments, non_snake_case)]
 pub(crate) fn build_field_schema(
     py: Python<'_>,
     _entity_type: &Bound<'_, PyType>,
@@ -425,11 +426,11 @@ pub(crate) fn build_field_schema(
     is_tagged_field: bool,
     classify_field: &Bound<'_, PyAny>,
     get_schema_field_type: &Bound<'_, PyAny>,
-    is_optional_fn: &Bound<'_, PyAny>,
-    prim_field: &Bound<'_, PyAny>,
-    prim_tuple_field: &Bound<'_, PyAny>,
-    ent_field: &Bound<'_, PyAny>,
-    ent_tuple_field: &Bound<'_, PyAny>,
+    is_optional: &Bound<'_, PyAny>,
+    PrimitiveField: &Bound<'_, PyAny>,
+    PrimitiveTupleField: &Bound<'_, PyAny>,
+    EntityField: &Bound<'_, PyAny>,
+    EntityTupleField: &Bound<'_, PyAny>,
     flexible: bool,
 ) -> PyResult<Arc<FieldSchema>> {
     let name: String = field.getattr("name")?.extract()?;
@@ -441,22 +442,22 @@ pub(crate) fn build_field_schema(
 
     let field_class = classify_field.call1((field,))?.into_bound();
 
-    let inner = if field_class.is_instance(prim_field)? {
+    let inner = if field_class.is_instance(PrimitiveField)? {
         let kafka_type: String = get_schema_field_type.call1((field,))?.extract()?;
-        let optional: bool = is_optional_fn.call1((field,))?.extract::<bool>()? && !is_tagged_field;
+        let optional: bool = is_optional.call1((field,))?.extract::<bool>()? && !is_tagged_field;
         let kind = primitive_kind_from_kafka(&kafka_type, flexible, optional)?;
         Arc::new(FieldSchema::Primitive(kind))
-    } else if field_class.is_instance(prim_tuple_field)? {
+    } else if field_class.is_instance(PrimitiveTupleField)? {
         let kafka_type: String = get_schema_field_type.call1((field,))?.extract()?;
         let kind = primitive_kind_from_kafka(&kafka_type, flexible, false)?;
         Arc::new(FieldSchema::Primitive(kind))
-    } else if field_class.is_instance(ent_field)? {
+    } else if field_class.is_instance(EntityField)? {
         let nested_type: Py<PyType> = field_class.getattr("type_")?.extract()?;
-        let inner_nullable: bool = is_optional_fn.call1((field,))?.extract()?;
+        let inner_nullable: bool = is_optional.call1((field,))?.extract()?;
         let bound = nested_type.bind(py);
         let schema = get_or_compile_schema(py, bound, inner_nullable)?;
         Arc::new(FieldSchema::Entity { schema })
-    } else if field_class.is_instance(ent_tuple_field)? {
+    } else if field_class.is_instance(EntityTupleField)? {
         let nested_type: Py<PyType> = field_class.getattr("type_")?.extract()?;
         let bound = nested_type.bind(py);
         let schema = get_or_compile_schema(py, bound, false)?;
@@ -465,8 +466,8 @@ pub(crate) fn build_field_schema(
         return Err(PyValueError::new_err("unsupported field classification"));
     };
 
-    let is_array =
-        field_class.is_instance(prim_tuple_field)? || field_class.is_instance(ent_tuple_field)?;
+    let is_array = field_class.is_instance(PrimitiveTupleField)?
+        || field_class.is_instance(EntityTupleField)?;
     if is_array {
         Ok(if flexible {
             Arc::new(FieldSchema::CompactArray(inner))
@@ -484,20 +485,10 @@ pub(crate) fn compile_entity_schema(
     nullable: bool,
 ) -> PyResult<Arc<EntitySchema>> {
     let flexible: bool = entity_type.getattr("__flexible__")?.extract()?;
-    let introspect = PyModule::import(py, "kio.serial._introspect")?;
-    let prim_field = introspect.getattr("PrimitiveField")?;
-    let prim_tuple_field = introspect.getattr("PrimitiveTupleField")?;
-    let ent_field = introspect.getattr("EntityField")?;
-    let ent_tuple_field = introspect.getattr("EntityTupleField")?;
-    let get_schema_field_type = introspect.getattr("get_schema_field_type")?;
-    let classify_field = introspect.getattr("classify_field")?;
-    let is_optional_fn = introspect.getattr("is_optional")?;
-    let get_field_tag = introspect.getattr("get_field_tag")?;
-    let implicit_defaults = PyModule::import(py, "kio.serial._implicit_defaults")?;
-    let get_tagged_field_default = implicit_defaults.getattr("get_tagged_field_default")?;
-    let dataclasses = PyModule::import(py, "dataclasses")?;
-    let fields_fn = dataclasses.getattr("fields")?;
-    let fields_obj = fields_fn.call1((entity_type,))?;
+    let introspect = py_imports::introspect::introspect(py)?;
+    let get_tagged_field_default = py_imports::implicit_defaults::get_tagged_field_default(py)?;
+    let fields_fn = py_imports::dataclasses::fields(py)?;
+    let fields_obj = fields_fn.call1(py, (entity_type,))?;
 
     let type_name: String = entity_type.getattr("__name__")?.extract()?;
     let is_request_header = type_name == "RequestHeader";
@@ -506,13 +497,13 @@ pub(crate) fn compile_entity_schema(
     let mut tagged_field_schemas: HashMap<u64, (usize, Arc<FieldSchema>)> = HashMap::new();
     let mut tagged_field_defaults: Vec<(Py<PyString>, Py<PyAny>)> = Vec::new();
 
-    for field in fields_obj.try_iter()? {
+    for field in fields_obj.bind(py).try_iter()? {
         let field = field?;
-        let tag_any = get_field_tag.call1((&field,))?;
-        let tag_opt: Option<u64> = if tag_any.is_none() {
+        let tag_any = introspect.get_field_tag.call1(py, (field.clone(),))?;
+        let tag_opt: Option<u64> = if tag_any.is_none(py) {
             None
         } else {
-            Some(tag_any.extract::<u64>()?)
+            Some(tag_any.extract::<u64>(py)?)
         };
         let is_tagged_field = tag_opt.is_some();
         let field_schema = build_field_schema(
@@ -521,13 +512,13 @@ pub(crate) fn compile_entity_schema(
             &field,
             is_request_header,
             is_tagged_field,
-            &classify_field,
-            &get_schema_field_type,
-            &is_optional_fn,
-            &prim_field,
-            &prim_tuple_field,
-            &ent_field,
-            &ent_tuple_field,
+            introspect.classify_field.bind(py),
+            introspect.get_schema_field_type.bind(py),
+            introspect.is_optional.bind(py),
+            introspect.PrimitiveField.bind(py),
+            introspect.PrimitiveTupleField.bind(py),
+            introspect.EntityField.bind(py),
+            introspect.EntityTupleField.bind(py),
             flexible,
         )?;
         let field_name: String = field.getattr("name")?.extract()?;
@@ -537,7 +528,7 @@ pub(crate) fn compile_entity_schema(
         if let Some(tag) = tag_opt {
             let idx = tagged_field_defaults.len();
             tagged_field_schemas.insert(tag, (idx, Arc::clone(&field_schema)));
-            let implicit_default = get_tagged_field_default.call1((&field,))?.into();
+            let implicit_default = get_tagged_field_default.call1(py, (field,))?;
             tagged_field_defaults.push((py_name, implicit_default));
         } else {
             field_schemas.push((py_name, field_schema));

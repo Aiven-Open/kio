@@ -4,8 +4,9 @@ use std::collections::HashMap;
 use std::sync::{Arc, LazyLock, Mutex};
 
 use pyo3::prelude::*;
-use pyo3::types::{PyModule, PyTuple, PyType};
+use pyo3::types::{PyTuple, PyType};
 
+use crate::py_imports;
 use crate::schema::{
     EntitySchema, FieldSchema, build_field_schema, get_or_compile_schema, parse_entity, read_field,
 };
@@ -196,14 +197,7 @@ pub fn get_field_reader(
     is_request_header: bool,
     is_tagged_field: bool,
 ) -> PyResult<Py<PyAny>> {
-    let introspect = PyModule::import(py, "kio.serial._introspect")?;
-    let prim_field = introspect.getattr("PrimitiveField")?;
-    let prim_tuple_field = introspect.getattr("PrimitiveTupleField")?;
-    let ent_field = introspect.getattr("EntityField")?;
-    let ent_tuple_field = introspect.getattr("EntityTupleField")?;
-    let get_schema_field_type = introspect.getattr("get_schema_field_type")?;
-    let classify_field = introspect.getattr("classify_field")?;
-    let is_optional_fn = introspect.getattr("is_optional")?;
+    let introspect = py_imports::introspect::introspect(py)?;
     let flexible: bool = entity_type.getattr("__flexible__")?.extract()?;
     let field_schema = build_field_schema(
         py,
@@ -211,13 +205,13 @@ pub fn get_field_reader(
         &field,
         is_request_header,
         is_tagged_field,
-        &classify_field,
-        &get_schema_field_type,
-        &is_optional_fn,
-        &prim_field,
-        &prim_tuple_field,
-        &ent_field,
-        &ent_tuple_field,
+        introspect.classify_field.bind(py),
+        introspect.get_schema_field_type.bind(py),
+        introspect.is_optional.bind(py),
+        introspect.PrimitiveField.bind(py),
+        introspect.PrimitiveTupleField.bind(py),
+        introspect.EntityField.bind(py),
+        introspect.EntityTupleField.bind(py),
         flexible,
     )?;
     Ok(Py::new(

@@ -5,6 +5,8 @@ use pyo3::prelude::*;
 use pyo3::types::PyBytes;
 use std::cmp::Ordering;
 
+use crate::py_imports;
+
 mod kio_errors {
     pyo3::import_exception!(kio.serial.errors, UnexpectedNull);
     pyo3::import_exception!(kio.serial.errors, InvalidUnicode);
@@ -539,13 +541,12 @@ pub(crate) fn instantiate_uuid<'a>(
 ) -> SizedResult<Option<Py<PyAny>>> {
     match bytes {
         Some(bytes) => {
-            let none = PyModule::import(py, "builtins")?.getattr("None")?;
-            let uuid_cls: Py<PyAny> = PyModule::import(py, "uuid")?.getattr("UUID")?.into();
+            let uuid = py_imports::uuid::UUID(py)?;
             let py_bytes = PyBytes::new(py, bytes);
             // bytes is second key-word argument. We pass hex=None to avoid having to construct
             // key-word arguments.
-            let args = (none, py_bytes);
-            let uuid_value = uuid_cls.call1(py, args)?.into();
+            let args = (py.None(), py_bytes);
+            let uuid_value = uuid.call1(py, args)?.into();
             Ok((uuid_value, UUID_BYTE_SIZE))
         }
         None => Ok((None, UUID_BYTE_SIZE)),
@@ -565,10 +566,8 @@ pub(crate) fn internal_read_error_code(bytes: &[u8]) -> SizedResult<i16> {
 }
 
 pub(crate) fn wrap_error_code_value(py: Python<'_>, int_value: i16) -> PyResult<Py<PyAny>> {
-    let error_code_cls: Py<PyAny> = PyModule::import(py, "kio.schema.errors")?
-        .getattr("ErrorCode")?
-        .into();
-    error_code_cls.call1(py, (int_value,))
+    let error_code = py_imports::error_code::ErrorCode(py)?;
+    error_code.call1(py, (int_value,))
 }
 
 #[pyfunction]
@@ -582,16 +581,14 @@ pub(crate) fn instantiate_timedelta<'a, T: IntoPyObject<'a>>(
     py: Python<'a>,
     int_value: T,
 ) -> PyResult<Py<PyAny>> {
-    let timedelta_cls: Py<PyAny> = PyModule::import(py, "datetime")?
-        .getattr("timedelta")?
-        .into();
+    let timedelta = py_imports::datetime::timedelta(py)?;
     let args = (
         0,         // days
         0,         // seconds
         0,         // microseconds
         int_value, // milliseconds
     );
-    timedelta_cls.call1(py, args)
+    timedelta.call1(py, args)
 }
 
 pub(crate) fn internal_read_timedelta_i32(bytes: &[u8]) -> SizedResult<i32> {
@@ -629,11 +626,10 @@ pub fn read_timedelta_i64(
 /// Millisecond timestamp to a UTC [`datetime.datetime`] compatible with [`kio.static.primitive.TZAware`].
 #[pyfunction]
 pub fn tz_aware_from_i64(py: Python<'_>, timestamp_ms: i64) -> PyResult<Py<PyAny>> {
-    let module = PyModule::import(py, "datetime")?;
-    let cls: Py<PyAny> = module.getattr("datetime")?.into();
-    let tz: Py<PyAny> = module.getattr("UTC")?.into();
-    let args = (timestamp_ms / 1000, tz);
-    cls.call_method1(py, "fromtimestamp", args)
+    let datetime = py_imports::datetime::datetime(py)?;
+    let utc = py_imports::datetime::UTC(py)?;
+    let args = (timestamp_ms / 1000, utc);
+    datetime.call_method1(py, "fromtimestamp", args)
 }
 
 const DATETIME_I64_NULL: &i64 = &-1;

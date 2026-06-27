@@ -2,6 +2,7 @@ use pyo3::prelude::*;
 
 mod entity;
 mod parse;
+mod py_imports;
 mod readers;
 mod schema;
 
