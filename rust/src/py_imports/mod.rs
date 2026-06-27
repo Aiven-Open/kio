@@ -5,7 +5,6 @@
 #![allow(non_snake_case)] // names mirror imported Python attributes
 
 pub(crate) mod dataclasses;
-pub(crate) mod datetime;
 pub(crate) mod error_code;
 pub(crate) mod implicit_defaults;
 pub(crate) mod introspect;

@@ -205,7 +205,7 @@ fn read_primitive(
         }
         PrimitiveKind::TimedeltaI32 => {
             let (ms, sz) = internal_read_timedelta_i32(bytes)?;
-            let v = instantiate_timedelta(py, ms)?;
+            let v = instantiate_timedelta(py, i64::from(ms))?;
             (v.into_bound(py).into_any(), sz)
         }
         PrimitiveKind::TimedeltaI64 => {

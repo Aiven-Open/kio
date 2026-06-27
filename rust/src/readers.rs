@@ -5,6 +5,7 @@ use pyo3::prelude::*;
 use pyo3::types::PyBytes;
 use std::cmp::Ordering;
 
+use crate::datetime::{datetime_from_timestamp_milliseconds, timedelta_from_milliseconds};
 use crate::py_imports;
 
 mod kio_errors {
@@ -577,18 +578,8 @@ pub fn read_error_code(py: Python, buffered: Py<PyAny>, offset: usize) -> SizedR
     Ok((error_code, end_offset))
 }
 
-pub(crate) fn instantiate_timedelta<'a, T: IntoPyObject<'a>>(
-    py: Python<'a>,
-    int_value: T,
-) -> PyResult<Py<PyAny>> {
-    let timedelta = py_imports::datetime::timedelta(py)?;
-    let args = (
-        0,         // days
-        0,         // seconds
-        0,         // microseconds
-        int_value, // milliseconds
-    );
-    timedelta.call1(py, args)
+pub(crate) fn instantiate_timedelta(py: Python<'_>, milliseconds: i64) -> PyResult<Py<PyAny>> {
+    timedelta_from_milliseconds(py, milliseconds)
 }
 
 pub(crate) fn internal_read_timedelta_i32(bytes: &[u8]) -> SizedResult<i32> {
@@ -603,7 +594,7 @@ pub fn read_timedelta_i32(
 ) -> SizedResult<Py<PyAny>> {
     let (int_value, end_offset) =
         internal_read_timedelta_i32(data_from_input(py, buffered, offset)?)?;
-    let timedelta = instantiate_timedelta(py, int_value)?;
+    let timedelta = instantiate_timedelta(py, i64::from(int_value))?;
     Ok((timedelta, end_offset))
 }
 
@@ -626,10 +617,7 @@ pub fn read_timedelta_i64(
 /// Millisecond timestamp to a UTC [`datetime.datetime`] compatible with [`kio.static.primitive.TZAware`].
 #[pyfunction]
 pub fn tz_aware_from_i64(py: Python<'_>, timestamp_ms: i64) -> PyResult<Py<PyAny>> {
-    let datetime = py_imports::datetime::datetime(py)?;
-    let utc = py_imports::datetime::UTC(py)?;
-    let args = (timestamp_ms / 1000, utc);
-    datetime.call_method1(py, "fromtimestamp", args)
+    datetime_from_timestamp_milliseconds(py, timestamp_ms)
 }
 
 const DATETIME_I64_NULL: &i64 = &-1;
