@@ -2,11 +2,11 @@ use pyo3::Python;
 use pyo3::buffer::PyBuffer;
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use pyo3::types::PyBytes;
 use std::cmp::Ordering;
 
 use crate::datetime::{datetime_from_timestamp_milliseconds, timedelta_from_milliseconds};
 use crate::py_imports;
+use crate::uuid::uuid_from_bytes;
 
 mod kio_errors {
     pyo3::import_exception!(kio.serial.errors, UnexpectedNull);
@@ -542,13 +542,11 @@ pub(crate) fn instantiate_uuid<'a>(
 ) -> SizedResult<Option<Py<PyAny>>> {
     match bytes {
         Some(bytes) => {
-            let uuid = py_imports::uuid::UUID(py)?;
-            let py_bytes = PyBytes::new(py, bytes);
-            // bytes is second key-word argument. We pass hex=None to avoid having to construct
-            // key-word arguments.
-            let args = (py.None(), py_bytes);
-            let uuid_value = uuid.call1(py, args)?.into();
-            Ok((uuid_value, UUID_BYTE_SIZE))
+            let wire_bytes: &[u8; UUID_BYTE_SIZE] = bytes
+                .try_into()
+                .map_err(|_| PyValueError::new_err("UUID wire value must be 16 bytes"))?;
+            let uuid_value = uuid_from_bytes(py, wire_bytes)?;
+            Ok((Some(uuid_value), UUID_BYTE_SIZE))
         }
         None => Ok((None, UUID_BYTE_SIZE)),
     }

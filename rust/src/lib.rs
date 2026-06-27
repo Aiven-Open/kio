@@ -6,6 +6,7 @@ mod parse;
 mod py_imports;
 mod readers;
 mod schema;
+mod uuid;
 
 #[pymodule]
 mod _kio_native {

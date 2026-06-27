@@ -9,7 +9,6 @@ pub(crate) mod error_code;
 pub(crate) mod implicit_defaults;
 pub(crate) mod introspect;
 pub(crate) mod kio_native;
-pub(crate) mod uuid;
 
 use pyo3::prelude::*;
 use pyo3::types::PyModule;
