@@ -247,9 +247,18 @@ class CustomTypeDef:
     type_: Primitive
 
     def get_definition(self) -> str:
+        # String nominal types use PhantomStr so that plain ``str`` values
+        # produced by the Rust decoder satisfy ``isinstance(x, TopicName)``
+        # at runtime and no wrapping call is needed.
+        if self.type_ == Primitive.string:
+            return textwrap.dedent(
+                f"""\
+                class {self.name}(PhantomStr):
+                    ...
+                """
+            )
         type_hint = self.type_.get_type_hint()
         if self.type_ in (
-            Primitive.string,
             Primitive.int8,
             Primitive.int16,
             Primitive.int32,
@@ -615,7 +624,7 @@ def basic_name(schema_name: str) -> str:
 seen_custom_types = set[str]()
 custom_type_imports = """\
 from typing import NewType
-from kio.static.primitive import i8, i16, i32, i64, u8, u16, u32, u64, f64
+from kio.static.primitive import PhantomStr, i8, i16, i32, i64, u8, u16, u32, u64, f64
 """
 
 
