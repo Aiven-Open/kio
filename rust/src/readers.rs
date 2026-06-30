@@ -565,8 +565,7 @@ pub(crate) fn internal_read_error_code(bytes: &[u8]) -> SizedResult<i16> {
 }
 
 pub(crate) fn wrap_error_code_value(py: Python<'_>, int_value: i16) -> PyResult<Py<PyAny>> {
-    let error_code = py_imports::error_code::ErrorCode(py)?;
-    error_code.call1(py, (int_value,))
+    py_imports::error_code::error_code_member(py, int_value)
 }
 
 #[pyfunction]
