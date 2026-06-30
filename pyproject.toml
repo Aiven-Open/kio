@@ -53,7 +53,7 @@ all = [
 "Bug Tracker" = "https://github.com/Aiven-Open/kio/issues"
 
 [build-system]
-requires = ["maturin==1.12.5", "setuptools-scm==9.2.2"]
+requires = ["maturin==1.14.1", "setuptools-scm==10.2.0"]
 build-backend = "build_kio"
 backend-path = ["."]
 
