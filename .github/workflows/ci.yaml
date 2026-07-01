@@ -22,7 +22,7 @@ jobs:
     name: Static analysis
     uses: less-action/reusables/.github/workflows/pre-commit.yaml@f26f5812fa62d31b9a4e0af9f75f19f7f028425c
     with:
-      python-version: "3.13"
+      python-version: "3.14"
 
   rust-lint:
     name: Rust static analysis
@@ -61,7 +61,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.11", "3.12", "3.13"]
+        python-version: ["3.11", "3.12", "3.13", "3.14", "3.15-dev"]
     steps:
       - uses: actions/checkout@v6
 
@@ -104,7 +104,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.11", "3.12", "3.13"]
+        python-version: ["3.11", "3.12", "3.13", "3.14", "3.15-dev"]
     steps:
       - uses: actions/checkout@v6
 
@@ -134,7 +134,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.11", "3.12", "3.13"]
+        python-version: ["3.11", "3.12", "3.13", "3.14", "3.15-dev"]
     steps:
       - uses: actions/checkout@v6
 
@@ -164,7 +164,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.11", "3.12", "3.13"]
+        python-version: ["3.11", "3.12", "3.13", "3.14", "3.15-dev"]
     steps:
       - uses: actions/checkout@v6
 
@@ -201,7 +201,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: "3.13"
+          python-version: "3.14"
           cache: pip
           cache-dependency-path: setup.cfg
           check-latest: true
@@ -213,10 +213,10 @@ jobs:
           key: >-
             ${{ runner.os }}
             -pre-commit
-            -3.13
+            -3.14
             -${{ hashFiles('.pre-commit-config.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-pre-commit-3.13
+            ${{ runner.os }}-pre-commit-3.14
             ${{ runner.os }}-pre-commit
 
       - name: Schema cache
@@ -250,7 +250,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: "3.13"
+          python-version: "3.14"
           cache: pip
           cache-dependency-path: docs/requirements.txt
       - name: Install dependencies
