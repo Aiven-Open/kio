@@ -35,6 +35,7 @@ test = [
   "pytest-random-order",
   "hypothesis>=6.61.0",
   "coverage",
+  "psutil",
 ]
 codegen = [
   "pydantic>=1.10.4,<2",
