@@ -4,9 +4,132 @@ on:
   release:
     types: [published]
 
+permissions:
+  contents: read
+
 jobs:
-  build-and-publish:
-    name: Build and publish
+  linux:
+    name: Build wheels · linux-${{ matrix.platform.target }}-${{ matrix.platform.manylinux }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - target: x86_64
+            manylinux: "2_28"
+          - target: aarch64
+            manylinux: "2_28"
+          - target: x86_64
+            manylinux: musllinux_1_2
+          - target: aarch64
+            manylinux: musllinux_1_2
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+      - name: Set release version
+        uses: ./.github/actions/set-version
+        with:
+          version: ${{ github.event.release.tag_name }}
+      - name: Build wheels
+        uses: PyO3/maturin-action@v1
+        with:
+          maturin-version: v1.14.1
+          target: ${{ matrix.platform.target }}
+          manylinux: ${{ matrix.platform.manylinux }}
+          args: --release --out dist -i 3.11 3.12 3.13 3.14 3.15
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-linux-${{ matrix.platform.target }}-${{ matrix.platform.manylinux }}
+          path: dist
+
+  macos:
+    name: Build wheels · macos-${{ matrix.target }}
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [x86_64, aarch64]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: |
+            3.11
+            3.12
+            3.13
+            3.14
+            3.15-dev
+      - name: Set release version
+        uses: ./.github/actions/set-version
+        with:
+          version: ${{ github.event.release.tag_name }}
+      - name: Build wheels
+        uses: PyO3/maturin-action@v1
+        with:
+          maturin-version: v1.14.1
+          target: ${{ matrix.target }}
+          args: --release --out dist --find-interpreter
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-macos-${{ matrix.target }}
+          path: dist
+
+  windows:
+    name: Build wheels · windows-x64
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: |
+            3.11
+            3.12
+            3.13
+            3.14
+            3.15-dev
+      - name: Set release version
+        uses: ./.github/actions/set-version
+        with:
+          version: ${{ github.event.release.tag_name }}
+      - name: Build wheels
+        uses: PyO3/maturin-action@v1
+        with:
+          maturin-version: v1.14.1
+          target: x64
+          args: --release --out dist --find-interpreter
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-windows-x64
+          path: dist
+
+  sdist:
+    name: Build sdist
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+      - name: Set release version
+        uses: ./.github/actions/set-version
+        with:
+          version: ${{ github.event.release.tag_name }}
+      - name: Build sdist
+        uses: PyO3/maturin-action@v1
+        with:
+          maturin-version: v1.14.1
+          command: sdist
+          args: --out dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sdist
+          path: dist
+
+  publish:
+    name: Publish to PyPI
+    needs: [linux, macos, windows, sdist]
     runs-on: ubuntu-latest
     environment:
       name: pypi
@@ -14,34 +137,36 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v6
+      - uses: actions/download-artifact@v4
         with:
-          python-version: 3.13
-          cache: pip
-          cache-dependency-path: pyproject.toml
-          check-latest: true
-      - name: Install dependencies
-        run: python3 -m pip install --upgrade build pkginfo
-      - name: Build
-        run: python3 -m build --sdist --wheel .
+          pattern: wheels-*
+          merge-multiple: true
+          path: dist
+      - uses: actions/download-artifact@v4
+        with:
+          name: sdist
+          path: dist
       - name: Verify release version
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
-          pkg_info_version=$(
-          python3 <(cat << EOF
-          from pathlib import Path
-          from pkginfo import Wheel
-          wheel = Wheel(next(Path("dist").glob("*.whl")))
-          print(wheel.version)
-          EOF
-          )
-          )
-          if [[ "$pkg_info_version" != "${{ github.event.release.tag_name }}" ]]; then
-            echo "💥 The version of the built wheel doesn't match the release tag."
-            echo
-            echo "Release tag: '${{ github.event.release.tag_name }}'"
-            echo "Packaged version: '$pkg_info_version'"
+          shopt -s nullglob
+          wheels=(dist/*.whl)
+          if [[ ${#wheels[@]} -eq 0 ]]; then
+            echo "💥 No wheels found in dist/ to publish."
             exit 1
           fi
+          mismatch=0
+          for artifact in dist/*.whl dist/*.tar.gz; do
+            name=$(basename "$artifact")
+            if [[ "$name" != "kio-${RELEASE_TAG}-"* && "$name" != "kio-${RELEASE_TAG}.tar.gz" ]]; then
+              echo "💥 '$name' does not match release tag '$RELEASE_TAG'."
+              mismatch=1
+            fi
+          done
+          if [[ "$mismatch" != "0" ]]; then
+            exit 1
+          fi
+          echo "✅ All artifacts match release tag '$RELEASE_TAG'."
       - name: Publish
         uses: pypa/gh-action-pypi-publish@release/v1
