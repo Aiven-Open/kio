@@ -1,9 +1,12 @@
 use pyo3::prelude::*;
 
+mod datetime;
 mod entity;
 mod parse;
+mod py_imports;
 mod readers;
 mod schema;
+mod uuid;
 
 #[pymodule]
 mod _kio_native {

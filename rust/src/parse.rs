@@ -1,6 +1,7 @@
 use pyo3::exceptions::PyNotImplementedError;
 use pyo3::prelude::*;
-use pyo3::types::PyModule;
+
+use crate::py_imports;
 
 #[pyfunction]
 pub fn get_reader(
@@ -50,7 +51,8 @@ fn get_reader_inner(
             )));
         }
     };
-    Ok(PyModule::import(py, "kio._kio_native")?
+    Ok(py_imports::kio_native::module(py)?
+        .bind(py)
         .getattr(reader_name)?
         .into())
 }

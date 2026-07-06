@@ -1,7 +1,12 @@
 """
-Large flexible `MetadataResponse` parse micro-benchmark.
+Parse micro-benchmarks for the native extension.
 
-Reproduce and compare branches (after rebuilding the extension, e.g. ``maturin develop --release``)::
+``roundtrip`` uses a large flexible ``MetadataResponse`` (integer-heavy).
+``produce_response`` uses ``ProduceResponse`` with the same topic/partition
+scale but a ``datetime_i64`` field on every partition (datetime-heavy).
+
+Reproduce and compare branches (after rebuilding the extension, e.g.
+``maturin develop --release``)::
 
     PYTHONPATH=src python benchmarks/parsing.py --fast -o /tmp/kio-parse-main.json   # on main
     PYTHONPATH=src python benchmarks/parsing.py --fast -o /tmp/kio-parse-branch.json # on your branch
@@ -24,12 +29,17 @@ from kio.schema.metadata.v12 import MetadataResponse
 from kio.schema.metadata.v12.response import MetadataResponseBroker
 from kio.schema.metadata.v12.response import MetadataResponsePartition
 from kio.schema.metadata.v12.response import MetadataResponseTopic
+from kio.schema.produce.v9 import ProduceResponse
+from kio.schema.produce.v9.response import PartitionProduceResponse
+from kio.schema.produce.v9.response import TopicProduceResponse
 from kio.schema.types import BrokerId
 from kio.schema.types import TopicName
 from kio.serial import entity_reader
 from kio.serial import entity_writer
+from kio.serial.readers import tz_aware_from_i64
 from kio.static.primitive import i32
 from kio.static.primitive import i32Timedelta
+from kio.static.primitive import i64
 
 write_metadata_response = entity_writer(MetadataResponse)
 read_metadata_response = entity_reader(MetadataResponse)
@@ -85,6 +95,105 @@ with io.BytesIO() as buffer:
     buffer = buffer.getvalue()
 
 
+write_produce_response = entity_writer(ProduceResponse)
+read_produce_response = entity_reader(ProduceResponse)
+
+log_append_time = tz_aware_from_i64(i64(1_672_531_200_123))
+
+produce_instance = ProduceResponse(
+    throttle_time=i32Timedelta.parse(datetime.timedelta(milliseconds=123)),
+    responses=tuple(
+        TopicProduceResponse(
+            name=TopicName(f"topic {n}"),
+            partition_responses=tuple(
+                PartitionProduceResponse(
+                    index=i32(p),
+                    error_code=ErrorCode.none,
+                    base_offset=i64(42),
+                    log_append_time=log_append_time,
+                    record_errors=(),
+                )
+                for p in range(12)
+            ),
+        )
+        for n in range(1_000)
+    ),
+)
+
+with io.BytesIO() as produce_buffer:
+    write_produce_response(
+        produce_buffer,
+        replace(
+            produce_instance,
+            throttle_time=i32Timedelta.parse(datetime.timedelta(milliseconds=1)),
+        ),
+    )
+    write_produce_response(
+        produce_buffer,
+        replace(
+            produce_instance,
+            throttle_time=i32Timedelta.parse(datetime.timedelta(milliseconds=2)),
+        ),
+    )
+    write_produce_response(
+        produce_buffer,
+        replace(
+            produce_instance,
+            throttle_time=i32Timedelta.parse(datetime.timedelta(milliseconds=3)),
+        ),
+    )
+    write_produce_response(
+        produce_buffer,
+        replace(
+            produce_instance,
+            throttle_time=i32Timedelta.parse(datetime.timedelta(milliseconds=4)),
+        ),
+    )
+    write_produce_response(
+        produce_buffer,
+        replace(
+            produce_instance,
+            throttle_time=i32Timedelta.parse(datetime.timedelta(milliseconds=5)),
+        ),
+    )
+    write_produce_response(
+        produce_buffer,
+        replace(
+            produce_instance,
+            throttle_time=i32Timedelta.parse(datetime.timedelta(milliseconds=6)),
+        ),
+    )
+    write_produce_response(
+        produce_buffer,
+        replace(
+            produce_instance,
+            throttle_time=i32Timedelta.parse(datetime.timedelta(milliseconds=7)),
+        ),
+    )
+    write_produce_response(
+        produce_buffer,
+        replace(
+            produce_instance,
+            throttle_time=i32Timedelta.parse(datetime.timedelta(milliseconds=8)),
+        ),
+    )
+    write_produce_response(
+        produce_buffer,
+        replace(
+            produce_instance,
+            throttle_time=i32Timedelta.parse(datetime.timedelta(milliseconds=9)),
+        ),
+    )
+    write_produce_response(
+        produce_buffer,
+        replace(
+            produce_instance,
+            throttle_time=i32Timedelta.parse(datetime.timedelta(milliseconds=10)),
+        ),
+    )
+    produce_buffer = produce_buffer.getvalue()
+
+
 def perform_parsing(
     loops: int,
 ) -> float:
@@ -120,8 +229,46 @@ def perform_parsing(
     return accumulated
 
 
+def perform_produce_response_parsing(loops: int) -> float:
+    loop_range = range(loops)
+    accumulated = 0.0
+
+    for _ in loop_range:
+        offset = 0
+        t0 = pyperf.perf_counter()
+        _, size = read_produce_response(produce_buffer, offset)
+        offset += size
+        _, size = read_produce_response(produce_buffer, offset)
+        offset += size
+        _, size = read_produce_response(produce_buffer, offset)
+        offset += size
+        _, size = read_produce_response(produce_buffer, offset)
+        offset += size
+        _, size = read_produce_response(produce_buffer, offset)
+        offset += size
+        _, size = read_produce_response(produce_buffer, offset)
+        offset += size
+        _, size = read_produce_response(produce_buffer, offset)
+        offset += size
+        _, size = read_produce_response(produce_buffer, offset)
+        offset += size
+        _, size = read_produce_response(produce_buffer, offset)
+        offset += size
+        _, size = read_produce_response(produce_buffer, offset)
+        offset += size
+        accumulated += pyperf.perf_counter() - t0
+        assert offset == len(produce_buffer), "buffer not exhausted after read"
+
+    return accumulated
+
+
 if __name__ == "__main__":
     import pyperf
 
     runner = pyperf.Runner()
     runner.bench_time_func("roundtrip", perform_parsing, inner_loops=10000)
+    runner.bench_time_func(
+        "produce_response",
+        perform_produce_response_parsing,
+        inner_loops=10000,
+    )
