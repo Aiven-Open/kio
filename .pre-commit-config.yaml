@@ -81,5 +81,5 @@ repos:
       - id: check-manifest
         args: ["--no-build-isolation"]
         additional_dependencies:
-          - maturin==1.12.5
-          - setuptools-scm==9.2.2
+          - maturin==1.14.1
+          - setuptools-scm==10.2.0
