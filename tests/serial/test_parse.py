@@ -2,9 +2,12 @@ import datetime
 import io
 import uuid
 
+from dataclasses import Field
 from dataclasses import dataclass
 from dataclasses import field
+from typing import Any
 from typing import ClassVar
+from typing import assert_type
 
 import pytest
 
@@ -17,6 +20,7 @@ from kio.schema.metadata.v12.response import (
 )
 from kio.serial import entity_reader
 from kio.serial import readers
+from kio.serial._parse import get_field_reader
 from kio.serial._parse import get_reader
 from kio.serial._shared import NullableEntityMarker
 from kio.serial.writers import write_boolean
@@ -413,3 +417,19 @@ def test_can_read_empty_nested_nullable_entity(buffer: io.BytesIO) -> None:
         child=None,
         name="parent name",
     )
+
+
+def _typecheck_parse_return_types(
+    entity_type: type[MetadataResponse],
+    int32_field: Field[i32],
+) -> None:
+    assert_type(entity_reader(entity_type), readers.Reader[MetadataResponse])
+    assert_type(
+        entity_reader(entity_type, nullable=True),
+        readers.Reader[MetadataResponse | None],
+    )
+    assert_type(
+        get_field_reader(entity_type, int32_field, False, False),
+        readers.Reader[i32],
+    )
+    assert_type(get_reader("int32", True, False), readers.Reader[Any])

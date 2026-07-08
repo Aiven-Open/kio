@@ -1,8 +1,7 @@
-import datetime
-
 from dataclasses import Field
-from typing import Any
+from typing import Literal
 from typing import TypeVar
+from typing import overload
 from uuid import UUID
 
 from typing_extensions import Buffer
@@ -15,7 +14,11 @@ from kio.static.primitive import f64
 from kio.static.primitive import i8
 from kio.static.primitive import i16
 from kio.static.primitive import i32
+from kio.static.primitive import i32Timedelta
 from kio.static.primitive import i64
+from kio.static.primitive import i64Timedelta
+from kio.static.primitive import svarint
+from kio.static.primitive import svarlong
 from kio.static.primitive import u8
 from kio.static.primitive import u16
 from kio.static.primitive import u32
@@ -25,6 +28,7 @@ from kio.static.primitive import uvarlong
 from kio.static.protocol import Entity
 
 T = TypeVar("T")
+E = TypeVar("E", bound=Entity)
 
 def read_boolean(
     buffered: Buffer,
@@ -150,12 +154,12 @@ def read_timedelta_i32(
     buffered: Buffer,
     offset: int,
     /,
-) -> SizedResult[datetime.timedelta]: ...
+) -> SizedResult[i32Timedelta]: ...
 def read_timedelta_i64(
     buffered: Buffer,
     offset: int,
     /,
-) -> SizedResult[datetime.timedelta]: ...
+) -> SizedResult[i64Timedelta]: ...
 def read_datetime_i64(
     buffered: Buffer,
     offset: int,
@@ -170,22 +174,31 @@ def read_signed_varint(
     buffered: Buffer,
     offset: int,
     /,
-) -> SizedResult[int]: ...
+) -> SizedResult[svarint]: ...
 def read_signed_varlong(
     buffered: Buffer,
     offset: int,
     /,
-) -> SizedResult[int]: ...
+) -> SizedResult[svarlong]: ...
 def tz_aware_from_i64(timestamp_ms: i64) -> TZAware: ...
 def compact_array_reader(item_reader: Reader[T]) -> Reader[tuple[T, ...] | None]: ...
 def legacy_array_reader(item_reader: Reader[T]) -> Reader[tuple[T, ...] | None]: ...
-def entity_reader(entity_type: type[Entity], nullable: bool = False) -> Reader[Any]: ...
+@overload
+def entity_reader(
+    entity_type: type[E],
+    nullable: Literal[False] = ...,
+) -> Reader[E]: ...
+@overload
+def entity_reader(
+    entity_type: type[E],
+    nullable: Literal[True],
+) -> Reader[E | None]: ...
 def get_field_reader(
     entity_type: type[Entity],
-    field: Field[Any],
+    field: Field[T],
     is_request_header: bool,
     is_tagged_field: bool,
-) -> Reader[Any]: ...
+) -> Reader[T]: ...
 def get_reader(
     kafka_type: str,
     flexible: bool,
