@@ -8,9 +8,13 @@ from dataclasses import dataclass
 from dataclasses import field
 from io import BytesIO
 from typing import ClassVar
+from typing import assert_type
 from typing import final
+from uuid import UUID
 
 import pytest
+
+from typing_extensions import Buffer
 
 from kio.schema.errors import ErrorCode
 from kio.serial import entity_reader
@@ -35,11 +39,14 @@ from kio.serial.readers import read_int8
 from kio.serial.readers import read_int16
 from kio.serial.readers import read_int32
 from kio.serial.readers import read_int64
+from kio.serial.readers import read_legacy_array_length
 from kio.serial.readers import read_legacy_bytes
 from kio.serial.readers import read_legacy_string
 from kio.serial.readers import read_nullable_datetime_i64
 from kio.serial.readers import read_nullable_legacy_bytes
 from kio.serial.readers import read_nullable_legacy_string
+from kio.serial.readers import read_signed_varint
+from kio.serial.readers import read_signed_varlong
 from kio.serial.readers import read_timedelta_i32
 from kio.serial.readers import read_timedelta_i64
 from kio.serial.readers import read_uint8
@@ -47,11 +54,27 @@ from kio.serial.readers import read_uint16
 from kio.serial.readers import read_uint32
 from kio.serial.readers import read_uint64
 from kio.serial.readers import read_unsigned_varint
+from kio.serial.readers import read_unsigned_varlong
 from kio.serial.readers import read_uuid
+from kio.serial.readers import tz_aware_from_i64
 from kio.static.constants import EntityType
 from kio.static.constants import uuid_zero
+from kio.static.primitive import TZAware
+from kio.static.primitive import f64
 from kio.static.primitive import i8
 from kio.static.primitive import i16
+from kio.static.primitive import i32
+from kio.static.primitive import i32Timedelta
+from kio.static.primitive import i64
+from kio.static.primitive import i64Timedelta
+from kio.static.primitive import svarint
+from kio.static.primitive import svarlong
+from kio.static.primitive import u8
+from kio.static.primitive import u16
+from kio.static.primitive import u32
+from kio.static.primitive import u64
+from kio.static.primitive import uvarint
+from kio.static.primitive import uvarlong
 
 
 class BufferUnderflowContract:
@@ -787,3 +810,47 @@ class TestReadNullableDatetimeI64:
     def test_raises_out_of_bound_value_for_negative_values(self) -> None:
         with pytest.raises(OutOfBoundValue):
             read_nullable_datetime_i64(struct.pack(">q", -2), 0)
+
+
+def _typecheck_reader_return_types(
+    buffer: Buffer,
+    offset: int,
+    timestamp: i64,
+    item_reader: Reader[i32],
+) -> None:
+    assert_type(read_boolean(buffer, offset), SizedResult[bool])
+    assert_type(read_int8(buffer, offset), SizedResult[i8])
+    assert_type(read_int16(buffer, offset), SizedResult[i16])
+    assert_type(read_int32(buffer, offset), SizedResult[i32])
+    assert_type(read_int64(buffer, offset), SizedResult[i64])
+    assert_type(read_uint8(buffer, offset), SizedResult[u8])
+    assert_type(read_uint16(buffer, offset), SizedResult[u16])
+    assert_type(read_uint32(buffer, offset), SizedResult[u32])
+    assert_type(read_uint64(buffer, offset), SizedResult[u64])
+    assert_type(read_unsigned_varint(buffer, offset), SizedResult[uvarint])
+    assert_type(read_unsigned_varlong(buffer, offset), SizedResult[uvarlong])
+    assert_type(read_signed_varint(buffer, offset), SizedResult[svarint])
+    assert_type(read_signed_varlong(buffer, offset), SizedResult[svarlong])
+    assert_type(read_float64(buffer, offset), SizedResult[f64])
+    assert_type(read_compact_string_as_bytes(buffer, offset), SizedResult[bytes])
+    assert_type(
+        read_compact_string_as_bytes_nullable(buffer, offset),
+        SizedResult[bytes | None],
+    )
+    assert_type(read_compact_string(buffer, offset), SizedResult[str])
+    assert_type(read_compact_string_nullable(buffer, offset), SizedResult[str | None])
+    assert_type(read_legacy_bytes(buffer, offset), SizedResult[bytes])
+    assert_type(read_nullable_legacy_bytes(buffer, offset), SizedResult[bytes | None])
+    assert_type(read_legacy_string(buffer, offset), SizedResult[str])
+    assert_type(read_nullable_legacy_string(buffer, offset), SizedResult[str | None])
+    assert_type(read_legacy_array_length(buffer, offset), SizedResult[i32])
+    assert_type(read_compact_array_length(buffer, offset), SizedResult[int | None])
+    assert_type(read_uuid(buffer, offset), SizedResult[UUID | None])
+    assert_type(read_error_code(buffer, offset), SizedResult[ErrorCode])
+    assert_type(read_timedelta_i32(buffer, offset), SizedResult[i32Timedelta])
+    assert_type(read_timedelta_i64(buffer, offset), SizedResult[i64Timedelta])
+    assert_type(read_datetime_i64(buffer, offset), SizedResult[TZAware])
+    assert_type(read_nullable_datetime_i64(buffer, offset), SizedResult[TZAware | None])
+    assert_type(tz_aware_from_i64(timestamp), TZAware)
+    assert_type(compact_array_reader(item_reader), Reader[tuple[i32, ...] | None])
+    assert_type(legacy_array_reader(item_reader), Reader[tuple[i32, ...] | None])
