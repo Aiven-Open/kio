@@ -24,8 +24,9 @@ class ReplicaState:
     __api_key__: ClassVar[i16] = i16(55)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     replica_id: BrokerId = field(metadata={"kafka_type": "int32"})
+    """The ID of the replica."""
     log_end_offset: i64 = field(metadata={"kafka_type": "int64"})
-    """The last known log end offset of the follower or -1 if it is unknown"""
+    """The last known log end offset of the follower or -1 if it is unknown."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -38,13 +39,17 @@ class PartitionData:
     partition_index: i32 = field(metadata={"kafka_type": "int32"})
     """The partition index."""
     error_code: ErrorCode = field(metadata={"kafka_type": "error_code"})
+    """The partition error code."""
     leader_id: BrokerId = field(metadata={"kafka_type": "int32"})
     """The ID of the current leader or -1 if the leader is unknown."""
     leader_epoch: i32 = field(metadata={"kafka_type": "int32"})
-    """The latest known leader epoch"""
+    """The latest known leader epoch."""
     high_watermark: i64 = field(metadata={"kafka_type": "int64"})
+    """The high water mark."""
     current_voters: tuple[ReplicaState, ...]
+    """The current voters of the partition."""
     observers: tuple[ReplicaState, ...]
+    """The observers of the partition."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -57,6 +62,7 @@ class TopicData:
     topic_name: TopicName = field(metadata={"kafka_type": "string"})
     """The topic name."""
     partitions: tuple[PartitionData, ...]
+    """The partition data."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -69,3 +75,4 @@ class DescribeQuorumResponse:
     error_code: ErrorCode = field(metadata={"kafka_type": "error_code"})
     """The top level error code."""
     topics: tuple[TopicData, ...]
+    """The response from the describe quorum API."""

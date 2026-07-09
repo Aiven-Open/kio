@@ -48,4 +48,4 @@ class OffsetDeleteRequest:
     group_id: GroupId = field(metadata={"kafka_type": "string"})
     """The unique group identifier."""
     topics: tuple[OffsetDeleteRequestTopic, ...]
-    """The topics to delete offsets for"""
+    """The topics to delete offsets for."""

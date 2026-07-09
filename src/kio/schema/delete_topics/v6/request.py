@@ -23,9 +23,9 @@ class DeleteTopicState:
     __api_key__: ClassVar[i16] = i16(20)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     name: TopicName | None = field(metadata={"kafka_type": "string"}, default=None)
-    """The topic name"""
+    """The topic name."""
     topic_id: uuid.UUID | None = field(metadata={"kafka_type": "uuid"})
-    """The unique topic ID"""
+    """The unique topic ID."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -36,6 +36,6 @@ class DeleteTopicsRequest:
     __api_key__: ClassVar[i16] = i16(20)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     topics: tuple[DeleteTopicState, ...]
-    """The name or topic ID of the topic"""
+    """The name or topic ID of the topic."""
     timeout: i32Timedelta = field(metadata={"kafka_type": "timedelta_i32"})
     """The length of time in milliseconds to wait for the deletions to complete."""

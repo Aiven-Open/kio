@@ -40,7 +40,7 @@ class ListOffsetsTopicResponse:
     __api_key__: ClassVar[i16] = i16(2)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     name: TopicName = field(metadata={"kafka_type": "string"})
-    """The topic name"""
+    """The topic name."""
     partitions: tuple[ListOffsetsPartitionResponse, ...]
     """Each partition in the response."""
 

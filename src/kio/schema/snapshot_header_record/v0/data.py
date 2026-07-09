@@ -17,6 +17,6 @@ class SnapshotHeaderRecord:
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     version: i16 = field(metadata={"kafka_type": "int16"})
-    """The version of the snapshot header record"""
+    """The version of the snapshot header record."""
     last_contained_log_timestamp: i64 = field(metadata={"kafka_type": "int64"})
-    """The append time of the last record from the log contained in this snapshot"""
+    """The append time of the last record from the log contained in this snapshot."""

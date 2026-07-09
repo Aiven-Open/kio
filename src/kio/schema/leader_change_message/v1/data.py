@@ -20,8 +20,9 @@ class Voter:
     __version__: ClassVar[i16] = i16(1)
     __flexible__: ClassVar[bool] = True
     voter_id: i32 = field(metadata={"kafka_type": "int32"})
+    """The ID of the voter."""
     voter_directory_id: uuid.UUID | None = field(metadata={"kafka_type": "uuid"})
-    """The directory id of the voter"""
+    """The directory id of the voter."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -30,10 +31,10 @@ class LeaderChangeMessage:
     __version__: ClassVar[i16] = i16(1)
     __flexible__: ClassVar[bool] = True
     version: i16 = field(metadata={"kafka_type": "int16"})
-    """The version of the leader change message"""
+    """The version of the leader change message."""
     leader_id: BrokerId = field(metadata={"kafka_type": "int32"})
-    """The ID of the newly elected leader"""
+    """The ID of the newly elected leader."""
     voters: tuple[Voter, ...]
-    """The set of voters in the quorum for this epoch"""
+    """The set of voters in the quorum for this epoch."""
     granting_voters: tuple[Voter, ...]
-    """The voters who voted for the leader at the time of election"""
+    """The voters who voted for the leader at the time of election."""

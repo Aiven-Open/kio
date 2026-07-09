@@ -72,7 +72,7 @@ class ErrorCode(enum.IntEnum):
     inconsistent_group_protocol = 23, False
     """The group member's supported protocols are incompatible with those of existing members or first group member tried to join with empty protocol type or empty protocol list."""
     invalid_group_id = 24, False
-    """The configured groupId is invalid."""
+    """The group id is invalid."""
     unknown_member_id = 25, False
     """The coordinator is not aware of this member."""
     invalid_session_timeout = 26, False
@@ -186,7 +186,7 @@ class ErrorCode(enum.IntEnum):
     preferred_leader_not_available = 80, True
     """The preferred leader was not available."""
     group_max_size_reached = 81, False
-    """The consumer group has reached its max size."""
+    """The group has reached its maximum size."""
     fenced_instance_id = 82, False
     """The broker rejected this static consumer since another consumer with the same group.instance.id has registered with a different member.id."""
     eligible_leaders_not_available = 83, True
@@ -279,3 +279,15 @@ class ErrorCode(enum.IntEnum):
     """The voter is already part of the set of voters."""
     voter_not_found = 127, False
     """The voter is not part of the set of voters."""
+    invalid_regular_expression = 128, False
+    """The regular expression is not valid."""
+    rebootstrap_required = 129, False
+    """Client metadata is stale. The client should rebootstrap to obtain new metadata."""
+    streams_invalid_topology = 130, False
+    """The supplied topology is invalid."""
+    streams_invalid_topology_epoch = 131, False
+    """The supplied topology epoch is invalid."""
+    streams_topology_fenced = 132, False
+    """The supplied topology epoch is outdated."""
+    share_session_limit_reached = 133, True
+    """The limit of share sessions has been reached."""

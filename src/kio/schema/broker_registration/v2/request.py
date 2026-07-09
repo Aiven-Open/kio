@@ -61,13 +61,13 @@ class BrokerRegistrationRequest:
     incarnation_id: uuid.UUID | None = field(metadata={"kafka_type": "uuid"})
     """The incarnation id of the broker process."""
     listeners: tuple[Listener, ...]
-    """The listeners of this broker"""
+    """The listeners of this broker."""
     features: tuple[Feature, ...]
     """The features on this broker. Note: in v0-v3, features with MinSupportedVersion = 0 are omitted."""
     rack: str | None = field(metadata={"kafka_type": "string"})
     """The rack which this broker is in."""
     is_migrating_zk_broker: bool = field(metadata={"kafka_type": "bool"}, default=False)
-    """If the required configurations for ZK migration are present, this value is set to true"""
+    """If the required configurations for ZK migration are present, this value is set to true."""
     log_dirs: tuple[uuid.UUID | None, ...] = field(
         metadata={"kafka_type": "uuid"}, default=()
     )

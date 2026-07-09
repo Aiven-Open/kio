@@ -23,13 +23,13 @@ class CurrentLeader:
     __api_key__: ClassVar[i16] = i16(82)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     leader_id: BrokerId = field(metadata={"kafka_type": "int32"}, default=BrokerId(-1))
-    """The replica id of the current leader or -1 if the leader is unknown"""
+    """The replica id of the current leader or -1 if the leader is unknown."""
     leader_epoch: i32 = field(metadata={"kafka_type": "int32"}, default=i32(-1))
-    """The latest known leader epoch"""
+    """The latest known leader epoch."""
     host: str = field(metadata={"kafka_type": "string"})
-    """The node's hostname"""
+    """The node's hostname."""
     port: i32 = field(metadata={"kafka_type": "int32"})
-    """The node's port"""
+    """The node's port."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -42,5 +42,6 @@ class UpdateRaftVoterResponse:
     throttle_time: i32Timedelta = field(metadata={"kafka_type": "timedelta_i32"})
     """The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota."""
     error_code: ErrorCode = field(metadata={"kafka_type": "error_code"})
-    """The error code, or 0 if there was no error"""
+    """The error code, or 0 if there was no error."""
     current_leader: CurrentLeader = field(metadata={"tag": 0})
+    """Details of the current Raft cluster leader."""

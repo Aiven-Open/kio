@@ -50,6 +50,6 @@ class OffsetFetchRequest:
     __api_key__: ClassVar[i16] = i16(9)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     groups: tuple[OffsetFetchRequestGroup, ...]
-    """Each group we would like to fetch offsets for"""
+    """Each group we would like to fetch offsets for."""
     require_stable: bool = field(metadata={"kafka_type": "bool"}, default=False)
     """Whether broker should hold on returning unstable offsets but set a retriable error code for the partitions."""

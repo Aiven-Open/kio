@@ -38,7 +38,7 @@ class DeleteStateResult:
     __api_key__: ClassVar[i16] = i16(86)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     topic_id: uuid.UUID | None = field(metadata={"kafka_type": "uuid"})
-    """The topic identifier"""
+    """The topic identifier."""
     partitions: tuple[PartitionResult, ...]
     """The results for the partitions."""
 
@@ -51,4 +51,4 @@ class DeleteShareGroupStateResponse:
     __api_key__: ClassVar[i16] = i16(86)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     results: tuple[DeleteStateResult, ...]
-    """The delete results"""
+    """The delete results."""

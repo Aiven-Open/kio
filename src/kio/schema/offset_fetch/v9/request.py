@@ -39,7 +39,7 @@ class OffsetFetchRequestGroup:
     group_id: GroupId = field(metadata={"kafka_type": "string"})
     """The group ID."""
     member_id: str | None = field(metadata={"kafka_type": "string"}, default=None)
-    """The member ID assigned by the group coordinator if using the new consumer protocol (KIP-848)."""
+    """The member id."""
     member_epoch: i32 = field(metadata={"kafka_type": "int32"}, default=i32(-1))
     """The member epoch if using the new consumer protocol (KIP-848)."""
     topics: tuple[OffsetFetchRequestTopics, ...] | None
@@ -54,6 +54,6 @@ class OffsetFetchRequest:
     __api_key__: ClassVar[i16] = i16(9)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     groups: tuple[OffsetFetchRequestGroup, ...]
-    """Each group we would like to fetch offsets for"""
+    """Each group we would like to fetch offsets for."""
     require_stable: bool = field(metadata={"kafka_type": "bool"}, default=False)
     """Whether broker should hold on returning unstable offsets but set a retriable error code for the partitions."""

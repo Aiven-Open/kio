@@ -39,7 +39,7 @@ class AddPartitionsToTxnTopicResult:
     name: TopicName = field(metadata={"kafka_type": "string"})
     """The topic name."""
     results_by_partition: tuple[AddPartitionsToTxnPartitionResult, ...]
-    """The results for each partition"""
+    """The results for each partition."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

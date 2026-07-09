@@ -25,8 +25,8 @@ class AllocateProducerIdsResponse:
     throttle_time: i32Timedelta = field(metadata={"kafka_type": "timedelta_i32"})
     """The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota."""
     error_code: ErrorCode = field(metadata={"kafka_type": "error_code"})
-    """The top level response error code"""
+    """The top level response error code."""
     producer_id_start: ProducerId = field(metadata={"kafka_type": "int64"})
-    """The first producer ID in this range, inclusive"""
+    """The first producer ID in this range, inclusive."""
     producer_id_len: i32 = field(metadata={"kafka_type": "int32"})
-    """The number of producer IDs in this range"""
+    """The number of producer IDs in this range."""

@@ -18,7 +18,9 @@ class TopicPartition:
     __version__: ClassVar[i16] = i16(3)
     __flexible__: ClassVar[bool] = False
     topic: TopicName = field(metadata={"kafka_type": "string"})
+    """The topic name."""
     partitions: tuple[i32, ...] = field(metadata={"kafka_type": "int32"}, default=())
+    """The partition ids."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -27,7 +29,12 @@ class ConsumerProtocolSubscription:
     __version__: ClassVar[i16] = i16(3)
     __flexible__: ClassVar[bool] = False
     topics: tuple[str, ...] = field(metadata={"kafka_type": "string"}, default=())
+    """The topics that the member wants to consume."""
     user_data: bytes | None = field(metadata={"kafka_type": "bytes"}, default=None)
+    """User data that will be passed back to the consumer."""
     owned_partitions: tuple[TopicPartition, ...]
+    """The partitions that the member owns."""
     generation_id: i32 = field(metadata={"kafka_type": "int32"}, default=i32(-1))
+    """The generation id of the member."""
     rack_id: str | None = field(metadata={"kafka_type": "string"}, default=None)
+    """The rack id of the member."""

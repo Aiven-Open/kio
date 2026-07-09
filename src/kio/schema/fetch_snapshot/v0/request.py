@@ -23,7 +23,9 @@ class SnapshotId:
     __api_key__: ClassVar[i16] = i16(59)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     end_offset: i64 = field(metadata={"kafka_type": "int64"})
+    """The end offset of the snapshot."""
     epoch: i32 = field(metadata={"kafka_type": "int32"})
+    """The epoch of the snapshot."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -34,13 +36,13 @@ class PartitionSnapshot:
     __api_key__: ClassVar[i16] = i16(59)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     partition: i32 = field(metadata={"kafka_type": "int32"})
-    """The partition index"""
+    """The partition index."""
     current_leader_epoch: i32 = field(metadata={"kafka_type": "int32"})
-    """The current leader epoch of the partition, -1 for unknown leader epoch"""
+    """The current leader epoch of the partition, -1 for unknown leader epoch."""
     snapshot_id: SnapshotId
-    """The snapshot endOffset and epoch to fetch"""
+    """The snapshot endOffset and epoch to fetch."""
     position: i64 = field(metadata={"kafka_type": "int64"})
-    """The byte position within the snapshot to start fetching from"""
+    """The byte position within the snapshot to start fetching from."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -51,9 +53,9 @@ class TopicSnapshot:
     __api_key__: ClassVar[i16] = i16(59)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     name: TopicName = field(metadata={"kafka_type": "string"})
-    """The name of the topic to fetch"""
+    """The name of the topic to fetch."""
     partitions: tuple[PartitionSnapshot, ...]
-    """The partitions to fetch"""
+    """The partitions to fetch."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -66,10 +68,10 @@ class FetchSnapshotRequest:
     cluster_id: str | None = field(
         metadata={"kafka_type": "string", "tag": 0}, default=None
     )
-    """The clusterId if known, this is used to validate metadata fetches prior to broker registration"""
+    """The clusterId if known, this is used to validate metadata fetches prior to broker registration."""
     replica_id: BrokerId = field(metadata={"kafka_type": "int32"}, default=BrokerId(-1))
-    """The broker ID of the follower"""
+    """The broker ID of the follower."""
     max_bytes: i32 = field(metadata={"kafka_type": "int32"}, default=i32(2147483647))
-    """The maximum bytes to fetch from all of the snapshots"""
+    """The maximum bytes to fetch from all of the snapshots."""
     topics: tuple[TopicSnapshot, ...]
-    """The topics to fetch"""
+    """The topics to fetch."""

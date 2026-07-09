@@ -60,7 +60,7 @@ class ListPartitionReassignmentsResponse:
     throttle_time: i32Timedelta = field(metadata={"kafka_type": "timedelta_i32"})
     """The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota."""
     error_code: ErrorCode = field(metadata={"kafka_type": "error_code"})
-    """The top-level error code, or 0 if there was no error"""
+    """The top-level error code, or 0 if there was no error."""
     error_message: str | None = field(metadata={"kafka_type": "string"})
     """The top-level error message, or null if there was no error."""
     topics: tuple[OngoingTopicReassignment, ...]

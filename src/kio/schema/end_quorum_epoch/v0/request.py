@@ -24,13 +24,13 @@ class PartitionData:
     partition_index: i32 = field(metadata={"kafka_type": "int32"})
     """The partition index."""
     leader_id: BrokerId = field(metadata={"kafka_type": "int32"})
-    """The current leader ID that is resigning"""
+    """The current leader ID that is resigning."""
     leader_epoch: i32 = field(metadata={"kafka_type": "int32"})
-    """The current epoch"""
+    """The current epoch."""
     preferred_successors: tuple[i32, ...] = field(
         metadata={"kafka_type": "int32"}, default=()
     )
-    """A sorted list of preferred successors to start the election"""
+    """A sorted list of preferred successors to start the election."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -43,6 +43,7 @@ class TopicData:
     topic_name: TopicName = field(metadata={"kafka_type": "string"})
     """The topic name."""
     partitions: tuple[PartitionData, ...]
+    """The partitions."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -53,4 +54,6 @@ class EndQuorumEpochRequest:
     __api_key__: ClassVar[i16] = i16(54)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     cluster_id: str | None = field(metadata={"kafka_type": "string"}, default=None)
+    """The cluster id."""
     topics: tuple[TopicData, ...]
+    """The topics."""

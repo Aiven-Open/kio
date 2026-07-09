@@ -34,6 +34,7 @@ class TopicData:
     topic_name: TopicName = field(metadata={"kafka_type": "string"})
     """The topic name."""
     partitions: tuple[PartitionData, ...]
+    """The partitions to describe."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -44,3 +45,4 @@ class DescribeQuorumRequest:
     __api_key__: ClassVar[i16] = i16(55)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     topics: tuple[TopicData, ...]
+    """The topics to describe."""

@@ -28,7 +28,7 @@ class DescribeLogDirsPartition:
     partition_size: i64 = field(metadata={"kafka_type": "int64"})
     """The size of the log segments in this partition in bytes."""
     offset_lag: i64 = field(metadata={"kafka_type": "int64"})
-    """The lag of the log's LEO w.r.t. partition's HW (if it is the current log for the partition) or current replica's LEO (if it is the future log for the partition)"""
+    """The lag of the log's LEO w.r.t. partition's HW (if it is the current log for the partition) or current replica's LEO (if it is the future log for the partition)."""
     is_future_key: bool = field(metadata={"kafka_type": "bool"})
     """True if this log is created by AlterReplicaLogDirsRequest and will replace the current log of the replica in the future."""
 
@@ -43,6 +43,7 @@ class DescribeLogDirsTopic:
     name: TopicName = field(metadata={"kafka_type": "string"})
     """The topic name."""
     partitions: tuple[DescribeLogDirsPartition, ...]
+    """The partitions."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -57,11 +58,11 @@ class DescribeLogDirsResult:
     log_dir: str = field(metadata={"kafka_type": "string"})
     """The absolute log directory path."""
     topics: tuple[DescribeLogDirsTopic, ...]
-    """Each topic."""
+    """The topics."""
     total_bytes: i64 = field(metadata={"kafka_type": "int64"}, default=i64(-1))
-    """The total size in bytes of the volume the log directory is in."""
+    """The total size in bytes of the volume the log directory is in. This value does not include the size of data stored in remote storage."""
     usable_bytes: i64 = field(metadata={"kafka_type": "int64"}, default=i64(-1))
-    """The usable size in bytes of the volume the log directory is in."""
+    """The usable size in bytes of the volume the log directory is in. This value does not include the size of data stored in remote storage."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

@@ -22,7 +22,8 @@ class RemoveRaftVoterRequest:
     __api_key__: ClassVar[i16] = i16(81)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     cluster_id: str | None = field(metadata={"kafka_type": "string"})
+    """The cluster id of the request."""
     voter_id: i32 = field(metadata={"kafka_type": "int32"})
-    """The replica id of the voter getting removed from the topic partition"""
+    """The replica id of the voter getting removed from the topic partition."""
     voter_directory_id: uuid.UUID | None = field(metadata={"kafka_type": "uuid"})
-    """The directory id of the voter getting removed from the topic partition"""
+    """The directory id of the voter getting removed from the topic partition."""

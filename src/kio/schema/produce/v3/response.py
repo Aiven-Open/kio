@@ -46,7 +46,7 @@ class TopicProduceResponse:
     __api_key__: ClassVar[i16] = i16(0)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     name: TopicName = field(metadata={"kafka_type": "string"})
-    """The topic name"""
+    """The topic name."""
     partition_responses: tuple[PartitionProduceResponse, ...]
     """Each partition that we produced to within the topic."""
 
@@ -59,7 +59,7 @@ class ProduceResponse:
     __api_key__: ClassVar[i16] = i16(0)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     responses: tuple[TopicProduceResponse, ...]
-    """Each produce response"""
+    """Each produce response."""
     throttle_time: i32Timedelta = field(
         metadata={"kafka_type": "timedelta_i32"},
         default=i32Timedelta.parse(datetime.timedelta(milliseconds=0)),

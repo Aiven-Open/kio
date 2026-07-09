@@ -21,6 +21,6 @@ class AllocateProducerIdsRequest:
     __api_key__: ClassVar[i16] = i16(67)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     broker_id: BrokerId = field(metadata={"kafka_type": "int32"})
-    """The ID of the requesting broker"""
+    """The ID of the requesting broker."""
     broker_epoch: i64 = field(metadata={"kafka_type": "int64"}, default=i64(-1))
-    """The epoch of the requesting broker"""
+    """The epoch of the requesting broker."""

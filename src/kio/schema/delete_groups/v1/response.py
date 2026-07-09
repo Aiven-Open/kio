@@ -22,7 +22,7 @@ class DeletableGroupResult:
     __api_key__: ClassVar[i16] = i16(42)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     group_id: GroupId = field(metadata={"kafka_type": "string"})
-    """The group id"""
+    """The group id."""
     error_code: ErrorCode = field(metadata={"kafka_type": "error_code"})
     """The deletion error, or 0 if the deletion succeeded."""
 
@@ -37,4 +37,4 @@ class DeleteGroupsResponse:
     throttle_time: i32Timedelta = field(metadata={"kafka_type": "timedelta_i32"})
     """The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota."""
     results: tuple[DeletableGroupResult, ...]
-    """The deletion results"""
+    """The deletion results."""

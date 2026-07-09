@@ -1,0 +1,65 @@
+"""
+Generated from ``clients/src/main/resources/common/message/ReadShareGroupStateSummaryResponse.json``.
+"""
+
+import uuid
+
+from dataclasses import dataclass
+from dataclasses import field
+from typing import ClassVar
+
+from kio.schema.errors import ErrorCode
+from kio.schema.response_header.v1.header import ResponseHeader
+from kio.static.constants import EntityType
+from kio.static.primitive import i16
+from kio.static.primitive import i32
+from kio.static.primitive import i64
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class PartitionResult:
+    __type__: ClassVar = EntityType.nested
+    __version__: ClassVar[i16] = i16(1)
+    __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(87)
+    __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
+    partition: i32 = field(metadata={"kafka_type": "int32"})
+    """The partition index."""
+    error_code: ErrorCode = field(metadata={"kafka_type": "error_code"})
+    """The error code, or 0 if there was no error."""
+    error_message: str | None = field(metadata={"kafka_type": "string"}, default=None)
+    """The error message, or null if there was no error."""
+    state_epoch: i32 = field(metadata={"kafka_type": "int32"})
+    """The state epoch of the share-partition."""
+    leader_epoch: i32 = field(metadata={"kafka_type": "int32"})
+    """The leader epoch of the share-partition."""
+    start_offset: i64 = field(metadata={"kafka_type": "int64"})
+    """The share-partition start offset."""
+    delivery_complete_count: i32 = field(
+        metadata={"kafka_type": "int32"}, default=i32(-1)
+    )
+    """The number of offsets greater than or equal to share-partition start offset for which delivery has been completed."""
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ReadStateSummaryResult:
+    __type__: ClassVar = EntityType.nested
+    __version__: ClassVar[i16] = i16(1)
+    __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(87)
+    __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
+    topic_id: uuid.UUID | None = field(metadata={"kafka_type": "uuid"})
+    """The topic identifier."""
+    partitions: tuple[PartitionResult, ...]
+    """The results for the partitions."""
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ReadShareGroupStateSummaryResponse:
+    __type__: ClassVar = EntityType.response
+    __version__: ClassVar[i16] = i16(1)
+    __flexible__: ClassVar[bool] = True
+    __api_key__: ClassVar[i16] = i16(87)
+    __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
+    results: tuple[ReadStateSummaryResult, ...]
+    """The read results."""

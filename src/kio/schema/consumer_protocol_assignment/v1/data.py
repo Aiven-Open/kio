@@ -18,7 +18,9 @@ class TopicPartition:
     __version__: ClassVar[i16] = i16(1)
     __flexible__: ClassVar[bool] = False
     topic: TopicName = field(metadata={"kafka_type": "string"})
+    """The topic name."""
     partitions: tuple[i32, ...] = field(metadata={"kafka_type": "int32"}, default=())
+    """The list of partitions assigned to this consumer."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -27,4 +29,6 @@ class ConsumerProtocolAssignment:
     __version__: ClassVar[i16] = i16(1)
     __flexible__: ClassVar[bool] = False
     assigned_partitions: tuple[TopicPartition, ...]
+    """The list of topics and partitions assigned to this consumer."""
     user_data: bytes | None = field(metadata={"kafka_type": "bytes"}, default=None)
+    """User data."""

@@ -41,7 +41,7 @@ class GetTelemetrySubscriptionsResponse:
     telemetry_max_bytes: i32 = field(metadata={"kafka_type": "int32"})
     """The maximum bytes of binary data the broker accepts in PushTelemetryRequest."""
     delta_temporality: bool = field(metadata={"kafka_type": "bool"})
-    """Flag to indicate monotonic/counter metrics are to be emitted as deltas or cumulative values"""
+    """Flag to indicate monotonic/counter metrics are to be emitted as deltas or cumulative values."""
     requested_metrics: tuple[str, ...] = field(
         metadata={"kafka_type": "string"}, default=()
     )

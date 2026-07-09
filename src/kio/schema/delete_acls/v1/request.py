@@ -22,7 +22,7 @@ class DeleteAclsFilter:
     resource_type_filter: i8 = field(metadata={"kafka_type": "int8"})
     """The resource type."""
     resource_name_filter: str | None = field(metadata={"kafka_type": "string"})
-    """The resource name."""
+    """The resource name, or null to match any resource name."""
     pattern_type_filter: i8 = field(metadata={"kafka_type": "int8"}, default=i8(3))
     """The pattern type."""
     principal_filter: str | None = field(metadata={"kafka_type": "string"})

@@ -24,11 +24,11 @@ class Listener:
     __api_key__: ClassVar[i16] = i16(80)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     name: str = field(metadata={"kafka_type": "string"})
-    """The name of the endpoint"""
+    """The name of the endpoint."""
     host: str = field(metadata={"kafka_type": "string"})
-    """The hostname"""
+    """The hostname."""
     port: u16 = field(metadata={"kafka_type": "uint16"})
-    """The port"""
+    """The port."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -39,10 +39,12 @@ class AddRaftVoterRequest:
     __api_key__: ClassVar[i16] = i16(80)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     cluster_id: str | None = field(metadata={"kafka_type": "string"})
+    """The cluster id."""
     timeout: i32Timedelta = field(metadata={"kafka_type": "timedelta_i32"})
+    """The maximum time to wait for the request to complete before returning."""
     voter_id: i32 = field(metadata={"kafka_type": "int32"})
-    """The replica id of the voter getting added to the topic partition"""
+    """The replica id of the voter getting added to the topic partition."""
     voter_directory_id: uuid.UUID | None = field(metadata={"kafka_type": "uuid"})
-    """The directory id of the voter getting added to the topic partition"""
+    """The directory id of the voter getting added to the topic partition."""
     listeners: tuple[Listener, ...]
-    """The endpoints that can be used to communicate with the voter"""
+    """The endpoints that can be used to communicate with the voter."""

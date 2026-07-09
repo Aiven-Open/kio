@@ -61,6 +61,6 @@ class ControllerRegistrationRequest:
     zk_migration_ready: bool = field(metadata={"kafka_type": "bool"})
     """Set if the required configurations for ZK migration are present."""
     listeners: tuple[Listener, ...]
-    """The listeners of this controller"""
+    """The listeners of this controller."""
     features: tuple[Feature, ...]
-    """The features on this controller"""
+    """The features on this controller."""

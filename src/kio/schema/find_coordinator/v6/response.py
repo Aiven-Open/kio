@@ -46,4 +46,4 @@ class FindCoordinatorResponse:
     throttle_time: i32Timedelta = field(metadata={"kafka_type": "timedelta_i32"})
     """The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota."""
     coordinators: tuple[Coordinator, ...]
-    """Each coordinator result in the response"""
+    """Each coordinator result in the response."""

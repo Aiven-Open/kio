@@ -25,10 +25,11 @@ class PartitionData:
     partition_index: i32 = field(metadata={"kafka_type": "int32"})
     """The partition index."""
     error_code: ErrorCode = field(metadata={"kafka_type": "error_code"})
+    """The error code for this partition."""
     leader_id: BrokerId = field(metadata={"kafka_type": "int32"})
     """The ID of the current leader or -1 if the leader is unknown."""
     leader_epoch: i32 = field(metadata={"kafka_type": "int32"})
-    """The latest known leader epoch"""
+    """The latest known leader epoch."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -41,6 +42,7 @@ class TopicData:
     topic_name: TopicName = field(metadata={"kafka_type": "string"})
     """The topic name."""
     partitions: tuple[PartitionData, ...]
+    """The partition data."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -53,3 +55,4 @@ class BeginQuorumEpochResponse:
     error_code: ErrorCode = field(metadata={"kafka_type": "error_code"})
     """The top level error code."""
     topics: tuple[TopicData, ...]
+    """The topic data."""

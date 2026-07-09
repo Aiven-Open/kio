@@ -49,7 +49,7 @@ class DescribeConfigsResourceResult:
     synonyms: tuple[DescribeConfigsSynonym, ...]
     """The synonyms for this configuration key."""
     config_type: i8 = field(metadata={"kafka_type": "int8"}, default=i8(0))
-    """The configuration data type. Type can be one of the following values - BOOLEAN, STRING, INT, SHORT, LONG, DOUBLE, LIST, CLASS, PASSWORD"""
+    """The configuration data type. Type can be one of the following values - BOOLEAN, STRING, INT, SHORT, LONG, DOUBLE, LIST, CLASS, PASSWORD."""
     documentation: str | None = field(metadata={"kafka_type": "string"})
     """The configuration documentation."""
 

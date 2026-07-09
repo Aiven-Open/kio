@@ -23,6 +23,6 @@ class DeleteTopicsRequest:
     topic_names: tuple[TopicName, ...] = field(
         metadata={"kafka_type": "string"}, default=()
     )
-    """The names of the topics to delete"""
+    """The names of the topics to delete."""
     timeout: i32Timedelta = field(metadata={"kafka_type": "timedelta_i32"})
     """The length of time in milliseconds to wait for the deletions to complete."""

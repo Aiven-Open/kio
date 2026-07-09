@@ -21,7 +21,7 @@ class DescribedGroupMember:
     __api_key__: ClassVar[i16] = i16(15)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     member_id: str = field(metadata={"kafka_type": "string"})
-    """The member ID assigned by the group coordinator."""
+    """The member id."""
     client_id: str = field(metadata={"kafka_type": "string"})
     """The client ID used in the member's latest join group request."""
     client_host: str = field(metadata={"kafka_type": "string"})
