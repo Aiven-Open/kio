@@ -4,7 +4,6 @@ from typing import ClassVar
 from typing import Protocol
 from typing import TypeAlias
 
-import kio.schema.request_header.v0
 import kio.schema.request_header.v1
 import kio.schema.request_header.v2
 import kio.schema.response_header.v0
@@ -23,7 +22,6 @@ __all__ = (
     "RequestHeader",
     "ResponseHeader",
     "Header",
-    "HeaderV0RequestPayload",
     "HeaderV1RequestPayload",
     "HeaderV2RequestPayload",
     "HeaderV0ResponsePayload",
@@ -32,8 +30,7 @@ __all__ = (
 
 
 RequestHeader: TypeAlias = (
-    kio.schema.request_header.v0.RequestHeader
-    | kio.schema.request_header.v1.RequestHeader
+    kio.schema.request_header.v1.RequestHeader
     | kio.schema.request_header.v2.RequestHeader
 )
 """Convenient union type of all possible request header types."""
@@ -95,12 +92,6 @@ class Payload(DataclassInstance, Protocol):
         """
 
 
-class HeaderV0RequestPayload(Payload, Protocol):
-    """Protocol describing a request payload entity type with a V0 header."""
-
-    __header_schema__: ClassVar[type[kio.schema.request_header.v0.RequestHeader]]
-
-
 class HeaderV1RequestPayload(Payload, Protocol):
     """Protocol describing a request payload entity type with a V1 header."""
 
@@ -113,9 +104,7 @@ class HeaderV2RequestPayload(Payload, Protocol):
     __header_schema__: ClassVar[type[kio.schema.request_header.v2.RequestHeader]]
 
 
-RequestPayload: TypeAlias = (
-    HeaderV0RequestPayload | HeaderV1RequestPayload | HeaderV2RequestPayload
-)
+RequestPayload: TypeAlias = HeaderV1RequestPayload | HeaderV2RequestPayload
 """Convenient union type of all possible request payloads."""
 
 

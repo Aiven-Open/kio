@@ -9,19 +9,12 @@ from contextlib import closing
 from typing import Any
 from typing import Final
 from typing import TypeVar
-from typing import assert_never
 from typing import assert_type
 from unittest import mock
 
 import pytest
 
 from typing_extensions import Buffer
-
-import kio.schema.request_header.v0.header
-import kio.schema.request_header.v1.header
-import kio.schema.request_header.v2.header
-import kio.schema.response_header.v0.header
-import kio.schema.response_header.v1.header
 
 from kio.schema.api_versions.v2 import request as api_versions_v2_request
 from kio.schema.api_versions.v2 import response as api_versions_v2_response
@@ -62,7 +55,6 @@ from kio.static.primitive import i16
 from kio.static.primitive import i32
 from kio.static.primitive import i32Timedelta
 from kio.static.primitive import i64
-from kio.static.protocol import RequestHeader
 from kio.static.protocol import RequestPayload
 from kio.static.protocol import ResponsePayload
 
@@ -81,30 +73,12 @@ def write_request_header(
     client_id: str | None,
 ) -> None:
     header_schema = payload.__header_schema__
-    header: RequestHeader
-
-    if issubclass(header_schema, kio.schema.request_header.v0.header.RequestHeader):
-        header = header_schema(
-            request_api_key=payload.__api_key__,
-            request_api_version=payload.__version__,
-            correlation_id=correlation_id,
-        )
-    elif issubclass(
-        header_schema,
-        (
-            kio.schema.request_header.v1.header.RequestHeader
-            | kio.schema.request_header.v2.header.RequestHeader
-        ),
-    ):
-        header = header_schema(
-            request_api_key=payload.__api_key__,
-            request_api_version=payload.__version__,
-            correlation_id=correlation_id,
-            client_id=client_id,
-        )
-    else:
-        assert_never(header_schema)
-
+    header = header_schema(
+        request_api_key=payload.__api_key__,
+        request_api_version=payload.__version__,
+        correlation_id=correlation_id,
+        client_id=client_id,
+    )
     entity_writer(header_schema)(buffer, header)
 
 

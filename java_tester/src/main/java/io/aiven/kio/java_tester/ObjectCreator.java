@@ -6,8 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.kafka.common.Uuid;
-import org.apache.kafka.common.record.BaseRecords;
-import org.apache.kafka.common.record.MemoryRecords;
+import org.apache.kafka.common.record.internal.BaseRecords;
+import org.apache.kafka.common.record.internal.MemoryRecords;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.text.CaseUtils;
@@ -123,6 +123,8 @@ class ObjectCreator<T> extends BaseCreator {
             case "transaction_start_time" -> fieldName = "transaction_start_time_ms";
             case "log_append_time" -> fieldName = "log_append_time_ms";
             case "push_interval" -> fieldName = "push_interval_ms";
+            case "acquisition_lock_timeout" -> fieldName = "acquisition_lock_timeout_ms";
+            case "task_offset_interval" -> fieldName = "task_offset_interval_ms";
         }
 
         fieldName = CaseUtils.toCamelCase(fieldName, true, '_');

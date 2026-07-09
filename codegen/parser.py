@@ -10,7 +10,6 @@ from collections.abc import Callable
 from collections.abc import Iterator
 from collections.abc import Mapping
 from collections.abc import Sequence
-from typing import Annotated
 from typing import Final
 from typing import Literal
 from typing import NamedTuple
@@ -258,6 +257,8 @@ timedelta_names: Final = frozenset(
         "RetentionTimeMs",
         "HeartbeatIntervalMs",
         "PushIntervalMs",
+        "AcquisitionLockTimeoutMs",
+        "TaskOffsetIntervalMs",
     }
 )
 datetime_names: Final = frozenset(
@@ -414,11 +415,23 @@ class DataSchema(_BaseSchema):
     type: Literal["data"]
 
 
+class NoValidVersionSchema(BaseModel):
+    """A message removed from Kafka, left behind as a stub with no valid versions
+    and no body (e.g. the ZooKeeper-era control-plane RPCs dropped in 4.0)."""
+
+    name: str
+    validVersions: VersionRange
+
+    @validator("validVersions")
+    @classmethod
+    def must_have_no_valid_versions(cls, value: VersionRange) -> VersionRange:
+        if not value.is_empty:
+            raise ValueError("validVersions must be empty ('none')")
+        return value
+
+
 class Schema(BaseModel):
-    __root__: Annotated[
-        MessageSchema | HeaderSchema | DataSchema,
-        pydantic.Field(discriminator="type"),
-    ]
+    __root__: MessageSchema | HeaderSchema | DataSchema | NoValidVersionSchema
 
 
 class CommonStruct(BaseModel):
@@ -498,7 +511,9 @@ def parse_common_structs(json_structure: object) -> dict[str, CommonStruct]:
     }
 
 
-def parse_file(path: pathlib.Path) -> MessageSchema | HeaderSchema | DataSchema:
+def parse_file(
+    path: pathlib.Path,
+) -> MessageSchema | HeaderSchema | DataSchema | NoValidVersionSchema:
     global structs_registry
     structs_registry = {}
 

@@ -59,6 +59,8 @@ class RootMessageInfo {
             && !shortClassName.equals("DefaultPrincipalData")
             && !shortClassName.equals("KRaftVersionRecord")
             && !shortClassName.equals("VotersRecord")
+            && !shortClassName.equals("ControlRecordTypeSchema")
+            && !shortClassName.equals("EndTxnMarker")
         ) {
             className += "Data";
         }
