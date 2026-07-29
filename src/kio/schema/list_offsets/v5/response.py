@@ -32,6 +32,7 @@ class ListOffsetsPartitionResponse:
     offset: i64 = field(metadata={"kafka_type": "int64"}, default=i64(-1))
     """The returned offset."""
     leader_epoch: i32 = field(metadata={"kafka_type": "int32"}, default=i32(-1))
+    """The leader epoch associated with the returned offset."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -42,7 +43,7 @@ class ListOffsetsTopicResponse:
     __api_key__: ClassVar[i16] = i16(2)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     name: TopicName = field(metadata={"kafka_type": "string"})
-    """The topic name"""
+    """The topic name."""
     partitions: tuple[ListOffsetsPartitionResponse, ...]
     """Each partition in the response."""
 

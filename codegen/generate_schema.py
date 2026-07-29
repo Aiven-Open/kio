@@ -32,6 +32,7 @@ from .parser import EntityType
 from .parser import Field
 from .parser import HeaderSchema
 from .parser import MessageSchema
+from .parser import NoValidVersionSchema
 from .parser import Primitive
 from .parser import PrimitiveArrayField
 from .parser import PrimitiveArrayType
@@ -430,15 +431,19 @@ def generate_common_struct_field(
     field: CommonStructField,
     version: int,
 ) -> str:
+    optional = field.is_nullable_for_version(version)
     field_call = format_dataclass_field(
         field_type=field.type,
-        default=None,
-        optional=field.is_nullable_for_version(version),
+        default=field.default,
+        optional=optional,
         custom_type=None,
         tag=field.get_tag(version),
         ignorable=field.ignorable,
     )
-    return f"    {to_snake_case(field.name)}: {field.type.struct.name}{field_call}\n"
+    annotation = (
+        f"{field.type.struct.name} | None" if optional else field.type.struct.name
+    )
+    return f"    {to_snake_case(field.name)}: {annotation}{field_call}\n"
 
 
 seen = set[tuple[str, int]]()
@@ -715,6 +720,9 @@ def main() -> None:
         except ValidationError as exc:
             exc.add_note(f"💥 Failed parsing schema in {path}")
             raise exc
+
+        if isinstance(schema, NoValidVersionSchema):
+            continue
 
         api_name = basic_name(schema.name)
 

@@ -51,3 +51,4 @@ class JoinGroupResponse:
     member_id: str = field(metadata={"kafka_type": "string"})
     """The member ID assigned by the group coordinator."""
     members: tuple[JoinGroupResponseMember, ...]
+    """The group members."""

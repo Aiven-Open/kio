@@ -26,18 +26,18 @@ class PartitionData:
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     partition_index: i32 = field(metadata={"kafka_type": "int32"})
     """The partition index."""
-    candidate_epoch: i32 = field(metadata={"kafka_type": "int32"})
-    """The bumped epoch of the candidate sending the request"""
-    candidate_id: BrokerId = field(metadata={"kafka_type": "int32"})
+    replica_epoch: i32 = field(metadata={"kafka_type": "int32"})
+    """The epoch of the voter sending the request"""
+    replica_id: BrokerId = field(metadata={"kafka_type": "int32"})
     """The replica id of the voter sending the request"""
-    candidate_directory_id: uuid.UUID | None = field(metadata={"kafka_type": "uuid"})
+    replica_directory_id: uuid.UUID | None = field(metadata={"kafka_type": "uuid"})
     """The directory id of the voter sending the request"""
     voter_directory_id: uuid.UUID | None = field(metadata={"kafka_type": "uuid"})
-    """The ID of the voter sending the request"""
+    """The directory id of the voter receiving the request"""
     last_offset_epoch: i32 = field(metadata={"kafka_type": "int32"})
-    """The epoch of the last record written to the metadata log"""
+    """The epoch of the last record written to the metadata log."""
     last_offset: i64 = field(metadata={"kafka_type": "int64"})
-    """The offset of the last record written to the metadata log"""
+    """The log end offset of the metadata log of the voter sending the request."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -50,6 +50,7 @@ class TopicData:
     topic_name: TopicName = field(metadata={"kafka_type": "string"})
     """The topic name."""
     partitions: tuple[PartitionData, ...]
+    """The partition data."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -60,6 +61,8 @@ class VoteRequest:
     __api_key__: ClassVar[i16] = i16(52)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     cluster_id: str | None = field(metadata={"kafka_type": "string"}, default=None)
+    """The cluster id."""
     voter_id: BrokerId = field(metadata={"kafka_type": "int32"}, default=BrokerId(-1))
-    """The replica id of the voter receiving the request"""
+    """The replica id of the voter receiving the request."""
     topics: tuple[TopicData, ...]
+    """The topic data."""

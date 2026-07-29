@@ -25,11 +25,11 @@ class StateBatch:
     __api_key__: ClassVar[i16] = i16(84)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     first_offset: i64 = field(metadata={"kafka_type": "int64"})
-    """The base offset of this state batch."""
+    """The first offset of this state batch."""
     last_offset: i64 = field(metadata={"kafka_type": "int64"})
     """The last offset of this state batch."""
     delivery_state: i8 = field(metadata={"kafka_type": "int8"})
-    """The state - 0:Available,2:Acked,4:Archived."""
+    """The delivery state - 0:Available,2:Acked,4:Archived."""
     delivery_count: i16 = field(metadata={"kafka_type": "int16"})
     """The delivery count."""
 
@@ -48,10 +48,11 @@ class PartitionResult:
     error_message: str | None = field(metadata={"kafka_type": "string"}, default=None)
     """The error message, or null if there was no error."""
     state_epoch: i32 = field(metadata={"kafka_type": "int32"})
-    """The state epoch for this share-partition."""
+    """The state epoch of the share-partition."""
     start_offset: i64 = field(metadata={"kafka_type": "int64"})
     """The share-partition start offset, which can be -1 if it is not yet initialized."""
     state_batches: tuple[StateBatch, ...]
+    """The state batches for this share-partition."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -62,7 +63,7 @@ class ReadStateResult:
     __api_key__: ClassVar[i16] = i16(84)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     topic_id: uuid.UUID | None = field(metadata={"kafka_type": "uuid"})
-    """The topic identifier"""
+    """The topic identifier."""
     partitions: tuple[PartitionResult, ...]
     """The results for the partitions."""
 
@@ -75,4 +76,4 @@ class ReadShareGroupStateResponse:
     __api_key__: ClassVar[i16] = i16(84)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     results: tuple[ReadStateResult, ...]
-    """The read results"""
+    """The read results."""

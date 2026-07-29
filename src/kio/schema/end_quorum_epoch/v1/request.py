@@ -25,7 +25,9 @@ class ReplicaInfo:
     __api_key__: ClassVar[i16] = i16(54)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     candidate_id: BrokerId = field(metadata={"kafka_type": "int32"})
+    """The ID of the candidate replica."""
     candidate_directory_id: uuid.UUID | None = field(metadata={"kafka_type": "uuid"})
+    """The directory ID of the candidate replica."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -38,11 +40,11 @@ class PartitionData:
     partition_index: i32 = field(metadata={"kafka_type": "int32"})
     """The partition index."""
     leader_id: BrokerId = field(metadata={"kafka_type": "int32"})
-    """The current leader ID that is resigning"""
+    """The current leader ID that is resigning."""
     leader_epoch: i32 = field(metadata={"kafka_type": "int32"})
-    """The current epoch"""
+    """The current epoch."""
     preferred_candidates: tuple[ReplicaInfo, ...]
-    """A sorted list of preferred candidates to start the election"""
+    """A sorted list of preferred candidates to start the election."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -55,6 +57,7 @@ class TopicData:
     topic_name: TopicName = field(metadata={"kafka_type": "string"})
     """The topic name."""
     partitions: tuple[PartitionData, ...]
+    """The partitions."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -65,11 +68,11 @@ class LeaderEndpoint:
     __api_key__: ClassVar[i16] = i16(54)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     name: str = field(metadata={"kafka_type": "string"})
-    """The name of the endpoint"""
+    """The name of the endpoint."""
     host: str = field(metadata={"kafka_type": "string"})
-    """The node's hostname"""
+    """The node's hostname."""
     port: u16 = field(metadata={"kafka_type": "uint16"})
-    """The node's port"""
+    """The node's port."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -80,6 +83,8 @@ class EndQuorumEpochRequest:
     __api_key__: ClassVar[i16] = i16(54)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     cluster_id: str | None = field(metadata={"kafka_type": "string"}, default=None)
+    """The cluster id."""
     topics: tuple[TopicData, ...]
+    """The topics."""
     leader_endpoints: tuple[LeaderEndpoint, ...]
-    """Endpoints for the leader"""
+    """Endpoints for the leader."""

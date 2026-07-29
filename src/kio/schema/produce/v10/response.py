@@ -28,11 +28,11 @@ class BatchIndexAndErrorMessage:
     __api_key__: ClassVar[i16] = i16(0)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     batch_index: i32 = field(metadata={"kafka_type": "int32"})
-    """The batch index of the record that cause the batch to be dropped"""
+    """The batch index of the record that caused the batch to be dropped."""
     batch_index_error_message: str | None = field(
         metadata={"kafka_type": "string"}, default=None
     )
-    """The error message of the record that caused the batch to be dropped"""
+    """The error message of the record that caused the batch to be dropped."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -45,7 +45,7 @@ class LeaderIdAndEpoch:
     leader_id: BrokerId = field(metadata={"kafka_type": "int32"}, default=BrokerId(-1))
     """The ID of the current leader or -1 if the leader is unknown."""
     leader_epoch: i32 = field(metadata={"kafka_type": "int32"}, default=i32(-1))
-    """The latest known leader epoch"""
+    """The latest known leader epoch."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -68,12 +68,13 @@ class PartitionProduceResponse:
     log_start_offset: i64 = field(metadata={"kafka_type": "int64"}, default=i64(-1))
     """The log start offset."""
     record_errors: tuple[BatchIndexAndErrorMessage, ...]
-    """The batch indices of records that caused the batch to be dropped"""
+    """The batch indices of records that caused the batch to be dropped."""
     error_message: str | None = field(metadata={"kafka_type": "string"}, default=None)
-    """The global error message summarizing the common root cause of the records that caused the batch to be dropped"""
+    """The global error message summarizing the common root cause of the records that caused the batch to be dropped."""
     current_leader: LeaderIdAndEpoch = field(
         metadata={"tag": 0}, default=LeaderIdAndEpoch()
     )
+    """The leader broker that the producer should use for future requests."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -84,7 +85,7 @@ class TopicProduceResponse:
     __api_key__: ClassVar[i16] = i16(0)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     name: TopicName = field(metadata={"kafka_type": "string"})
-    """The topic name"""
+    """The topic name."""
     partition_responses: tuple[PartitionProduceResponse, ...]
     """Each partition that we produced to within the topic."""
 
@@ -114,7 +115,7 @@ class ProduceResponse:
     __api_key__: ClassVar[i16] = i16(0)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     responses: tuple[TopicProduceResponse, ...]
-    """Each produce response"""
+    """Each produce response."""
     throttle_time: i32Timedelta = field(
         metadata={"kafka_type": "timedelta_i32"},
         default=i32Timedelta.parse(datetime.timedelta(milliseconds=0)),

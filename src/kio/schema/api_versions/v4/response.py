@@ -87,4 +87,4 @@ class ApiVersionsResponse:
     zk_migration_ready: bool = field(
         metadata={"kafka_type": "bool", "tag": 3}, default=False
     )
-    """Set by a KRaft controller if the required configurations for ZK migration are present"""
+    """Set by a KRaft controller if the required configurations for ZK migration are present."""

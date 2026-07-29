@@ -9,15 +9,11 @@ from codegen.parser import MessageSchema
 
 def _get_request_header_schema(
     schema: MessageSchema,
-    version: int,
     is_flexible: bool,
 ) -> str:
     assert schema.type == "request"
 
-    # Version 0 of ControlledShutdownRequest is special, see Kafka source linked above.
-    if version == 0 and schema.apiKey == 7:
-        return "from kio.schema.request_header.v0.header import RequestHeader\n"
-    elif is_flexible:
+    if is_flexible:
         return "from kio.schema.request_header.v2.header import RequestHeader\n"
     else:
         return "from kio.schema.request_header.v1.header import RequestHeader\n"
@@ -46,7 +42,7 @@ def get_header_schema_import(
         return ""
     is_flexible = schema.flexibleVersions.matches(version)
     if schema.type == "request":
-        return _get_request_header_schema(schema, version, is_flexible)
+        return _get_request_header_schema(schema, is_flexible)
     elif schema.type == "response":
         return _get_response_header_schema(schema, is_flexible)
     raise NotImplementedError("Unknown schema type")

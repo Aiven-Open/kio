@@ -22,9 +22,9 @@ class DescribedDelegationTokenRenewer:
     __api_key__: ClassVar[i16] = i16(41)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     principal_type: str = field(metadata={"kafka_type": "string"})
-    """The renewer principal type"""
+    """The renewer principal type."""
     principal_name: str = field(metadata={"kafka_type": "string"})
-    """The renewer principal name"""
+    """The renewer principal name."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

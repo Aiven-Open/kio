@@ -20,11 +20,11 @@ class Endpoint:
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     name: str = field(metadata={"kafka_type": "string"})
-    """The name of the endpoint"""
+    """The name of the endpoint."""
     host: str = field(metadata={"kafka_type": "string"})
-    """The hostname"""
+    """The hostname."""
     port: u16 = field(metadata={"kafka_type": "uint16"})
-    """The port"""
+    """The port."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -33,9 +33,9 @@ class KRaftVersionFeature:
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     min_supported_version: i16 = field(metadata={"kafka_type": "int16"})
-    """The minimum supported KRaft protocol version"""
+    """The minimum supported KRaft protocol version."""
     max_supported_version: i16 = field(metadata={"kafka_type": "int16"})
-    """The maximum supported KRaft protocol version"""
+    """The maximum supported KRaft protocol version."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -44,13 +44,13 @@ class Voter:
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     voter_id: BrokerId = field(metadata={"kafka_type": "int32"})
-    """The replica id of the voter in the topic partition"""
+    """The replica id of the voter in the topic partition."""
     voter_directory_id: uuid.UUID | None = field(metadata={"kafka_type": "uuid"})
-    """The directory id of the voter in the topic partition"""
+    """The directory id of the voter in the topic partition."""
     endpoints: tuple[Endpoint, ...]
-    """The endpoint that can be used to communicate with the voter"""
+    """The endpoint that can be used to communicate with the voter."""
     k_raft_version_feature: KRaftVersionFeature
-    """The range of versions of the protocol that the replica supports"""
+    """The range of versions of the protocol that the replica supports."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -59,5 +59,6 @@ class VotersRecord:
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     version: i16 = field(metadata={"kafka_type": "int16"})
-    """The version of the voters record"""
+    """The version of the voters record."""
     voters: tuple[Voter, ...]
+    """The set of voters in the quorum for this epoch."""

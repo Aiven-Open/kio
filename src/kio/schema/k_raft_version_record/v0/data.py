@@ -16,6 +16,6 @@ class KRaftVersionRecord:
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     version: i16 = field(metadata={"kafka_type": "int16"})
-    """The version of the kraft version record"""
+    """The version of the kraft version record."""
     k_raft_version: i16 = field(metadata={"kafka_type": "int16"})
-    """The kraft protocol version"""
+    """The kraft protocol version."""

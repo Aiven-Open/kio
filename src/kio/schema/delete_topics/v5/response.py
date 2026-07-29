@@ -22,7 +22,7 @@ class DeletableTopicResult:
     __api_key__: ClassVar[i16] = i16(20)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     name: TopicName = field(metadata={"kafka_type": "string"})
-    """The topic name"""
+    """The topic name."""
     error_code: ErrorCode = field(metadata={"kafka_type": "error_code"})
     """The deletion error, or 0 if the deletion succeeded."""
     error_message: str | None = field(metadata={"kafka_type": "string"}, default=None)

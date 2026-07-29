@@ -16,8 +16,8 @@ class DefaultPrincipalData:
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = True
     type_: str = field(metadata={"kafka_type": "string"})
-    """The principal type"""
+    """The principal type."""
     name: str = field(metadata={"kafka_type": "string"})
-    """The principal name"""
+    """The principal name."""
     token_authenticated: bool = field(metadata={"kafka_type": "bool"})
     """Whether the principal was authenticated by a delegation token on the forwarding broker."""

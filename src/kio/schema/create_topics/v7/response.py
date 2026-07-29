@@ -47,7 +47,7 @@ class CreatableTopicResult:
     name: TopicName = field(metadata={"kafka_type": "string"})
     """The topic name."""
     topic_id: uuid.UUID | None = field(metadata={"kafka_type": "uuid"})
-    """The unique topic ID"""
+    """The unique topic ID."""
     error_code: ErrorCode = field(metadata={"kafka_type": "error_code"})
     """The error code, or 0 if there was no error."""
     error_message: str | None = field(metadata={"kafka_type": "string"})

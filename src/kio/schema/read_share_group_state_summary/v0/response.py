@@ -31,6 +31,8 @@ class PartitionResult:
     """The error message, or null if there was no error."""
     state_epoch: i32 = field(metadata={"kafka_type": "int32"})
     """The state epoch of the share-partition."""
+    leader_epoch: i32 = field(metadata={"kafka_type": "int32"})
+    """The leader epoch of the share-partition."""
     start_offset: i64 = field(metadata={"kafka_type": "int64"})
     """The share-partition start offset."""
 
@@ -43,7 +45,7 @@ class ReadStateSummaryResult:
     __api_key__: ClassVar[i16] = i16(87)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     topic_id: uuid.UUID | None = field(metadata={"kafka_type": "uuid"})
-    """The topic identifier"""
+    """The topic identifier."""
     partitions: tuple[PartitionResult, ...]
     """The results for the partitions."""
 
@@ -56,4 +58,4 @@ class ReadShareGroupStateSummaryResponse:
     __api_key__: ClassVar[i16] = i16(87)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     results: tuple[ReadStateSummaryResult, ...]
-    """The read results"""
+    """The read results."""

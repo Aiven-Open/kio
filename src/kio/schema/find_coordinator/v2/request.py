@@ -22,4 +22,4 @@ class FindCoordinatorRequest:
     key: str = field(metadata={"kafka_type": "string"})
     """The coordinator key."""
     key_type: i8 = field(metadata={"kafka_type": "int8"}, default=i8(0))
-    """The coordinator key type. (Group, transaction, etc.)"""
+    """The coordinator key type. (group, transaction, share)."""

@@ -23,7 +23,7 @@ class DescribedGroupMember:
     __api_key__: ClassVar[i16] = i16(15)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     member_id: str = field(metadata={"kafka_type": "string"})
-    """The member ID assigned by the group coordinator."""
+    """The member id."""
     group_instance_id: str | None = field(
         metadata={"kafka_type": "string"}, default=None
     )

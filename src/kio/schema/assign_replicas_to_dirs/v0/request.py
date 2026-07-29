@@ -24,7 +24,7 @@ class PartitionData:
     __api_key__: ClassVar[i16] = i16(73)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     partition_index: i32 = field(metadata={"kafka_type": "int32"})
-    """The partition index"""
+    """The partition index."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -35,8 +35,9 @@ class TopicData:
     __api_key__: ClassVar[i16] = i16(73)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     topic_id: uuid.UUID | None = field(metadata={"kafka_type": "uuid"})
-    """The ID of the assigned topic"""
+    """The ID of the assigned topic."""
     partitions: tuple[PartitionData, ...]
+    """The partitions assigned to the directory."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -47,8 +48,9 @@ class DirectoryData:
     __api_key__: ClassVar[i16] = i16(73)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     id_: uuid.UUID | None = field(metadata={"kafka_type": "uuid"})
-    """The ID of the directory"""
+    """The ID of the directory."""
     topics: tuple[TopicData, ...]
+    """The topics assigned to the directory."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -59,7 +61,8 @@ class AssignReplicasToDirsRequest:
     __api_key__: ClassVar[i16] = i16(73)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     broker_id: BrokerId = field(metadata={"kafka_type": "int32"})
-    """The ID of the requesting broker"""
+    """The ID of the requesting broker."""
     broker_epoch: i64 = field(metadata={"kafka_type": "int64"}, default=i64(-1))
-    """The epoch of the requesting broker"""
+    """The epoch of the requesting broker."""
     directories: tuple[DirectoryData, ...]
+    """The directories to which replicas should be assigned."""

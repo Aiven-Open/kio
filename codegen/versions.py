@@ -12,6 +12,10 @@ class VersionRange(NamedTuple):
     def matches(self, value: int) -> bool:
         return self.low <= value <= self.high
 
+    @property
+    def is_empty(self) -> bool:
+        return self.low > self.high
+
     @classmethod
     def __get_validators__(cls) -> Iterator[Callable[[object], VersionRange]]:
         def parse_valid_versions(value: object) -> VersionRange:

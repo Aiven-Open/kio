@@ -23,9 +23,11 @@ class TransactionState:
     __api_key__: ClassVar[i16] = i16(66)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     transactional_id: TransactionalId = field(metadata={"kafka_type": "string"})
+    """The transactional id."""
     producer_id: ProducerId = field(metadata={"kafka_type": "int64"})
+    """The producer id."""
     transaction_state: str = field(metadata={"kafka_type": "string"})
-    """The current transaction state of the producer"""
+    """The current transaction state of the producer."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -38,8 +40,10 @@ class ListTransactionsResponse:
     throttle_time: i32Timedelta = field(metadata={"kafka_type": "timedelta_i32"})
     """The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota."""
     error_code: ErrorCode = field(metadata={"kafka_type": "error_code"})
+    """The error code, or 0 if there was no error."""
     unknown_state_filters: tuple[str, ...] = field(
         metadata={"kafka_type": "string"}, default=()
     )
-    """Set of state filters provided in the request which were unknown to the transaction coordinator"""
+    """Set of state filters provided in the request which were unknown to the transaction coordinator."""
     transaction_states: tuple[TransactionState, ...]
+    """The current state of the transaction for the transactional id."""

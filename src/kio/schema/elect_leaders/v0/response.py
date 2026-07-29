@@ -23,7 +23,7 @@ class PartitionResult:
     __api_key__: ClassVar[i16] = i16(43)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     partition_id: i32 = field(metadata={"kafka_type": "int32"})
-    """The partition id"""
+    """The partition id."""
     error_code: ErrorCode = field(metadata={"kafka_type": "error_code"})
     """The result error, or zero if there was no error."""
     error_message: str | None = field(metadata={"kafka_type": "string"})
@@ -38,9 +38,9 @@ class ReplicaElectionResult:
     __api_key__: ClassVar[i16] = i16(43)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     topic: TopicName = field(metadata={"kafka_type": "string"})
-    """The topic name"""
+    """The topic name."""
     partition_result: tuple[PartitionResult, ...]
-    """The results for each partition"""
+    """The results for each partition."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

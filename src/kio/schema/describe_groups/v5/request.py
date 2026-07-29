@@ -20,6 +20,6 @@ class DescribeGroupsRequest:
     __api_key__: ClassVar[i16] = i16(15)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     groups: tuple[GroupId, ...] = field(metadata={"kafka_type": "string"}, default=())
-    """The names of the groups to describe"""
+    """The names of the groups to describe."""
     include_authorized_operations: bool = field(metadata={"kafka_type": "bool"})
     """Whether to include authorized operations."""

@@ -38,9 +38,9 @@ class ReassignableTopicResponse:
     __api_key__: ClassVar[i16] = i16(45)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     name: TopicName = field(metadata={"kafka_type": "string"})
-    """The topic name"""
+    """The topic name."""
     partitions: tuple[ReassignablePartitionResponse, ...]
-    """The responses to partitions to reassign"""
+    """The responses to partitions to reassign."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

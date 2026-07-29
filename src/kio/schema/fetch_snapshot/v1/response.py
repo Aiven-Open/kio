@@ -27,7 +27,9 @@ class SnapshotId:
     __api_key__: ClassVar[i16] = i16(59)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     end_offset: i64 = field(metadata={"kafka_type": "int64"})
+    """The snapshot end offset."""
     epoch: i32 = field(metadata={"kafka_type": "int32"})
+    """The snapshot epoch."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -40,7 +42,7 @@ class LeaderIdAndEpoch:
     leader_id: BrokerId = field(metadata={"kafka_type": "int32"})
     """The ID of the current leader or -1 if the leader is unknown."""
     leader_epoch: i32 = field(metadata={"kafka_type": "int32"})
-    """The latest known leader epoch"""
+    """The latest known leader epoch."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -55,14 +57,15 @@ class PartitionSnapshot:
     error_code: ErrorCode = field(metadata={"kafka_type": "error_code"})
     """The error code, or 0 if there was no fetch error."""
     snapshot_id: SnapshotId
-    """The snapshot endOffset and epoch fetched"""
+    """The snapshot endOffset and epoch fetched."""
     current_leader: LeaderIdAndEpoch = field(metadata={"tag": 0})
+    """The leader of the partition at the time of the snapshot."""
     size: i64 = field(metadata={"kafka_type": "int64"})
     """The total size of the snapshot."""
     position: i64 = field(metadata={"kafka_type": "int64"})
     """The starting byte position within the snapshot included in the Bytes field."""
     unaligned_records: Records = field(metadata={"kafka_type": "records"})
-    """Snapshot data in records format which may not be aligned on an offset boundary"""
+    """Snapshot data in records format which may not be aligned on an offset boundary."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -86,11 +89,11 @@ class NodeEndpoint:
     __api_key__: ClassVar[i16] = i16(59)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     node_id: BrokerId = field(metadata={"kafka_type": "int32"})
-    """The ID of the associated node"""
+    """The ID of the associated node."""
     host: str = field(metadata={"kafka_type": "string"})
-    """The node's hostname"""
+    """The node's hostname."""
     port: u16 = field(metadata={"kafka_type": "uint16"})
-    """The node's port"""
+    """The node's port."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -107,4 +110,4 @@ class FetchSnapshotResponse:
     topics: tuple[TopicSnapshot, ...]
     """The topics to fetch."""
     node_endpoints: tuple[NodeEndpoint, ...] = field(metadata={"tag": 0}, default=())
-    """Endpoints for all current-leaders enumerated in PartitionSnapshot"""
+    """Endpoints for all current-leaders enumerated in PartitionSnapshot."""

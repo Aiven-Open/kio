@@ -48,7 +48,7 @@ class OffsetFetchResponseTopics:
     name: TopicName = field(metadata={"kafka_type": "string"})
     """The topic name."""
     partitions: tuple[OffsetFetchResponsePartitions, ...]
-    """The responses per partition"""
+    """The responses per partition."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

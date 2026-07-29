@@ -21,7 +21,7 @@ class DescribableLogDirTopic:
     __api_key__: ClassVar[i16] = i16(35)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     topic: TopicName = field(metadata={"kafka_type": "string"})
-    """The topic name"""
+    """The topic name."""
     partitions: tuple[i32, ...] = field(metadata={"kafka_type": "int32"}, default=())
     """The partition indexes."""
 

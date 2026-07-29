@@ -20,7 +20,7 @@ class FindCoordinatorRequest:
     __api_key__: ClassVar[i16] = i16(10)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     key_type: i8 = field(metadata={"kafka_type": "int8"}, default=i8(0))
-    """The coordinator key type. (Group, transaction, etc.)"""
+    """The coordinator key type. (group, transaction, share)."""
     coordinator_keys: tuple[str, ...] = field(
         metadata={"kafka_type": "string"}, default=()
     )

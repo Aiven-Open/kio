@@ -25,13 +25,19 @@ class ProducerState:
     __api_key__: ClassVar[i16] = i16(61)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     producer_id: ProducerId = field(metadata={"kafka_type": "int64"})
+    """The producer id."""
     producer_epoch: i32 = field(metadata={"kafka_type": "int32"})
+    """The producer epoch."""
     last_sequence: i32 = field(metadata={"kafka_type": "int32"}, default=i32(-1))
+    """The last sequence number sent by the producer."""
     last_timestamp: i64 = field(metadata={"kafka_type": "int64"}, default=i64(-1))
+    """The last timestamp sent by the producer."""
     coordinator_epoch: i32 = field(metadata={"kafka_type": "int32"})
+    """The current epoch of the producer group."""
     current_txn_start_offset: i64 = field(
         metadata={"kafka_type": "int64"}, default=i64(-1)
     )
+    """The current transaction start offset of the producer."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -46,8 +52,9 @@ class PartitionResponse:
     error_code: ErrorCode = field(metadata={"kafka_type": "error_code"})
     """The partition error code, or 0 if there was no error."""
     error_message: str | None = field(metadata={"kafka_type": "string"}, default=None)
-    """The partition error message, which may be null if no additional details are available"""
+    """The partition error message, which may be null if no additional details are available."""
     active_producers: tuple[ProducerState, ...]
+    """The active producers for the partition."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -58,7 +65,7 @@ class TopicResponse:
     __api_key__: ClassVar[i16] = i16(61)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     name: TopicName = field(metadata={"kafka_type": "string"})
-    """The topic name"""
+    """The topic name."""
     partitions: tuple[PartitionResponse, ...]
     """Each partition in the response."""
 

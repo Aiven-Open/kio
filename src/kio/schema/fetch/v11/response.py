@@ -46,7 +46,7 @@ class PartitionData:
     high_watermark: i64 = field(metadata={"kafka_type": "int64"})
     """The current high water mark."""
     last_stable_offset: i64 = field(metadata={"kafka_type": "int64"}, default=i64(-1))
-    """The last stable offset (or LSO) of the partition. This is the last offset such that the state of all transactional records prior to this offset have been decided (ABORTED or COMMITTED)"""
+    """The last stable offset (or LSO) of the partition. This is the last offset such that the state of all transactional records prior to this offset have been decided (ABORTED or COMMITTED)."""
     log_start_offset: i64 = field(metadata={"kafka_type": "int64"}, default=i64(-1))
     """The current log start offset."""
     aborted_transactions: tuple[AbortedTransaction, ...] | None
@@ -54,7 +54,7 @@ class PartitionData:
     preferred_read_replica: BrokerId = field(
         metadata={"kafka_type": "int32"}, default=BrokerId(-1)
     )
-    """The preferred read replica for the consumer to use on its next fetch request"""
+    """The preferred read replica for the consumer to use on its next fetch request."""
     records: Records | None = field(metadata={"kafka_type": "records"})
     """The record data."""
 

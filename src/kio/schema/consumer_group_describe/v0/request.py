@@ -22,6 +22,6 @@ class ConsumerGroupDescribeRequest:
     group_ids: tuple[GroupId, ...] = field(
         metadata={"kafka_type": "string"}, default=()
     )
-    """The ids of the groups to describe"""
+    """The ids of the groups to describe."""
     include_authorized_operations: bool = field(metadata={"kafka_type": "bool"})
     """Whether to include authorized operations."""

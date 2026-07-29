@@ -25,7 +25,7 @@ class DeleteRecordsPartition:
     partition_index: i32 = field(metadata={"kafka_type": "int32"})
     """The partition index."""
     offset: i64 = field(metadata={"kafka_type": "int64"})
-    """The deletion offset."""
+    """The deletion offset. -1 means that records should be truncated to the high watermark."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

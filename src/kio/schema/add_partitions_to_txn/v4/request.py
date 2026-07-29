@@ -25,7 +25,7 @@ class AddPartitionsToTxnTopic:
     name: TopicName = field(metadata={"kafka_type": "string"})
     """The name of the topic."""
     partitions: tuple[i32, ...] = field(metadata={"kafka_type": "int32"}, default=())
-    """The partition indexes to add to the transaction"""
+    """The partition indexes to add to the transaction."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

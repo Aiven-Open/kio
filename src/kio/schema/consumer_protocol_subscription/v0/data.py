@@ -16,4 +16,6 @@ class ConsumerProtocolSubscription:
     __version__: ClassVar[i16] = i16(0)
     __flexible__: ClassVar[bool] = False
     topics: tuple[str, ...] = field(metadata={"kafka_type": "string"}, default=())
+    """The topics that the member wants to consume."""
     user_data: bytes | None = field(metadata={"kafka_type": "bytes"}, default=None)
+    """User data that will be passed back to the consumer."""

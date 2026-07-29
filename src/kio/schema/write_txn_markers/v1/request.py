@@ -45,7 +45,7 @@ class WritableTxnMarker:
     topics: tuple[WritableTxnMarkerTopic, ...]
     """Each topic that we want to write transaction marker(s) for."""
     coordinator_epoch: i32 = field(metadata={"kafka_type": "int32"})
-    """Epoch associated with the transaction state partition hosted by this transaction coordinator"""
+    """Epoch associated with the transaction state partition hosted by this transaction coordinator."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

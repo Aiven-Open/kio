@@ -24,7 +24,7 @@ class ListPartitionReassignmentsTopics:
     __api_key__: ClassVar[i16] = i16(46)
     __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader
     name: TopicName = field(metadata={"kafka_type": "string"})
-    """The topic name"""
+    """The topic name."""
     partition_indexes: tuple[i32, ...] = field(
         metadata={"kafka_type": "int32"}, default=()
     )

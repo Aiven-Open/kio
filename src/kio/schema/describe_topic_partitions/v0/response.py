@@ -86,9 +86,9 @@ class Cursor:
     __api_key__: ClassVar[i16] = i16(75)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     topic_name: TopicName = field(metadata={"kafka_type": "string"})
-    """The name for the first topic to process"""
+    """The name for the first topic to process."""
     partition_index: i32 = field(metadata={"kafka_type": "int32"})
-    """The partition index to start with"""
+    """The partition index to start with."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

@@ -28,7 +28,9 @@ class EpochEndOffset:
     __api_key__: ClassVar[i16] = i16(1)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     epoch: i32 = field(metadata={"kafka_type": "int32"}, default=i32(-1))
+    """The largest epoch."""
     end_offset: i64 = field(metadata={"kafka_type": "int64"}, default=i64(-1))
+    """The end offset of the epoch."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -41,7 +43,7 @@ class LeaderIdAndEpoch:
     leader_id: BrokerId = field(metadata={"kafka_type": "int32"}, default=BrokerId(-1))
     """The ID of the current leader or -1 if the leader is unknown."""
     leader_epoch: i32 = field(metadata={"kafka_type": "int32"}, default=i32(-1))
-    """The latest known leader epoch"""
+    """The latest known leader epoch."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -52,7 +54,9 @@ class SnapshotId:
     __api_key__: ClassVar[i16] = i16(1)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     end_offset: i64 = field(metadata={"kafka_type": "int64"}, default=i64(-1))
+    """The end offset of the epoch."""
     epoch: i32 = field(metadata={"kafka_type": "int32"}, default=i32(-1))
+    """The largest epoch."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -82,16 +86,17 @@ class PartitionData:
     high_watermark: i64 = field(metadata={"kafka_type": "int64"})
     """The current high water mark."""
     last_stable_offset: i64 = field(metadata={"kafka_type": "int64"}, default=i64(-1))
-    """The last stable offset (or LSO) of the partition. This is the last offset such that the state of all transactional records prior to this offset have been decided (ABORTED or COMMITTED)"""
+    """The last stable offset (or LSO) of the partition. This is the last offset such that the state of all transactional records prior to this offset have been decided (ABORTED or COMMITTED)."""
     log_start_offset: i64 = field(metadata={"kafka_type": "int64"}, default=i64(-1))
     """The current log start offset."""
     diverging_epoch: EpochEndOffset = field(
         metadata={"tag": 0}, default=EpochEndOffset()
     )
-    """In case divergence is detected based on the `LastFetchedEpoch` and `FetchOffset` in the request, this field indicates the largest epoch and its end offset such that subsequent records are known to diverge"""
+    """In case divergence is detected based on the `LastFetchedEpoch` and `FetchOffset` in the request, this field indicates the largest epoch and its end offset such that subsequent records are known to diverge."""
     current_leader: LeaderIdAndEpoch = field(
         metadata={"tag": 1}, default=LeaderIdAndEpoch()
     )
+    """The current leader of the partition."""
     snapshot_id: SnapshotId = field(metadata={"tag": 2}, default=SnapshotId())
     """In the case of fetching an offset less than the LogStartOffset, this is the end offset and epoch that should be used in the FetchSnapshot request."""
     aborted_transactions: tuple[AbortedTransaction, ...] | None
@@ -99,7 +104,7 @@ class PartitionData:
     preferred_read_replica: BrokerId = field(
         metadata={"kafka_type": "int32"}, default=BrokerId(-1)
     )
-    """The preferred read replica for the consumer to use on its next fetch request"""
+    """The preferred read replica for the consumer to use on its next fetch request."""
     records: Records | None = field(metadata={"kafka_type": "records"})
     """The record data."""
 
@@ -112,7 +117,7 @@ class FetchableTopicResponse:
     __api_key__: ClassVar[i16] = i16(1)
     __header_schema__: ClassVar[type[ResponseHeader]] = ResponseHeader
     topic_id: uuid.UUID | None = field(metadata={"kafka_type": "uuid"})
-    """The unique topic ID"""
+    """The unique topic ID."""
     partitions: tuple[PartitionData, ...]
     """The topic partitions."""
 
