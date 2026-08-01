@@ -39,7 +39,7 @@ jobs:
           target: ${{ matrix.platform.target }}
           manylinux: ${{ matrix.platform.manylinux }}
           args: --release --out dist -i 3.11 3.12 3.13 3.14 3.15
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: wheels-linux-${{ matrix.platform.target }}-${{ matrix.platform.manylinux }}
           path: dist
@@ -71,7 +71,7 @@ jobs:
           maturin-version: v1.14.1
           target: ${{ matrix.target }}
           args: --release --out dist --find-interpreter
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: wheels-macos-${{ matrix.target }}
           path: dist
@@ -99,7 +99,7 @@ jobs:
           maturin-version: v1.14.1
           target: x64
           args: --release --out dist --find-interpreter
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: wheels-windows-x64
           path: dist
@@ -122,7 +122,7 @@ jobs:
           maturin-version: v1.14.1
           command: sdist
           args: --out dist
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: sdist
           path: dist
