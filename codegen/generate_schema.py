@@ -457,10 +457,13 @@ def filter_version_fields(version: int, fields: Iterable[Field]) -> Iterator[Fie
 
 def message_class_vars(
     schema: MessageSchema | HeaderSchema | DataSchema,
+    top_level: bool,
 ) -> Iterator[str]:
     if not isinstance(schema, MessageSchema):
         return
     yield f"    __api_key__: ClassVar[i16] = i16({schema.apiKey})\n"
+    if top_level and not schema.javaTest:
+        yield "    __java_test__: ClassVar[bool] = False\n"
     if schema.type == "request":
         yield "    __header_schema__: ClassVar[type[RequestHeader]] = RequestHeader\n"
     elif schema.type == "response":
@@ -588,7 +591,7 @@ def generate_dataclass(  # noqa: C901
     yield f"    __version__: ClassVar[i16] = i16({version})\n"
     is_flexible = str(schema.flexibleVersions.matches(version))
     yield f"    __flexible__: ClassVar[bool] = {is_flexible}\n"
-    yield from message_class_vars(schema)
+    yield from message_class_vars(schema, top_level)
     yield from class_fields
 
     if top_level:

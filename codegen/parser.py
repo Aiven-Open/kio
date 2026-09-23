@@ -400,6 +400,7 @@ class _BaseSchema(BaseModel):
     validVersions: VersionRange
     flexibleVersions: VersionRange
     fields: tuple[Field, ...]
+    javaTest: bool = True
 
 
 class MessageSchema(_BaseSchema):

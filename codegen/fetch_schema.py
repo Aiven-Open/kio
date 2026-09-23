@@ -18,6 +18,7 @@ from . import build_tag
 base: Final = Path(__file__).parent.parent.resolve() / "schema"
 schema_dir: Final = base / build_tag
 cache_dir: Final = base / "cache"
+custom_schema_dir: Final = Path(__file__).parent / "custom_schema" / build_tag
 list_url: Final = (
     f"https://api.github.com/repos/apache/kafka/contents/clients/src/main/resources"
     f"/common/message?ref={build_tag}"
@@ -64,6 +65,19 @@ def fetch_file(content_file: ContentFile) -> None:
             fd.write(chunk)
 
 
+def copy_custom_schema() -> None:
+    if not custom_schema_dir.exists():
+        return
+
+    for custom_path in sorted(custom_schema_dir.glob("*.json")):
+        target_path = schema_dir / custom_path.name
+        if target_path.exists():
+            raise RuntimeError(
+                f"Custom schema collides with upstream schema: {target_path}"
+            )
+        shutil.copyfile(custom_path, target_path)
+
+
 def main() -> None:
     base.mkdir(parents=True, exist_ok=True)
 
@@ -90,6 +104,7 @@ def main() -> None:
     with ThreadPoolExecutor() as pool:
         for content_file in parsed_response.__root__:
             pool.submit(fetch_file, content_file)
+    copy_custom_schema()
     print(" done.")
 
 

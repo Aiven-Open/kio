@@ -114,6 +114,7 @@ api_key_map: Final[APIKeyMap] = MappingProxyType(
         90: "describe_share_group_offsets",
         91: "alter_share_group_offsets",
         92: "delete_share_group_offsets",
+        94: "decommission_controller",
     }
 )
 
@@ -932,6 +933,20 @@ schema_name_map: Final[SchemaNameMap] = MappingProxyType(
                     {
                         EntityType.data: (
                             "kio.schema.default_principal_data.v0.data:DefaultPrincipalData"
+                        ),
+                    }
+                ),
+            }
+        ),
+        "decommission_controller": MappingProxyType(
+            {
+                0: MappingProxyType(
+                    {
+                        EntityType.request: (
+                            "kio.schema.decommission_controller.v0.request:DecommissionControllerRequest"
+                        ),
+                        EntityType.response: (
+                            "kio.schema.decommission_controller.v0.response:DecommissionControllerResponse"
                         ),
                     }
                 ),

@@ -20,7 +20,7 @@ import io
 from hypothesis import given
 from hypothesis.strategies import from_type
 from kio.serial import entity_writer
-from tests.conftest import setup_buffer, JavaTester
+from tests.conftest import setup_buffer
 from kio.serial import entity_reader
 from typing import Final
 import pytest
@@ -48,6 +48,7 @@ def test_{entity_snake_case}_roundtrip(instance: {entity_type}) -> None:
     assert instance == result
 """
 
+java_import = "from tests.conftest import JavaTester\n"
 test_code_java = """\
 @pytest.mark.java
 @given(instance=from_type({entity_type}))
@@ -72,6 +73,7 @@ def main() -> None:
 
     module_imports = defaultdict(list)
     module_code = defaultdict(list)
+    module_java_tests = defaultdict(bool)
 
     for entity_type, file in get_entities():
         module_path = generated_tests_module / build_filename(Path(file))
@@ -88,7 +90,10 @@ def main() -> None:
             )
         )
 
-        if entity_type.__type__ is not EntityType.nested:
+        if entity_type.__type__ is not EntityType.nested and getattr(
+            entity_type, "__java_test__", True
+        ):
+            module_java_tests[module_path] = True
             module_code[module_path].append(
                 test_code_java.format(
                     entity_type=entity_type.__name__,
@@ -99,6 +104,8 @@ def main() -> None:
     for module_path, entity_imports in module_imports.items():
         with module_path.open("w") as fd:
             print(imports, file=fd)
+            if module_java_tests[module_path]:
+                print(java_import, file=fd)
             for code in chain(entity_imports, module_code[module_path]):
                 print(code, file=fd)
 

@@ -7,6 +7,9 @@ from dataclasses import dataclass
 from typing import Final
 from typing import Self
 
+from . import build_tag
+from .custom_error_codes import CUSTOM_ERROR_CODES
+from .custom_error_codes import CustomErrorCode
 from .introspect_schema import base_dir
 
 target_path: Final = base_dir / "src/kio/schema/errors.py"
@@ -74,6 +77,33 @@ class ErrorCode:
         )
 
 
+def merge_error_codes(
+    source_codes: list[ErrorCode],
+    custom_codes: tuple[CustomErrorCode, ...],
+) -> list[ErrorCode]:
+    by_code = {code.code: code for code in source_codes}
+    by_name = {code.name: code for code in source_codes}
+
+    for custom_code in custom_codes:
+        code = ErrorCode(
+            code=custom_code.code,
+            name=custom_code.name,
+            retriable=custom_code.retriable,
+            message=custom_code.message,
+        )
+        existing_code = by_code.get(code.code)
+        existing_name = by_name.get(code.name)
+        if existing_code is None and existing_name is None:
+            by_code[code.code] = code
+            by_name[code.name] = code
+        elif existing_code == code and existing_name == code:
+            continue
+        else:
+            raise ValueError(f"Conflicting custom error code: {code!r}")
+
+    return sorted(by_code.values(), key=lambda value: value.code)
+
+
 def main() -> None:
     try:
         source_path = pathlib.Path(sys.argv[1])
@@ -92,8 +122,12 @@ def main() -> None:
     ):
         print(module_setup, file=target_fd)
 
-        for line in source_fd.readlines():
-            code = ErrorCode.parse_line(line)
+        source_codes = [ErrorCode.parse_line(line) for line in source_fd.readlines()]
+        error_codes = merge_error_codes(
+            source_codes,
+            CUSTOM_ERROR_CODES.get(build_tag, ()),
+        )
+        for code in error_codes:
             print(
                 f"{indent}{code.name} = {code.code}, {code.retriable}",
                 file=target_fd,

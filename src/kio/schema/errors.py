@@ -291,3 +291,5 @@ class ErrorCode(enum.IntEnum):
     """The supplied topology epoch is outdated."""
     share_session_limit_reached = 133, True
     """The limit of share sessions has been reached."""
+    controller_id_not_registered = 136, False
+    """The given controller ID was not registered."""

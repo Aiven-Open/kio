@@ -13,6 +13,16 @@ response for version 12 of the metadata API, you would import it like so.
 
     from kio.schema.metadata.v12.request import MetadataRequest
 
+Aiven protocol extensions
+-------------------------
+
+KIO also includes the pre-KIP Aiven ``DecommissionController`` v0 extension
+at API key 94. Its request and response wire layout is compatible with the
+upstream ``UnregisterController`` v0 API introduced by KIP-1312, but the
+Aiven operation records a decommission marker and does not physically remove
+the controller registration. KIO provides only the protocol types; server
+lifecycle behavior belongs to the Kafka implementation and its caller.
+
 Introspection protocols
 -----------------------
 
