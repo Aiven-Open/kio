@@ -1,4 +1,5 @@
 import datetime
+import tracemalloc
 
 from io import BytesIO
 
@@ -54,6 +55,23 @@ class TestReadSignedCompactStringAsBytesNullable:
             match=r"^Invalid length for signed compact string: -2$",
         ):
             read_signed_compact_string_as_bytes_nullable(buffer.getvalue(), 0)
+
+    def test_does_not_copy_whole_buffer(self, buffer: BytesIO) -> None:
+        # Buffers can hold many records, so copying the full buffer per string
+        # read makes parsing quadratic.
+        write_signed_varint(buffer, 5)
+        buffer.write(b"abcde")
+        data = buffer.getvalue() + bytes(10_000_000)
+
+        tracemalloc.start()
+        try:
+            result, _ = read_signed_compact_string_as_bytes_nullable(data, 0)
+            _, peak = tracemalloc.get_traced_memory()
+        finally:
+            tracemalloc.stop()
+
+        assert result == b"abcde"
+        assert peak < 1_000_000
 
 
 def test_read_header(buffer: BytesIO) -> None:
