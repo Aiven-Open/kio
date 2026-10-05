@@ -7,6 +7,7 @@ from typing import TypeVar
 from crc32c import crc32c
 from typing_extensions import Buffer
 
+from kio.serial.errors import BufferUnderflow
 from kio.serial.readers import Reader
 from kio.serial.readers import SizedResult
 from kio.serial.readers import read_int8
@@ -35,8 +36,11 @@ def read_signed_compact_string_as_bytes_nullable(
         raise ValueError(f"Invalid length for signed compact string: {string_length}")
     string_start_offset = offset + length_size
     string_end_offset = string_start_offset + string_length
+    buffer_slice = memoryview(buffer)[string_start_offset:string_end_offset]
+    if len(buffer_slice) < string_length:
+        raise BufferUnderflow("Buffer is exhausted")
     return (
-        bytes(memoryview(buffer)[string_start_offset:string_end_offset]),
+        bytes(buffer_slice),
         length_size + string_length,
     )
 
