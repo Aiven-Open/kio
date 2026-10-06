@@ -12,6 +12,7 @@ from kio.records.schema import Record
 from kio.records.schema import RecordBatch
 from kio.records.schema import RecordHeader
 from kio.records.writers import write_batch
+from kio.serial.errors import BufferUnderflow
 from kio.serial.writers import write_int8
 from kio.serial.writers import write_int16
 from kio.serial.writers import write_int32
@@ -72,6 +73,15 @@ class TestReadSignedCompactStringAsBytesNullable:
 
         assert result == b"abcde"
         assert peak < 1_000_000
+
+    def test_raises_buffer_underflow(
+        self,
+        buffer: BytesIO,
+    ) -> None:
+        write_signed_varint(buffer, 5)
+        buffer.write(b"abcd")
+        with pytest.raises(BufferUnderflow):
+            read_signed_compact_string_as_bytes_nullable(buffer.getvalue(), 0)
 
 
 def test_read_header(buffer: BytesIO) -> None:
