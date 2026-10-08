@@ -15,7 +15,7 @@ runs:
   steps:
     - name: Install setuptools-scm
       shell: bash
-      run: python -m pip install --upgrade "setuptools-scm==10.2.0"
+      run: python -m pip install --upgrade "setuptools-scm==10.3.4"
 
     - name: Generate src/kio/_version.py
       shell: bash
