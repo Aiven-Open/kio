@@ -59,7 +59,7 @@ async def async_buffers() -> AsyncIterator[
     reader = asyncio.StreamReader()
     reader_protocol = asyncio.StreamReaderProtocol(reader)
     loop = asyncio.get_running_loop()
-    read_transport, _ = await loop.connect_read_pipe(
+    _read_transport, _ = await loop.connect_read_pipe(
         protocol_factory=lambda: reader_protocol,
         pipe=os.fdopen(read_fd),
     )

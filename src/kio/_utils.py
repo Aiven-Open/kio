@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 from typing import Protocol
 from typing import TypeVar
 
-__all__ = ("cache", "DataclassInstance")
+__all__ = ("DataclassInstance", "cache")
 
 
 # Work-around for broken support for cache decorators in

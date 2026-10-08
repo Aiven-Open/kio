@@ -24,5 +24,5 @@ def exhaust(
     offset: int = 0,
 ) -> T:
     value, remaining = read(reader, buffer, offset)
-    assert remaining == b""
+    assert bytes(remaining) == b""
     return value

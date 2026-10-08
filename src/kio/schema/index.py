@@ -7,10 +7,10 @@ from typing import TypeAlias
 from kio.static.constants import EntityType
 
 __all__ = (
+    "LoadableEntityType",
+    "PayloadEntityType",
     "api_key_map",
     "schema_name_map",
-    "PayloadEntityType",
-    "LoadableEntityType",
 )
 
 PayloadEntityType: TypeAlias = Literal[EntityType.response, EntityType.request]

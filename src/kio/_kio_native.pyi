@@ -27,8 +27,8 @@ from kio.static.primitive import uvarint
 from kio.static.primitive import uvarlong
 from kio.static.protocol import Entity
 
-T = TypeVar("T")
-E = TypeVar("E", bound=Entity)
+_T = TypeVar("_T")
+_E = TypeVar("_E", bound=Entity)
 
 def read_boolean(
     buffered: Buffer,
@@ -181,24 +181,24 @@ def read_signed_varlong(
     /,
 ) -> SizedResult[svarlong]: ...
 def tz_aware_from_i64(timestamp_ms: i64) -> TZAware: ...
-def compact_array_reader(item_reader: Reader[T]) -> Reader[tuple[T, ...] | None]: ...
-def legacy_array_reader(item_reader: Reader[T]) -> Reader[tuple[T, ...] | None]: ...
+def compact_array_reader(item_reader: Reader[_T]) -> Reader[tuple[_T, ...] | None]: ...
+def legacy_array_reader(item_reader: Reader[_T]) -> Reader[tuple[_T, ...] | None]: ...
 @overload
 def entity_reader(
-    entity_type: type[E],
+    entity_type: type[_E],
     nullable: Literal[False] = ...,
-) -> Reader[E]: ...
+) -> Reader[_E]: ...
 @overload
 def entity_reader(
-    entity_type: type[E],
+    entity_type: type[_E],
     nullable: Literal[True],
-) -> Reader[E | None]: ...
+) -> Reader[_E | None]: ...
 def get_field_reader(
     entity_type: type[Entity],
-    field: Field[T],
+    field: Field[_T],
     is_request_header: bool,
     is_tagged_field: bool,
-) -> Reader[T]: ...
+) -> Reader[_T]: ...
 def get_reader(
     kafka_type: str,
     flexible: bool,

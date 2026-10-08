@@ -121,7 +121,7 @@ class CorrelationIdMismatch(RuntimeError): ...
 async def read_response_bytes(stream: StreamReader) -> memoryview:
     response_length_bytes = memoryview(await stream.readexactly(4))
     response_length, remaining = read(read_int32, response_length_bytes)
-    assert remaining == b""
+    assert bytes(remaining) == b""
     return memoryview(await stream.readexactly(response_length))
 
 
@@ -169,7 +169,7 @@ async def make_request(
             response_type,
             correlation_id,
         )
-        assert remaining == b""
+        assert bytes(remaining) == b""
 
     return response
 
