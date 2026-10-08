@@ -70,7 +70,7 @@ from kio.static.constants import EntityType
 
 def format_default(  # noqa: C901
     type_: Primitive | EntityType | CommonStructType,
-    default: str | int | float | bool,
+    default: str | float | bool,
     optional: bool,
     custom_type: CustomTypeDef | None,
 ) -> str:
@@ -140,7 +140,7 @@ def format_default(  # noqa: C901
 
 def format_dataclass_field(
     field_type: Primitive | PrimitiveArrayType | EntityType | CommonStructType,
-    default: str | int | float | bool | None,
+    default: str | float | bool | None,
     optional: bool,
     custom_type: CustomTypeDef | None,
     tag: int | None,
@@ -719,7 +719,7 @@ def main() -> None:
             schema = parse_file(path)
         except ValidationError as exc:
             exc.add_note(f"💥 Failed parsing schema in {path}")
-            raise exc
+            raise
 
         if isinstance(schema, NoValidVersionSchema):
             continue
@@ -752,7 +752,7 @@ def main() -> None:
                         code=code,
                     )
                 case no_match:
-                    assert_never(no_match)  # type: ignore[arg-type]
+                    assert_never(no_match)
 
     # We accumulate entity types and process them separately here, so that they can
     # be sorted before written, otherwise they become a source of in-determinism.

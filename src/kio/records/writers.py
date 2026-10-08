@@ -111,10 +111,9 @@ def _write_batch_post_checksum(
 def write_new_batch(buffer: IO[bytes], new_batch: NewRecordBatch) -> None:
     match new_batch.records:
         case (first_record, *_, last_record):
-            first_record = first_record
-            last_record = last_record
+            pass
         case (first_record,):
-            first_record = last_record = first_record
+            last_record = first_record
         case _:
             raise ValueError("Need at least one record to construct batch")
 

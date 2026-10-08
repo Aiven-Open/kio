@@ -3,6 +3,7 @@ from __future__ import annotations
 import enum
 
 from typing import TYPE_CHECKING
+from typing import Self
 
 from kio.static.primitive import i16
 
@@ -15,7 +16,7 @@ class ErrorCode(enum.IntEnum):
     # conditional check fails.
     if not TYPE_CHECKING:  # pragma: no cover
 
-        def __new__(cls, value: int, retriable: bool) -> ErrorCode:
+        def __new__(cls, value: int, retriable: bool) -> Self:
             normalized_value = i16(value)
             obj = int.__new__(cls, normalized_value)
             obj._value_ = normalized_value

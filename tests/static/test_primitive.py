@@ -266,7 +266,7 @@ class TestTZAware:
             # Testing lower bound.
             datetime.datetime.fromtimestamp(-1, tz=datetime.UTC),
             # No timezone.
-            datetime.datetime(2024, 1, 1),
+            datetime.datetime(2024, 1, 1),  # noqa: DTZ001
         ),
     )
     def test_invalid_value_is_not_instance(self, value: object) -> None:

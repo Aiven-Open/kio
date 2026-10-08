@@ -25,7 +25,7 @@ jobs:
             manylinux: musllinux_1_2
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.14"
       - name: Set release version
@@ -35,11 +35,11 @@ jobs:
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
-          maturin-version: v1.14.1
+          maturin-version: v1.15.0
           target: ${{ matrix.platform.target }}
           manylinux: ${{ matrix.platform.manylinux }}
           args: --release --out dist -i 3.11 3.12 3.13 3.14 3.15
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: wheels-linux-${{ matrix.platform.target }}-${{ matrix.platform.manylinux }}
           path: dist
@@ -53,7 +53,7 @@ jobs:
         target: [x86_64, aarch64]
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: |
             3.11
@@ -68,10 +68,10 @@ jobs:
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
-          maturin-version: v1.14.1
+          maturin-version: v1.15.0
           target: ${{ matrix.target }}
           args: --release --out dist --find-interpreter
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: wheels-macos-${{ matrix.target }}
           path: dist
@@ -81,7 +81,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: |
             3.11
@@ -96,10 +96,10 @@ jobs:
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
-          maturin-version: v1.14.1
+          maturin-version: v1.15.0
           target: x64
           args: --release --out dist --find-interpreter
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: wheels-windows-x64
           path: dist
@@ -109,7 +109,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.14"
       - name: Set release version
@@ -119,10 +119,10 @@ jobs:
       - name: Build sdist
         uses: PyO3/maturin-action@v1
         with:
-          maturin-version: v1.14.1
+          maturin-version: v1.15.0
           command: sdist
           args: --out dist
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: sdist
           path: dist
@@ -137,12 +137,12 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           pattern: wheels-*
           merge-multiple: true
           path: dist
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: sdist
           path: dist
