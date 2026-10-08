@@ -1,3 +1,5 @@
+extend = "../pyproject.toml"
+
 [lint]
 extend-ignore = [
   "T201",  # print() is intentional output in benchmark scripts

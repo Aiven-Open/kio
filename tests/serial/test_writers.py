@@ -52,11 +52,11 @@ from kio.static.primitive import i32Timedelta
 from kio.static.primitive import i64Timedelta
 from kio.static.primitive import uvarint
 
-_I = TypeVar("_I", bound=int, contravariant=True)
+_I_contra = TypeVar("_I_contra", bound=int, contravariant=True)
 
 
-class IntWriterContract(Generic[_I]):
-    write_function: Writer[_I]
+class IntWriterContract(Generic[_I_contra]):
+    write_function: Writer[_I_contra]
     lower_limit: int
     lower_limit_as_bytes: bytes
     upper_limit: int
@@ -77,7 +77,7 @@ class IntWriterContract(Generic[_I]):
 
     @classmethod
     def call_function(cls, buffer: io.BytesIO, value: int) -> None:
-        cls.write_function(buffer, cast(_I, value))
+        cls.write_function(buffer, cast(_I_contra, value))
 
     def test_raises_struct_error_when_exceeding_lower_limit(
         self,

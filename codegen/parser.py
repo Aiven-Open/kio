@@ -456,8 +456,6 @@ class CommonStructSchema(BaseModel):
         This is implemented with a recursive function, but guarding itself against a
         situation where it's no longer making progress.
         """
-        global structs_registry
-
         if not isinstance(value, Sequence) or not value:
             return value  # type: ignore[return-value]
 
@@ -541,6 +539,6 @@ def parse_file(
         exc.add_note(
             f"\n🧑‍🚒 Location of last error: {location}, value:\n\n{extracted}\n"
         )
-        raise exc
+        raise
 
     return parsed_schema.__root__

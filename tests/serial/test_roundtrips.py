@@ -75,11 +75,11 @@ def test_booleans_roundtrip_sync(a: bool, b: bool) -> None:
     assert parsed_b is b
 
 
-_I = TypeVar("_I", bound=int | None, contravariant=True)
+_I_contra = TypeVar("_I_contra", bound=int | None, contravariant=True)
 
 
 def create_integer_roundtrip_test(
-    int_writer: Writer[_I],
+    int_writer: Writer[_I_contra],
     int_reader: Reader[int | None],
     min_value: int,
     max_value: int,
@@ -91,7 +91,7 @@ def create_integer_roundtrip_test(
 
     class Test:
         @parameterize
-        def test_roundtrip(self, a: _I, b: _I) -> None:
+        def test_roundtrip(self, a: _I_contra, b: _I_contra) -> None:
             buffer = io.BytesIO()
             int_writer(buffer, a)
             int_writer(buffer, b)

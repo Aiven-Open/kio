@@ -265,8 +265,7 @@ class TestReadUnsignedVarint(BufferUnderflowContract):
     valid_serialization = b"\x00"
 
     def test_raises_value_error_for_too_long_value(self, buffer: io.BytesIO) -> None:
-        for _ in range(5):
-            buffer.write(0b10000001.to_bytes(1, "little"))
+        buffer.writelines(0b10000001.to_bytes(1, "little") for _ in range(5))
         with pytest.raises(ValueError, match=r"^Varint is too long"):
             self.read(buffer)
 

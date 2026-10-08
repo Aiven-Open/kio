@@ -44,7 +44,7 @@ def _wrap_hook(hook):
     @functools.wraps(hook)
     def wrapper(*args, **kwargs) -> str:
         print("Generating version file with setuptools-scm.")
-        setuptools_scm_process = subprocess.run(  # noqa: S603
+        setuptools_scm_process = subprocess.run(
             [
                 sys.executable,
                 "-m",

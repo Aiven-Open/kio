@@ -147,8 +147,12 @@ extend-ignore = [
   "E501",
   # Allow function calls in argument defaults.
   "B008",
+  # Allow function calls in dataclass field defaults.
+  "RUF009",
   # Bad advice, builtin syntax is simpler than imports.
   "SIM105",
+  # Parsers accept `object` and reject input of the wrong shape, that's a ValueError.
+  "TRY004",
 ]
 
 [tool.ruff.lint.isort]
@@ -194,4 +198,12 @@ forbidden_modules = "tests"
 name = "kio.static.primitive is independent"
 type = "forbidden"
 source_modules = "kio.static.primitive"
-forbidden_modules = ["kio.*", "kio.schema.*"]
+forbidden_modules = [
+  "kio._utils",
+  "kio.index",
+  "kio.records",
+  "kio.schema",
+  "kio.serial",
+  "kio.static.constants",
+  "kio.static.protocol",
+]

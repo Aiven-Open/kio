@@ -35,7 +35,7 @@ def is_optional(field: Field) -> bool:
         type_args = get_args(field.type)
         match type_args:
             case (inner_type, EllipsisType()):
-                inner_type = inner_type
+                pass
             case _:
                 raise SchemaError(
                     f"Field {field.name} has invalid tuple type args: {type_args}"
