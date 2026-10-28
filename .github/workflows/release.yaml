@@ -60,7 +60,7 @@ jobs:
             3.12
             3.13
             3.14
-            3.15-dev
+            3.15
       - name: Set release version
         uses: ./.github/actions/set-version
         with:
@@ -88,7 +88,7 @@ jobs:
             3.12
             3.13
             3.14
-            3.15-dev
+            3.15
       - name: Set release version
         uses: ./.github/actions/set-version
         with:
