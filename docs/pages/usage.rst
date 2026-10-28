@@ -57,15 +57,17 @@ to Apache Kafka®, and receive and parse the response into a full entity.
             stream_writer.write(request_buffer.getvalue())
             await stream_writer.drain()
 
-            # Read response into a temporary buffer.
-            response_length_bytes = await stream.readexactly(4)
-            response_length = read_int32(io.BytesIO(response_length_bytes))
-            response_buffer = io.BytesIO(await stream_reader.readexactly(response_length))
+            # Read message size, then message itself, from the connection stream.
+            response_length, _ = read_int32(await stream_reader.readexactly(4), 0)
+            response_bytes = await stream_reader.readexactly(response_length)
 
-        # Parse header and payload from response buffer.
-        response_header = read_header(response_buffer)
+        # Parse header and payload from response bytes. Readers return the parsed
+        # value along with the number of bytes consumed, which is the offset to
+        # continue reading the payload from.
+        response_header, header_size = read_header(response_bytes, 0)
         assert response_header.correlation_id == correlation_id
-        return read_metadata(response_buffer)
+        response, _ = read_metadata(response_bytes, header_size)
+        return response
 
 
 Synchronous writing and reading
@@ -124,11 +126,12 @@ blocking facilities for IO.
             stream.write(message_buffer.getvalue())
             stream.flush()
 
-            # Read response into a buffer.
-            response_length = read_int32(stream)
-            response_buffer = io.BytesIO(stream.read(response_length))
+            # Read message size, then message itself, from the connection stream.
+            response_length, _ = read_int32(stream.read(4), 0)
+            response_bytes = stream.read(response_length)
 
-        # Parse header and payload from response buffer.
-        response_header = read_header(response_buffer)
+        # Parse header and payload from response bytes.
+        response_header, header_size = read_header(response_bytes, 0)
         assert response_header.correlation_id == correlation_id
-        return read_metadata(response_buffer)
+        response, _ = read_metadata(response_bytes, header_size)
+        return response
