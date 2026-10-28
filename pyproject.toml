@@ -86,6 +86,7 @@ addopts = """\
 --durations=5 \
 """
 asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 # Promote warnings to errors.
 filterwarnings = [
   "error",
