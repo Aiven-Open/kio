@@ -5,8 +5,11 @@ from io import BytesIO
 
 import pytest
 
+from crc32c import crc32c
+
 from kio.records.readers import read_batch
 from kio.records.readers import read_header
+from kio.records.readers import read_record
 from kio.records.readers import read_signed_compact_string_as_bytes_nullable
 from kio.records.schema import Record
 from kio.records.schema import RecordBatch
@@ -18,6 +21,7 @@ from kio.serial.writers import write_int16
 from kio.serial.writers import write_int32
 from kio.serial.writers import write_int64
 from kio.serial.writers import write_signed_varint
+from kio.serial.writers import write_signed_varlong
 from kio.serial.writers import write_uint32
 from kio.static.primitive import TZAwareMicros
 from kio.static.primitive import i8
@@ -95,6 +99,36 @@ def test_read_header(buffer: BytesIO) -> None:
         value=b"bcdef",
     )
     assert size == 12
+
+
+class TestReadRecord:
+    def test_raises_value_error_for_inconsistent_record_length(
+        self,
+        buffer: BytesIO,
+    ) -> None:
+        # record length, one byte more than the fields that follow
+        write_signed_varint(buffer, 7)
+        # attributes
+        write_int8(buffer, i8(0))
+        # timestamp delta
+        write_signed_varlong(buffer, 0)
+        # offset delta
+        write_signed_varint(buffer, 0)
+        # key
+        write_signed_varint(buffer, -1)
+        # value
+        write_signed_varint(buffer, -1)
+        # header count
+        write_signed_varint(buffer, 0)
+
+        with pytest.raises(
+            ValueError,
+            match=(
+                r"^Record data contains inconsistently sized data that does not "
+                r"match the record length$"
+            ),
+        ):
+            read_record(buffer.getvalue(), i64(0), i64(0), 0)
 
 
 class TestReadBatch:
@@ -279,5 +313,52 @@ class TestReadBatch:
         with pytest.raises(
             ValueError,
             match=r"^Record has timestamp larger than batch max timestamp$",
+        ):
+            read_batch(buffer.getvalue(), 0)
+
+    def test_raises_value_error_for_inconsistent_batch_length(
+        self,
+        buffer: BytesIO,
+    ) -> None:
+        with BytesIO() as checksummed:
+            # attributes
+            write_int16(checksummed, i16(0))
+            # last offset delta
+            write_int32(checksummed, i32(0))
+            # base timestamp
+            write_int64(checksummed, i64(0))
+            # max timestamp
+            write_int64(checksummed, i64(0))
+            # producer id
+            write_int64(checksummed, i64(-1))
+            # producer epoch
+            write_int16(checksummed, i16(-1))
+            # base sequence
+            write_int32(checksummed, i32(-1))
+            # record count
+            write_int32(checksummed, i32(0))
+            # trailing byte not accounted for by any record
+            write_int8(checksummed, i8(0))
+            checksummed_data = checksummed.getvalue()
+
+        # base offset
+        write_int64(buffer, i64(0))
+        # batch length, covering partition leader epoch, magic byte, crc, and the
+        # checksummed data
+        write_int32(buffer, i32(9 + len(checksummed_data)))
+        # partition leader epoch
+        write_int32(buffer, i32(0))
+        # magic byte value
+        write_int8(buffer, RecordBatch.magic)
+        # crc
+        write_uint32(buffer, u32(crc32c(checksummed_data)))
+        buffer.write(checksummed_data)
+
+        with pytest.raises(
+            ValueError,
+            match=(
+                r"^Record batch data contains inconsistently sized data that does "
+                r"not match the batch length$"
+            ),
         ):
             read_batch(buffer.getvalue(), 0)

@@ -278,3 +278,9 @@ class TestTZAware:
                 datetime.datetime.max.replace(tzinfo=datetime.UTC)
                 + datetime.timedelta(milliseconds=1)
             )
+
+    def test_truncate_discards_microseconds(self) -> None:
+        value = datetime.datetime(2024, 1, 1, 12, 0, 0, 123456, tzinfo=datetime.UTC)
+        truncated = TZAware.truncate(value)
+        assert isinstance(truncated, TZAware)
+        assert truncated == datetime.datetime(2024, 1, 1, 12, tzinfo=datetime.UTC)
