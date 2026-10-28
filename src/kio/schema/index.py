@@ -114,11 +114,22 @@ api_key_map: Final[APIKeyMap] = MappingProxyType(
         90: "describe_share_group_offsets",
         91: "alter_share_group_offsets",
         92: "delete_share_group_offsets",
+        93: "streams_group_topology_description_update",
+        94: "unregister_controller",
     }
 )
 
 schema_name_map: Final[SchemaNameMap] = MappingProxyType(
     {
+        "aborted_txn": MappingProxyType(
+            {
+                0: MappingProxyType(
+                    {
+                        EntityType.data: ("kio.schema.aborted_txn.v0.data:AbortedTxn"),
+                    }
+                ),
+            }
+        ),
         "add_offsets_to_txn": MappingProxyType(
             {
                 0: MappingProxyType(
@@ -482,6 +493,16 @@ schema_name_map: Final[SchemaNameMap] = MappingProxyType(
                         ),
                         EntityType.response: (
                             "kio.schema.api_versions.v4.response:ApiVersionsResponse"
+                        ),
+                    }
+                ),
+                5: MappingProxyType(
+                    {
+                        EntityType.request: (
+                            "kio.schema.api_versions.v5.request:ApiVersionsRequest"
+                        ),
+                        EntityType.response: (
+                            "kio.schema.api_versions.v5.response:ApiVersionsResponse"
                         ),
                     }
                 ),
@@ -1000,6 +1021,16 @@ schema_name_map: Final[SchemaNameMap] = MappingProxyType(
                         ),
                         EntityType.response: (
                             "kio.schema.delete_groups.v2.response:DeleteGroupsResponse"
+                        ),
+                    }
+                ),
+                3: MappingProxyType(
+                    {
+                        EntityType.request: (
+                            "kio.schema.delete_groups.v3.request:DeleteGroupsRequest"
+                        ),
+                        EntityType.response: (
+                            "kio.schema.delete_groups.v3.response:DeleteGroupsResponse"
                         ),
                     }
                 ),
@@ -3391,6 +3422,16 @@ schema_name_map: Final[SchemaNameMap] = MappingProxyType(
                         ),
                     }
                 ),
+                1: MappingProxyType(
+                    {
+                        EntityType.request: (
+                            "kio.schema.streams_group_describe.v1.request:StreamsGroupDescribeRequest"
+                        ),
+                        EntityType.response: (
+                            "kio.schema.streams_group_describe.v1.response:StreamsGroupDescribeResponse"
+                        ),
+                    }
+                ),
             }
         ),
         "streams_group_heartbeat": MappingProxyType(
@@ -3402,6 +3443,30 @@ schema_name_map: Final[SchemaNameMap] = MappingProxyType(
                         ),
                         EntityType.response: (
                             "kio.schema.streams_group_heartbeat.v0.response:StreamsGroupHeartbeatResponse"
+                        ),
+                    }
+                ),
+                1: MappingProxyType(
+                    {
+                        EntityType.request: (
+                            "kio.schema.streams_group_heartbeat.v1.request:StreamsGroupHeartbeatRequest"
+                        ),
+                        EntityType.response: (
+                            "kio.schema.streams_group_heartbeat.v1.response:StreamsGroupHeartbeatResponse"
+                        ),
+                    }
+                ),
+            }
+        ),
+        "streams_group_topology_description_update": MappingProxyType(
+            {
+                0: MappingProxyType(
+                    {
+                        EntityType.request: (
+                            "kio.schema.streams_group_topology_description_update.v0.request:StreamsGroupTopologyDescriptionUpdateRequest"
+                        ),
+                        EntityType.response: (
+                            "kio.schema.streams_group_topology_description_update.v0.response:StreamsGroupTopologyDescriptionUpdateResponse"
                         ),
                     }
                 ),
@@ -3533,6 +3598,16 @@ schema_name_map: Final[SchemaNameMap] = MappingProxyType(
                         ),
                     }
                 ),
+                6: MappingProxyType(
+                    {
+                        EntityType.request: (
+                            "kio.schema.txn_offset_commit.v6.request:TxnOffsetCommitRequest"
+                        ),
+                        EntityType.response: (
+                            "kio.schema.txn_offset_commit.v6.response:TxnOffsetCommitResponse"
+                        ),
+                    }
+                ),
             }
         ),
         "unregister_broker": MappingProxyType(
@@ -3544,6 +3619,20 @@ schema_name_map: Final[SchemaNameMap] = MappingProxyType(
                         ),
                         EntityType.response: (
                             "kio.schema.unregister_broker.v0.response:UnregisterBrokerResponse"
+                        ),
+                    }
+                ),
+            }
+        ),
+        "unregister_controller": MappingProxyType(
+            {
+                0: MappingProxyType(
+                    {
+                        EntityType.request: (
+                            "kio.schema.unregister_controller.v0.request:UnregisterControllerRequest"
+                        ),
+                        EntityType.response: (
+                            "kio.schema.unregister_controller.v0.response:UnregisterControllerResponse"
                         ),
                     }
                 ),

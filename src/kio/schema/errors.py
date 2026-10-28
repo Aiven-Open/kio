@@ -273,7 +273,7 @@ class ErrorCode(enum.IntEnum):
     invalid_share_session_epoch = 123, True
     """The share session epoch is invalid."""
     fenced_state_epoch = 124, False
-    """The share coordinator rejected the request because the share-group state epoch did not match."""
+    """The coordinator rejected the request because the state epoch did not match."""
     invalid_voter_key = 125, False
     """The voter key doesn't match the receiving replica's key."""
     duplicate_voter = 126, False
@@ -292,3 +292,9 @@ class ErrorCode(enum.IntEnum):
     """The supplied topology epoch is outdated."""
     share_session_limit_reached = 133, True
     """The limit of share sessions has been reached."""
+    group_deletion_failed = 134, False
+    """DeleteGroups could not complete; see the error message on the per-group result for details."""
+    streams_topology_description_update_failed = 135, False
+    """The broker could not process the topology description update; see the error message for details."""
+    controller_id_not_registered = 136, False
+    """The given controller ID was not registered."""

@@ -79,9 +79,9 @@ class EndpointToPartitions:
     user_endpoint: Endpoint
     """User-defined endpoint to connect to the node"""
     active_partitions: tuple[TopicPartition, ...]
-    """All topic partitions materialized by active tasks on the node"""
+    """The source topic partitions, including repartition source topics, of the active tasks assigned to this member"""
     standby_partitions: tuple[TopicPartition, ...]
-    """All topic partitions materialized by standby tasks on the node"""
+    """The source topic partitions, including repartition source topics, of the standby and warm-up tasks assigned to this member"""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -103,8 +103,8 @@ class StreamsGroupHeartbeatResponse:
     """The member epoch."""
     heartbeat_interval: i32Timedelta = field(metadata={"kafka_type": "timedelta_i32"})
     """The heartbeat interval in milliseconds."""
-    acceptable_recovery_lag: i32 = field(metadata={"kafka_type": "int32"})
-    """The maximal lag a warm-up task can have to be considered caught-up."""
+    acceptable_recovery_lag_legacy: i32 = field(metadata={"kafka_type": "int32"})
+    """Deprecated. The maximum acceptable lag (number of offsets to catch up) for a client to be considered caught-up enough to receive an active task assignment. Use AcceptableRecoveryLag instead."""
     task_offset_interval: i32Timedelta = field(metadata={"kafka_type": "timedelta_i32"})
     """The interval in which the task changelog offsets on a client are updated on the broker. The offsets are sent with the next heartbeat after this time has passed."""
     status: tuple[Status, ...] | None
@@ -118,4 +118,4 @@ class StreamsGroupHeartbeatResponse:
     endpoint_information_epoch: i32 = field(metadata={"kafka_type": "int32"})
     """The endpoint epoch set in the response"""
     partitions_by_user_endpoint: tuple[EndpointToPartitions, ...] | None
-    """Global assignment information used for IQ. Null if unchanged since last heartbeat."""
+    """Global assignment information used for IQ. There is one entry per member, so several entries carry the same UserEndpoint when a client runs more than one stream thread; clients must union the entries of an endpoint. Null if unchanged since last heartbeat."""

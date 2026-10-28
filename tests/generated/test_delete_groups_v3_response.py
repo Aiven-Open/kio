@@ -1,0 +1,56 @@
+from __future__ import annotations
+
+from typing import Final
+
+import pytest
+
+from hypothesis import given
+from hypothesis.strategies import from_type
+
+from kio.schema.delete_groups.v3.response import DeletableGroupResult
+from kio.schema.delete_groups.v3.response import DeleteGroupsResponse
+from kio.serial import entity_reader
+from kio.serial import entity_writer
+from tests.conftest import JavaTester
+from tests.conftest import setup_buffer
+
+read_deletable_group_result: Final = entity_reader(DeletableGroupResult)
+
+
+@pytest.mark.roundtrip
+@given(from_type(DeletableGroupResult))
+def test_deletable_group_result_roundtrip(instance: DeletableGroupResult) -> None:
+    writer = entity_writer(DeletableGroupResult)
+    with setup_buffer() as buffer:
+        writer(buffer, instance)
+        result, _ = read_deletable_group_result(
+            buffer.getvalue(),
+            0,
+        )
+
+    assert instance == result
+
+
+read_delete_groups_response: Final = entity_reader(DeleteGroupsResponse)
+
+
+@pytest.mark.roundtrip
+@given(from_type(DeleteGroupsResponse))
+def test_delete_groups_response_roundtrip(instance: DeleteGroupsResponse) -> None:
+    writer = entity_writer(DeleteGroupsResponse)
+    with setup_buffer() as buffer:
+        writer(buffer, instance)
+        result, _ = read_delete_groups_response(
+            buffer.getvalue(),
+            0,
+        )
+
+    assert instance == result
+
+
+@pytest.mark.java
+@given(instance=from_type(DeleteGroupsResponse))
+def test_delete_groups_response_java(
+    instance: DeleteGroupsResponse, java_tester: JavaTester
+) -> None:
+    java_tester.test(instance)

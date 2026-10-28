@@ -64,8 +64,10 @@ class TxnOffsetCommitRequest:
     """The current producer ID in use by the transactional ID."""
     producer_epoch: i16 = field(metadata={"kafka_type": "int16"})
     """The current epoch associated with the producer ID."""
-    generation_id: i32 = field(metadata={"kafka_type": "int32"}, default=i32(-1))
-    """The generation of the consumer."""
+    generation_id_or_member_epoch: i32 = field(
+        metadata={"kafka_type": "int32"}, default=i32(-1)
+    )
+    """The generation of the group if using the classic group protocol or the member epoch if using the consumer protocol."""
     member_id: str = field(metadata={"kafka_type": "string"}, default="")
     """The member ID assigned by the group coordinator."""
     group_instance_id: str | None = field(

@@ -61,6 +61,7 @@ class RootMessageInfo {
             && !shortClassName.equals("VotersRecord")
             && !shortClassName.equals("ControlRecordTypeSchema")
             && !shortClassName.equals("EndTxnMarker")
+            && !shortClassName.equals("AbortedTxn")
         ) {
             className += "Data";
         }

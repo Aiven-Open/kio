@@ -31,6 +31,7 @@ settings.register_profile(
     suppress_health_check=[
         hypothesis.HealthCheck.too_slow,
         hypothesis.HealthCheck.filter_too_much,
+        hypothesis.HealthCheck.data_too_large,
     ],
     derandomize=True,
     max_examples=5,
@@ -41,6 +42,7 @@ settings.register_profile(
     suppress_health_check=[
         hypothesis.HealthCheck.too_slow,
         hypothesis.HealthCheck.filter_too_much,
+        hypothesis.HealthCheck.data_too_large,
     ],
 )
 
