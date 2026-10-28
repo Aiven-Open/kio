@@ -192,6 +192,10 @@ jobs:
       - name: Run integration tests
         run: python -X dev -m pytest -m integration
 
+      - name: Show Kafka logs
+        if: ${{ !cancelled() }}
+        run: docker compose logs kafka
+
   check-generate-schema:
     name: Check schema
     runs-on: ubuntu-latest

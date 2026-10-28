@@ -33,6 +33,10 @@ from kio.schema.fetch.v13.request import FetchPartition
 from kio.schema.fetch.v13.request import FetchRequest
 from kio.schema.fetch.v13.request import FetchTopic
 from kio.schema.fetch.v13.response import FetchResponse
+from kio.schema.list_offsets.v8 import ListOffsetsRequest
+from kio.schema.list_offsets.v8 import ListOffsetsResponse
+from kio.schema.list_offsets.v8.request import ListOffsetsPartition
+from kio.schema.list_offsets.v8.request import ListOffsetsTopic
 from kio.schema.metadata.v5 import request as metadata_v5_request
 from kio.schema.metadata.v5 import response as metadata_v5_response
 from kio.schema.metadata.v12 import request as metadata_v12_request
@@ -369,6 +373,38 @@ async def create_topic(topic_name: TopicName) -> CreateTopicsResponse:
     )
 
 
+async def wait_for_partition_leaders(topic: CreatableTopicResult) -> None:
+    # The broker applies created topics asynchronously, and takes leadership of their
+    # partitions only after it has started including them in metadata responses, so
+    # requests made right after creating a topic can fail with not_leader_or_follower.
+    request = ListOffsetsRequest(
+        replica_id=BrokerId(-1),
+        isolation_level=i8(0),
+        topics=(
+            ListOffsetsTopic(
+                name=topic.name,
+                partitions=tuple(
+                    ListOffsetsPartition(
+                        partition_index=i32(partition_index),
+                        timestamp=i64(-1),
+                    )
+                    for partition_index in range(topic.num_partitions)
+                ),
+            ),
+        ),
+    )
+    async with asyncio.timeout(10):
+        while True:
+            response = await make_request(request, ListOffsetsResponse)
+            (topic_response,) = response.topics
+            if all(
+                partition.error_code is ErrorCode.none
+                for partition in topic_response.partitions
+            ):
+                return
+            await asyncio.sleep(0.1)
+
+
 async def metadata_v12(topic: TopicName) -> metadata_v12_response.MetadataResponse:
     return await make_request(
         request=metadata_v12_request.MetadataRequest(
@@ -433,7 +469,7 @@ async def test_topic_and_metadata_operations() -> None:
     )
     (created_topic,) = create_topics_response.topics
 
-    # The previous creation call should guarantee this call contains the topic.
+    await wait_for_partition_leaders(created_topic)
     response_v12 = await metadata_v12(created_topic.name)
     assert response_v12 == metadata_v12_response.MetadataResponse(
         throttle_time=timedelta_zero,
@@ -514,6 +550,7 @@ async def test_produce_consume() -> None:
     )
     (created_topic,) = create_topics_response.topics
 
+    await wait_for_partition_leaders(created_topic)
     metadata = await metadata_v12(topic_name)
     (topic,) = metadata.topics
     partition, _, _ = topic.partitions
