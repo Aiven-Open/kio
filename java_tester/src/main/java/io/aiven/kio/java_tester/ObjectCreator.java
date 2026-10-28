@@ -93,6 +93,8 @@ class ObjectCreator<T> extends BaseCreator {
                 if (buffer != null) {
                     setter.invoke(instance, MemoryRecords.readableRecords(buffer));
                 }
+            } else if (fieldValue.isNull()) {
+                setter.invoke(instance, (Object) null);
             } else {
                 Object o = new ObjectCreator<>(
                     rootMessageInfo, new EntityClass<>(parameterType), fieldSchema).create(fieldValue);
