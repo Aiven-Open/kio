@@ -23,13 +23,15 @@
 - Message classes are simple light-weight data containers that do not inherit anything
   or expose any methods other than a regular dataclass. Encoding and decoding is enabled
   by making all the necessary details about Kafka encoding introspectable.
-- Widely compatible encoding and decoding of messages, writing to any `IO[bytes]` and
-  reading from any object that implements the buffer protocol.
+- A [sans-IO] protocol implementation, parsing messages from any object that implements
+  the buffer protocol and serializing them to any `IO[bytes]`.
+- Parsing is implemented natively in Rust.
 - Test suite with focus on roundtrip property tests using Hypothesis, including
   compatibility testing against the internals of upstream Apache Kafka®.
 
 [schema-source]:
   https://github.com/apache/kafka/tree/trunk/clients/src/main/resources/common/message
+[sans-IO]: https://sans-io.readthedocs.io/how-to-sans-io.html
 
 ## Installation
 
