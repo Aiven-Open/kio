@@ -1,6 +1,15 @@
 Usage examples
 ==============
 
+kio performs no IO of its own, so the examples below manage the connection to the broker
+themselves. Only the IO differs between the asynchronous and the synchronous example;
+the calls into kio are identical.
+
+The examples are minimal, showing only what it takes to send a single request and parse
+its response. Everything else a client needs around its network connections, such as
+retries, timeouts, error handling, and multiplexing requests over a connection, is the
+responsibility of the calling code.
+
 Asynchronous writing and reading
 --------------------------------
 
